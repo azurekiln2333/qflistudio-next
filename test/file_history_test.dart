@@ -3,7 +3,12 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:flutter/material.dart';
 import 'package:qflistudio/services/file_backup.dart';
+import 'package:qflistudio/store/auth_store.dart';
+import 'package:qflistudio/store/settings_store.dart';
+import 'package:qflistudio/app.dart';
+import 'package:qflistudio/store/project_store.dart';
 
 void main() {
   late Directory base;
@@ -87,5 +92,32 @@ void main() {
     final after =
         await FileBackup.listVersions(original, projectName: 'proj');
     expect(after.length, before.length);
+  });
+
+  testWidgets('启动页：ready=false 显示品牌启动页，ready=true 进入主页', (tester) async {
+    final ready = ValueNotifier<bool>(false);
+    final store = ProjectStore(
+      storageFile: File(p.join(base.path, 'projects.json')),
+    );
+    final auth = AuthStore(
+      storageFile: File(p.join(base.path, 'auth.json')),
+    );
+    await tester.pumpWidget(QfliApp(
+      store: store,
+      auth: auth,
+      settings: SettingsStore(),
+      ready: ready,
+    ));
+    await tester.pump();
+    expect(find.text('QFLIStudio+'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    ready.value = true;
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 3),
+    );
+    expect(find.byType(NavigationBar), findsOneWidget);
   });
 }

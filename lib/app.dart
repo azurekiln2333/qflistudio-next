@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'store/auth_store.dart';
 import 'store/project_store.dart';
 import 'store/settings_store.dart';
 import 'pages/home_page.dart';
+import 'splash_screen.dart';
 
 class QfliApp extends StatelessWidget {
   const QfliApp({
@@ -11,6 +13,7 @@ class QfliApp extends StatelessWidget {
     required this.store,
     required this.auth,
     this.settings,
+    this.ready,
   });
 
   final ProjectStore store;
@@ -18,6 +21,10 @@ class QfliApp extends StatelessWidget {
 
   /// 应用设置；未传入时用未加载的默认值（测试场景）。
   final SettingsStore? settings;
+
+  /// 启动完成信号：false 时显示品牌启动页（数据后台加载）。
+  /// 默认 null = 立即就绪（测试/预览场景直接进主页）。
+  final ValueListenable<bool>? ready;
 
   /// 品牌色：basic_blue #2196F3、basic_deep_blue #1976D2。
   ///
@@ -31,17 +38,25 @@ class QfliApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'QFLIStudio+',
-      debugShowCheckedModeBanner: false,
-      theme: _buildTheme(Brightness.light),
-      darkTheme: _buildTheme(Brightness.dark),
-      themeMode: ThemeMode.system,
-      home: HomePage(
-        store: store,
-        auth: auth,
-        settings: settings ?? SettingsStore(),
-      ),
+    return ListenableBuilder(
+      listenable: ready ?? ValueNotifier<bool>(true),
+      builder: (context, _) {
+        final isReady = ready?.value ?? true;
+        return MaterialApp(
+          title: 'QFLIStudio+',
+          debugShowCheckedModeBanner: false,
+          theme: _buildTheme(Brightness.light),
+          darkTheme: _buildTheme(Brightness.dark),
+          themeMode: ThemeMode.system,
+          home: isReady
+              ? HomePage(
+                  store: store,
+                  auth: auth,
+                  settings: settings ?? SettingsStore(),
+                )
+              : const SplashScreen(),
+        );
+      },
     );
   }
 
