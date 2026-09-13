@@ -31,6 +31,7 @@ import 'highlight_themes.dart';
 import 'open_file.dart';
 import 'project_history.dart';
 import 'terminal_pane.dart';
+import '../pages/settings_page.dart';
 import 'ai_panel.dart';
 
 enum _BottomPanel { none, terminal, ai }
@@ -424,7 +425,11 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
   }
 
   Future<void> _openInitialFile(String path) async {
-    final error = await _editor.openPath(path);
+    // 模板主文件是相对路径（如 src/main.py），必须拼到项目根下。
+    final abs = p.isAbsolute(path)
+        ? path
+        : p.join(widget.project.path, path);
+    final error = await _editor.openPath(abs);
     if (error != null && mounted) {
       ScaffoldMessenger.of(
         context,
@@ -765,6 +770,15 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                               ? _BottomPanel.none
                                               : _BottomPanel.terminal,
                                         );
+                                      case 'settings':
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) => SettingsPage(
+                                              settings: widget.settings,
+                                              auth: widget.auth,
+                                            ),
+                                          ),
+                                        );
                                       case 'ai':
                                         setState(
                                           () => _bottomPanel = _bottomPanel ==
@@ -895,6 +909,16 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ),
+                                    const PopupMenuItem(
+                                      value: 'settings',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.settings_outlined, size: 20),
+                                          SizedBox(width: 12),
+                                          Text('设置'),
+                                        ],
+                                      ),
+                                    ),
                                     PopupMenuItem(
                                       value: 'ai',
                                       child: Row(

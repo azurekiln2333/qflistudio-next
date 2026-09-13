@@ -31,9 +31,14 @@ class EditorFindPanel extends StatelessWidget implements PreferredSizeWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           color: scheme.surfaceContainerHigh,
-          child: Row(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: MediaQuery.sizeOf(context).width - 24),
+            child: Row(
             children: [
-              Expanded(
+              SizedBox(
+                width: 180,
                 child: TextField(
                   controller: controller.findInputController,
                   focusNode: controller.findInputFocusNode,
@@ -99,6 +104,8 @@ class EditorFindPanel extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
+          ),
+          ),
         );
       },
     );
@@ -138,9 +145,12 @@ class EditorFindReplacePanel extends StatelessWidget
             EditorFindPanel(controller: controller, readOnly: false),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+              child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  Expanded(
+                  SizedBox(
+                    width: 220,
                     child: TextField(
                       controller: controller.replaceInputController,
                       focusNode: controller.replaceInputFocusNode,
@@ -163,6 +173,7 @@ class EditorFindReplacePanel extends StatelessWidget
                     child: const Text('全部替换'),
                   ),
                 ],
+              ),
               ),
             ),
           ],
