@@ -97,9 +97,9 @@ const wchar_t* WindowClassRegistrar::GetWindowClass() {
     window_class.hInstance = GetModuleHandle(nullptr);
     window_class.hIcon =
         LoadIcon(window_class.hInstance, MAKEINTRESOURCE(IDI_APP_ICON));
-    // 窗口背景刷使用品牌主题的 surface 色（#F8F9FF），
+    // 窗口背景刷使用纯白（亮色启动页同色），
     // 消除引擎首帧渲染前的白屏闪烁。
-    window_class.hbrBackground = CreateSolidBrush(RGB(248, 249, 255));
+    window_class.hbrBackground = CreateSolidBrush(RGB(255, 255, 255));
     window_class.lpszMenuName = nullptr;
     window_class.lpfnWndProc = Win32Window::WndProc;
     RegisterClass(&window_class);

@@ -6,72 +6,41 @@ import 'store/auth_store.dart';
 import 'store/project_store.dart';
 import 'store/settings_store.dart';
 
-/// 启动页：与原生启动遮罩同底色（亮 #F8F9FF / 暗 #111418），无缝衔接。
-/// 数据由 main 的 bootstrap 并行加载，加载完且停留满最短时长后淡出。
+/// 启动页：Flutter 原生组件，纯白/纯黑背景自适应，
+/// 应用图标居中，进度条压在屏幕底部。
+/// 背景色与原生启动遮罩（startWindowBackground / launch_background）
+/// 保持一致：亮色纯白、深色纯黑，遮罩消失时零跳变。
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    // 与 ohos startWindowBackground / Android splash_background 完全一致，
-    // 遮罩消失时视觉零跳变。
-    final background = brightness == Brightness.dark
-        ? const Color(0xFF111418)
-        : const Color(0xFFF8F9FF);
-    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: background,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 84,
-              height: 84,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    scheme.primary,
-                    scheme.tertiary.withValues(alpha: 0.85),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: scheme.primary.withValues(alpha: 0.25),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.terminal,
-                size: 44,
-                color: Colors.white,
+      backgroundColor: isDark ? Colors.black : Colors.white,
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Image.asset(
+                'assets/app_icon.png',
+                width: 96,
+                height: 96,
+                filterQuality: FilterQuality.high,
               ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              'QFLIStudio+',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
-                  ),
+          ),
+          // 进度条压底：不定色（组件自适应明暗），细条全宽。
+          const LinearProgressIndicator(minHeight: 3),
+          // 深色模式下底部安全区不影响进度条贴底观感。
+          SizedBox(
+            height: MediaQuery.paddingOf(context).bottom,
+            width: double.infinity,
+            child: ColoredBox(
+              color: isDark ? Colors.black : Colors.white,
             ),
-            const SizedBox(height: 28),
-            SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.4,
-                color: scheme.primary,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -109,8 +109,9 @@ void main() {
       ready: ready,
     ));
     await tester.pump();
-    expect(find.text('QFLIStudio+'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    // 应用图标（Image.asset）+ 底部进度条
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
 
     ready.value = true;
     await tester.pumpAndSettle(
