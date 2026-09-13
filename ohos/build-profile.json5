@@ -1,0 +1,53 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/Keystore/azurekiln.p12",
+          "storePassword": "0000001CA7F6BC41986FF3909299687F844B69B8805A79FCEA6661848C4DD47397FC3D835204D0CE0E6B8CF2",
+          "keyAlias": "azurekiln",
+          "keyPassword": "0000001C5BB5DB9DF0C553CDCD17CE2D35758E8B5594D2803A930EC44E1CD1026EB1EAF47E73358ED3C14FB3",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/Keystore/qfli_profileDebug.p7b",
+          "certpath": "D:/Keystore/qflistudio.cer"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.1.1(24)"
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "profile"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
