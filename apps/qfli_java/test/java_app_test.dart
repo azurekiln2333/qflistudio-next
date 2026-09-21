@@ -36,15 +36,14 @@ void main() {
 
   group('档位收窄', () {
     test('新建项目只放行「空项目」和 Java', () {
-      expect(
-        javaProfile.filterTemplates(ProjectTemplate.values),
-        [ProjectTemplate.empty, ProjectTemplate.java],
-      );
+      expect(javaProfile.filterTemplates(ProjectTemplate.values), [
+        ProjectTemplate.empty,
+        ProjectTemplate.java,
+      ]);
     });
 
     test('默认模板是 Java 而不是空项目', () {
-      expect(javaProfile.defaultTemplate,
-          ProjectTemplate.java);
+      expect(javaProfile.defaultTemplate, ProjectTemplate.java);
     });
 
     test('语言筛选芯片只剩 Java', () {
@@ -54,7 +53,8 @@ void main() {
     });
 
     test('产品名带 Java 版后缀', () {
-      expect(javaProfile.appTitle, 'QFLIStudio+ Java 版');
+      expect(javaProfile.appTitle, 'QFLIJVMX');
+      expect(javaProfile.showEditorTabs, isFalse);
     });
   });
 

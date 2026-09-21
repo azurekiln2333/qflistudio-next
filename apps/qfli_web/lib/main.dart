@@ -11,7 +11,7 @@ import 'package:qfli_studio_core/store/project_store.dart';
 import 'package:qfli_studio_core/store/settings_store.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLIStudio+ Web 版';
+const String _appTitle = StudioProductCatalog.webForge;
 
 /// Web 版档位：同一套内核 UI，收窄成只服务 Web。
 ///
@@ -21,6 +21,7 @@ const StudioProfile webProfile = StudioProfile(
   appTitle: _appTitle,
   templates: [ProjectTemplate.empty, ProjectTemplate.html],
   isOffline: true,
+  showEditorTabs: false,
   // 本版不注入运行后端：`.html` 交给内核已有的分流逻辑——它会起一个本地静态
   // 服务器、注入调试桥，并把 console 输出回传到编辑器。也就是说 Web 版的
   // 「运行」能力内核已经具备，这里少写一行反而是完整的。

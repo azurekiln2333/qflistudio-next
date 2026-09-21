@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'c_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLIStudio+ C 版';
+const String _appTitle = StudioProductCatalog.forge;
 
 /// C 版档位：同一套内核 UI，收窄成只服务 C 语言。
 ///
@@ -25,6 +25,7 @@ const StudioProfile cProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.c],
   runner: CProgramRunner(),
   isOffline: true,
+  showEditorTabs: false,
   // `main.c` 排在默认入口表前面，保证 C 版一定先命中它。
   entryFileNames: ['main.c', 'src/main.c'],
 );

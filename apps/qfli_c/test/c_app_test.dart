@@ -65,8 +65,10 @@ void main() {
 
   group('档位收窄', () {
     test('新建项目只放行「空项目」和 C', () {
-      expect(cProfile.filterTemplates(ProjectTemplate.values),
-          [ProjectTemplate.empty, ProjectTemplate.c]);
+      expect(cProfile.filterTemplates(ProjectTemplate.values), [
+        ProjectTemplate.empty,
+        ProjectTemplate.c,
+      ]);
     });
 
     test('默认模板是 C 而不是空项目', () {
@@ -80,7 +82,8 @@ void main() {
     });
 
     test('产品名带 C 版后缀', () {
-      expect(cProfile.appTitle, 'QFLIStudio+ C 版');
+      expect(cProfile.appTitle, 'QFLIForge');
+      expect(cProfile.showEditorTabs, isFalse);
     });
   });
 
@@ -88,22 +91,28 @@ void main() {
     test('优先命中 main.c', () {
       write('main.c', 'int main(void) { return 0; }');
       write('main.py', 'print("hi")');
-      expect(RunnerService.findEntry(project.path),
-          p.join(project.path, 'main.c'));
+      expect(
+        RunnerService.findEntry(project.path),
+        p.join(project.path, 'main.c'),
+      );
     });
 
     test('main.c 在 src/ 下也能找到', () {
       write('src/main.c', 'int main(void) { return 0; }');
       // 入口表里写的是 'src/main.c'，p.join 不会改动段内已有的分隔符。
-      expect(RunnerService.findEntry(project.path),
-          p.join(project.path, 'src/main.c'));
+      expect(
+        RunnerService.findEntry(project.path),
+        p.join(project.path, 'src/main.c'),
+      );
     });
 
     test('没有 C 文件时不误报入口', () {
       write('main.py', 'print("hi")');
       // 默认入口表里的 main.py 仍会命中，但 C 版的运行后端不会接管它。
-      expect(RunnerService.findEntry(project.path),
-          p.join(project.path, 'main.py'));
+      expect(
+        RunnerService.findEntry(project.path),
+        p.join(project.path, 'main.py'),
+      );
     });
   });
 
@@ -260,7 +269,8 @@ int main(void) {
 
     test('GBK 编码的源码不会读崩', () async {
       // 用 GBK 字节写中文注释和字符串，模拟从 Windows 记事本存出来的文件。
-      const source = '#include <stdio.h>\n'
+      const source =
+          '#include <stdio.h>\n'
           'int main(void) {\n'
           '    printf("你好\\n");  // 中文注释\n'
           '    return 0;\n'
@@ -297,14 +307,20 @@ int main(void) {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
-    void mockNative({required bool available, Map<String, Object?>? runResult}) {
+    void mockNative({
+      required bool available,
+      Map<String, Object?>? runResult,
+    }) {
       messenger.setMockMethodCallHandler(channel, (call) async {
         switch (call.method) {
           case 'available':
             return available;
           case 'run':
             if (runResult == null) {
-              throw PlatformException(code: 'QFLI_C_NATIVE_FAILED', message: '解释器崩了');
+              throw PlatformException(
+                code: 'QFLI_C_NATIVE_FAILED',
+                message: '解释器崩了',
+              );
             }
             return runResult;
           default:
@@ -338,7 +354,10 @@ int main(void) {
     test('原生后端只把 .c 交给 picoc，头文件走 #include', () async {
       write('utils.h', 'int triple(int x);');
       write('utils.c', 'int triple(int x) { return x * 3; }');
-      write('main.c', '#include "utils.h"\nint main(void) { return triple(1); }');
+      write(
+        'main.c',
+        '#include "utils.h"\nint main(void) { return triple(1); }',
+      );
       final seen = <String>[];
       messenger.setMockMethodCallHandler(channel, (call) async {
         if (call.method == 'available') return true;

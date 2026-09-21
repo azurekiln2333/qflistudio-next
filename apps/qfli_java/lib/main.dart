@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'java_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLIStudio+ Java 版';
+const String _appTitle = StudioProductCatalog.jvmx;
 
 /// Java 版档位：同一套内核 UI，收窄成只服务 Java。
 ///
@@ -24,6 +24,7 @@ const StudioProfile javaProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.java],
   runner: JavaProgramRunner(),
   isOffline: true,
+  showEditorTabs: false,
   // Main.java 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['Main.java', 'src/Main.java'],
 );

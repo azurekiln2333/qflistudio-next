@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'lua_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLIStudio+ Lua 版';
+const String _appTitle = StudioProductCatalog.script;
 
 /// Lua 版档位：同一套内核 UI，收窄成只服务 Lua。
 ///
@@ -23,6 +23,7 @@ const StudioProfile luaProfile = StudioProfile(
   appTitle: _appTitle,
   templates: [ProjectTemplate.empty, ProjectTemplate.lua],
   isOffline: true,
+  showEditorTabs: false,
   runner: LuaProgramRunner(),
   // main.lua 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.lua', 'src/main.lua'],

@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'python_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLIStudio+ Python 版';
+const String _appTitle = StudioProductCatalog.pyFlow;
 
 /// Python 版档位：同一套内核 UI，收窄成只服务 Python。
 ///
@@ -24,6 +24,7 @@ const StudioProfile pythonProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.python],
   runner: PythonProgramRunner(),
   isOffline: true,
+  showEditorTabs: false,
   // main.py 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.py', 'src/main.py'],
 );

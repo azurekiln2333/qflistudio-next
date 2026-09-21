@@ -32,9 +32,7 @@ const int _notRun = PythonProgramRunner.notRunExitCode;
 ///
 /// 传 null 表示「这个构建里没有原生后端」——等价于设备上没打进 `.so`，
 /// 此时 `invokeMethod` 会抛 `MissingPluginException`。
-void _installNativeHandler(
-  Future<Object?> Function(MethodCall call)? handler,
-) {
+void _installNativeHandler(Future<Object?> Function(MethodCall call)? handler) {
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(_nativeChannel, handler);
 }
@@ -45,13 +43,12 @@ Map<String, Object?> _outcome({
   String output = '',
   String? error,
   bool truncated = false,
-}) =>
-    <String, Object?>{
-      'exitCode': exitCode,
-      'output': output,
-      'error': error,
-      'truncated': truncated,
-    };
+}) => <String, Object?>{
+  'exitCode': exitCode,
+  'output': output,
+  'error': error,
+  'truncated': truncated,
+};
 
 /// `available` 的返回结构（与 ArkTS 侧 PyProbeResult 一致）。
 ///
@@ -61,12 +58,11 @@ Map<String, Object?> _probe({
   bool available = true,
   String version = '1.24.1 (ecfdd5d)',
   String detail = '',
-}) =>
-    <String, Object?>{
-      'available': available,
-      'version': version,
-      'detail': detail,
-    };
+}) => <String, Object?>{
+  'available': available,
+  'version': version,
+  'detail': detail,
+};
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -92,18 +88,17 @@ void main() {
     file.writeAsStringSync(content);
   }
 
-  Future<ProgramRunResult?> runEntry(String entry) =>
-      pythonProfile.runner!.run(
-        projectPath: project.path,
-        entryFile: p.join(project.path, entry),
-      );
+  Future<ProgramRunResult?> runEntry(String entry) => pythonProfile.runner!.run(
+    projectPath: project.path,
+    entryFile: p.join(project.path, entry),
+  );
 
   group('档位收窄', () {
     test('新建项目只放行「空项目」和 Python', () {
-      expect(
-        pythonProfile.filterTemplates(ProjectTemplate.values),
-        [ProjectTemplate.empty, ProjectTemplate.python],
-      );
+      expect(pythonProfile.filterTemplates(ProjectTemplate.values), [
+        ProjectTemplate.empty,
+        ProjectTemplate.python,
+      ]);
     });
 
     test('默认模板是 Python 而不是空项目', () {
@@ -117,7 +112,8 @@ void main() {
     });
 
     test('产品名带 Python 版后缀', () {
-      expect(pythonProfile.appTitle, 'QFLIStudio+ Python 版');
+      expect(pythonProfile.appTitle, 'QFLIPyFlow');
+      expect(pythonProfile.showEditorTabs, isFalse);
     });
   });
 
@@ -335,8 +331,13 @@ void main() {
       expect(result!.title, contains('缺少 Python 执行后端'));
       final lines = await result.stdout.toList();
       // ArkTS 侧给的原因要原样透出来——它比 Dart 侧猜的准。
-      expect(lines, contains('$_appPrefix'
-          'libqfli_py.so 没能加载：dlopen 阶段就失败了。'));
+      expect(
+        lines,
+        contains(
+          '$_appPrefix'
+          'libqfli_py.so 没能加载：dlopen 阶段就失败了。',
+        ),
+      );
       expect(await result.exitCode, _notRun);
     });
 

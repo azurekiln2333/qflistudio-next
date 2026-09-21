@@ -36,15 +36,14 @@ void main() {
 
   group('档位收窄', () {
     test('新建项目只放行「空项目」和 Dart', () {
-      expect(
-        dartProfile.filterTemplates(ProjectTemplate.values),
-        [ProjectTemplate.empty, ProjectTemplate.dart],
-      );
+      expect(dartProfile.filterTemplates(ProjectTemplate.values), [
+        ProjectTemplate.empty,
+        ProjectTemplate.dart,
+      ]);
     });
 
     test('默认模板是 Dart 而不是空项目', () {
-      expect(dartProfile.defaultTemplate,
-          ProjectTemplate.dart);
+      expect(dartProfile.defaultTemplate, ProjectTemplate.dart);
     });
 
     test('语言筛选芯片只剩 Dart', () {
@@ -53,8 +52,9 @@ void main() {
       expect(dartProfile.filterLanguages(all), ['Dart']);
     });
 
-    test('产品名带 Dart 版后缀', () {
-      expect(dartProfile.appTitle, 'QFLIStudio+ Dart 版');
+    test('产品名使用 QFLIStudio+', () {
+      expect(dartProfile.appTitle, 'QFLIStudio+');
+      expect(dartProfile.showEditorTabs, isFalse);
     });
   });
 

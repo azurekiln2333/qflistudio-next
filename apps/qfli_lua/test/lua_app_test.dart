@@ -53,7 +53,8 @@ void main() {
     });
 
     test('产品名带 Lua 版后缀', () {
-      expect(luaProfile.appTitle, 'QFLIStudio+ Lua 版');
+      expect(luaProfile.appTitle, 'QFLIScript');
+      expect(luaProfile.showEditorTabs, isFalse);
     });
 
     test('档位只使用本地能力', () {

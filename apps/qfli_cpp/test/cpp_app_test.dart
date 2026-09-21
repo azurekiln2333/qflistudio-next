@@ -53,7 +53,8 @@ void main() {
     });
 
     test('产品名带 C++ 版后缀', () {
-      expect(cppProfile.appTitle, 'QFLIStudio+ C++ 版');
+      expect(cppProfile.appTitle, 'QFLIForge');
+      expect(cppProfile.showEditorTabs, isFalse);
     });
 
     test('档位只使用本地能力', () {

@@ -40,10 +40,10 @@ void main() {
 
   group('档位收窄', () {
     test('新建项目只放行「空项目」和 Web', () {
-      expect(
-        webProfile.filterTemplates(ProjectTemplate.values),
-        [ProjectTemplate.empty, ProjectTemplate.html],
-      );
+      expect(webProfile.filterTemplates(ProjectTemplate.values), [
+        ProjectTemplate.empty,
+        ProjectTemplate.html,
+      ]);
     });
 
     test('默认模板是 Web', () {
@@ -60,7 +60,8 @@ void main() {
     });
 
     test('产品名带 Web 版后缀', () {
-      expect(webProfile.appTitle, 'QFLIStudio+ Web 版');
+      expect(webProfile.appTitle, 'QFLIWebForge');
+      expect(webProfile.showEditorTabs, isFalse);
     });
   });
 
