@@ -12,6 +12,7 @@ import { common, Want, ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
+import { handlePickerCall, isPickerMethod } from './PickerBridge';
 
 const CHANNEL_PLATFORM = 'qflistudio/platform';
 const CHANNEL_HUAWEI = 'qflistudio/huawei_account';
@@ -77,6 +78,8 @@ export default class EntryAbility extends FlutterAbility {
             .catch((err: BusinessError) => {
               result.error('SHARE_FAILED', `${err.code}: ${err.message}`, null);
             });
+        } else if (isPickerMethod(call.method)) {
+          handlePickerCall(abilityContext, call, result);
         } else {
           result.notImplemented();
         }
