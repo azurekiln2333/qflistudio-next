@@ -2,6 +2,19 @@ import 'project_templates.dart';
 
 /// 产品线名称登记表。语言 App 的 UI 标题从这里取，后续新增产品时不必散落硬编码。
 abstract final class StudioProductCatalog {
+  static const qfliStudioKey = 'qflistudio';
+  static const scriptKey = 'script';
+  static const rustCoreKey = 'rustcore';
+  static const goShiftKey = 'goshift';
+  static const jvmxKey = 'jvmx';
+  static const webForgeKey = 'webforge';
+  static const pyFlowKey = 'pyflow';
+  static const forgeKey = 'forge';
+  static const dartWingKey = 'dartwing';
+  static const sqlabKey = 'sqlab';
+  static const jsonKey = 'json';
+  static const noteKey = 'note';
+
   static const qfliStudio = 'QFLIStudio+';
   static const qfliStudioDescription = '多语言编辑器（暂定）';
   static const script = 'QFLIScript';
@@ -11,17 +24,37 @@ abstract final class StudioProductCatalog {
   static const webForge = 'QFLIWebForge';
   static const pyFlow = 'QFLIPyFlow';
   static const forge = 'QFLIForge';
+  static const dartWing = 'QFLIDartWing';
   static const sqlab = 'QFLISQLab';
   static const json = 'QFLIJson';
-  static const regex = 'QFLIRegex';
-  static const diff = 'QFLIDiff';
-  static const encode = 'QFLIEncode';
-  static const toolbox = 'QFLIToolbox';
   static const note = 'QFLINote';
 
-  /// 已登记的语言产品名称。未创建独立 App 的产品也先在这里保留命名。
+  /// The only installable products. Keep this list as the product identity source.
+  static const products = <String, String>{
+    qfliStudioKey: qfliStudio,
+    scriptKey: script,
+    rustCoreKey: rustCore,
+    goShiftKey: goShift,
+    jvmxKey: jvmx,
+    webForgeKey: webForge,
+    pyFlowKey: pyFlow,
+    forgeKey: forge,
+    dartWingKey: dartWing,
+    sqlabKey: sqlab,
+    jsonKey: json,
+    noteKey: note,
+  };
+
+  static const packagePrefix = 'com.azurekiln.qfli';
+
+  static String packageName(String key) => '$packagePrefix.$key';
+
+  /// Product name by source language/type. This is also used for tutorial labels.
   static const languageProducts = <String, String>{
     'lua': script,
+    'javascript': script,
+    'typescript': script,
+    'shell': script,
     'java': jvmx,
     'web': webForge,
     'python': pyFlow,
@@ -29,10 +62,14 @@ abstract final class StudioProductCatalog {
     'cpp': forge,
     'rust': rustCore,
     'go': goShift,
+    'dart': dartWing,
+    'sql': sqlab,
+    'json': json,
+    'markdown': note,
   };
 
   static String forLanguage(String language) =>
-      languageProducts[language] ?? qfliStudio;
+      languageProducts[language.toLowerCase()] ?? qfliStudio;
 }
 
 /// 语言专属 App 的「档位」。

@@ -10,25 +10,27 @@ import 'package:qfli_studio_core/store/auth_store.dart';
 import 'package:qfli_studio_core/store/project_store.dart';
 import 'package:qfli_studio_core/store/settings_store.dart';
 
-import 'c_runner.dart';
+import 'forge_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
 const String _appTitle = StudioProductCatalog.forge;
 
-/// C 版档位：同一套内核 UI，收窄成只服务 C 语言。
+/// Forge 档位：同一套内核 UI，收窄成 C/C++ 工具。
 ///
 /// 新建项目只出现 C 模板，运行按钮交给应用内的 C 解释器。
 /// 单独提出来是为了让测试能直接断言档位，而不必为了一个常量去跑 `main()`。
-const StudioProfile cProfile = StudioProfile(
-  id: 'c',
+const StudioProfile forgeProfile = StudioProfile(
+  id: 'forge',
   appTitle: _appTitle,
-  templates: [ProjectTemplate.empty, ProjectTemplate.c],
-  runner: CProgramRunner(),
+  templates: [ProjectTemplate.empty, ProjectTemplate.c, ProjectTemplate.cpp],
+  runner: ForgeProgramRunner(),
   isOffline: true,
   showEditorTabs: false,
-  // `main.c` 排在默认入口表前面，保证 C 版一定先命中它。
-  entryFileNames: ['main.c', 'src/main.c'],
+  entryFileNames: ['main.c', 'src/main.c', 'main.cpp', 'src/main.cpp'],
 );
+
+/// Backwards-compatible name for integrations that imported the former C profile.
+const StudioProfile cProfile = forgeProfile;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

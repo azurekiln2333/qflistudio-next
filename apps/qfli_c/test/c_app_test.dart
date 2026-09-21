@@ -68,6 +68,7 @@ void main() {
       expect(cProfile.filterTemplates(ProjectTemplate.values), [
         ProjectTemplate.empty,
         ProjectTemplate.c,
+        ProjectTemplate.cpp,
       ]);
     });
 
@@ -75,10 +76,10 @@ void main() {
       expect(cProfile.defaultTemplate, ProjectTemplate.c);
     });
 
-    test('语言筛选芯片只剩 C', () {
+    test('语言筛选芯片只剩 C 和 C++', () {
       // 首页传给档位的候选本来就不含「空项目」——它不是一门语言。
       const all = ['C', 'Python', 'Java', 'C++', 'Web'];
-      expect(cProfile.filterLanguages(all), ['C']);
+      expect(cProfile.filterLanguages(all), ['C', 'C++']);
     });
 
     test('产品名使用 QFLIForge', () {
@@ -444,13 +445,14 @@ int main(void) { printf("dart\\n"); return 0; }
       expect(result, isNull);
     });
 
-    test('C++ 入口也交回内核（本版不做 C++）', () async {
+    test('C++ 入口由 Forge 的 C++ 后端接管', () async {
       write('main.cpp', 'int main() { return 0; }');
       final result = await cProfile.runner!.run(
         projectPath: project.path,
         entryFile: p.join(project.path, 'main.cpp'),
       );
-      expect(result, isNull);
+      expect(result, isNotNull);
+      expect(result!.title, contains('C++ 运行后端未就绪'));
     });
   });
 }

@@ -17,7 +17,6 @@ workspace:
   - apps/qfli_python
   - apps/qfli_java
   - apps/qfli_dart
-  - apps/qfli_cpp
   - apps/qfli_lua
 
 dependencies:

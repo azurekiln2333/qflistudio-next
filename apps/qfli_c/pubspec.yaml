@@ -1,5 +1,5 @@
 name: qfli_c
-description: "QFLIStudio+ C 版：只做 C 语言的移动端 IDE，本地解释执行，不依赖在线编译服务。"
+description: "QFLIForge：C/C++ 移动端 IDE。"
 publish_to: 'none'
 version: 1.0.0+1
 

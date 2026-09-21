@@ -319,10 +319,11 @@ class _LocalContentError extends StatelessWidget {
 
 String _displayName(String language) {
   final profile = StudioProfile.current;
-  if (profile?.id == language) {
-    return profile!.appTitle
-        .replaceFirst('QFLIStudio+ ', '')
-        .replaceFirst(' 版', '');
+  if (profile?.isOffline == true) {
+    return profile!.appTitle;
   }
-  return language.toUpperCase();
+  final product = StudioProductCatalog.forLanguage(language);
+  return product == StudioProductCatalog.qfliStudio
+      ? language.toUpperCase()
+      : product;
 }
