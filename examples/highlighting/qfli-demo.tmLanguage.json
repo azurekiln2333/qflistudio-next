@@ -1,0 +1,19 @@
+{
+  "name": "QFLI Demo",
+  "scopeName": "source.demo",
+  "fileTypes": ["demo"],
+  "patterns": [
+    { "include": "#strings" },
+    { "name": "comment.line.demo", "match": "//.*$" },
+    { "name": "keyword.control.demo", "match": "\\b(let|return|if|else)\\b" },
+    { "name": "constant.numeric.demo", "match": "\\b[0-9]+\\b" }
+  ],
+  "repository": {
+    "strings": {
+      "name": "string.quoted.double.demo",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [{ "name": "constant.character.escape.demo", "match": "\\\\." }]
+    }
+  }
+}

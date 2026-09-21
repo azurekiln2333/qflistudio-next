@@ -1,0 +1,33 @@
+name: qfli_dart
+description: "QFLIStudio+ Dart 版：手机上的 Dart IDE，本地解释执行。"
+publish_to: 'none'
+version: 1.0.0+1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  qfli_studio_core:
+    path: ../../packages/qfli_studio_core
+
+  cupertino_icons: ^1.0.8
+
+  # dart_runner.dart 用它做路径处理（p.extension / p.basename）。
+  # 不显式声明的话 flutter analyze 会报 depend_on_referenced_packages——
+  # 只是靠传递依赖拿到了包，哪天上游不带了就编不过。
+  path: ^1.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/app_icon.png

@@ -1,0 +1,33 @@
+name: qfli_c
+description: "QFLIStudio+ C 版：只做 C 语言的移动端 IDE，本地解释执行，不依赖在线编译服务。"
+publish_to: 'none'
+version: 1.0.0+1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  qfli_studio_core:
+    path: ../../packages/qfli_studio_core
+  qfli_c_runtime:
+    path: ../../packages/qfli_c_runtime
+
+  # c_runner.dart 直接用到（解析项目内相对路径）。
+  path: ^1.9.1
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/app_icon.png

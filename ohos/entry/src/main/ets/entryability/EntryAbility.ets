@@ -8,7 +8,8 @@ import {
 } from '@ohos/flutter_ohos';
 import { authentication } from '@kit.AccountKit';
 import { systemShare } from '@kit.ShareKit';
-import { common, Want } from '@kit.AbilityKit';
+import { common, Want, ConfigurationConstant } from '@kit.AbilityKit';
+import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
 
@@ -16,6 +17,21 @@ const CHANNEL_PLATFORM = 'qflistudio/platform';
 const CHANNEL_HUAWEI = 'qflistudio/huawei_account';
 
 export default class EntryAbility extends FlutterAbility {
+  onWindowStageCreate(windowStage: window.WindowStage): void {
+    // 启动遮罩消失后、Flutter 首帧渲染前，引擎初始化期间窗口会露出
+    // 默认白底。窗口底色与 Flutter 的 MD3 surface 保持一致。
+    try {
+      const isDark = this.context.config?.colorMode ===
+        ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
+      windowStage.getMainWindowSync().setWindowBackgroundColor(
+        isDark ? '#FF111418' : '#FFF8F9FF',
+      );
+    } catch (e) {
+      // 设置失败不影响启动（仅深色模式可能出现短暂白闪）。
+    }
+    super.onWindowStageCreate(windowStage);
+  }
+
   configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     GeneratedPluginRegistrant.registerWith(flutterEngine)

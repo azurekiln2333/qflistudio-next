@@ -1,0 +1,237 @@
+{
+  "language": "python",
+  "displayName": "Python",
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-19",
+  "runtime": {
+    "kind": "interpreter",
+    "status": "planned",
+    "engine": "应用内 Python 子集解释器（纯 Dart，开发中）",
+    "stdin": "项目根目录放 input.txt，内容就是程序的标准输入",
+    "limits": "单次运行有 10 秒墙钟上限和 2 亿步兜底上限"
+  },
+  "chapters": [
+    {
+      "id": "basics",
+      "title": "第一章 从零开始",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "第一个程序",
+          "summary": "Python 不需要任何仪式感，一行就能跑。",
+          "concepts": ["print", "字符串", "缩进"],
+          "explain": "Python 用缩进（通常是 4 个空格）表示代码块，不用大括号。print 是函数，括号里放要显示的内容。字符串用单引号或双引号都行。",
+          "code": "print(\"Hello, Python!\")\nprint('单引号也可以')\n",
+          "output": "Hello, Python!\n单引号也可以\n",
+          "tasks": [
+            {
+              "prompt": "打印三行，分别是你的名字、年龄和城市。",
+              "hint": "写三个 print 就行。",
+              "answer": "print(\"小明\")\nprint(18)\nprint(\"杭州\")"
+            }
+          ]
+        },
+        {
+          "id": "variables",
+          "title": "变量与类型",
+          "summary": "Python 的变量不用声明类型。",
+          "concepts": ["动态类型", "int", "float", "str", "bool"],
+          "explain": "赋值就是创建变量，类型由值自己决定，而且可以随时变。用 type() 可以看到一个值的类型。这一点和 C、Java 很不一样。",
+          "code": "age = 18\nheight = 1.75\nname = \"小明\"\nis_student = True\n\nprint(age, height, name, is_student)\nprint(type(age), type(height), type(name), type(is_student))\n",
+          "output": "18 1.75 小明 True\n<class 'int'> <class 'float'> <class 'str'> <class 'bool'>\n",
+          "tasks": [
+            {
+              "prompt": "把 age 重新赋成字符串 \"十八\"，再打印它的类型。",
+              "hint": "Python 允许变量换类型，直接重新赋值即可。",
+              "answer": "age = \"十八\"\nprint(type(age))  # <class 'str'>"
+            }
+          ]
+        },
+        {
+          "id": "strings",
+          "title": "字符串操作",
+          "summary": "拼接、重复、f-string 格式化。",
+          "concepts": ["拼接", "f-string", "len"],
+          "explain": "f-string 是 Python 最顺手的格式化方式：在字符串前加 f，然后用 {} 把变量嵌进去。len() 返回长度。",
+          "code": "name = \"小明\"\nage = 18\n\nprint(\"我叫\" + name)\nprint(\"我叫\" + name + \"，今年\" + str(age) + \"岁\")\nprint(f\"我叫{name}，今年{age}岁\")\nprint(\"-\" * 20)\nprint(f\"名字有 {len(name)} 个字\")\n",
+          "output": "我叫小明\n我叫小明，今年18岁\n我叫小明，今年18岁\n--------------------\n名字有 2 个字\n",
+          "tasks": [
+            {
+              "prompt": "用 f-string 打印「商品：苹果，单价 5.5 元，数量 3，合计 16.5 元」。",
+              "hint": "在 {} 里可以直接写表达式，比如 {price * count}。",
+              "answer": "price, count = 5.5, 3\nprint(f\"商品：苹果，单价 {price} 元，数量 {count}，合计 {price * count} 元\")"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "control",
+      "title": "第二章 流程控制",
+      "lessons": [
+        {
+          "id": "if",
+          "title": "条件判断",
+          "summary": "if / elif / else，靠缩进划分层级。",
+          "concepts": ["if", "elif", "缩进"],
+          "explain": "Python 用 elif 而不是 else if。条件后面记得写冒号，下一行缩进。冒号忘了或者缩进不一致，是新手最常遇到的报错。",
+          "code": "score = 85\n\nif score >= 90:\n    print(\"优秀\")\nelif score >= 60:\n    print(\"及格\")\nelse:\n    print(\"不及格\")\n",
+          "output": "及格\n",
+          "tasks": [
+            {
+              "prompt": "再加一个等级：90 以上优秀、80 以上良好、60 以上及格、其余不及格。",
+              "hint": "在优秀和及格之间插一个 elif score >= 80。",
+              "answer": "if score >= 90:\n    print(\"优秀\")\nelif score >= 80:\n    print(\"良好\")\nelif score >= 60:\n    print(\"及格\")\nelse:\n    print(\"不及格\")"
+            }
+          ]
+        },
+        {
+          "id": "loops",
+          "title": "循环",
+          "summary": "for 遍历，while 条件循环，range 生成数列。",
+          "concepts": ["for", "while", "range"],
+          "explain": "Python 的 for 是「遍历一个序列」，range(1, 101) 生成 1 到 100。range(5) 从 0 到 4，range(1, 10, 2) 是 1、3、5、7、9（步长 2）。",
+          "code": "total = 0\nfor i in range(1, 101):\n    total += i\nprint(f\"1 到 100 的和是 {total}\")\n\nn = 5\nwhile n > 0:\n    print(n, end=\" \")\n    n -= 1\nprint(\"发射！\")\n\nfor i in range(1, 10, 2):\n    print(i, end=\" \")\nprint()\n",
+          "output": "1 到 100 的和是 5050\n5 4 3 2 1 发射！\n1 3 5 7 9 \n",
+          "tasks": [
+            {
+              "prompt": "打印 1 到 20 之间所有 3 的倍数。",
+              "hint": "可以用 range(3, 21, 3)，也可以用 if 判断 i % 3 == 0。",
+              "answer": "for i in range(3, 21, 3):\n    print(i, end=\" \")"
+            }
+          ]
+        },
+        {
+          "id": "nested",
+          "title": "嵌套循环：九九乘法表",
+          "summary": "两层循环的经典练习。",
+          "concepts": ["嵌套循环", "end 参数"],
+          "explain": "print 默认每次换行，加 end=\"\" 可以不让它换行，这样内层循环的多个结果就能排在同一行。",
+          "code": "for i in range(1, 10):\n    for j in range(1, i + 1):\n        print(f\"{j}x{i}={i * j}\", end=\"\\t\")\n    print()\n",
+          "output": "1x1=1\t\n1x2=2\t2x2=4\t\n1x3=3\t2x3=6\t3x3=9\t\n...\n",
+          "tasks": [
+            {
+              "prompt": "打印一个 5 行的直角三角形，第 n 行有 n 个星号。",
+              "hint": "print(\"*\" * row) 可以一步搞定，试试用嵌套循环和字符串乘法两种写法。",
+              "answer": "for row in range(1, 6):\n    print(\"*\" * row)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "containers",
+      "title": "第三章 容器",
+      "lessons": [
+        {
+          "id": "lists",
+          "title": "列表",
+          "summary": "Python 最常用的容器。",
+          "concepts": ["list", "下标", "append", "切片"],
+          "explain": "列表可以装不同类型的东西，能随时增删。下标从 0 开始，-1 表示最后一个。切片 fruits[1:3] 取的是下标 1 和 2，不含 3。",
+          "code": "fruits = [\"苹果\", \"香蕉\", \"橙子\"]\nfruits.append(\"葡萄\")\n\nprint(fruits)\nprint(fruits[0], fruits[-1])\nprint(fruits[1:3])\nprint(f\"共 {len(fruits)} 种\")\n\nfor i, fruit in enumerate(fruits, 1):\n    print(f\"{i}. {fruit}\")\n",
+          "output": "['苹果', '香蕉', '橙子', '葡萄']\n苹果 葡萄\n['香蕉', '橙子']\n共 4 种\n1. 苹果\n2. 香蕉\n3. 橙子\n4. 葡萄\n",
+          "tasks": [
+            {
+              "prompt": "把列表倒序打印出来。",
+              "hint": "切片 fruits[::-1] 可以直接得到倒序副本。",
+              "answer": "print(fruits[::-1])"
+            }
+          ]
+        },
+        {
+          "id": "dicts",
+          "title": "字典",
+          "summary": "用名字而不是下标来存数据。",
+          "concepts": ["dict", "键值对", "items"],
+          "explain": "字典存的是「键 → 值」的对应关系，用 [] 按键取值。遍历时用 .items() 能同时拿到键和值。取一个不存在的键会报 KeyError，用 .get() 可以给默认值。",
+          "code": "student = {\"name\": \"小明\", \"age\": 18, \"score\": 88}\n\nprint(student[\"name\"])\nprint(student.get(\"city\", \"未填写\"))\n\nfor key, value in student.items():\n    print(f\"{key} = {value}\")\n",
+          "output": "小明\n未填写\nname = 小明\nage = 18\nscore = 88\n",
+          "tasks": [
+            {
+              "prompt": "统计一句话里每个字出现的次数。",
+              "hint": "遍历字符串，用字典累加：counts[ch] = counts.get(ch, 0) + 1。",
+              "answer": "text = \"你好世界你好\"\ncounts = {}\nfor ch in text:\n    counts[ch] = counts.get(ch, 0) + 1\nprint(counts)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "functions",
+      "title": "第四章 函数",
+      "lessons": [
+        {
+          "id": "functions",
+          "title": "定义函数",
+          "summary": "用 def 把逻辑包起来。",
+          "concepts": ["def", "参数", "return", "默认参数"],
+          "explain": "def 定义函数，return 交回结果（不写 return 就返回 None）。参数可以给默认值，调用时不传就用默认的。",
+          "code": "def greet(name, greeting=\"你好\"):\n    return f\"{greeting}，{name}！\"\n\n\ndef max_of(a, b):\n    return a if a > b else b\n\n\nprint(greet(\"小明\"))\nprint(greet(\"小红\", \"早上好\"))\nprint(max_of(12, 7))\n",
+          "output": "你好，小明！\n早上好，小红！\n12\n",
+          "tasks": [
+            {
+              "prompt": "写一个函数，接收一个列表，返回最大值和最小值。",
+              "hint": "Python 允许 return a, b，调用方用两个变量接。",
+              "answer": "def min_max(nums):\n    return min(nums), max(nums)\n\nlo, hi = min_max([3, 9, 1, 7])\nprint(lo, hi)  # 1 9"
+            }
+          ]
+        },
+        {
+          "id": "modules",
+          "title": "模块与主入口",
+          "summary": "把代码拆进文件，理解 if __name__ == \"__main__\"。",
+          "concepts": ["import", "__main__", "函数拆分"],
+          "explain": "if __name__ == \"__main__\": 的意思是「只有直接运行这个文件时才执行下面的代码」。被别的文件 import 时不会执行。项目大了以后，这个写法能让文件既当脚本跑、又能当模块被引用。",
+          "code": "import math\n\n\ndef area(r):\n    return math.pi * r * r\n\n\nif __name__ == \"__main__\":\n    print(f\"半径 2 的圆面积是 {area(2):.2f}\")\n    print(f\"sqrt(16) = {math.sqrt(16)}\")\n",
+          "output": "半径 2 的圆面积是 12.57\nsqrt(16) = 4.0\n",
+          "tasks": [
+            {
+              "prompt": "用 math 模块算出 30 度的正弦值（保留 3 位小数）。",
+              "hint": "math.sin 收的是弧度，用 math.radians(30) 转换。",
+              "answer": "print(f\"{math.sin(math.radians(30)):.3f}\")  # 0.500"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "io",
+      "title": "第五章 输入与综合练习",
+      "lessons": [
+        {
+          "id": "input",
+          "title": "读取输入",
+          "summary": "用 input() 读一行，记得转换类型。",
+          "concepts": ["input", "int()", "split"],
+          "explain": "本 App 的解释器是「先把输入准备好、再一次性跑完」的模型，所以标准输入要写在项目根目录的 input.txt 里。input() 读到的永远是字符串，要参与算术就得用 int() 或 float() 转换。一行读多个数可以用 input().split()。",
+          "code": "a = int(input())\nb = int(input())\n\nprint(f\"{a} + {b} = {a + b}\")\nprint(f\"{a} - {b} = {a - b}\")\n",
+          "output": "输入（input.txt）：\n17\n5\n\n输出：\n17 + 5 = 22\n17 - 5 = 12\n",
+          "tasks": [
+            {
+              "prompt": "一行读入两个数（空格分隔），输出它们的乘积。",
+              "hint": "x, y = input().split() 之后别忘了转 int。",
+              "answer": "x, y = map(int, input().split())\nprint(x * y)"
+            }
+          ]
+        },
+        {
+          "id": "stats",
+          "title": "综合练习：统计与排序",
+          "summary": "把列表、循环、函数串起来。",
+          "concepts": ["sorted", "sum", "推导式"],
+          "explain": "sorted() 返回排好序的新列表，sum() 求和，max()/min() 找极值。列表推导式 [x for x in ...] 是 Python 很常用的写法，比循环更短。",
+          "code": "nums = [88, 92, 79, 95, 67]\n\nprint(f\"原序：{nums}\")\nprint(f\"排序：{sorted(nums)}\")\nprint(f\"总分：{sum(nums)}\")\nprint(f\"平均：{sum(nums) / len(nums):.1f}\")\nprint(f\"最高：{max(nums)}  最低：{min(nums)}\")\n\npassing = [n for n in nums if n >= 80]\nprint(f\"80 分以上：{passing}\")\n",
+          "output": "原序：[88, 92, 79, 95, 67]\n排序：[67, 79, 88, 92, 95]\n总分：421\n平均：84.2\n最高：95  最低：67\n80 分以上：[88, 92, 95]\n",
+          "tasks": [
+            {
+              "prompt": "把 60 分以下的挑出来单独放一个列表。",
+              "hint": "照着 passing 那行写，条件改成 n < 60。",
+              "answer": "failing = [n for n in nums if n < 60]\nprint(failing)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

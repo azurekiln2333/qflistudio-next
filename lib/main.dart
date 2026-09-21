@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'app.dart';
-import 'splash_screen.dart';
-import 'store/auth_store.dart';
-import 'store/project_store.dart';
-import 'store/settings_store.dart';
+import 'package:qfli_studio_core/app.dart';
+import 'package:qfli_studio_core/splash_screen.dart';
+import 'package:qfli_studio_core/store/auth_store.dart';
+import 'package:qfli_studio_core/store/project_store.dart';
+import 'package:qfli_studio_core/store/settings_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +16,15 @@ Future<void> main() async {
   final ready = ValueNotifier<bool>(false);
   // 先 runApp 品牌启动页（与原生遮罩同色，无白屏），数据后台并行加载。
   runApp(QfliApp(store: store, auth: auth, settings: settings, ready: ready));
-  unawaited(AppBootstrap.run(
-    store: store,
-    auth: auth,
-    settings: settings,
-    ready: ready,
-  ));
+  // 首帧提交后再做磁盘/插件初始化，避免与首帧构建争用主 isolate。
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(
+      AppBootstrap.run(
+        store: store,
+        auth: auth,
+        settings: settings,
+        ready: ready,
+      ),
+    );
+  });
 }

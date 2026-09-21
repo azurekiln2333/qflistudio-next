@@ -1,0 +1,59 @@
+{
+  "language": "cpp",
+  "displayName": "C++",
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-21",
+  "runtime": {
+    "kind": "interpreter",
+    "status": "planned",
+    "engine": "应用内 C++ 解释器（开发中）",
+    "stdin": "项目根目录放 input.txt，内容就是程序的标准输入",
+    "limits": "当前版本只提供编辑器、教程和示例代码，运行后端接入后会更新这里"
+  },
+  "chapters": [
+    {
+      "id": "basics",
+      "title": "第一章 从零开始",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "第一个程序",
+          "summary": "用 iostream 输出第一行 C++ 文本。",
+          "concepts": ["main 函数", "iostream", "cout"],
+          "explain": "C++ 程序从 main 函数开始。iostream 提供输入输出能力，cout 把内容写到标准输出，endl 负责换行并刷新输出。",
+          "code": "#include <iostream>\n\nint main() {\n    std::cout << \"Hello, C++!\" << std::endl;\n    return 0;\n}\n",
+          "output": "Hello, C++!\n",
+          "tasks": [
+            {
+              "prompt": "把问候语改成你的名字。",
+              "hint": "修改 cout 后面的字符串。",
+              "answer": "std::cout << \"你好，小明！\" << std::endl;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "types",
+      "title": "第二章 变量与函数",
+      "lessons": [
+        {
+          "id": "function",
+          "title": "写一个加法函数",
+          "summary": "用函数封装可重复使用的计算。",
+          "concepts": ["函数", "int", "return"],
+          "explain": "函数由返回类型、名称、参数和函数体组成。把计算放进函数后，main 可以多次调用它。",
+          "code": "#include <iostream>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    std::cout << add(20, 22) << std::endl;\n    return 0;\n}\n",
+          "output": "42\n",
+          "tasks": [
+            {
+              "prompt": "增加一个乘法函数并打印结果。",
+              "hint": "复制 add 的结构，把运算符改成 *。",
+              "answer": "int multiply(int a, int b) { return a * b; }"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

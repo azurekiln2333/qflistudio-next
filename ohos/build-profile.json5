@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/Keystore/azurekiln.p12",
-          "storePassword": "0000001CA7F6BC41986FF3909299687F844B69B8805A79FCEA6661848C4DD47397FC3D835204D0CE0E6B8CF2",
-          "keyAlias": "azurekiln",
-          "keyPassword": "0000001C5BB5DB9DF0C553CDCD17CE2D35758E8B5594D2803A930EC44E1CD1026EB1EAF47E73358ED3C14FB3",
+          "storeFile": "D:/Keystore/suanxiwanjie.p12",
+          "storePassword": "0000002091E01AA78AA7EAB873FF1F6432FA2EF8A108F3A0E3562B01850A3C05941FDA377C45D01CF08D92ED6153AABE",
+          "keyAlias": "suanxiwanjie",
+          "keyPassword": "00000020487F9608BBA6BBF7C72AB6562B12A594A479AB70E463412F8BB8E096985F5F175859E5FA2903BBECDA01AF76",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/Keystore/qfli_profileDebug.p7b",
-          "certpath": "D:/Keystore/qflistudio.cer"
+          "profile": "D:/Keystore/qfli26919Debug.p7b",
+          "certpath": "D:/Keystore/suanxiwanjie_debug.cer"
         }
       }
     ],

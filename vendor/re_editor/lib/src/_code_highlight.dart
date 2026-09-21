@@ -1,24 +1,24 @@
 part of re_editor;
 
 class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
-
   final BuildContext _context;
   final _CodeParagraphProvider _provider;
   final _CodeHighlightEngine _engine;
 
   CodeLineEditingController _controller;
   CodeHighlightTheme? _theme;
+  Timer? _debounce;
 
   _CodeHighlighter({
     required BuildContext context,
     required CodeLineEditingController controller,
     CodeHighlightTheme? theme,
-  }) : _context = context,
-    _provider = _CodeParagraphProvider(),
-    _controller = controller,
-    _theme = theme,
-    _engine = _CodeHighlightEngine(theme),
-    super(const []) {
+  })  : _context = context,
+        _provider = _CodeParagraphProvider(),
+        _controller = controller,
+        _theme = theme,
+        _engine = _CodeHighlightEngine(theme),
+        super(const []) {
     _controller.addListener(_onCodesChanged);
     _processHighlight();
   }
@@ -28,6 +28,8 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
       return;
     }
     _controller.removeListener(_onCodesChanged);
+    _debounce?.cancel();
+    _engine.invalidate();
     _controller = value;
     _controller.addListener(_onCodesChanged);
     _processHighlight();
@@ -38,6 +40,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
       return;
     }
     _theme = value;
+    _debounce?.cancel();
     _engine.theme = value;
     _processHighlight();
   }
@@ -50,12 +53,13 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   }) {
     _provider.updateBaseStyle(style);
     _provider.updateMaxLengthSingleLineRendering(maxLengthSingleLineRendering);
-    return _provider.build(_controller.buildTextSpan(
-      context: _context,
-      index: index,
-      textSpan: _buildSpan(index, style),
-      style: style
-    ), maxWidth);
+    return _provider.build(
+        _controller.buildTextSpan(
+            context: _context,
+            index: index,
+            textSpan: _buildSpan(index, style),
+            style: style),
+        maxWidth);
   }
 
   void clearCache() {
@@ -65,6 +69,7 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   @override
   void dispose() {
     _controller.removeListener(_onCodesChanged);
+    _debounce?.cancel();
     _engine.dispose();
     super.dispose();
   }
@@ -72,17 +77,11 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
   TextSpan _buildSpan(int index, TextStyle style) {
     final String text = _controller.codeLines[index].text;
     if (index >= value.length) {
-      return TextSpan(
-        text: text,
-        style: style
-      );
+      return TextSpan(text: text, style: style);
     }
     final _HighlightResult result = value[index];
     if (result.nodes.isEmpty) {
-      return TextSpan(
-        text: text,
-        style: style
-      );
+      return TextSpan(text: text, style: style);
     }
     if (result.source == text) {
       return _buildSpanFromNodes(result.nodes, style);
@@ -103,7 +102,8 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     final List<_HighlightNode> endNodes = [];
     for (int i = result.nodes.length - 1; i >= 0 && start < end; i--) {
       final String value = result.nodes[i].value;
-      if (text.substring(start, end).endsWith(value)) {
+      if (value.length <= end - start &&
+          text.startsWith(value, end - value.length)) {
         endNodes.insert(0, result.nodes[i]);
         end -= value.length;
       } else {
@@ -112,37 +112,35 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     }
     final _HighlightNode? midNode;
     if (startNodes.isEmpty) {
-      midNode = _HighlightNode(text.substring(start, end), result.nodes[0].className);
+      midNode =
+          _HighlightNode(text.substring(start, end), result.nodes[0].className);
     } else if (startNodes.length < result.nodes.length) {
-      midNode = _HighlightNode(text.substring(start, end), result.nodes[startNodes.length].className);
-    } else if (end > start){
-      midNode = _HighlightNode(text.substring(start, end), result.nodes.last.className);
+      midNode = _HighlightNode(text.substring(start, end),
+          result.nodes[startNodes.length].className);
+    } else if (end > start) {
+      midNode = _HighlightNode(
+          text.substring(start, end), result.nodes.last.className);
     } else {
       midNode = null;
     }
-    return _buildSpanFromNodes([
-      ...startNodes,
-      if (midNode != null)
-        midNode,
-      ...endNodes
-    ], style);
+    return _buildSpanFromNodes(
+        [...startNodes, if (midNode != null) midNode, ...endNodes], style);
   }
 
-  TextSpan _buildSpanFromNodes(List<_HighlightNode> nodes, TextStyle baseStyle) {
+  TextSpan _buildSpanFromNodes(
+      List<_HighlightNode> nodes, TextStyle baseStyle) {
     return TextSpan(
-      children: nodes.map((e) => TextSpan(
-          text: e.value,
-          style: _findStyle(e.className)
-        )).toList(),
-      style: baseStyle
-    );
+        children: nodes
+            .map((e) => TextSpan(text: e.value, style: _findStyle(e.className)))
+            .toList(),
+        style: baseStyle);
   }
 
   TextStyle? _findStyle(String? className) {
     if (className == null) {
       return null;
     }
-    while(true) {
+    while (true) {
       final TextStyle? style = _theme?.theme[className];
       if (style != null) {
         return style;
@@ -163,117 +161,190 @@ class _CodeHighlighter extends ValueNotifier<List<_HighlightResult>> {
     if (_controller.preValue?.codeLines == _controller.codeLines) {
       return;
     }
-    _processHighlight();
+    _engine.invalidate();
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 100), _processHighlight);
   }
 
   void _processHighlight() {
     _engine.run(_controller.codeLines, (result) => value = result);
   }
-
 }
 
 class _CodeHighlightEngine {
-
-  late final _IsolateTasker<_HighlightPayload, List<_HighlightResult>> _tasker;
-
+  late _IsolateTasker<_HighlightPayload, List<_HighlightResult>> _tasker;
   Highlight? _highlight;
   CodeHighlightTheme? _theme;
+  CodeLines? _pendingCodes;
+  IsolateCallback<List<_HighlightResult>>? _pendingCallback;
+  Timer? _watchdog;
+  bool _running = false;
+  bool _disposed = false;
+  bool _disabled = false;
+  int _revision = 0;
+  int _themeId = 0;
 
-  _CodeHighlightEngine(final CodeHighlightTheme? theme) {
+  static int? _cachedThemeId;
+  static Highlight? _cachedHighlight;
+
+  _CodeHighlightEngine(CodeHighlightTheme? theme) {
+    _createTasker();
     this.theme = theme;
-    _tasker = _IsolateTasker<_HighlightPayload, List<_HighlightResult>>('CodeHighlightEngine', _run);
+  }
+
+  void _createTasker() {
+    _tasker = _IsolateTasker<_HighlightPayload, List<_HighlightResult>>(
+        'CodeHighlightEngine', _run);
   }
 
   set theme(CodeHighlightTheme? value) {
-    if (_theme == value) {
-      return;
-    }
+    if (_theme == value) return;
+    invalidate();
+    _watchdog?.cancel();
+    _tasker.close();
+    _createTasker();
+    _running = false;
+    _disabled = false;
     _theme = value;
-    final Map<String, CodeHighlightThemeMode>? modes = _theme?.languages;
-    if (modes == null) {
+    _themeId++;
+    final modes = value?.languages;
+    if (modes == null || modes.isEmpty) {
       _highlight = null;
     } else {
-      final Highlight highlight = Highlight();
-      highlight.registerLanguages(modes.map((key, value) => MapEntry(key, value.mode)));
-      for (final HLPlugin plugin in _theme!.plugins) {
+      final highlight = Highlight();
+      highlight.registerLanguages(
+          modes.map((key, value) => MapEntry(key, value.mode)));
+      for (final plugin in value!.plugins) {
         highlight.addPlugin(plugin);
       }
       _highlight = highlight;
     }
   }
 
+  /// Mark results obsolete immediately, including during the input debounce.
+  void invalidate() {
+    _revision++;
+    _pendingCodes = null;
+    _pendingCallback = null;
+  }
+
   void dispose() {
+    _disposed = true;
+    invalidate();
+    _watchdog?.cancel();
     _tasker.close();
   }
 
   void run(CodeLines codes, IsolateCallback<List<_HighlightResult>> callback) {
-    final Highlight? highlight = _highlight;
-    if (highlight == null) {
+    if (_disposed) return;
+    _revision++;
+    if (_highlight == null || _disabled) {
+      _pendingCodes = null;
+      _pendingCallback = null;
       callback(const []);
       return;
     }
-    final Map<String, CodeHighlightThemeMode>? modes = _theme?.languages;
-    if (modes == null) {
-      callback(const []);
-      return;
+    // At most one running request and one latest request; never queue every key.
+    _pendingCodes = codes;
+    _pendingCallback = callback;
+    _dispatch();
+  }
+
+  void _dispatch() {
+    if (_disposed || _running || _pendingCodes == null) return;
+    final codes = _pendingCodes!;
+    final callback = _pendingCallback!;
+    final revision = _revision;
+    final modes = _theme!.languages;
+    _pendingCodes = null;
+    _pendingCallback = null;
+    _running = true;
+
+    void fail() {
+      if (_disposed) return;
+      _watchdog?.cancel();
+      _tasker.close();
+      _createTasker();
+      _disabled = true;
+      _running = false;
+      // Bound pathological regular expressions to an isolate; keep editing usable.
+      if (revision == _revision) callback(const []);
+      _pendingCallback?.call(const []);
+      _pendingCallback = null;
+      _pendingCodes = null;
     }
-    _tasker.run(_HighlightPayload(
-      highlight: highlight,
-      codes: codes,
-      languages: modes.keys.toList(),
-      maxSizes: modes.values.map((e) => e.maxSize).toList(),
-      maxLineLengths: modes.values.map((e) => e.maxLineLength).toList(),
-    ), callback);
+
+    _watchdog = Timer(const Duration(seconds: 2), fail);
+    _tasker.run(
+        _HighlightPayload(
+          highlight: _highlight!,
+          themeId: _themeId,
+          codes: codes,
+          languages: modes.keys.toList(),
+          language: _theme!.language,
+          maxSizes: modes.values.map((e) => e.maxSize).toList(),
+          maxLineLengths: modes.values.map((e) => e.maxLineLength).toList(),
+        ), (result) {
+      if (_disposed) return;
+      _watchdog?.cancel();
+      _running = false;
+      if (revision == _revision) callback(result);
+      _dispatch();
+    }, onError: (_, __) => fail());
   }
 
   @pragma('vm:entry-point')
   static List<_HighlightResult> _run(_HighlightPayload payload) {
-    final CodeLines codeLines = payload.codes;
-    final int maxSize = payload.maxSizes.reduce(min);
-    final int maxLineLength = payload.maxLineLengths.reduce(min);
-    // Evalaute performance
-    bool canHighlight = true;
-    int total = 0;
-    for (int i = 0; i < codeLines.length; i++) {
-      final int length = codeLines[i].length;
-      if (length > maxLineLength || total > maxSize) {
-        canHighlight = false;
-        break;
+    final maxSize = payload.maxSizes.reduce(min);
+    final maxLineLength = payload.maxLineLengths.reduce(min);
+    var total = 0;
+    var firstLine = true;
+    // Walk segments once. Do not build a full string when plain text is enough.
+    for (final segment in payload.codes.segments) {
+      for (final line in segment.codeLines) {
+        total += line.length + (firstLine ? 0 : 1);
+        firstLine = false;
+        if (line.length > maxLineLength || total > maxSize) return const [];
       }
-      total += length;
     }
-    final String code = payload.codes.asString(TextLineBreak.lf, false);
+    if (_cachedThemeId != payload.themeId) {
+      _cachedThemeId = payload.themeId;
+      _cachedHighlight = payload.highlight;
+    }
+    final highlight = _cachedHighlight!;
+    final code = payload.codes.asString(TextLineBreak.lf, false);
+    final language = payload.language;
     final HighlightResult result;
-    if (!canHighlight) {
-      result = payload.highlight.justTextHighlightResult(code);
-    } else if (payload.languages.length == 1) {
-      result = payload.highlight.highlight(code: code, language: payload.languages.first);
+    if (language != null || payload.languages.length == 1) {
+      result = highlight.highlight(
+          code: code, language: language ?? payload.languages.first);
     } else {
-      result = payload.highlight.highlightAuto(code, payload.languages);
+      result = highlight.highlightAuto(code, payload.languages);
     }
-    final _HighlightLineRenderer renderer = _HighlightLineRenderer();
+    final renderer = _HighlightLineRenderer();
     result.render(renderer);
     return renderer.lineResults;
   }
-
 }
 
 class _HighlightPayload {
-
   final Highlight highlight;
+  final int themeId;
   final CodeLines codes;
   final List<String> languages;
+  final String? language;
   final List<int> maxSizes;
   final List<int> maxLineLengths;
 
   const _HighlightPayload({
     required this.highlight,
+    required this.themeId,
     required this.codes,
     required this.languages,
+    required this.language,
     required this.maxSizes,
     required this.maxLineLengths,
   });
-
 }
 
 class _HighlightResult {
@@ -281,11 +352,10 @@ class _HighlightResult {
 
   _HighlightResult(this.nodes);
 
-  String get source => nodes.map((e) => e.value).join();
+  late final String source = nodes.map((e) => e.value).join();
 }
 
 class _HighlightNode {
-
   final String? className;
   final String value;
 
@@ -293,12 +363,11 @@ class _HighlightNode {
 }
 
 class _HighlightLineRenderer implements HighlightRenderer {
-
   final List<_HighlightResult> lineResults;
   final List<String?> classNames;
-  _HighlightLineRenderer(): lineResults = [
-    _HighlightResult([])
-  ], classNames = [];
+  _HighlightLineRenderer()
+      : lineResults = [_HighlightResult([])],
+        classNames = [];
 
   @override
   void addText(String text) {
@@ -307,7 +376,8 @@ class _HighlightLineRenderer implements HighlightRenderer {
     lineResults.last.nodes.add(_HighlightNode(lines.first, className));
     if (lines.length > 1) {
       for (int i = 1; i < lines.length; i++) {
-        lineResults.add(_HighlightResult([_HighlightNode(lines[i], className)]));
+        lineResults
+            .add(_HighlightResult([_HighlightNode(lines[i], className)]));
       }
     }
   }
@@ -325,13 +395,10 @@ class _HighlightLineRenderer implements HighlightRenderer {
     classNames.add(newClassName);
   }
 
-
   @override
   void closeNode(DataNode node) {
     if (classNames.isNotEmpty) {
       classNames.removeLast();
     }
   }
-
 }
-

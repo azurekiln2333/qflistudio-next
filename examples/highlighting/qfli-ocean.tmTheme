@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+  <dict>
+    <key>name</key><string>QFLI Ocean (TextMate)</string>
+    <key>settings</key>
+    <array>
+      <dict><key>settings</key><dict>
+        <key>background</key><string>#111A26</string>
+        <key>foreground</key><string>#DCE8F5</string>
+        <key>caret</key><string>#A6C8FF</string>
+      </dict></dict>
+      <dict><key>scope</key><string>keyword, storage</string><key>settings</key><dict>
+        <key>foreground</key><string>#A6C8FF</string>
+      </dict></dict>
+      <dict><key>scope</key><string>string</string><key>settings</key><dict>
+        <key>foreground</key><string>#A6D7B0</string>
+      </dict></dict>
+      <dict><key>scope</key><string>comment</string><key>settings</key><dict>
+        <key>foreground</key><string>#8D9CB2</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict></dict>
+    </array>
+  </dict>
+</plist>

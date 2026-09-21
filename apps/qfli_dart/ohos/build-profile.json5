@@ -1,0 +1,56 @@
+{
+  "app": {
+    // 签名留空是有意的——别照着主工程抄，有两个硬约束：
+    //
+    // 1. HarmonyOS 的 .p7b 描述文件绑定 bundleName。D:/Keystore 下现有的三个
+    //    分别是 com.azurekiln.qflistudio（qfliRelease / qfli_profileDebug）和
+    //    com.azurekiln.terminax，没有一个是 com.azurekiln.qflistudio.dart。
+    // 2. 主工程用的密钥库是 suanxiwanjie.p12，别名 suanxiwanjie。
+    //
+    // 所以首次构建前二选一：
+    //   A（推荐）DevEco Studio 自动生成签名：
+    //      File → Project Structure → Signing Configs →
+    //      勾上 "Automatically generate signature"，登录华为账号。
+    //      DevEco 会为当前 bundleName 生成一套材料并自动写回这一段。
+    //   B 在 AGC 里为 com.azurekiln.qflistudio.dart 新建应用，重新生成证书和
+    //      描述文件，再把 material 补上。
+    //
+    // 不配签名也能构建，只是产出 entry-default-unsigned.hap，装不上设备。
+    // 把 bundleName 改回 com.azurekiln.qflistudio 也能立刻用主工程那套签名，
+    // 但那样两个 App 会互相覆盖安装。
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.1.1(24)"
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "profile"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "QFLI Ocean",
+  "colors": {
+    "editor.background": "#111A26",
+    "editor.foreground": "#DCE8F5",
+    "editorCursor.foreground": "#A6C8FF",
+    "editor.selectionBackground": "#335E8A80",
+    "editor.lineHighlightBackground": "#172638"
+  },
+  "tokenColors": [
+    { "scope": ["keyword", "storage"], "settings": { "foreground": "#A6C8FF" } },
+    { "scope": "string", "settings": { "foreground": "#A6D7B0" } },
+    { "scope": "comment", "settings": { "foreground": "#8D9CB2", "fontStyle": "italic" } },
+    { "scope": "constant.numeric", "settings": { "foreground": "#E5C38F" } },
+    { "scope": "entity.name", "settings": { "foreground": "#B5C4FF" } },
+    { "scope": ["entity.other.attribute-name", "support.type.property-name"], "settings": { "foreground": "#93D4DC" } }
+  ]
+}

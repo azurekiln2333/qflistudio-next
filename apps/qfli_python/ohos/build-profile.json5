@@ -1,0 +1,53 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/Keystore/suanxiwanjie.p12",
+          "storePassword": "00000020742CAB0A0DF70C248AA1FF70E98ED907BB47497FDDA774C8C93338C0A6276F8FF9B5A819A88A8C7F58EEDC28",
+          "keyAlias": "suanxiwanjie",
+          "keyPassword": "000000204E8BE97A8D59B2F675FA8EAE6F599330E76D1DB182A80485556B4A7BAD3AE5DE8C61E21C1CC7619283992A6C",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/Keystore/QFLIPyFlow920Debug.p7b",
+          "certpath": "D:/Keystore/suanxiwanjie_debug.cer"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "26.0.0"
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "profile"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

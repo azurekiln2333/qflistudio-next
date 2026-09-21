@@ -1,0 +1,205 @@
+{
+  "language": "java",
+  "displayName": "Java",
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-19",
+  "runtime": {
+    "kind": "interpreter",
+    "status": "planned",
+    "engine": "应用内 Java 子集解释器（纯 Dart，开发中）",
+    "stdin": "项目根目录放 input.txt，内容就是程序的标准输入",
+    "limits": "单次运行有 10 秒墙钟上限和 2 亿步兜底上限"
+  },
+  "chapters": [
+    {
+      "id": "basics",
+      "title": "第一章 从零开始",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "第一个程序",
+          "summary": "Java 的一切都写在类里面。",
+          "concepts": ["class", "main 方法", "System.out.println"],
+          "explain": "Java 程序必须有一个类，程序从类里的 main 方法开始跑。main 的签名 public static void main(String[] args) 一个字都不能少——它是 Java 规定的入口。println 打完会换行，print 不会。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, Java!\");\n        System.out.print(\"这一行\");\n        System.out.println(\"接着上一行\");\n    }\n}\n",
+          "output": "Hello, Java!\n这一行接着上一行\n",
+          "tasks": [
+            {
+              "prompt": "打印三行：姓名、年龄、城市。",
+              "hint": "用三个 System.out.println。",
+              "answer": "System.out.println(\"小明\");\nSystem.out.println(18);\nSystem.out.println(\"杭州\");"
+            }
+          ]
+        },
+        {
+          "id": "types",
+          "title": "变量与类型",
+          "summary": "Java 是强类型语言，每个变量都有固定类型。",
+          "concepts": ["int", "double", "boolean", "char", "String", "类型转换"],
+          "explain": "Java 里基本类型有 int、double、boolean、char 等，字符串 String 是对象类型。变量一旦声明类型就不能再改。整数和小数运算时，Java 会自动把 int 提升成 double，但反过来要强制转换。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        int age = 18;\n        double height = 1.75;\n        boolean isStudent = true;\n        char grade = 'A';\n        String name = \"小明\";\n\n        System.out.println(name + \" 今年 \" + age + \" 岁\");\n        System.out.println(\"身高 \" + height + \"，等级 \" + grade);\n        System.out.println(\"是学生吗？\" + isStudent);\n\n        int a = 7, b = 2;\n        System.out.println(\"整数除法：\" + (a / b));\n        System.out.println(\"小数除法：\" + ((double) a / b));\n    }\n}\n",
+          "output": "小明 今年 18 岁\n身高 1.75，等级 A\n是学生吗？true\n整数除法：3\n小数除法：3.5\n",
+          "tasks": [
+            {
+              "prompt": "把 7 除以 2 的结果保留两位小数输出。",
+              "hint": "用 String.format(\"%.2f\", 值) 或 System.out.printf。",
+              "answer": "System.out.printf(\"%.2f%n\", 7.0 / 2);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "control",
+      "title": "第二章 流程控制",
+      "lessons": [
+        {
+          "id": "if",
+          "title": "条件判断",
+          "summary": "if / else if / else。",
+          "concepts": ["if", "else if", "比较运算符"],
+          "explain": "Java 的判断条件和 C 一样用 ==、!=、>、<。字符串比较不能用 ==，要用 .equals()——== 比的是两个对象是不是同一个，内容相同不代表是同一个。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        int score = 85;\n\n        if (score >= 90) {\n            System.out.println(\"优秀\");\n        } else if (score >= 60) {\n            System.out.println(\"及格\");\n        } else {\n            System.out.println(\"不及格\");\n        }\n\n        String name = \"小明\";\n        if (name.equals(\"小明\")) {\n            System.out.println(\"你好，小明！\");\n        }\n    }\n}\n",
+          "output": "及格\n你好，小明！\n",
+          "tasks": [
+            {
+              "prompt": "再加一档：80 分以上「良好」。",
+              "hint": "在优秀和及格之间插一个 else if。",
+              "answer": "} else if (score >= 80) {\n    System.out.println(\"良好\");\n} else if (score >= 60) {"
+            }
+          ]
+        },
+        {
+          "id": "loops",
+          "title": "循环",
+          "summary": "for、while、do-while。",
+          "concepts": ["for", "while", "do-while", "break", "continue"],
+          "explain": "for 的三段式是「初始化; 条件; 每轮结束做什么」。break 直接跳出循环，continue 跳过本轮剩下的部分进入下一轮。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        int sum = 0;\n        for (int i = 1; i <= 100; i++) {\n            sum += i;\n        }\n        System.out.println(\"1 到 100 的和是 \" + sum);\n\n        int n = 5;\n        while (n > 0) {\n            System.out.print(n + \" \");\n            n--;\n        }\n        System.out.println(\"发射！\");\n\n        for (int i = 1; i <= 10; i++) {\n            if (i % 3 == 0) continue;\n            if (i > 8) break;\n            System.out.print(i + \" \");\n        }\n        System.out.println();\n    }\n}\n",
+          "output": "1 到 100 的和是 5050\n5 4 3 2 1 发射！\n1 2 4 5 7 8 \n",
+          "tasks": [
+            {
+              "prompt": "用 while 求 1 到 100 之间所有偶数的和。",
+              "hint": "从 2 开始，每次加 2。",
+              "answer": "int i = 2, even = 0;\nwhile (i <= 100) {\n    even += i;\n    i += 2;\n}\nSystem.out.println(even);  // 2550"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arrays",
+      "title": "第三章 数组与字符串",
+      "lessons": [
+        {
+          "id": "arrays",
+          "title": "数组",
+          "summary": "固定长度的一组同类型数据。",
+          "concepts": ["数组声明", "length", "增强 for"],
+          "explain": "Java 数组的长度在创建时定死，用 .length 取长度。增强 for（for-each）写法更简洁，适合只读遍历；需要下标时还是用普通 for。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        int[] scores = {88, 92, 79, 95, 67};\n\n        int sum = 0, max = scores[0];\n        for (int i = 0; i < scores.length; i++) {\n            sum += scores[i];\n            if (scores[i] > max) max = scores[i];\n        }\n        System.out.println(\"总分 \" + sum);\n        System.out.printf(\"平均 %.1f%n\", sum / (double) scores.length);\n        System.out.println(\"最高 \" + max);\n\n        for (int s : scores) {\n            System.out.print(s + \" \");\n        }\n        System.out.println();\n    }\n}\n",
+          "output": "总分 421\n平均 84.2\n最高 95\n88 92 79 95 67 \n",
+          "tasks": [
+            {
+              "prompt": "再求一个最低分。",
+              "hint": "仿照 max 的写法，初始值取 scores[0]。",
+              "answer": "int min = scores[0];\nfor (int s : scores) {\n    if (s < min) min = s;\n}\nSystem.out.println(\"最低 \" + min);"
+            }
+          ]
+        },
+        {
+          "id": "strings",
+          "title": "字符串常用方法",
+          "summary": "长度、截取、查找、大小写、拆分。",
+          "concepts": ["length()", "substring", "indexOf", "split", "equals"],
+          "explain": "String 是不可变的：所有「修改」方法都返回新字符串，原字符串不变。length() 带括号（是方法），数组的 length 不带括号（是属性），这一点容易混。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        String text = \"Hello, Java World\";\n\n        System.out.println(\"长度：\" + text.length());\n        System.out.println(\"大写：\" + text.toUpperCase());\n        System.out.println(\"含 Java？\" + text.contains(\"Java\"));\n        System.out.println(\"Java 的位置：\" + text.indexOf(\"Java\"));\n        System.out.println(\"前 5 个字符：\" + text.substring(0, 5));\n\n        String[] parts = text.split(\", \");\n        for (String p : parts) {\n            System.out.println(\"片段：\" + p);\n        }\n    }\n}\n",
+          "output": "长度：17\n大写：HELLO, JAVA WORLD\n含 Java？true\nJava 的位置：7\n前 5 个字符：Hello\n片段：Hello\n片段：Java World\n",
+          "tasks": [
+            {
+              "prompt": "判断一个字符串是不是回文（正着反着读一样）。",
+              "hint": "用 StringBuilder 的 reverse() 得到反转串，再和原串 equals 比较。",
+              "answer": "String s = \"上海自来水来自海上\";\nString r = new StringBuilder(s).reverse().toString();\nSystem.out.println(s.equals(r));  // true"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oop",
+      "title": "第四章 类与对象",
+      "lessons": [
+        {
+          "id": "classes",
+          "title": "定义类",
+          "summary": "把数据和行为打包在一起。",
+          "concepts": ["class", "字段", "构造方法", "this"],
+          "explain": "类是模板，对象是按模板造出来的实例。构造方法名字和类名相同，没有返回类型。this 指当前对象，用来区分「字段」和「同名参数」。",
+          "code": "public class Main {\n    public static void main(String[] args) {\n        Student s = new Student(\"小明\", 88);\n        s.printInfo();\n        s.addScore(7);\n        s.printInfo();\n    }\n}\n\nclass Student {\n    String name;\n    int score;\n\n    Student(String name, int score) {\n        this.name = name;\n        this.score = score;\n    }\n\n    void addScore(int delta) {\n        this.score += delta;\n    }\n\n    void printInfo() {\n        System.out.println(name + \"：\" + score + \" 分\");\n    }\n}\n",
+          "output": "小明：88 分\n小明：95 分\n",
+          "tasks": [
+            {
+              "prompt": "给 Student 加一个 isPass() 方法，60 分及以上返回 true。",
+              "hint": "返回类型写 boolean。",
+              "answer": "boolean isPass() {\n    return this.score >= 60;\n}"
+            }
+          ]
+        },
+        {
+          "id": "collections",
+          "title": "ArrayList：可变长列表",
+          "summary": "数组长度固定，ArrayList 可以随时增删。",
+          "concepts": ["ArrayList", "add", "size", "get", "增强 for"],
+          "explain": "ArrayList 要 import java.util.ArrayList。泛型 <> 里写元素类型，编译器会帮你检查类型安全。size() 相当于数组的 length。",
+          "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> fruits = new ArrayList<>();\n        fruits.add(\"苹果\");\n        fruits.add(\"香蕉\");\n        fruits.add(\"橙子\");\n        fruits.remove(\"香蕉\");\n\n        System.out.println(fruits);\n        System.out.println(\"共 \" + fruits.size() + \" 种\");\n        System.out.println(\"第一个：\" + fruits.get(0));\n\n        int total = 0;\n        ArrayList<Integer> nums = new ArrayList<>();\n        nums.add(10);\n        nums.add(20);\n        nums.add(30);\n        for (int n : nums) {\n            total += n;\n        }\n        System.out.println(\"总和 \" + total);\n    }\n}\n",
+          "output": "[苹果, 橙子]\n共 2 种\n第一个：苹果\n总和 60\n",
+          "tasks": [
+            {
+              "prompt": "在 nums 里找出最大值并打印。",
+              "hint": "用 for-each 遍历，维护一个 max 变量。",
+              "answer": "int max = nums.get(0);\nfor (int n : nums) {\n    if (n > max) max = n;\n}\nSystem.out.println(\"最大 \" + max);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "io",
+      "title": "第五章 输入与综合练习",
+      "lessons": [
+        {
+          "id": "input",
+          "title": "读取输入",
+          "summary": "用 Scanner 读标准输入。",
+          "concepts": ["Scanner", "nextInt", "nextLine"],
+          "explain": "本 App 的解释器是「先把输入准备好、再一次性跑完」的模型，所以标准输入要写在项目根目录的 input.txt 里。Scanner 要 import java.util.Scanner。nextInt() 读一个整数，nextLine() 读一整行。混用两者时要注意 nextInt 不会吃掉行尾的换行符。",
+          "code": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n\n        System.out.println(a + \" + \" + b + \" = \" + (a + b));\n        System.out.println(a + \" - \" + b + \" = \" + (a - b));\n    }\n}\n",
+          "output": "输入（input.txt）：\n17 5\n\n输出：\n17 + 5 = 22\n17 - 5 = 12\n",
+          "tasks": [
+            {
+              "prompt": "读两个整数，输出它们的乘积和商（商保留两位小数）。",
+              "hint": "商用 (double) a / b，再 printf(\"%.2f\")。",
+              "answer": "System.out.println(\"积 \" + (a * b));\nSystem.out.printf(\"商 %.2f%n\", (double) a / b);"
+            }
+          ]
+        },
+        {
+          "id": "grades",
+          "title": "综合练习：成绩统计",
+          "summary": "把类、集合、循环、输入串起来。",
+          "concepts": ["综合运用", "方法拆分", "ArrayList"],
+          "explain": "真实的小程序都是这么组织起来的：用类描述数据，用集合装多个对象，用方法拆开每件事。把「算平均」和「找最高」分别写成方法，主逻辑就只剩几行了。",
+          "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<Student> list = new ArrayList<>();\n        list.add(new Student(\"小明\", 88));\n        list.add(new Student(\"小红\", 95));\n        list.add(new Student(\"小刚\", 72));\n\n        System.out.println(\"平均分 \" + average(list));\n        System.out.println(\"最高分 \" + top(list).name);\n\n        for (Student s : list) {\n            System.out.println(s.name + \" -> \" + (s.isPass() ? \"及格\" : \"不及格\"));\n        }\n    }\n\n    static double average(ArrayList<Student> list) {\n        int sum = 0;\n        for (Student s : list) sum += s.score;\n        return sum / (double) list.size();\n    }\n\n    static Student top(ArrayList<Student> list) {\n        Student best = list.get(0);\n        for (Student s : list) {\n            if (s.score > best.score) best = s;\n        }\n        return best;\n    }\n}\n\nclass Student {\n    String name;\n    int score;\n\n    Student(String name, int score) {\n        this.name = name;\n        this.score = score;\n    }\n\n    boolean isPass() {\n        return this.score >= 60;\n    }\n}\n",
+          "output": "平均分 85.0\n最高分 小红\n小明 -> 及格\n小红 -> 及格\n小刚 -> 及格\n",
+          "tasks": [
+            {
+              "prompt": "再写一个方法统计不及格的人数。",
+              "hint": "遍历列表，用 isPass() 判断，计数器累加。",
+              "answer": "static int failCount(ArrayList<Student> list) {\n    int n = 0;\n    for (Student s : list) if (!s.isPass()) n++;\n    return n;\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

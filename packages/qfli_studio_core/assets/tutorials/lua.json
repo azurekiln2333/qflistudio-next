@@ -1,0 +1,59 @@
+{
+  "language": "lua",
+  "displayName": "Lua",
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-21",
+  "runtime": {
+    "kind": "interpreter",
+    "status": "planned",
+    "engine": "应用内 Lua 解释器（开发中）",
+    "stdin": "项目根目录放 input.txt，内容就是程序的标准输入",
+    "limits": "当前版本只提供编辑器、教程和示例代码，运行后端接入后会更新这里"
+  },
+  "chapters": [
+    {
+      "id": "basics",
+      "title": "第一章 从零开始",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "第一个程序",
+          "summary": "用 print 输出第一行 Lua 文本。",
+          "concepts": ["print", "字符串", "注释"],
+          "explain": "Lua 的程序可以从第一行直接执行。print 函数负责输出内容，双横线开头的文字是注释，不会被执行。",
+          "code": "-- 我的第一个 Lua 程序\nprint(\"Hello, Lua!\")\n",
+          "output": "Hello, Lua!\n",
+          "tasks": [
+            {
+              "prompt": "把问候语改成你的名字。",
+              "hint": "修改 print 括号里的字符串。",
+              "answer": "print(\"你好，小明！\")"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "values",
+      "title": "第二章 变量与条件",
+      "lessons": [
+        {
+          "id": "variable",
+          "title": "保存一个值",
+          "summary": "用 local 变量保存数据并输出。",
+          "concepts": ["local", "变量", "字符串拼接"],
+          "explain": "Lua 使用 local 声明局部变量。字符串可以用两个点连接，局部变量能让代码更容易阅读，也不会污染全局环境。",
+          "code": "local name = \"QFLIStudio+\"\nprint(\"Hello, \" .. name .. \"!\")\n",
+          "output": "Hello, QFLIStudio+!\n",
+          "tasks": [
+            {
+              "prompt": "增加一个 language 变量并把它打印出来。",
+              "hint": "用 local 声明变量，再用 .. 拼接。",
+              "answer": "local language = \"Lua\"\nprint(language)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

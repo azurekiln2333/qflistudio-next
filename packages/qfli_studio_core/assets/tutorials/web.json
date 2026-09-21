@@ -1,0 +1,183 @@
+{
+  "language": "web",
+  "displayName": "Web",
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-19",
+  "runtime": {
+    "kind": "static-server",
+    "status": "available",
+    "engine": "应用内本地静态服务器（127.0.0.1 随机端口）+ 系统浏览器预览",
+    "stdout": "页面里的 console.log 会通过调试桥回传到编辑器，显示在调试输出里",
+    "note": "鸿蒙上的浏览器拉起需要原生通道，其余平台已可用"
+  },
+  "chapters": [
+    {
+      "id": "html",
+      "title": "第一章 HTML：页面的骨架",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "第一个网页",
+          "summary": "HTML 用标签描述内容。",
+          "concepts": ["标签", "html/head/body", "标题与段落"],
+          "explain": "HTML 文档分两部分：head 放「关于页面的信息」（标题、编码、样式表引用），body 放「看得见的内容」。标签成对出现，内容夹在中间。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>我的第一个网页</title>\n</head>\n<body>\n  <h1>你好，网页！</h1>\n  <p>这是一个段落。</p>\n</body>\n</html>\n",
+          "output": "浏览器里显示一行大标题「你好，网页！」，下面一行普通文字「这是一个段落。」\n\n提示：点运行后会在本地起一个服务器并用浏览器打开页面。",
+          "tasks": [
+            {
+              "prompt": "加一个二级标题和一句自我介绍。",
+              "hint": "二级标题用 <h2>。",
+              "answer": "<h2>关于我</h2>\n<p>我是小明，正在学网页开发。</p>"
+            }
+          ]
+        },
+        {
+          "id": "text",
+          "title": "文字与列表",
+          "summary": "标题分级、加粗、有序和无序列表。",
+          "concepts": ["h1-h6", "strong", "em", "ul/ol/li", "a"],
+          "explain": "h1 到 h6 是六级标题，数字越大字越小。ul 是无序列表（圆点），ol 是有序列表（数字），里面每一项都是 li。a 标签做链接，href 写目标地址。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>文字与列表</title>\n</head>\n<body>\n  <h1>学习计划</h1>\n  <p>今天要学 <strong>HTML</strong> 和 <em>CSS</em>。</p>\n\n  <h2>待办</h2>\n  <ul>\n    <li>看完 HTML 基础</li>\n    <li>写一个个人主页</li>\n  </ul>\n\n  <h2>步骤</h2>\n  <ol>\n    <li>先写结构</li>\n    <li>再加样式</li>\n  </ol>\n\n  <p><a href=\"https://developer.mozilla.org/zh-CN/\">MDN 文档</a></p>\n</body>\n</html>\n",
+          "output": "页面显示：一级标题「学习计划」、一句话（HTML 加粗、CSS 斜体）、两个二级标题，下面分别是一个圆点列表和一个数字列表，最后一行是蓝色可点击链接。",
+          "tasks": [
+            {
+              "prompt": "在待办列表里再加一项，并让它显示为已完成（用删除线）。",
+              "hint": "删除线标签是 <del>。",
+              "answer": "<li><del>看完 HTML 基础</del></li>"
+            }
+          ]
+        },
+        {
+          "id": "images",
+          "title": "图片与容器",
+          "summary": "插入图片，用 div 给内容分组。",
+          "concepts": ["img", "alt", "div", "语义化标签"],
+          "explain": "img 是自闭合标签，src 写图片地址，alt 是图片加载不出来时显示的文字（也方便读屏软件）。div 本身没有外观，作用是「把几样东西圈在一起」，方便统一排版和加样式。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>图片与容器</title>\n</head>\n<body>\n  <header>\n    <h1>我的相册</h1>\n  </header>\n\n  <main>\n    <div class=\"card\">\n      <img src=\"https://picsum.photos/200/120\" alt=\"随机风景图\">\n      <p>一张随机图片</p>\n    </div>\n  </main>\n\n  <footer>\n    <p>© 2026 小明</p>\n  </footer>\n</body>\n</html>\n",
+          "output": "页面从上到下：页头标题、一张 200x120 的图片和说明文字、页脚版权行。header / main / footer 这三个语义化标签目前看不出差别，但它们让结构更清楚。",
+          "tasks": [
+            {
+              "prompt": "再加一张图片，宽度改成 100 像素。",
+              "hint": "用 width 属性：<img src=\"...\" width=\"100\">。",
+              "answer": "<img src=\"https://picsum.photos/100/60\" alt=\"小图\" width=\"100\">"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "css",
+      "title": "第二章 CSS：让页面好看",
+      "lessons": [
+        {
+          "id": "selector",
+          "title": "选择器与基本样式",
+          "summary": "CSS 决定「长什么样」。",
+          "concepts": ["选择器", "属性", "颜色", "字体"],
+          "explain": "CSS 的写法是「选中谁 { 改什么: 改成什么 }」。标签名、.类名、#id 是最常用的三种选择器。样式可以写在 head 里的 style 标签中，也可以单独放一个 .css 文件再用 link 引进来。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>选择器</title>\n  <style>\n    body {\n      font-family: system-ui, sans-serif;\n      color: #1f2328;\n    }\n    h1 {\n      color: #185fa5;\n    }\n    .highlight {\n      background: #faeeda;\n      padding: 4px 8px;\n      border-radius: 4px;\n    }\n    #footer-note {\n      font-size: 12px;\n      color: #888780;\n    }\n  </style>\n</head>\n<body>\n  <h1>样式演示</h1>\n  <p>普通段落，其中 <span class=\"highlight\">这几个字</span> 有背景色。</p>\n  <p id=\"footer-note\">这行字更小更浅。</p>\n</body>\n</html>\n",
+          "output": "标题变成蓝色；中间几个字带浅黄底色和圆角；最后一行是 12 像素的灰色小字。",
+          "tasks": [
+            {
+              "prompt": "给整页加一个浅灰背景色。",
+              "hint": "在 body 里加 background: #f6f8fa;。",
+              "answer": "body {\n  background: #f6f8fa;\n}"
+            }
+          ]
+        },
+        {
+          "id": "box",
+          "title": "盒模型与居中",
+          "summary": "margin、padding、border 和居中三件套。",
+          "concepts": ["margin", "padding", "border", "flex 居中"],
+          "explain": "每个元素都是一个盒子：内容外面是 padding（内边距），再外面是 border（边框），最外面是 margin（外边距）。让一个盒子在页面正中，最省事的是 display: grid + place-items: center。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>盒模型</title>\n  <style>\n    body {\n      margin: 0;\n      min-height: 100vh;\n      display: grid;\n      place-items: center;\n      background: #f6f8fa;\n      font-family: system-ui, sans-serif;\n    }\n    .card {\n      width: 260px;\n      padding: 24px;\n      border: 1px solid #d3d1c7;\n      border-radius: 12px;\n      background: #ffffff;\n      text-align: center;\n    }\n    .card button {\n      margin-top: 12px;\n      padding: 8px 16px;\n      border: none;\n      border-radius: 6px;\n      background: #185fa5;\n      color: #ffffff;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"card\">\n    <h2>欢迎</h2>\n    <p>这是一个居中的卡片。</p>\n    <button>点我</button>\n  </div>\n</body>\n</html>\n",
+          "output": "页面正中有一张白底圆角卡片，宽度 260 像素，内容居中；卡片里有一个蓝底白字的圆角按钮。",
+          "tasks": [
+            {
+              "prompt": "把卡片宽度改成 320 像素，边框改成 2 像素虚线。",
+              "hint": "border: 2px dashed #d3d1c7;",
+              "answer": ".card {\n  width: 320px;\n  border: 2px dashed #d3d1c7;\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "js",
+      "title": "第三章 JavaScript：让页面动起来",
+      "lessons": [
+        {
+          "id": "basics",
+          "title": "变量与输出",
+          "summary": "JS 的变量、字符串拼接和控制台输出。",
+          "concepts": ["let", "const", "模板字符串", "console.log"],
+          "explain": "let 声明可以改的变量，const 声明不改的常量。模板字符串用反引号，里面 ${} 可以直接嵌变量。console.log 的内容会通过调试桥回到编辑器的调试输出里，看不到页面变化时先去看那里。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>JS 基础</title>\n</head>\n<body>\n  <h1>看调试输出</h1>\n  <script>\n    const name = '小明';\n    let age = 18;\n\n    console.log('我叫' + name);\n    console.log(`我叫${name}，今年${age}岁`);\n\n    age = age + 1;\n    console.log(`明年${age}岁`);\n\n    console.log('7 / 2 =', 7 / 2);\n    console.log('7 % 2 =', 7 % 2);\n  </script>\n</body>\n</html>\n",
+          "output": "页面只有一行「看调试输出」。调试输出面板里依次出现：\n我叫小明\n我叫小明，今年18岁\n明年19岁\n7 / 2 = 3.5\n7 % 2 = 1\n\n注意：JS 的除法永远得到小数，不像 C 或 Java 会截断。",
+          "tasks": [
+            {
+              "prompt": "输出 1 到 5 的平方。",
+              "hint": "用 for 循环 + 模板字符串。",
+              "answer": "for (let i = 1; i <= 5; i++) {\n  console.log(`${i} 的平方是 ${i * i}`);\n}"
+            }
+          ]
+        },
+        {
+          "id": "dom",
+          "title": "操作页面元素",
+          "summary": "用 JS 改文字、改样式。",
+          "concepts": ["querySelector", "textContent", "style", "addEventListener"],
+          "explain": "document.querySelector 按 CSS 选择器找到元素，然后就能改它的内容或样式。addEventListener 给按钮挂点击事件——这是「页面动起来」的关键一步。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>DOM</title>\n  <style>\n    body { font-family: system-ui, sans-serif; padding: 24px; }\n    #count { font-size: 32px; color: #185fa5; }\n  </style>\n</head>\n<body>\n  <p>点击次数：<span id=\"count\">0</span></p>\n  <button id=\"btn\">点我 +1</button>\n\n  <script>\n    let count = 0;\n    const span = document.querySelector('#count');\n    const btn = document.querySelector('#btn');\n\n    btn.addEventListener('click', () => {\n      count++;\n      span.textContent = count;\n      console.log(`第 ${count} 次点击`);\n    });\n  </script>\n</body>\n</html>\n",
+          "output": "页面上显示「点击次数：0」和一个按钮。每点一次按钮，数字加一；调试输出里同步出现「第 N 次点击」。",
+          "tasks": [
+            {
+              "prompt": "再加一个按钮，点了把计数清零。",
+              "hint": "再挂一个 click 监听，把 count 设为 0 并更新 textContent。",
+              "answer": "document.querySelector('#reset').addEventListener('click', () => {\n  count = 0;\n  span.textContent = count;\n});"
+            }
+          ]
+        },
+        {
+          "id": "array",
+          "title": "数组与列表渲染",
+          "summary": "把数据变成页面上的列表。",
+          "concepts": ["数组", "for...of", "createElement", "appendChild"],
+          "explain": "「有一组数据，要把它显示成列表」是前端最常见的活。思路是：准备一个空的 ul，遍历数组，每个元素造一个 li 塞进去。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>列表渲染</title>\n  <style>\n    body { font-family: system-ui, sans-serif; padding: 24px; }\n    li { padding: 4px 0; }\n    .pass { color: #0f6e56; }\n    .fail { color: #a32d2d; }\n  </style>\n</head>\n<body>\n  <h1>成绩单</h1>\n  <ul id=\"list\"></ul>\n\n  <script>\n    const scores = [\n      { name: '小明', score: 88 },\n      { name: '小红', score: 95 },\n      { name: '小刚', score: 52 }\n    ];\n\n    const list = document.querySelector('#list');\n    for (const s of scores) {\n      const li = document.createElement('li');\n      li.textContent = `${s.name}：${s.score} 分`;\n      li.className = s.score >= 60 ? 'pass' : 'fail';\n      list.appendChild(li);\n    }\n\n    console.log('共', scores.length, '条记录');\n  </script>\n</body>\n</html>\n",
+          "output": "页面列出三行成绩：前两行绿色（及格），最后一行红色（不及格）。调试输出里是「共 3 条记录」。",
+          "tasks": [
+            {
+              "prompt": "在列表末尾追加一行总分。",
+              "hint": "用 scores.reduce((a, b) => a + b.score, 0) 求和。",
+              "answer": "const li = document.createElement('li');\nli.textContent = `总分：${scores.reduce((a, b) => a + b.score, 0)}`;\nlist.appendChild(li);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project",
+      "title": "第四章 综合项目",
+      "lessons": [
+        {
+          "id": "todo",
+          "title": "待办清单",
+          "summary": "HTML + CSS + JS 合起来做个小应用。",
+          "concepts": ["综合运用", "输入框取值", "数组增删", "重新渲染"],
+          "explain": "这个版本的思路最简单也最好懂：数据放在数组里，每次改动之后把整个列表清空重建。等熟悉了再学「只改变化的那一项」的优化写法。",
+          "code": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>待办清单</title>\n  <style>\n    body { font-family: system-ui, sans-serif; padding: 24px; max-width: 420px; }\n    .row { display: flex; gap: 8px; }\n    input { flex: 1; padding: 8px; border: 1px solid #d3d1c7; border-radius: 6px; }\n    button { padding: 8px 14px; border: none; border-radius: 6px; background: #185fa5; color: #fff; }\n    li { padding: 6px 0; display: flex; justify-content: space-between; }\n    .done { text-decoration: line-through; color: #888780; }\n  </style>\n</head>\n<body>\n  <h1>待办清单</h1>\n  <div class=\"row\">\n    <input id=\"input\" placeholder=\"输入待办后回车\">\n    <button id=\"add\">添加</button>\n  </div>\n  <ul id=\"list\"></ul>\n\n  <script>\n    let todos = [];\n\n    const input = document.querySelector('#input');\n    const list = document.querySelector('#list');\n\n    function render() {\n      list.innerHTML = '';\n      todos.forEach((todo, i) => {\n        const li = document.createElement('li');\n        const span = document.createElement('span');\n        span.textContent = todo.text;\n        if (todo.done) span.className = 'done';\n        span.addEventListener('click', () => {\n          todos[i].done = !todos[i].done;\n          render();\n        });\n\n        const del = document.createElement('button');\n        del.textContent = '删除';\n        del.addEventListener('click', () => {\n          todos.splice(i, 1);\n          render();\n        });\n\n        li.appendChild(span);\n        li.appendChild(del);\n        list.appendChild(li);\n      });\n      console.log('当前待办数：', todos.length);\n    }\n\n    function add() {\n      const text = input.value.trim();\n      if (!text) return;\n      todos.push({ text: text, done: false });\n      input.value = '';\n      render();\n    }\n\n    document.querySelector('#add').addEventListener('click', add);\n    input.addEventListener('keydown', (e) => {\n      if (e.key === 'Enter') add();\n    });\n\n    render();\n  </script>\n</body>\n</html>\n",
+          "output": "页面有输入框和「添加」按钮。输入内容后点添加（或回车），下方出现一条待办，右侧有删除按钮。点文字会加删除线表示完成，再点恢复。调试输出里每次变动都会打印当前待办数。",
+          "tasks": [
+            {
+              "prompt": "加一个「全部清除」按钮。",
+              "hint": "把 todos 设为空数组，然后调用 render()。",
+              "answer": "document.querySelector('#clear').addEventListener('click', () => {\n  todos = [];\n  render();\n});"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

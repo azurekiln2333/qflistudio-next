@@ -6,11 +6,11 @@ part of re_editor;
 ///
 /// Please see [Re-Highlight](https://reqable/re-highlight).
 class CodeHighlightTheme {
-
   const CodeHighlightTheme({
     required this.languages,
     required this.theme,
     this.plugins = const [],
+    this.language,
   });
 
   /// Supported syntax highlighting language rules.
@@ -22,20 +22,24 @@ class CodeHighlightTheme {
   /// The plugins for syntax highlighting.
   final List<HLPlugin> plugins;
 
+  /// Explicit root language; other registered languages are available for
+  /// embedded CSS/JavaScript without auto-detecting the entire document.
+  final String? language;
+
   @override
-  int get hashCode => Object.hash(languages, theme, plugins);
+  int get hashCode => Object.hash(languages, theme, plugins, language);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeHighlightTheme
-        && mapEquals(other.languages, languages)
-        && mapEquals(other.theme, theme)
-        && listEquals(other.plugins, plugins);
+    return other is CodeHighlightTheme &&
+        mapEquals(other.languages, languages) &&
+        mapEquals(other.theme, theme) &&
+        other.language == language &&
+        listEquals(other.plugins, plugins);
   }
-
 }
 
 /// Define language rules and restrictions for highlighting.
@@ -46,7 +50,6 @@ class CodeHighlightTheme {
 ///
 /// The issue see https://github.com/dart-lang/sdk/issues/48425
 class CodeHighlightThemeMode {
-
   const CodeHighlightThemeMode({
     required this.mode,
     this.maxSize = 4 * 1024 * 1024,
@@ -76,15 +79,13 @@ class CodeHighlightThemeMode {
     if (identical(this, other)) {
       return true;
     }
-    return other is CodeHighlightThemeMode
-        && mode == other.mode && maxSize == other.maxSize
-        && maxLineLength == other.maxLineLength;
+    return other is CodeHighlightThemeMode &&
+        mode == other.mode &&
+        maxSize == other.maxSize &&
+        maxLineLength == other.maxLineLength;
   }
-
 }
 
 extension CodeHighlightThemeModeExtension on Mode {
-
   CodeHighlightThemeMode get themeMode => CodeHighlightThemeMode(mode: this);
-
 }

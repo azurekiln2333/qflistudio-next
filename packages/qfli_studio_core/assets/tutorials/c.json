@@ -1,0 +1,237 @@
+{
+  "language": "c",
+  "displayName": "C",
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-19",
+  "runtime": {
+    "kind": "interpreter",
+    "status": "available",
+    "engine": "应用内 C 解释器（纯 Dart，不需要设备上的编译器）",
+    "stdin": "项目根目录放 input.txt，内容就是程序的标准输入",
+    "limits": "单次运行有 10 秒墙钟上限和 2 亿步兜底上限"
+  },
+  "chapters": [
+    {
+      "id": "basics",
+      "title": "第一章 从零开始",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "第一个程序",
+          "summary": "让程序在终端里说一句话。",
+          "concepts": ["main 函数", "printf", "#include"],
+          "explain": "每个 C 程序都从 main 函数开始执行。printf 负责把文字打到屏幕上，它来自 stdio.h 这个头文件，所以开头要写 #include <stdio.h>。\\n 是换行符，不写它光标会停在行尾。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    printf(\"Hello, C!\\n\");\n    return 0;\n}\n",
+          "output": "Hello, C!\n",
+          "tasks": [
+            {
+              "prompt": "把问候语改成你的名字。",
+              "hint": "直接改 printf 引号里的文字即可。",
+              "answer": "printf(\"你好，小明！\\n\");"
+            }
+          ]
+        },
+        {
+          "id": "variables",
+          "title": "变量与类型",
+          "summary": "用变量存数据，认识 int / double / char。",
+          "concepts": ["int", "double", "char", "格式占位符"],
+          "explain": "C 是静态类型语言：变量必须先声明类型再用。int 存整数，double 存小数，char 存单个字符。printf 里用 %d、%f、%c 占位，后面按顺序给出变量。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    int age = 18;\n    double height = 1.75;\n    char grade = 'A';\n    printf(\"年龄 %d\\n\", age);\n    printf(\"身高 %.2f\\n\", height);\n    printf(\"等级 %c\\n\", grade);\n    return 0;\n}\n",
+          "output": "年龄 18\n身高 1.75\n等级 A\n",
+          "tasks": [
+            {
+              "prompt": "再加一个变量存体重，并打印出来。",
+              "hint": "体重用 double，格式用 %.1f。",
+              "answer": "double weight = 60.5;\nprintf(\"体重 %.1f\\n\", weight);"
+            }
+          ]
+        },
+        {
+          "id": "arithmetic",
+          "title": "算术运算",
+          "summary": "加减乘除、取余，以及整数除法的坑。",
+          "concepts": ["+ - * /", "%", "整数除法"],
+          "explain": "两个 int 相除结果还是 int，小数部分直接丢掉——7/2 得到 3 而不是 3.5。想要小数结果，至少要让一边是 double（写 7.0/2）。% 是取余数。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    int a = 7, b = 2;\n    printf(\"%d + %d = %d\\n\", a, b, a + b);\n    printf(\"%d - %d = %d\\n\", a, b, a - b);\n    printf(\"%d * %d = %d\\n\", a, b, a * b);\n    printf(\"%d / %d = %d\\n\", a, b, a / b);\n    printf(\"%d %% %d = %d\\n\", a, b, a % b);\n    printf(\"%.1f / %d = %.2f\\n\", 7.0, b, 7.0 / b);\n    return 0;\n}\n",
+          "output": "7 + 2 = 9\n7 - 2 = 5\n7 * 2 = 14\n7 / 2 = 3\n7 % 2 = 1\n7.0 / 2 = 3.50\n",
+          "tasks": [
+            {
+              "prompt": "输入一个秒数，换算成「几分几秒」。",
+              "hint": "分钟用 /60，秒用 %60。",
+              "answer": "int total = 145;\nprintf(\"%d 分 %d 秒\\n\", total / 60, total % 60);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "control",
+      "title": "第二章 流程控制",
+      "lessons": [
+        {
+          "id": "if",
+          "title": "条件判断",
+          "summary": "让程序会做选择。",
+          "concepts": ["if / else if / else", "比较运算符"],
+          "explain": "比较用 ==（判断相等）、!=、>、<、>=、<=。注意 = 是赋值，== 才是比较，写成 = 是新手最常犯的错。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    int score = 85;\n    if (score >= 90) {\n        printf(\"优秀\\n\");\n    } else if (score >= 60) {\n        printf(\"及格\\n\");\n    } else {\n        printf(\"不及格\\n\");\n    }\n    return 0;\n}\n",
+          "output": "及格\n",
+          "tasks": [
+            {
+              "prompt": "把 score 改成 95，看看输出变成什么。",
+              "hint": "改完直接再运行一次。",
+              "answer": "输出变成「优秀」"
+            }
+          ]
+        },
+        {
+          "id": "loops",
+          "title": "循环",
+          "summary": "for 和 while，让程序重复干活。",
+          "concepts": ["for", "while", "累加器"],
+          "explain": "for 适合次数已知的循环，while 适合次数不确定的。累加是循环最典型的用法：先准备一个 sum = 0，每轮往里加。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    int sum = 0;\n    for (int i = 1; i <= 100; i++) {\n        sum += i;\n    }\n    printf(\"1 到 100 的和是 %d\\n\", sum);\n\n    int n = 5;\n    while (n > 0) {\n        printf(\"%d \", n);\n        n--;\n    }\n    printf(\"发射！\\n\");\n    return 0;\n}\n",
+          "output": "1 到 100 的和是 5050\n5 4 3 2 1 发射！\n",
+          "tasks": [
+            {
+              "prompt": "求 1 到 100 之间所有偶数的和。",
+              "hint": "循环里加一个 if (i % 2 == 0) 判断。",
+              "answer": "for (int i = 1; i <= 100; i++) {\n    if (i % 2 == 0) sum += i;\n}\n// 结果 2550"
+            }
+          ]
+        },
+        {
+          "id": "nested",
+          "title": "嵌套循环：打印图形",
+          "summary": "用两层循环画出三角形。",
+          "concepts": ["嵌套循环", "循环变量"],
+          "explain": "外层控制行数，内层控制每行打印几个字符。这是理解嵌套循环最直观的例子。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    for (int row = 1; row <= 5; row++) {\n        for (int col = 1; col <= row; col++) {\n            printf(\"*\");\n        }\n        printf(\"\\n\");\n    }\n    return 0;\n}\n",
+          "output": "*\n**\n***\n****\n*****\n",
+          "tasks": [
+            {
+              "prompt": "改成打印倒三角形。",
+              "hint": "让内层循环条件反过来：col <= 6 - row。",
+              "answer": "for (int row = 1; row <= 5; row++) {\n    for (int col = 1; col <= 6 - row; col++) printf(\"*\");\n    printf(\"\\n\");\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "functions",
+      "title": "第三章 函数与数组",
+      "lessons": [
+        {
+          "id": "functions",
+          "title": "自定义函数",
+          "summary": "把一段逻辑包起来重复用。",
+          "concepts": ["函数声明", "参数", "返回值"],
+          "explain": "函数要先写返回类型，再写名字和参数表。return 把结果交回调用方。函数写在 main 后面时，前面要有一行「声明」告诉编译器这个函数长什么样。",
+          "code": "#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint maxOf(int a, int b) {\n    return a > b ? a : b;\n}\n\nint main(void) {\n    printf(\"3 + 5 = %d\\n\", add(3, 5));\n    printf(\"较大的是 %d\\n\", maxOf(12, 7));\n    return 0;\n}\n",
+          "output": "3 + 5 = 8\n较大的是 12\n",
+          "tasks": [
+            {
+              "prompt": "写一个函数求三个数里的最大值。",
+              "hint": "先求前两个的最大值，再和第三个比。",
+              "answer": "int max3(int a, int b, int c) {\n    return maxOf(maxOf(a, b), c);\n}"
+            }
+          ]
+        },
+        {
+          "id": "arrays",
+          "title": "数组",
+          "summary": "一次存一组数据。",
+          "concepts": ["数组定义", "下标", "遍历"],
+          "explain": "数组下标从 0 开始，所以长度 5 的数组合法下标是 0 到 4。C 不会帮你检查越界，写超了会读到垃圾数据，要自己小心。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    int scores[5] = {88, 92, 79, 95, 67};\n    int sum = 0, max = scores[0];\n    for (int i = 0; i < 5; i++) {\n        sum += scores[i];\n        if (scores[i] > max) max = scores[i];\n    }\n    printf(\"总分 %d\\n\", sum);\n    printf(\"平均 %.1f\\n\", sum / 5.0);\n    printf(\"最高 %d\\n\", max);\n    return 0;\n}\n",
+          "output": "总分 421\n平均 84.2\n最高 95\n",
+          "tasks": [
+            {
+              "prompt": "再求一个最低分。",
+              "hint": "仿照 max 的写法，初始值取 scores[0]。",
+              "answer": "int min = scores[0];\nfor (int i = 0; i < 5; i++) {\n    if (scores[i] < min) min = scores[i];\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": "第四章 指针与结构体",
+      "lessons": [
+        {
+          "id": "pointers",
+          "title": "指针入门",
+          "summary": "理解「地址」这个概念。",
+          "concepts": ["& 取地址", "* 解引用", "指针变量"],
+          "explain": "指针存的是变量的地址。&x 取 x 的地址，*p 取出 p 指向的那个值。函数想改调用方的变量，就得传指针进去——这是 C 里 swap 两个变量的经典写法。",
+          "code": "#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\n\nint main(void) {\n    int x = 1, y = 2;\n    swap(&x, &y);\n    printf(\"x = %d, y = %d\\n\", x, y);\n    return 0;\n}\n",
+          "output": "x = 2, y = 1\n",
+          "tasks": [
+            {
+              "prompt": "写一个函数，用指针把传入的整数加一。",
+              "hint": "参数写 int *p，函数体里写 (*p)++。",
+              "answer": "void inc(int *p) {\n    (*p)++;\n}"
+            }
+          ]
+        },
+        {
+          "id": "structs",
+          "title": "结构体",
+          "summary": "把相关的数据打包成一个整体。",
+          "concepts": ["struct", "成员访问", "结构体数组"],
+          "explain": "struct 让你自定义一种「组合类型」。用点号访问成员，例如 stu.score。结构体数组很适合存一张表。",
+          "code": "#include <stdio.h>\n\nstruct Student {\n    char name[20];\n    int score;\n};\n\nint main(void) {\n    struct Student list[3] = {\n        {\"小明\", 88},\n        {\"小红\", 95},\n        {\"小刚\", 72}\n    };\n    for (int i = 0; i < 3; i++) {\n        printf(\"%s：%d 分\\n\", list[i].name, list[i].score);\n    }\n    return 0;\n}\n",
+          "output": "小明：88 分\n小红：95 分\n小刚：72 分\n",
+          "tasks": [
+            {
+              "prompt": "给结构体加一个年龄字段并打印。",
+              "hint": "在 struct 里加 int age;，初始化时按顺序补上。",
+              "answer": "struct Student { char name[20]; int score; int age; };\n// 初始化：{\"小明\", 88, 18}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "io",
+      "title": "第五章 输入与综合练习",
+      "lessons": [
+        {
+          "id": "input",
+          "title": "读取输入",
+          "summary": "用 scanf 让程序读用户给的数据。",
+          "concepts": ["scanf", "input.txt"],
+          "explain": "本 App 的解释器是「先把输入准备好、再一次性跑完」的模型，所以标准输入要写在项目根目录的 input.txt 里，一行一个数。scanf 的用法和 printf 反过来：它按格式把读到的值写进变量的地址，所以变量前要加 &。",
+          "code": "#include <stdio.h>\n\nint main(void) {\n    int a, b;\n    scanf(\"%d %d\", &a, &b);\n    printf(\"%d + %d = %d\\n\", a, b, a + b);\n    printf(\"%d - %d = %d\\n\", a, b, a - b);\n    return 0;\n}\n",
+          "output": "输入（input.txt）：\n17 5\n\n输出：\n17 + 5 = 22\n17 - 5 = 12\n",
+          "tasks": [
+            {
+              "prompt": "读两个数，输出它们的乘积和商。",
+              "hint": "注意整数除法，想要小数就把一个操作数写成 double。",
+              "answer": "scanf(\"%d %d\", &a, &b);\nprintf(\"积 %d\\n\", a * b);\nprintf(\"商 %.2f\\n\", a / (double)b);"
+            }
+          ]
+        },
+        {
+          "id": "primes",
+          "title": "综合练习：素数筛",
+          "summary": "把前面学的东西串起来。",
+          "concepts": ["函数拆分", "嵌套循环", "条件判断"],
+          "explain": "判断素数只需要试除到平方根：如果 n 能被某个数整除，那个因子必然有一个不超过根号 n。把「判断」和「遍历」拆成两个函数，是写程序的好习惯。",
+          "code": "#include <stdio.h>\n\nint isPrime(int n) {\n    if (n < 2) return 0;\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) return 0;\n    }\n    return 1;\n}\n\nint main(void) {\n    int count = 0;\n    for (int i = 2; i <= 50; i++) {\n        if (isPrime(i)) {\n            printf(\"%d \", i);\n            count++;\n        }\n    }\n    printf(\"\\n共 %d 个素数\\n\", count);\n    return 0;\n}\n",
+          "output": "2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 \n共 15 个素数\n",
+          "tasks": [
+            {
+              "prompt": "统计 1 到 100 之间所有素数的和。",
+              "hint": "把 count++ 换成 sum += i。",
+              "answer": "int sum = 0;\nfor (int i = 2; i <= 100; i++) if (isPrime(i)) sum += i;\n// 结果 1060"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

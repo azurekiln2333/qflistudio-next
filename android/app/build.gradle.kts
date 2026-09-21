@@ -8,7 +8,8 @@ plugins {
 android {
     namespace = "com.example.qflistudio"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // flutter_ohos 默认 NDK 28.2 在本机下载解压失败；钉到已完整安装的 27.0。
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
