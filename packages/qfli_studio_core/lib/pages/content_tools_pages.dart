@@ -4,9 +4,14 @@ import '../i18n/studio_localizations.dart';
 import '../services/structured_content_service.dart';
 
 class JsonToolPage extends StatefulWidget {
-  const JsonToolPage({super.key, this.initialText = '{\n  "name": "QFLI"\n}'});
+  const JsonToolPage({
+    super.key,
+    this.initialText = '{\n  "name": "QFLI"\n}',
+    this.onApply,
+  });
 
   final String initialText;
+  final ValueChanged<String>? onApply;
 
   @override
   State<JsonToolPage> createState() => _JsonToolPageState();
@@ -76,6 +81,12 @@ class _JsonToolPageState extends State<JsonToolPage> {
                 icon: const Icon(Icons.check_circle_outline),
                 label: Text(l10n.jsonValidate),
               ),
+              if (widget.onApply != null)
+                OutlinedButton.icon(
+                  onPressed: () => widget.onApply!(_controller.text),
+                  icon: const Icon(Icons.input_outlined),
+                  label: Text(l10n.applyToEditor),
+                ),
             ],
           ),
           const SizedBox(height: 12),
@@ -154,9 +165,14 @@ class _JsonTree extends StatelessWidget {
 }
 
 class MarkdownToolPage extends StatefulWidget {
-  const MarkdownToolPage({super.key, this.initialText = '# QFLINote\n\nEdit and preview this note.'});
+  const MarkdownToolPage({
+    super.key,
+    this.initialText = '# QFLINote\n\nEdit and preview this note.',
+    this.onApply,
+  });
 
   final String initialText;
+  final ValueChanged<String>? onApply;
 
   @override
   State<MarkdownToolPage> createState() => _MarkdownToolPageState();
@@ -186,6 +202,14 @@ class _MarkdownToolPageState extends State<MarkdownToolPage> {
               Tab(text: l10n.markdownPreview),
             ],
           ),
+          actions: [
+            if (widget.onApply != null)
+              IconButton(
+                tooltip: l10n.applyToEditor,
+                onPressed: () => widget.onApply!(_controller.text),
+                icon: const Icon(Icons.input_outlined),
+              ),
+          ],
         ),
         body: TabBarView(
           children: [

@@ -33,6 +33,7 @@ import 'open_file.dart';
 import 'project_history.dart';
 import 'terminal_pane.dart';
 import '../pages/settings_page.dart';
+import '../pages/content_tools_pages.dart';
 import 'ai_panel.dart';
 
 enum _BottomPanel { none, terminal, ai }
@@ -560,10 +561,26 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     final result = CodeFormatter.format(open.name, open.controller.text);
     if (result.changed) {
       open.controller.text = result.text;
-      _showSnack('已格式化 ${open.name}');
-    } else {
-      _showSnack('格式已是最新（JSON 解析失败时不会改动原文）');
     }
+  }
+
+  void _openContentTool() {
+    final open = _editor.current;
+    if (open == null) return;
+    final extension = p.extension(open.name).toLowerCase();
+    if (extension != '.json' && extension != '.md' && extension != '.markdown') {
+      return;
+    }
+    final page = extension == '.json'
+        ? JsonToolPage(
+            initialText: open.controller.text,
+            onApply: (value) => setState(() => open.controller.text = value),
+          )
+        : MarkdownToolPage(
+            initialText: open.controller.text,
+            onApply: (value) => setState(() => open.controller.text = value),
+          );
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
   Future<void> _runProject() async {
@@ -783,6 +800,8 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                         _showGotoLineDialog();
                                       case 'format':
                                         _formatCurrent();
+                                      case 'content_tool':
+                                        _openContentTool();
                                       case 'minimap':
                                         widget.settings.setMinimap(
                                           !widget.settings.minimap,
@@ -875,6 +894,19 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ),
+                                    if (p.extension(_editor.current?.name ?? '').toLowerCase() == '.json' ||
+                                        p.extension(_editor.current?.name ?? '').toLowerCase() == '.md' ||
+                                        p.extension(_editor.current?.name ?? '').toLowerCase() == '.markdown')
+                                      const PopupMenuItem(
+                                        value: 'content_tool',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.preview_outlined, size: 20),
+                                            SizedBox(width: 12),
+                                            Text('内容工具'),
+                                          ],
+                                        ),
+                                      ),
                                     PopupMenuItem(
                                       value: 'minimap',
                                       child: Row(

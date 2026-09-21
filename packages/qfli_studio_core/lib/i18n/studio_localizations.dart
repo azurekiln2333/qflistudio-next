@@ -158,6 +158,7 @@ class StudioLocalizations {
   String get sqlTools => _text('sqlTools');
   String get sqlSource => _text('sqlSource');
   String get executeQuery => _text('executeQuery');
+  String get applyToEditor => _text('applyToEditor');
   String exitCode(int code) => _text('exitCode').replaceAll('{code}', '$code');
   String runEnded(int code) => _text('runEnded').replaceAll('{code}', '$code');
   String unableToExecute(String message) =>
@@ -261,6 +262,7 @@ class StudioLocalizations {
     'sqlTools': 'SQL 查询',
     'sqlSource': 'SQL 语句',
     'executeQuery': '执行查询',
+    'applyToEditor': '应用到编辑器',
   };
 
   static const _zhTw = <String, String>{
@@ -361,6 +363,7 @@ class StudioLocalizations {
     'sqlTools': 'SQL 查詢',
     'sqlSource': 'SQL 語句',
     'executeQuery': '執行查詢',
+    'applyToEditor': '套用到編輯器',
   };
 
   static const _en = <String, String>{
@@ -461,6 +464,7 @@ class StudioLocalizations {
     'sqlTools': 'SQL query',
     'sqlSource': 'SQL statement',
     'executeQuery': 'Run query',
+    'applyToEditor': 'Apply to editor',
   };
 }
 
