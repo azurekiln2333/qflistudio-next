@@ -28,6 +28,9 @@ migrate_working_dir/
 **/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins-dependencies
+# flutter tool 在包目录里落的状态文件（含 workspace 成员）
+.flutter
+.flutter_tool_state
 .pub-cache/
 .pub/
 /build/
@@ -43,3 +46,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# 第三方原生解释器源码：按 apps/qfli_c/native/README.md 的命令 clone 进来，
+# 不进版本库（上游在 GitLab，自己 clone 比在这里维护一份副本可靠）。
+/apps/qfli_c/native/third_party/picoc/
+
+# HarmonyOS 原生构建产物
+/apps/qfli_c/ohos/**/build/
+/apps/qfli_c/ohos/**/oh_modules/
+/apps/qfli_c/ohos/**/node_modules/
+/apps/qfli_c/ohos/**/.hvigor/
+/apps/qfli_c/ohos/entry/libs/
+
+# Local diagnostic exports and shell inspection fragments
+/_*.txt
+/tmp_*.txt
+/s[1-5].txt
+/rc[1-2].txt
+/run_chunk.txt
+/corelist.txt
+/lib_tree.txt
+/.dsh_*.txt
+/.dsh_tmp/
+/.gitstatus.txt
+/.gs.txt
+/.st.txt
