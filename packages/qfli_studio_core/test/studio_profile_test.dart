@@ -14,7 +14,7 @@ void main() {
     StudioProfile.current = const StudioProfile(
       id: 'c',
       appTitle: 'QFLIStudio+ C 版',
-      templates: const [],
+      templates: [],
       isOffline: true,
     );
     TutorialService.clearCache();
