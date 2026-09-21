@@ -1,58 +1,115 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:qfli_studio_core/services/studio_profile.dart';
 
-/// Lua 版 App 的运行后端。
-///
-/// 目标形态是**应用内 Lua 子集解释器（纯 Dart）**。
-/// 之所以是解释而不是编译：鸿蒙的普通应用被 SELinux 挡在 `exec` 之外，既调不动
-/// 设备上的编译器，也拉不起打包进 HAP 的可执行文件（HNP 那条路要求应用具备
-/// 生产力应用资格）。但沙箱从来不限制应用解释自己的数据，所以「自带解释器、
-/// 在当前进程里跑自己的源码」是普通应用唯一走得通的路。
-///
-/// C 版的 `qfli_c_runtime` 已经把这条路走通并交付（词法 → 预处理 → 语法 →
-/// 解释，约 7000 行纯 Dart），本版是同一个模式的接入点。
-///
-/// 解释器落地之前，[run] 明确返回「还不能运行」，而不是给一个看起来像结果的
-/// 东西——那比报错更糟。
-///
-/// **接入方式**：把 [_notReady] 换成真实解释器的调用（返回一个带
-/// stdout/stderr/exitCode 的 [ProgramRunResult]）。档位、入口识别、终端输出、
-/// 退出码这些接线都不用动。
+/// Runtime adapter for the shared scripting product.
 class LuaProgramRunner implements ProgramRunner {
   const LuaProgramRunner();
 
-  /// 本后端接管的源码后缀。
-  static const Set<String> _sourceExtensions = {'.lua'};
+  static const Set<String> _sourceExtensions = {
+    '.lua',
+    '.js',
+    '.mjs',
+    '.ts',
+    '.sh',
+  };
 
   @override
   Future<ProgramRunResult?> run({
     required String projectPath,
     required String entryFile,
   }) async {
-    // 不是本语言的文件交回内核（返回 null），内核会走自己的分流逻辑。
-    if (!_sourceExtensions.contains(p.extension(entryFile).toLowerCase())) {
-      return null;
+    final extension = p.extension(entryFile).toLowerCase();
+    if (!_sourceExtensions.contains(extension)) return null;
+    final runtime = _runtimeName(extension);
+    if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
+      return _notReady(p.basename(entryFile), runtime);
     }
-    return _notReady(p.basename(entryFile));
+
+    final command = await _commandFor(extension, entryFile);
+    if (command == null) return _notReady(p.basename(entryFile), runtime);
+    try {
+      final process = await Process.start(
+        command.first,
+        command.skip(1).toList(growable: false),
+        workingDirectory: projectPath,
+        runInShell: Platform.isWindows,
+      );
+      return ProgramRunResult(
+        title: '运行 ${p.basename(entryFile)}（$runtime）',
+        stdout: process.stdout
+            .transform(systemEncoding.decoder)
+            .transform(const LineSplitter()),
+        stderr: process.stderr
+            .transform(systemEncoding.decoder)
+            .transform(const LineSplitter()),
+        exitCode: process.exitCode,
+      );
+    } on ProcessException {
+      return _notReady(p.basename(entryFile), runtime);
+    }
   }
 
-  /// 解释器还没接上时的占位结果。
-  ProgramRunResult _notReady(String fileName) {
+  Future<List<String>?> _commandFor(String extension, String entryFile) async {
+    final candidates = switch (extension) {
+      '.lua' => const [
+        ['lua'],
+        ['luajit'],
+      ],
+      '.js' || '.mjs' => const [
+        ['node'],
+        ['deno', 'run'],
+      ],
+      '.ts' => const [
+        ['deno', 'run'],
+        ['tsx'],
+        ['ts-node'],
+      ],
+      '.sh' => Platform.isWindows
+          ? const [
+              ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File'],
+            ]
+          : const [
+              ['sh'],
+              ['bash'],
+            ],
+      _ => const <List<String>>[],
+    };
+    for (final candidate in candidates) {
+      final probe = await Process.run(
+        Platform.isWindows ? 'where' : 'which',
+        [candidate.first],
+        runInShell: Platform.isWindows,
+      );
+      if (probe.exitCode == 0) return [...candidate, entryFile];
+    }
+    return null;
+  }
+
+  ProgramRunResult _notReady(String fileName, String runtime) {
     final controller = StreamController<String>();
     scheduleMicrotask(() {
       controller
-        ..add('Lua 版的运行后端还在开发中（应用内纯 Dart 解释器）。')
-        ..add('现在已经可用的：编辑器、语法高亮、项目模板、Lua 入门教程。')
-        ..add('内置 Lua 解释器完成后即可在本 App 内运行这段代码。')
+        ..add('$runtime 运行时不可用：请在桌面端安装对应工具链。')
+        ..add('当前仍可使用编辑、保存、格式化和项目导入导出。')
         ..close();
     });
     return ProgramRunResult(
-      title: '运行 $fileName（Lua 解释器开发中）',
+      title: '运行 $fileName（$runtime 不可用）',
       stdout: controller.stream,
       stderr: const Stream<String>.empty(),
       exitCode: Future<int>.value(kProgramNotRunExitCode),
     );
   }
+
+  String _runtimeName(String extension) => switch (extension) {
+    '.lua' => 'Lua',
+    '.js' || '.mjs' => 'JavaScript',
+    '.ts' => 'TypeScript',
+    '.sh' => 'Shell',
+    _ => 'Script',
+  };
 }

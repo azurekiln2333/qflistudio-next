@@ -21,13 +21,28 @@ const String _appTitle = StudioProductCatalog.script;
 const StudioProfile luaProfile = StudioProfile(
   id: 'lua',
   appTitle: _appTitle,
-  templates: [ProjectTemplate.empty, ProjectTemplate.lua],
+  templates: [
+    ProjectTemplate.empty,
+    ProjectTemplate.lua,
+    ProjectTemplate.javascript,
+    ProjectTemplate.typescript,
+    ProjectTemplate.shell,
+  ],
   isOffline: true,
   productKey: StudioProductCatalog.scriptKey,
   showHomeTabs: false,
   runner: LuaProgramRunner(),
   // main.lua 排在默认入口表前面，保证本版一定先命中它。
-  entryFileNames: ['main.lua', 'src/main.lua'],
+  entryFileNames: [
+    'main.lua',
+    'src/main.lua',
+    'main.js',
+    'src/main.js',
+    'main.ts',
+    'src/main.ts',
+    'main.sh',
+    'src/main.sh',
+  ],
 );
 
 void main() async {

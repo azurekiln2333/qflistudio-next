@@ -35,10 +35,13 @@ void main() {
   }
 
   group('档位收窄', () {
-    test('新建项目只放行「空项目」和 Lua', () {
+    test('新建项目放行 Script 产品的脚本模板', () {
       expect(luaProfile.filterTemplates(ProjectTemplate.values), [
         ProjectTemplate.empty,
         ProjectTemplate.lua,
+        ProjectTemplate.javascript,
+        ProjectTemplate.typescript,
+        ProjectTemplate.shell,
       ]);
     });
 
@@ -97,7 +100,7 @@ void main() {
         entryFile: p.join(project.path, 'main.lua'),
       );
       expect(result, isNotNull, reason: '运行后端没有接管本语言文件');
-      expect(result!.title, contains('Lua 解释器开发中'));
+      expect(result!.title, contains('Lua 不可用'));
       expect(await result.stdout.toList(), isNotEmpty);
       expect(await result.exitCode, kProgramNotRunExitCode);
     });
@@ -121,7 +124,7 @@ void main() {
       );
       expect(result, isNotNull);
       expect(result!.hint, isNull, reason: '后端接管了就不该走兜底提示');
-      expect(result.title, contains('Lua 解释器开发中'));
+      expect(result.title, contains('Lua 不可用'));
     });
   });
 }

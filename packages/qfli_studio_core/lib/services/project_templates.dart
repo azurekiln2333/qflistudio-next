@@ -21,6 +21,7 @@ abstract final class ProjectLanguages {
     'Lua',
     'JavaScript',
     'TypeScript',
+    'Shell',
     'JSON',
     'Markdown',
     'SQL',
@@ -62,8 +63,11 @@ enum ProjectTemplate {
   javascript('JavaScript', Icons.javascript_outlined, 'JavaScript', [
     TemplateFile('src/main.js', _jsMain),
   ]),
-    typescript('TypeScript', Icons.javascript, 'TypeScript', [
+  typescript('TypeScript', Icons.javascript, 'TypeScript', [
     TemplateFile('src/main.ts', _tsMain),
+  ]),
+  shell('Shell', Icons.terminal_outlined, 'Shell', [
+    TemplateFile('src/main.sh', _shellMain),
   ]),
   json('JSON', Icons.data_object, 'JSON', [
     TemplateFile('src/data.json', _jsonData),
@@ -114,6 +118,7 @@ enum ProjectTemplate {
     ProjectTemplate.lua => 'lua',
     ProjectTemplate.javascript => 'javascript',
     ProjectTemplate.typescript => 'typescript',
+    ProjectTemplate.shell => 'shell',
     ProjectTemplate.json => 'json',
     ProjectTemplate.markdown => 'markdown',
     ProjectTemplate.sql => 'sql',
@@ -222,6 +227,11 @@ const String _tsMain = '''
 const greet = (name: string): string => `Hello, QFLIStudio+! \${name}`;
 
 console.log(greet('world'));
+''';
+
+const String _shellMain = '''
+#!/usr/bin/env sh
+printf 'Hello, QFLIStudio+!\\n'
 ''';
 
 const String _jsonData = '''
