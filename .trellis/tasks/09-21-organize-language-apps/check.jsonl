@@ -1,0 +1,4 @@
+
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Use the project frontend quality checklist during verification."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Review the new typed local-content contract."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Verify JSON-to-service-to-UI data flow."}

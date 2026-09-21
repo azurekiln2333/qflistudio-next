@@ -1,0 +1,8 @@
+
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"The task changes the shared Flutter package and apps workspace layout."}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"The task adds local tutorial and example-code page widgets."}
+{"file":".trellis/spec/frontend/state-management.md","reason":"The task changes tab composition and local tutorial loading state."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"The task extends the typed profile and tutorial data contract."}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"The task adds app and shared-package tests."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"The task must reuse the existing TutorialService and shared App shell."}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"The task crosses bundled JSON, service, model, navigation and app packages."}
