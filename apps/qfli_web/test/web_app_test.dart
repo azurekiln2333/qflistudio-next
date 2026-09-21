@@ -61,7 +61,6 @@ void main() {
 
     test('产品名使用 QFLIWebForge', () {
       expect(webProfile.appTitle, 'QFLIWebForge');
-      expect(webProfile.showEditorTabs, isFalse);
     });
   });
 

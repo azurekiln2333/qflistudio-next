@@ -113,7 +113,6 @@ void main() {
 
     test('产品名使用 QFLIPyFlow', () {
       expect(pythonProfile.appTitle, 'QFLIPyFlow');
-      expect(pythonProfile.showEditorTabs, isFalse);
     });
   });
 

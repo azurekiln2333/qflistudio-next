@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'sql_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLISQLab';
+const String _appTitle = StudioProductCatalog.sqlab;
 
 /// SQL 版档位：同一套内核 UI，收窄成只服务 SQL。
 ///
@@ -24,6 +24,8 @@ const StudioProfile sqlProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.sql],
   isOffline: true,
   runner: SqlProgramRunner(),
+  productKey: StudioProductCatalog.sqlabKey,
+  showHomeTabs: false,
   // main.sql 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.sql', 'src/main.sql'],
 );

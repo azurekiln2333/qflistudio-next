@@ -90,7 +90,6 @@ class StudioProfile {
     this.isOffline = false,
     this.productKey = StudioProductCatalog.qfliStudioKey,
     this.showHomeTabs = true,
-    this.showEditorTabs = true,
   });
 
   /// 档位标识，同时用于项目元数据里记录「由哪个 App 创建」。
@@ -119,9 +118,6 @@ class StudioProfile {
 
   /// Whether homepage project-scope and language tabs are shown.
   final bool showHomeTabs;
-
-  /// 是否显示编辑器顶部的文件标签栏。联网全能版保留，独立语言版隐藏。
-  final bool showEditorTabs;
 
   /// 当前生效的档位。为 null 时即全能版。
   static StudioProfile? current;

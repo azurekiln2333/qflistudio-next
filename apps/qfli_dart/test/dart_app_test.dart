@@ -53,8 +53,7 @@ void main() {
     });
 
     test('产品名使用 QFLIStudio+', () {
-      expect(dartProfile.appTitle, 'QFLIStudio+');
-      expect(dartProfile.showEditorTabs, isFalse);
+      expect(dartProfile.appTitle, 'QFLIDartWing');
     });
   });
 

@@ -84,7 +84,6 @@ void main() {
 
     test('产品名使用 QFLIForge', () {
       expect(cProfile.appTitle, 'QFLIForge');
-      expect(cProfile.showEditorTabs, isFalse);
     });
   });
 

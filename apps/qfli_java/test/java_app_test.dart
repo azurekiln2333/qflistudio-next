@@ -54,7 +54,6 @@ void main() {
 
     test('产品名使用 QFLIJVMX', () {
       expect(javaProfile.appTitle, 'QFLIJVMX');
-      expect(javaProfile.showEditorTabs, isFalse);
     });
   });
 

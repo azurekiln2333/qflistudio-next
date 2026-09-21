@@ -54,7 +54,6 @@ void main() {
 
     test('产品名使用 QFLIScript', () {
       expect(luaProfile.appTitle, 'QFLIScript');
-      expect(luaProfile.showEditorTabs, isFalse);
     });
 
     test('档位只使用本地能力', () {

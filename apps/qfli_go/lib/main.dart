@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'go_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = 'QFLIGoShift';
+const String _appTitle = StudioProductCatalog.goShift;
 
 /// Go 版档位：同一套内核 UI，收窄成只服务 Go。
 ///
@@ -24,6 +24,8 @@ const StudioProfile goProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.go],
   isOffline: true,
   runner: GoProgramRunner(),
+  productKey: StudioProductCatalog.goShiftKey,
+  showHomeTabs: false,
   // main.go 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.go', 'src/main.go'],
 );
