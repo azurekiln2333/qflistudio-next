@@ -142,6 +142,7 @@ class StudioLocalizations {
 
   String get terminalCollapsed => _text('terminalCollapsed');
   String get terminalHeader => _text('terminalHeader');
+  String get newTerminal => _text('newTerminal');
   String get jsonTools => _text('jsonTools');
   String get jsonSource => _text('jsonSource');
   String get jsonFormat => _text('jsonFormat');
@@ -241,6 +242,7 @@ class StudioLocalizations {
     'shellHintPrefix': '输入命令，回车执行（如 ',
     'terminalCollapsed': '本地终端（已收起，点击展开）',
     'terminalHeader': '本地终端（沙箱）',
+    'newTerminal': '新建终端',
     'exitCode': '（退出码 {code}）',
     'runEnded': '（运行结束，退出码 {code}）',
     'unableToExecute': '无法执行：',
@@ -340,6 +342,7 @@ class StudioLocalizations {
     'shellHintPrefix': '輸入指令，按 Enter 執行（例如 ',
     'terminalCollapsed': '本機終端機（已收起，點擊展開）',
     'terminalHeader': '本機終端機（沙盒）',
+    'newTerminal': '新增終端機',
     'exitCode': '（結束碼 {code}）',
     'runEnded': '（執行結束，結束碼 {code}）',
     'unableToExecute': '無法執行：',
@@ -439,6 +442,7 @@ class StudioLocalizations {
     'shellHintPrefix': 'Enter a command and press Enter (for example ',
     'terminalCollapsed': 'Local terminal (collapsed, tap to expand)',
     'terminalHeader': 'Local terminal (sandbox)',
+    'newTerminal': 'New terminal',
     'exitCode': '(exit code {code})',
     'runEnded': '(finished, exit code {code})',
     'unableToExecute': 'Unable to execute: ',

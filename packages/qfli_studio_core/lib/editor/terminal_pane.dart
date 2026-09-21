@@ -16,6 +16,7 @@ class TerminalPane extends StatefulWidget {
     required this.workingDirectory,
     this.onClose,
     this.onCollapseChanged,
+    this.onResizeDelta,
   });
 
   final String workingDirectory;
@@ -25,6 +26,8 @@ class TerminalPane extends StatefulWidget {
 
   /// 折叠状态变化回调（编辑器据此调整外层高度）。
   final ValueChanged<bool>? onCollapseChanged;
+
+  final ValueChanged<double>? onResizeDelta;
 
   @override
   State<TerminalPane> createState() => TerminalPaneState();
@@ -44,23 +47,6 @@ class TerminalPaneState extends State<TerminalPane> {
 
   bool get _isWindows => Platform.isWindows;
 
-  bool _printedIntro = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_printedIntro) return;
-    _printedIntro = true;
-    _outputLines.add(
-      _TermLine(
-        text: StudioLocalizations.of(
-          context,
-        ).terminalStarted(widget.workingDirectory),
-        kind: _LineKind.info,
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _currentProcess?.kill();
@@ -76,7 +62,9 @@ class TerminalPaneState extends State<TerminalPane> {
     _history.add(trimmed);
     _historyIndex = _history.length;
     setState(() {
-      _outputLines.add(_TermLine(text: '\$ $trimmed', kind: _LineKind.command));
+      _outputLines.add(
+        _TermLine(text: '$_prompt $trimmed', kind: _LineKind.command),
+      );
       _running = true;
     });
     _scrollToBottom();
@@ -300,6 +288,26 @@ class TerminalPaneState extends State<TerminalPane> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (widget.onResizeDelta != null)
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onVerticalDragUpdate: (details) =>
+                widget.onResizeDelta!(-details.delta.dy),
+            child: Container(
+              height: 8,
+              color: scheme.surfaceContainerHighest,
+              child: Center(
+                child: Container(
+                  width: 42,
+                  height: 2,
+                  decoration: BoxDecoration(
+                    color: scheme.onSurfaceVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+          ),
         Container(
           height: 36,
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -374,12 +382,16 @@ class TerminalPaneState extends State<TerminalPane> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(
               children: [
-                Text(
-                  _shortCwd,
-                  style: TextStyle(
-                    fontFamily: 'Consolas',
-                    fontSize: 12,
-                    color: scheme.primary,
+                Flexible(
+                  child: Text(
+                    _prompt,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'Consolas',
+                      fontSize: 12,
+                      color: scheme.primary,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -411,7 +423,9 @@ class TerminalPaneState extends State<TerminalPane> {
     );
   }
 
-  String get _shortCwd => '${p.basename(widget.workingDirectory)}>';
+  String get _prompt => Platform.isWindows
+      ? '${p.normalize(widget.workingDirectory)}>'
+      : '${p.normalize(widget.workingDirectory)}\$';
 }
 
 enum _LineKind { command, stdout, stderr, info, debug }

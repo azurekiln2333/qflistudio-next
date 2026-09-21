@@ -134,6 +134,10 @@ class LocalTerminalPage extends StatefulWidget {
 
 class _LocalTerminalPageState extends State<LocalTerminalPage> {
   late final Future<String?> _workingDirectory = _resolveWorkingDirectory();
+  final _sessions = <int>[0];
+  var _selectedSession = 0;
+  var _nextSessionId = 1;
+  var _terminalHeight = 420.0;
 
   Future<String?> _resolveWorkingDirectory() async {
     for (final project in widget.store.projects) {
@@ -147,10 +151,16 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = StudioLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(StudioLocalizations.of(context).terminal),
+        title: Text(l10n.terminal),
         actions: [
+          IconButton(
+            tooltip: l10n.newTerminal,
+            onPressed: _newSession,
+            icon: const Icon(Icons.add),
+          ),
           IconButton(
             tooltip: StudioLocalizations.of(context).close,
             onPressed: () => Navigator.of(context).maybePop(),
@@ -165,7 +175,7 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
           if (snapshot.connectionState != ConnectionState.done) {
             return Center(
               child: Semantics(
-                label: StudioLocalizations.of(context).loading,
+                label: l10n.loading,
                 child: const CircularProgressIndicator(),
               ),
             );
@@ -173,15 +183,79 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
           final path = snapshot.data;
           if (path == null || path.isEmpty) {
             return Center(
-              child: Text(StudioLocalizations.of(context).noWorkingDirectory),
+              child: Text(l10n.noWorkingDirectory),
             );
           }
-          return TerminalPane(
-            workingDirectory: path,
-            onClose: () => Navigator.of(context).maybePop(),
+          final maxHeight = MediaQuery.sizeOf(context).height * 0.78;
+          final height = _terminalHeight.clamp(180.0, maxHeight);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 48,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _sessions.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final id = _sessions[index];
+                    return InputChip(
+                      label: Text('${l10n.terminal} ${id + 1}'),
+                      selected: index == _selectedSession,
+                      onSelected: (_) => setState(() => _selectedSession = index),
+                      onDeleted: _sessions.length == 1
+                          ? null
+                          : () => _closeSession(id),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(
+                height: height,
+                child: IndexedStack(
+                  index: _selectedSession,
+                  children: [
+                    for (final id in _sessions)
+                      TerminalPane(
+                        key: ValueKey(id),
+                        workingDirectory: path,
+                        onResizeDelta: (delta) => setState(() {
+                          _terminalHeight =
+                              (_terminalHeight + delta).clamp(180.0, maxHeight);
+                        }),
+                        onClose: () => _closeSession(id),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           );
         },
       ),
     );
+  }
+
+  void _newSession() {
+    setState(() {
+      _sessions.add(_nextSessionId++);
+      _selectedSession = _sessions.length - 1;
+    });
+  }
+
+  void _closeSession(int id) {
+    if (_sessions.length == 1) {
+      Navigator.of(context).maybePop();
+      return;
+    }
+    setState(() {
+      final oldIndex = _sessions.indexOf(id);
+      _sessions.remove(id);
+      if (_selectedSession >= _sessions.length) {
+        _selectedSession = _sessions.length - 1;
+      } else if (oldIndex < _selectedSession) {
+        _selectedSession--;
+      }
+    });
   }
 }

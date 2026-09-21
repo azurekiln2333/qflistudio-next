@@ -91,6 +91,7 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
 
   bool? _explorerVisible;
   bool _terminalCollapsed = false;
+  double _terminalHeight = 240;
   bool _aiCollapsed = false;
   _BottomPanel _bottomPanel = _BottomPanel.none;
   bool get _terminalVisible => _bottomPanel == _BottomPanel.terminal;
@@ -1049,7 +1050,7 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                     if (_bottomPanel == _BottomPanel.terminal)
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 150),
-                        height: _terminalCollapsed ? 36 : 240,
+                        height: _terminalCollapsed ? 36 : _terminalHeight,
                         child: TerminalPane(
                           key: _terminalKey,
                           workingDirectory: widget.project.path,
@@ -1057,6 +1058,14 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                             if (mounted) {
                               setState(() => _terminalCollapsed = collapsed);
                             }
+                          },
+                          onResizeDelta: (delta) {
+                            if (!mounted) return;
+                            final maxHeight = MediaQuery.sizeOf(context).height * 0.7;
+                            setState(() {
+                              _terminalHeight =
+                                  (_terminalHeight + delta).clamp(150.0, maxHeight);
+                            });
                           },
                           onClose: () {
                             _debugSub?.cancel();
