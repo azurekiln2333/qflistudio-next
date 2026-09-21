@@ -23,6 +23,7 @@ abstract final class ProjectLanguages {
     'TypeScript',
     'JSON',
     'Markdown',
+    'SQL',
     'Kotlin',
     'Go',
     'Rust',
@@ -70,6 +71,9 @@ enum ProjectTemplate {
   markdown('Markdown', Icons.article_outlined, 'Markdown', [
     TemplateFile('README.md', _markdownReadme),
   ]),
+  sql('SQL', Icons.storage_outlined, 'SQL', [
+    TemplateFile('src/main.sql', _sqlMain),
+  ]),
   kotlin('Kotlin', Icons.code_off_outlined, 'Kotlin', [
     TemplateFile('src/main.kt', _kotlinMain),
   ]),
@@ -112,6 +116,7 @@ enum ProjectTemplate {
     ProjectTemplate.typescript => 'typescript',
     ProjectTemplate.json => 'json',
     ProjectTemplate.markdown => 'markdown',
+    ProjectTemplate.sql => 'sql',
     ProjectTemplate.kotlin => 'kotlin',
     ProjectTemplate.go => 'go',
     ProjectTemplate.rust => 'rust',
@@ -230,6 +235,15 @@ const String _markdownReadme = '''
 # QFLI project
 
 Edit this document and switch to preview to see the rendered Markdown.
+''';
+
+const String _sqlMain = '''
+CREATE TABLE IF NOT EXISTS notes (
+    id INTEGER PRIMARY KEY,
+    body TEXT NOT NULL
+);
+
+SELECT name FROM sqlite_master WHERE type = 'table';
 ''';
 
 const String _kotlinMain = '''

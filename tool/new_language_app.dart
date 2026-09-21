@@ -68,6 +68,8 @@ class _Spec {
     required this.description,
     required this.htmlDescription,
     required this.pendingRunner,
+    this.productTitle,
+    this.packageKey,
   });
 
   /// 目录名后缀，也是档位 id：`web` → `apps/qfli_web`。
@@ -98,19 +100,22 @@ class _Spec {
   /// true 表示解释器还没落地，后端先返回「开发中」。
   final bool pendingRunner;
 
+  final String? productTitle;
+  final String? packageKey;
+
   /// `QFLIStudio+ C 版` 里的 `C` 换成这个。
-  String get title => 'QFLIStudio+ $displayName 版';
+  String get title => productTitle ?? 'QFLIStudio+ $displayName 版';
 
   /// macOS 的 PRODUCT_NAME 不带「版」。
-  String get macName => 'QFLIStudio+ $displayName';
+  String get macName => title;
 
   String get appDir => 'apps/qfli_$id';
 
   String get runtimePackage => 'qfli_${id}_runtime';
 
-  String get androidAppId => 'com.example.qflistudio.$id';
+  String get androidAppId => 'com.azurekiln.qfli.${packageKey ?? id}';
 
-  String get ohosBundleName => 'com.azurekiln.qflistudio.$id';
+  String get ohosBundleName => androidAppId;
 
   /// Windows 的窗口标题。C++ 源码里只把非 ASCII 字符写成 `\uXXXX`，
   /// ASCII 原样保留——全是转义虽然也对，但没人读得出来。
@@ -123,6 +128,71 @@ class _Spec {
 }
 
 const List<_Spec> _specs = <_Spec>[
+  _Spec(
+    id: 'rust',
+    displayName: 'Rust',
+    productTitle: 'QFLIRustCore',
+    packageKey: 'rustcore',
+    template: 'rust',
+    entryFileNames: ['main.rs', 'src/main.rs'],
+    runnerClass: 'RustProgramRunner',
+    sourceExtensions: ['.rs'],
+    description: 'QFLIRustCore：Rust 编辑器与桌面工具链入口。',
+    htmlDescription: 'Rust 编辑器与桌面工具链入口。',
+    pendingRunner: true,
+  ),
+  _Spec(
+    id: 'go',
+    displayName: 'Go',
+    productTitle: 'QFLIGoShift',
+    packageKey: 'goshift',
+    template: 'go',
+    entryFileNames: ['main.go', 'src/main.go'],
+    runnerClass: 'GoProgramRunner',
+    sourceExtensions: ['.go'],
+    description: 'QFLIGoShift：Go 编辑器与桌面工具链入口。',
+    htmlDescription: 'Go 编辑器与桌面工具链入口。',
+    pendingRunner: true,
+  ),
+  _Spec(
+    id: 'sql',
+    displayName: 'SQL',
+    productTitle: 'QFLISQLab',
+    packageKey: 'sqlab',
+    template: 'sql',
+    entryFileNames: ['main.sql', 'src/main.sql'],
+    runnerClass: 'SqlProgramRunner',
+    sourceExtensions: ['.sql'],
+    description: 'QFLISQLab：SQLite 数据库与 SQL 工作流。',
+    htmlDescription: 'SQLite 数据库与 SQL 工作流。',
+    pendingRunner: true,
+  ),
+  _Spec(
+    id: 'json',
+    displayName: 'JSON',
+    productTitle: 'QFLIJson',
+    packageKey: 'json',
+    template: 'json',
+    entryFileNames: ['data.json', 'src/data.json'],
+    runnerClass: null,
+    sourceExtensions: ['.json'],
+    description: 'QFLIJson：JSON 编辑、校验、格式化与结构预览。',
+    htmlDescription: 'JSON 编辑、校验、格式化与结构预览。',
+    pendingRunner: false,
+  ),
+  _Spec(
+    id: 'note',
+    displayName: 'Markdown',
+    productTitle: 'QFLINote',
+    packageKey: 'note',
+    template: 'markdown',
+    entryFileNames: ['README.md', 'src/README.md'],
+    runnerClass: null,
+    sourceExtensions: ['.md', '.markdown'],
+    description: 'QFLINote：Markdown 编辑与预览。',
+    htmlDescription: 'Markdown 编辑与预览。',
+    pendingRunner: false,
+  ),
   _Spec(
     id: 'cpp',
     displayName: 'C++',
@@ -404,6 +474,8 @@ void _brand(_Spec spec, Directory dest) {
     // 越长的键越先替换。
     'com.azurekiln.qflistudio.c': spec.ohosBundleName,
     'com.example.qflistudio.c': spec.androidAppId,
+    'com.azurekiln.qfli.c': spec.ohosBundleName,
+    'QFLIForge': spec.title,
     r'QFLIStudio+ C \u7248': spec.cppEscapedTitle,
     'QFLIStudio+ C 版': spec.title,
     'QFLIStudio+ C': spec.macName,
