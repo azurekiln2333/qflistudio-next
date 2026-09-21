@@ -100,6 +100,16 @@ class StudioLocalizations {
   String get noProjects => _text('noProjects');
   String get desktopCreateProjectHint => _text('desktopCreateProjectHint');
   String get mobileCreateProjectHint => _text('mobileCreateProjectHint');
+  String get importResource => _text('importResource');
+  String get importPhoto => _text('importPhoto');
+  String get replaceExistingResource => _text('replaceExistingResource');
+  String importFinished(int count) =>
+      _text('importFinished').replaceAll('{count}', '$count');
+  String get replaceResource => _text('replaceResource');
+  String get importFailed => _text('importFailed');
+
+  String replaceResourceMessage(String name) =>
+      _text('replaceResourceMessage').replaceAll('{name}', name);
 
   String missingProjectPath(String path) =>
       '${_text('missingProjectPath')}$path';
@@ -196,6 +206,13 @@ class StudioLocalizations {
     'noProjects': '还没有项目',
     'desktopCreateProjectHint': '创建一个新项目，或添加磁盘上已有的文件夹',
     'mobileCreateProjectHint': '点击下方按钮，创建你的第一个项目',
+    'importResource': '从文件导入资源',
+    'importPhoto': '从相册导入图片',
+    'replaceExistingResource': '资源已存在',
+    'replaceResource': '覆盖',
+    'replaceResourceMessage': '“{name}”已存在，是否覆盖？',
+    'importFinished': '已导入 {count} 个资源',
+    'importFailed': '部分资源导入失败：',
     'missingProjectPath': '项目目录不存在：',
     'deletedProject': '已删除“{name}”，备份可在应用数据 recyclebin/projects_bin 找回',
     'removeMissingMessage': '以下 {count} 个项目的目录已不存在，将仅从列表移除：\n\n{names}',
@@ -273,6 +290,13 @@ class StudioLocalizations {
     'noProjects': '還沒有專案',
     'desktopCreateProjectHint': '建立新專案，或加入磁碟上已有的資料夾',
     'mobileCreateProjectHint': '點擊下方按鈕，建立你的第一個專案',
+    'importResource': '從檔案匯入資源',
+    'importPhoto': '從相簿匯入圖片',
+    'replaceExistingResource': '資源已存在',
+    'replaceResource': '覆蓋',
+    'replaceResourceMessage': '「{name}」已存在，是否覆蓋？',
+    'importFinished': '已匯入 {count} 個資源',
+    'importFailed': '部分資源匯入失敗：',
     'missingProjectPath': '專案目錄不存在：',
     'deletedProject': '已刪除「{name}」，備份可在應用程式資料 recyclebin/projects_bin 找回',
     'removeMissingMessage': '以下 {count} 個專案的目錄已不存在，只會從清單移除：\n\n{names}',
@@ -350,6 +374,13 @@ class StudioLocalizations {
     'noProjects': 'No projects yet',
     'desktopCreateProjectHint': 'Create a project or add a folder already on disk',
     'mobileCreateProjectHint': 'Tap the button below to create your first project',
+    'importResource': 'Import resource from files',
+    'importPhoto': 'Import image from photos',
+    'replaceExistingResource': 'Resource already exists',
+    'replaceResource': 'Replace',
+    'replaceResourceMessage': '“{name}” already exists. Replace it?',
+    'importFinished': 'Imported {count} resources',
+    'importFailed': 'Some resources failed to import: ',
     'missingProjectPath': 'Project directory does not exist: ',
     'deletedProject': 'Deleted “{name}”. The backup is in app data at recyclebin/projects_bin.',
     'removeMissingMessage': 'The directories for these {count} projects no longer exist. Only remove them from the list:\n\n{names}',

@@ -12,6 +12,9 @@ import '../store/settings_store.dart';
 import '../editor/project_history.dart';
 import '../pages/file_history_page.dart';
 import '../services/recycle_bin.dart';
+import '../services/picker_service.dart';
+import '../services/resource_import_service.dart';
+import '../i18n/studio_localizations.dart';
 import '../widgets/project_dialogs.dart';
 import 'editor_controller.dart';
 
@@ -215,6 +218,54 @@ class _FileExplorerState extends State<FileExplorer> {
     }
   }
 
+  Future<void> _importResources(FileNode directory, {required bool photos}) async {
+    final documents = <PickedDocument>[];
+    if (photos) {
+      documents.addAll(await PickerService.pickPhotos());
+    } else {
+      final document = await PickerService.pickDocument(extensions: const []);
+      if (document != null) documents.add(document);
+    }
+    if (documents.isEmpty || !mounted) return;
+    final l = StudioLocalizations.of(context);
+    final result = await ResourceImportService.importDocuments(
+      documents: documents,
+      destinationDirectory: directory.path,
+      resolveConflict: (name) async =>
+          await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l.replaceExistingResource),
+              content: Text(l.replaceResourceMessage(name)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l.cancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(l.replaceResource),
+                ),
+              ],
+            ),
+          ) ??
+          false,
+    );
+    if (!mounted) return;
+    await _refresh();
+    if (!mounted) return;
+    if (result.imported > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.importFinished(result.imported))),
+      );
+    }
+    if (result.errors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l.importFailed}${result.errors.join('; ')}')),
+      );
+    }
+  }
+
   void _toggle(FileNode node) {
     if (_expanded.remove(node.path)) {
       setState(() {});
@@ -334,6 +385,7 @@ class _FileExplorerState extends State<FileExplorer> {
 
   void _showMenu(FileNode node, Offset position) {
     final isRoot = node.path == _root.path;
+    final l = StudioLocalizations.of(context);
     final items = <PopupMenuEntry<String>>[
       if (!node.isDir)
         const PopupMenuItem(
@@ -347,6 +399,26 @@ class _FileExplorerState extends State<FileExplorer> {
           ),
         ),
       if (node.isDir) ...[
+        PopupMenuItem(
+          value: 'import_resource',
+          child: Row(
+            children: [
+              const Icon(Icons.file_upload_outlined, size: 18),
+              const SizedBox(width: 10),
+              Text(l.importResource),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'import_photo',
+          child: Row(
+            children: [
+              const Icon(Icons.photo_library_outlined, size: 18),
+              const SizedBox(width: 10),
+              Text(l.importPhoto),
+            ],
+          ),
+        ),
         const PopupMenuItem(
           value: 'new_file',
           child: Row(
@@ -420,6 +492,10 @@ class _FileExplorerState extends State<FileExplorer> {
           _create(node, false);
         case 'new_folder':
           _create(node, true);
+        case 'import_resource':
+          _importResources(node, photos: false);
+        case 'import_photo':
+          _importResources(node, photos: true);
         case 'refresh':
           _loadChildren(node);
         case 'delete':
