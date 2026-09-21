@@ -1318,7 +1318,7 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                   shape: BoxShape.circle,
                   color: scheme.primary,
                 ),
-              ),
+              )
             else
               GestureDetector(
                 onTap: () => _closeTab(_editor.files.indexOf(open)),
