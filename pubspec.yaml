@@ -18,6 +18,8 @@ workspace:
   - apps/qfli_java
   - apps/qfli_dart
   - apps/qfli_lua
+  - apps/qfli_rust
+  - apps/qfli_go
 
 dependencies:
   flutter:
