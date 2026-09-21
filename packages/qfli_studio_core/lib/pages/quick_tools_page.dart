@@ -4,17 +4,21 @@ import 'package:flutter/material.dart';
 
 import '../editor/terminal_pane.dart';
 import '../i18n/studio_localizations.dart';
+import '../services/studio_profile.dart';
 import '../services/app_paths.dart';
 import '../store/project_store.dart';
+import 'content_tools_pages.dart';
 
 /// 主页的功能页。
 class FunctionsTab extends StatelessWidget {
   const FunctionsTab({
     super.key,
     required this.onOpenTerminal,
+    this.onOpenContentTool,
   });
 
   final VoidCallback onOpenTerminal;
+  final VoidCallback? onOpenContentTool;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +34,60 @@ class FunctionsTab extends StatelessWidget {
             subtitle: l10n.terminalSubtitle,
             onTap: onOpenTerminal,
           ),
+          if (onOpenContentTool != null) ...[
+            const SizedBox(height: 8),
+            _QuickToolTile(
+              icon: switch (StudioProfile.current?.productKey) {
+                StudioProductCatalog.jsonKey => Icons.data_object,
+                StudioProductCatalog.noteKey => Icons.article_outlined,
+                StudioProductCatalog.sqlabKey => Icons.storage_outlined,
+                _ => Icons.build_outlined,
+              },
+              title: switch (StudioProfile.current?.productKey) {
+                StudioProductCatalog.jsonKey => l10n.jsonTools,
+                StudioProductCatalog.noteKey => l10n.markdownTools,
+                StudioProductCatalog.sqlabKey => l10n.sqlTools,
+                _ => l10n.functions,
+              },
+              subtitle: switch (StudioProfile.current?.productKey) {
+                StudioProductCatalog.jsonKey => l10n.jsonStructure,
+                StudioProductCatalog.noteKey => l10n.markdownPreview,
+                StudioProductCatalog.sqlabKey => l10n.executeQuery,
+                _ => l10n.functions,
+              },
+              onTap: onOpenContentTool!,
+            ),
+          ],
         ],
       ),
     );
+  }
+}
+
+class ContentToolsPage extends StatelessWidget {
+  const ContentToolsPage({super.key, required this.store});
+
+  final ProjectStore store;
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = StudioProfile.current;
+    return switch (profile?.productKey) {
+      StudioProductCatalog.jsonKey => const JsonToolPage(),
+      StudioProductCatalog.noteKey => const MarkdownToolPage(),
+      StudioProductCatalog.sqlabKey => SqlToolPage(projectPath: _projectPath),
+      _ => Scaffold(
+        appBar: AppBar(title: Text(StudioLocalizations.of(context).functions)),
+        body: const SizedBox.shrink(),
+      ),
+    };
+  }
+
+  String? get _projectPath {
+    for (final project in store.projects) {
+      if (!project.isCloud) return project.path;
+    }
+    return null;
   }
 }
 

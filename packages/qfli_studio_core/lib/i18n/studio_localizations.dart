@@ -142,6 +142,21 @@ class StudioLocalizations {
 
   String get terminalCollapsed => _text('terminalCollapsed');
   String get terminalHeader => _text('terminalHeader');
+  String get jsonTools => _text('jsonTools');
+  String get jsonSource => _text('jsonSource');
+  String get jsonFormat => _text('jsonFormat');
+  String get jsonValidate => _text('jsonValidate');
+  String get jsonValid => _text('jsonValid');
+  String get jsonInvalid => _text('jsonInvalid');
+  String get jsonRootType => _text('jsonRootType');
+  String get jsonStructure => _text('jsonStructure');
+  String get markdownTools => _text('markdownTools');
+  String get markdownEdit => _text('markdownEdit');
+  String get markdownPreview => _text('markdownPreview');
+  String get markdownSource => _text('markdownSource');
+  String get sqlTools => _text('sqlTools');
+  String get sqlSource => _text('sqlSource');
+  String get executeQuery => _text('executeQuery');
   String exitCode(int code) => _text('exitCode').replaceAll('{code}', '$code');
   String runEnded(int code) => _text('runEnded').replaceAll('{code}', '$code');
   String unableToExecute(String message) =>
@@ -229,6 +244,21 @@ class StudioLocalizations {
     'exitCode': '（退出码 {code}）',
     'runEnded': '（运行结束，退出码 {code}）',
     'unableToExecute': '无法执行：',
+    'jsonTools': 'JSON 工具',
+    'jsonSource': 'JSON 内容',
+    'jsonFormat': '格式化 JSON',
+    'jsonValidate': '校验 JSON',
+    'jsonValid': 'JSON 有效',
+    'jsonInvalid': 'JSON 无效',
+    'jsonRootType': '根类型',
+    'jsonStructure': '结构预览',
+    'markdownTools': 'Markdown 编辑与预览',
+    'markdownEdit': '编辑',
+    'markdownPreview': '预览',
+    'markdownSource': 'Markdown 内容',
+    'sqlTools': 'SQL 查询',
+    'sqlSource': 'SQL 语句',
+    'executeQuery': '执行查询',
   };
 
   static const _zhTw = <String, String>{
@@ -313,6 +343,21 @@ class StudioLocalizations {
     'exitCode': '（結束碼 {code}）',
     'runEnded': '（執行結束，結束碼 {code}）',
     'unableToExecute': '無法執行：',
+    'jsonTools': 'JSON 工具',
+    'jsonSource': 'JSON 內容',
+    'jsonFormat': '格式化 JSON',
+    'jsonValidate': '驗證 JSON',
+    'jsonValid': 'JSON 有效',
+    'jsonInvalid': 'JSON 無效',
+    'jsonRootType': '根類型',
+    'jsonStructure': '結構預覽',
+    'markdownTools': 'Markdown 編輯與預覽',
+    'markdownEdit': '編輯',
+    'markdownPreview': '預覽',
+    'markdownSource': 'Markdown 內容',
+    'sqlTools': 'SQL 查詢',
+    'sqlSource': 'SQL 語句',
+    'executeQuery': '執行查詢',
   };
 
   static const _en = <String, String>{
@@ -397,6 +442,21 @@ class StudioLocalizations {
     'exitCode': '(exit code {code})',
     'runEnded': '(finished, exit code {code})',
     'unableToExecute': 'Unable to execute: ',
+    'jsonTools': 'JSON tools',
+    'jsonSource': 'JSON source',
+    'jsonFormat': 'Format JSON',
+    'jsonValidate': 'Validate JSON',
+    'jsonValid': 'Valid JSON',
+    'jsonInvalid': 'Invalid JSON',
+    'jsonRootType': 'Root type',
+    'jsonStructure': 'Structure preview',
+    'markdownTools': 'Markdown editor and preview',
+    'markdownEdit': 'Edit',
+    'markdownPreview': 'Preview',
+    'markdownSource': 'Markdown source',
+    'sqlTools': 'SQL query',
+    'sqlSource': 'SQL statement',
+    'executeQuery': 'Run query',
   };
 }
 

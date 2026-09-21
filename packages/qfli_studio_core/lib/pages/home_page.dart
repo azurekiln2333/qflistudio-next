@@ -64,6 +64,13 @@ class _HomePageState extends State<HomePage> {
                     builder: (_) => LocalTerminalPage(store: widget.store),
                   ),
                 ),
+                onOpenContentTool: _isContentProduct
+                    ? () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ContentToolsPage(store: widget.store),
+                        ),
+                      )
+                    : null,
               ),
             )
           else
@@ -141,6 +148,13 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  bool get _isContentProduct => switch (StudioProfile.current?.productKey) {
+    StudioProductCatalog.jsonKey ||
+    StudioProductCatalog.noteKey ||
+    StudioProductCatalog.sqlabKey => true,
+    _ => false,
+  };
 }
 
 /// 主页 Tab：项目列表 + 搜索 + 更多操作。
