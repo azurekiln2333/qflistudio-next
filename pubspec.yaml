@@ -20,6 +20,9 @@ workspace:
   - apps/qfli_lua
   - apps/qfli_rust
   - apps/qfli_go
+  - apps/qfli_sql
+  - apps/qfli_json
+  - apps/qfli_note
 
 dependencies:
   flutter:
