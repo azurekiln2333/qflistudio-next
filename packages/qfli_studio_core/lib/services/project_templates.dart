@@ -21,6 +21,8 @@ abstract final class ProjectLanguages {
     'Lua',
     'JavaScript',
     'TypeScript',
+    'JSON',
+    'Markdown',
     'Kotlin',
     'Go',
     'Rust',
@@ -59,8 +61,14 @@ enum ProjectTemplate {
   javascript('JavaScript', Icons.javascript_outlined, 'JavaScript', [
     TemplateFile('src/main.js', _jsMain),
   ]),
-  typescript('TypeScript', Icons.javascript, 'TypeScript', [
+    typescript('TypeScript', Icons.javascript, 'TypeScript', [
     TemplateFile('src/main.ts', _tsMain),
+  ]),
+  json('JSON', Icons.data_object, 'JSON', [
+    TemplateFile('src/data.json', _jsonData),
+  ]),
+  markdown('Markdown', Icons.article_outlined, 'Markdown', [
+    TemplateFile('README.md', _markdownReadme),
   ]),
   kotlin('Kotlin', Icons.code_off_outlined, 'Kotlin', [
     TemplateFile('src/main.kt', _kotlinMain),
@@ -102,6 +110,8 @@ enum ProjectTemplate {
     ProjectTemplate.lua => 'lua',
     ProjectTemplate.javascript => 'javascript',
     ProjectTemplate.typescript => 'typescript',
+    ProjectTemplate.json => 'json',
+    ProjectTemplate.markdown => 'markdown',
     ProjectTemplate.kotlin => 'kotlin',
     ProjectTemplate.go => 'go',
     ProjectTemplate.rust => 'rust',
@@ -207,6 +217,19 @@ const String _tsMain = '''
 const greet = (name: string): string => `Hello, QFLIStudio+! \${name}`;
 
 console.log(greet('world'));
+''';
+
+const String _jsonData = '''
+{
+  "name": "QFLI project",
+  "version": 1
+}
+''';
+
+const String _markdownReadme = '''
+# QFLI project
+
+Edit this document and switch to preview to see the rendered Markdown.
 ''';
 
 const String _kotlinMain = '''
