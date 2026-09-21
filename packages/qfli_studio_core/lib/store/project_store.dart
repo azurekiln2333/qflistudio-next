@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 import '../models/project.dart';
+import '../models/tutorial.dart';
 import '../services/app_paths.dart';
 import '../services/project_config.dart';
 import '../services/project_templates.dart';
@@ -141,6 +142,35 @@ class ProjectStore extends ChangeNotifier {
       template: template,
       cloudId: null,
     );
+  }
+
+  /// Creates a real registered project and places an example in its entry file.
+  Future<ProjectResult> createProjectFromExample({
+    required String name,
+    required ExampleCode example,
+    String? location,
+  }) async {
+    final root = location ?? await AppPaths.projectsRoot(create: true);
+    if (root == null) {
+      return (error: '未找到可写的项目目录', project: null);
+    }
+    final template = ProjectTemplate.fromType(example.type) ??
+        ProjectTemplate.fromType(example.type == 'html' ? 'web' : example.type) ??
+        ProjectTemplate.empty;
+    final result = await createProject(
+      name: name,
+      location: root,
+      template: template,
+    );
+    final project = result.project;
+    final mainFile = template.mainFile;
+    if (project == null || mainFile == null) return result;
+    try {
+      await File(p.join(project.path, mainFile)).writeAsString(example.code);
+    } on FileSystemException catch (error) {
+      return (error: '写入示例代码失败：${error.message}', project: project);
+    }
+    return result;
   }
 
   Future<ProjectResult> _createProject({

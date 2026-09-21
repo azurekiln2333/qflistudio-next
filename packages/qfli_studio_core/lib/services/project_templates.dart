@@ -90,6 +90,34 @@ enum ProjectTemplate {
   final String language;
   final List<TemplateFile> files;
 
+  /// Stable JSON/type discriminator for project metadata and examples.
+  String get type => switch (this) {
+    ProjectTemplate.empty => 'empty',
+    ProjectTemplate.java => 'java',
+    ProjectTemplate.python => 'python',
+    ProjectTemplate.c => 'c',
+    ProjectTemplate.cpp => 'cpp',
+    ProjectTemplate.html => 'web',
+    ProjectTemplate.dart => 'dart',
+    ProjectTemplate.lua => 'lua',
+    ProjectTemplate.javascript => 'javascript',
+    ProjectTemplate.typescript => 'typescript',
+    ProjectTemplate.kotlin => 'kotlin',
+    ProjectTemplate.go => 'go',
+    ProjectTemplate.rust => 'rust',
+    ProjectTemplate.csharp => 'csharp',
+    ProjectTemplate.php => 'php',
+    ProjectTemplate.ruby => 'ruby',
+  };
+
+  static ProjectTemplate? fromType(String value) {
+    final normalized = value.trim().toLowerCase();
+    for (final template in values) {
+      if (template.type == normalized) return template;
+    }
+    return null;
+  }
+
   /// 创建完成后自动打开的主文件；空项目为 null。
   String? get mainFile => files.isEmpty ? null : files.first.path;
 }

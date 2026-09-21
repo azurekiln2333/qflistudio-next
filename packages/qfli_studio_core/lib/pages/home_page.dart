@@ -81,7 +81,11 @@ class _HomePageState extends State<HomePage> {
             TickerMode(
               enabled: _currentIndex == 3,
               child: offline
-                  ? ExampleCodeTab(language: profile!.id)
+                  ? ExampleCodeTab(
+                      language: profile!.id,
+                      store: widget.store,
+                      auth: widget.auth,
+                    )
                   : DiscussionTab(auth: widget.auth),
             )
           else

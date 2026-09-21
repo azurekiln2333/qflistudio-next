@@ -86,7 +86,9 @@ abstract final class TutorialService {
       final chapter = _map(raw);
       final lessons = <TutorialLesson>[];
       for (final rawLesson in _list(chapter['lessons'])) {
-        lessons.add(_lesson(_map(rawLesson)));
+        lessons.add(
+          _lesson(_map(rawLesson), fallbackType: _str(map['type'], fallback: language)),
+        );
       }
       chapters.add(
         TutorialChapter(
@@ -97,13 +99,34 @@ abstract final class TutorialService {
       );
     }
 
+    final parsedExamples = [
+      for (final raw in _list(map['examples'])) _example(_map(raw)),
+    ];
+    final examples = parsedExamples.isNotEmpty
+        ? parsedExamples
+        : [
+            for (final chapter in chapters)
+              for (final lesson in chapter.lessons)
+                ExampleCode(
+                  id: lesson.id,
+                  type: lesson.type,
+                  title: lesson.title,
+                  summary: lesson.summary,
+                  code: lesson.code,
+                  output: lesson.output,
+                  sourceLessonId: lesson.id,
+                ),
+          ];
+
     return Tutorial(
       language: _str(map['language'], fallback: language),
+      type: _str(map['type'], fallback: language),
       displayName: _str(map['displayName'], fallback: language),
       schemaVersion: _int(map['schemaVersion'], fallback: 1),
       updatedAt: _str(map['updatedAt']),
       runtime: _runtime(_map(map['runtime'])),
       chapters: chapters,
+      examples: examples,
     );
   }
 
@@ -121,7 +144,10 @@ abstract final class TutorialService {
     );
   }
 
-  static TutorialLesson _lesson(Map<String, Object?> map) {
+  static TutorialLesson _lesson(
+    Map<String, Object?> map, {
+    required String fallbackType,
+  }) {
     final tasks = <TutorialTask>[];
     for (final raw in _list(map['tasks'])) {
       final task = _map(raw);
@@ -135,6 +161,7 @@ abstract final class TutorialService {
     }
     return TutorialLesson(
       id: _str(map['id']),
+      type: _str(map['type'], fallback: fallbackType),
       title: _str(map['title']),
       summary: _str(map['summary']),
       concepts: [for (final c in _list(map['concepts'])) _str(c)],
@@ -144,6 +171,16 @@ abstract final class TutorialService {
       tasks: tasks,
     );
   }
+
+  static ExampleCode _example(Map<String, Object?> map) => ExampleCode(
+    id: _str(map['id']),
+    type: _str(map['type'], fallback: 'unknown'),
+    title: _str(map['title']),
+    summary: _str(map['summary']),
+    code: _str(map['code']),
+    output: _str(map['output']),
+    sourceLessonId: _nullableStr(map['sourceLessonId']),
+  );
 
   /// 依次尝试带包名前缀和不带前缀的 asset key。
   ///

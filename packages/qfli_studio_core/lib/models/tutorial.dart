@@ -13,15 +13,20 @@ library;
 class Tutorial {
   const Tutorial({
     required this.language,
+    required this.type,
     required this.displayName,
     required this.schemaVersion,
     required this.updatedAt,
     required this.runtime,
     required this.chapters,
+    required this.examples,
   });
 
   /// 语言标识，与 [StudioProfile.id] 同域，例如 `c` / `python`。
   final String language;
+
+  /// Stable language/type discriminator used by filters and import actions.
+  final String type;
 
   /// 展示名，例如 `C` / `Python`。
   final String displayName;
@@ -36,6 +41,9 @@ class Tutorial {
   final TutorialRuntime runtime;
 
   final List<TutorialChapter> chapters;
+
+  /// Explicit examples when supplied by JSON, otherwise lesson projections.
+  final List<ExampleCode> examples;
 
   /// 全部课时数。
   int get lessonCount =>
@@ -106,6 +114,7 @@ class TutorialChapter {
 class TutorialLesson {
   const TutorialLesson({
     required this.id,
+    required this.type,
     required this.title,
     required this.summary,
     required this.concepts,
@@ -116,6 +125,7 @@ class TutorialLesson {
   });
 
   final String id;
+  final String type;
   final String title;
 
   /// 一句话说明这一课要解决什么问题。
@@ -135,6 +145,38 @@ class TutorialLesson {
 
   /// 练习题。
   final List<TutorialTask> tasks;
+}
+
+/// A first-class example entry. It is intentionally separate from lessons so
+/// editable example catalogs can evolve without changing tutorial chapters.
+class ExampleCode {
+  const ExampleCode({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.summary,
+    required this.code,
+    required this.output,
+    this.sourceLessonId,
+  });
+
+  final String id;
+  final String type;
+  final String title;
+  final String summary;
+  final String code;
+  final String output;
+  final String? sourceLessonId;
+
+  ExampleCode copyWith({String? code, String? summary}) => ExampleCode(
+    id: id,
+    type: type,
+    title: title,
+    summary: summary ?? this.summary,
+    code: code ?? this.code,
+    output: output,
+    sourceLessonId: sourceLessonId,
+  );
 }
 
 /// 一课里的一道练习题。

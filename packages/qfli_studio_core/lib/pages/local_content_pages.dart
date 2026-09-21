@@ -5,6 +5,9 @@ import '../i18n/studio_localizations.dart';
 import '../models/tutorial.dart';
 import '../services/studio_profile.dart';
 import '../services/tutorial_service.dart';
+import '../store/auth_store.dart';
+import '../store/project_store.dart';
+import '../services/example_code_store.dart';
 
 /// 离线语言 App 的第二页：从随包 JSON 加载入门教程。
 class LocalTutorialsTab extends StatefulWidget {
@@ -59,9 +62,18 @@ class _LocalTutorialsTabState extends State<LocalTutorialsTab> {
 
 /// 离线语言 App 的第三页：展示教程 JSON 中的可复制示例代码。
 class ExampleCodeTab extends StatefulWidget {
-  const ExampleCodeTab({super.key, required this.language});
+  const ExampleCodeTab({
+    super.key,
+    required this.language,
+    this.store,
+    this.auth,
+    this.examples,
+  });
 
   final String language;
+  final ProjectStore? store;
+  final AuthStore? auth;
+  final ExampleCodeStore? examples;
 
   @override
   State<ExampleCodeTab> createState() => _ExampleCodeTabState();
@@ -93,7 +105,12 @@ class _ExampleCodeTabState extends State<ExampleCodeTab> {
           if (tutorial == null) {
             return _LocalContentError(message: l10n.localExamplesMissing);
           }
-          return _ExampleCodeList(tutorial: tutorial);
+          return _ExampleCodeList(
+            tutorial: tutorial,
+            store: widget.store,
+            auth: widget.auth,
+            examples: widget.examples,
+          );
         },
       ),
     );
@@ -139,9 +156,17 @@ class _TutorialList extends StatelessWidget {
 }
 
 class _ExampleCodeList extends StatelessWidget {
-  const _ExampleCodeList({required this.tutorial});
+  const _ExampleCodeList({
+    required this.tutorial,
+    this.store,
+    this.auth,
+    this.examples,
+  });
 
   final Tutorial tutorial;
+  final ProjectStore? store;
+  final AuthStore? auth;
+  final ExampleCodeStore? examples;
 
   @override
   Widget build(BuildContext context) {
@@ -157,30 +182,40 @@ class _ExampleCodeList extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        for (final chapter in tutorial.chapters) ...[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 12, 4, 4),
-            child: Text(chapter.title, style: theme.textTheme.titleMedium),
+        for (final example in tutorial.examples)
+          _ExampleCodeCard(
+            example: example,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ExampleDetailPage(
+                  example: example,
+                  store: store,
+                  auth: auth,
+                  examples: examples,
+                ),
+              ),
+            ),
           ),
-          for (final lesson in chapter.lessons)
-            _ExampleCodeCard(lesson: lesson),
-        ],
       ],
     );
   }
 }
 
 class _ExampleCodeCard extends StatelessWidget {
-  const _ExampleCodeCard({required this.lesson});
+  const _ExampleCodeCard({required this.example, this.onTap});
 
-  final TutorialLesson lesson;
+  final ExampleCode example;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = StudioLocalizations.of(context);
     return Card(
-      child: Padding(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 12, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -188,13 +223,14 @@ class _ExampleCodeCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(lesson.title, style: theme.textTheme.titleSmall),
+                  child: Text(example.title, style: theme.textTheme.titleSmall),
                 ),
+                Text(example.type),
                 IconButton(
                   tooltip: l10n.copyExample,
                   icon: const Icon(Icons.copy_outlined),
                   onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: lesson.code));
+                    await Clipboard.setData(ClipboardData(text: example.code));
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(
                       context,
@@ -214,7 +250,7 @@ class _ExampleCodeCard extends StatelessWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: SelectableText(
-                    lesson.code,
+                    example.code,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontFamily: 'monospace',
                     ),
@@ -224,7 +260,116 @@ class _ExampleCodeCard extends StatelessWidget {
             ),
           ],
         ),
+        ),
       ),
+    );
+  }
+}
+
+class ExampleDetailPage extends StatefulWidget {
+  const ExampleDetailPage({
+    super.key,
+    required this.example,
+    this.store,
+    this.auth,
+    this.examples,
+  });
+
+  final ExampleCode example;
+  final ProjectStore? store;
+  final AuthStore? auth;
+  final ExampleCodeStore? examples;
+
+  @override
+  State<ExampleDetailPage> createState() => _ExampleDetailPageState();
+}
+
+class _ExampleDetailPageState extends State<ExampleDetailPage> {
+  late final TextEditingController _code =
+      TextEditingController(text: widget.example.code);
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = StudioLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.example.title),
+        actions: [
+          IconButton(
+            tooltip: l10n.copyExample,
+            icon: const Icon(Icons.copy_outlined),
+            onPressed: () => Clipboard.setData(ClipboardData(text: _code.text)),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+        children: [
+          Text(widget.example.type),
+          const SizedBox(height: 8),
+          Text(widget.example.summary),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _code,
+            minLines: 12,
+            maxLines: 24,
+            expands: false,
+            style: const TextStyle(fontFamily: 'monospace'),
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+          ),
+          const SizedBox(height: 16),
+          Text(l10n.expectedOutput),
+          const SizedBox(height: 6),
+          SelectableText(widget.example.output),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FilledButton.icon(
+                onPressed: widget.store == null ? null : _importProject,
+                icon: const Icon(Icons.create_new_folder_outlined),
+                label: Text(l10n.importExampleProject),
+              ),
+              OutlinedButton.icon(
+                onPressed: _reset,
+                icon: const Icon(Icons.restore),
+                label: Text(l10n.restoreDefault),
+              ),
+              OutlinedButton.icon(
+                onPressed: widget.examples == null ? null : _save,
+                icon: const Icon(Icons.save_outlined),
+                label: Text(l10n.saveExample),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _reset() => setState(() => _code.text = widget.example.code);
+
+  Future<void> _save() async {
+    await widget.examples!.upsert(
+      widget.example.copyWith(code: _code.text),
+    );
+  }
+
+  Future<void> _importProject() async {
+    final result = await widget.store!.createProjectFromExample(
+      name: widget.example.title,
+      example: widget.example.copyWith(code: _code.text),
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result.error ?? StudioLocalizations.of(context).projectImported)),
     );
   }
 }
@@ -279,7 +424,17 @@ class _LessonPage extends StatelessWidget {
           const SizedBox(height: 20),
           Text(l10n.sampleCode, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
-          _ExampleCodeCard(lesson: lesson),
+          _ExampleCodeCard(
+            example: ExampleCode(
+              id: lesson.id,
+              type: lesson.type,
+              title: lesson.title,
+              summary: lesson.summary,
+              code: lesson.code,
+              output: lesson.output,
+              sourceLessonId: lesson.id,
+            ),
+          ),
           const SizedBox(height: 16),
           Text(l10n.expectedOutput, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),

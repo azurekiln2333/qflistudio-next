@@ -61,6 +61,10 @@ class StudioLocalizations {
   String get localExamplesMissing => _text('localExamplesMissing');
   String get copyExample => _text('copyExample');
   String get exampleCopied => _text('exampleCopied');
+  String get importExampleProject => _text('importExampleProject');
+  String get restoreDefault => _text('restoreDefault');
+  String get saveExample => _text('saveExample');
+  String get projectImported => _text('projectImported');
   String get sampleCode => _text('sampleCode');
   String get expectedOutput => _text('expectedOutput');
   String get practice => _text('practice');
@@ -153,6 +157,10 @@ class StudioLocalizations {
     'localExamplesMissing': '本地示例代码不存在或无法读取。',
     'copyExample': '复制示例代码',
     'exampleCopied': '示例代码已复制',
+    'importExampleProject': '导入新建项目',
+    'restoreDefault': '恢复默认',
+    'saveExample': '保存示例',
+    'projectImported': '示例已导入新项目',
     'sampleCode': '示例代码',
     'expectedOutput': '预期输出',
     'practice': '练习',
@@ -226,6 +234,10 @@ class StudioLocalizations {
     'localExamplesMissing': '本機範例程式碼不存在或無法讀取。',
     'copyExample': '複製範例程式碼',
     'exampleCopied': '範例程式碼已複製',
+    'importExampleProject': '匯入並建立專案',
+    'restoreDefault': '還原預設',
+    'saveExample': '儲存範例',
+    'projectImported': '範例已匯入新專案',
     'sampleCode': '範例程式碼',
     'expectedOutput': '預期輸出',
     'practice': '練習',
@@ -299,6 +311,10 @@ class StudioLocalizations {
     'localExamplesMissing': 'Local examples are missing or unreadable.',
     'copyExample': 'Copy example code',
     'exampleCopied': 'Example code copied',
+    'importExampleProject': 'Import into new project',
+    'restoreDefault': 'Restore default',
+    'saveExample': 'Save example',
+    'projectImported': 'Example imported into a new project',
     'sampleCode': 'Example code',
     'expectedOutput': 'Expected output',
     'practice': 'Practice',
