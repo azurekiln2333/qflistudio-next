@@ -99,8 +99,10 @@ abstract final class TutorialService {
       );
     }
 
+    final documentType = _str(map['type'], fallback: language);
     final parsedExamples = [
-      for (final raw in _list(map['examples'])) _example(_map(raw)),
+      for (final raw in _list(map['examples']))
+        _example(_map(raw), fallbackType: documentType),
     ];
     final examples = parsedExamples.isNotEmpty
         ? parsedExamples
@@ -172,9 +174,12 @@ abstract final class TutorialService {
     );
   }
 
-  static ExampleCode _example(Map<String, Object?> map) => ExampleCode(
+  static ExampleCode _example(
+    Map<String, Object?> map, {
+    required String fallbackType,
+  }) => ExampleCode(
     id: _str(map['id']),
-    type: _str(map['type'], fallback: 'unknown'),
+    type: _str(map['type'], fallback: fallbackType),
     title: _str(map['title']),
     summary: _str(map['summary']),
     code: _str(map['code']),

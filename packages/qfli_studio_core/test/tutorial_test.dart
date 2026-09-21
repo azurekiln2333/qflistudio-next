@@ -113,6 +113,24 @@ void main() {
       expect(tutorial.runtime.isAvailable, isTrue);
       expect(tutorial.isRunnable, isTrue);
     });
+
+    test('示例条目缺少 type 时继承教程 type', () {
+      final doc = _minimalDoc()..['type'] = 'demo-script';
+      doc['examples'] = <Object?>[
+        <String, Object?>{
+          'id': 'explicit-example',
+          'title': '显式示例',
+          'summary': '示例',
+          'code': 'print("example")',
+          'output': 'example',
+        },
+      ];
+
+      final tutorial = TutorialService.parse('demo', jsonEncode(doc));
+
+      expect(tutorial.type, 'demo-script');
+      expect(tutorial.examples.single.type, 'demo-script');
+    });
   });
 
   group('随包分发的教程资产', () {
@@ -129,6 +147,15 @@ void main() {
         expect(tutorial.lessonCount, greaterThan(0));
         expect(tutorial.displayName, isNotEmpty);
         expect(tutorial.updatedAt, isNotEmpty);
+        expect(tutorial.type, isNotEmpty);
+        expect(tutorial.examples, isNotEmpty);
+        for (final example in tutorial.examples) {
+          expect(
+            example.type,
+            isNotEmpty,
+            reason: '${tutorial.language}/${example.id}',
+          );
+        }
         expect(tutorial.runtime.engine, isNotEmpty);
         expect(
           tutorial.runtime.status,
