@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
@@ -6,6 +10,9 @@ import '../services/app_paths.dart';
 import '../services/file_backup.dart';
 import '../store/auth_store.dart';
 import '../store/settings_store.dart';
+import '../store/project_store.dart';
+import '../models/project.dart';
+import '../services/project_archive_service.dart';
 import '../widgets/settings_section.dart';
 import 'highlight_settings_page.dart';
 
@@ -14,11 +21,13 @@ class SettingsPage extends StatefulWidget {
     super.key,
     required this.settings,
     this.auth,
+    this.store,
     this.showAi = true,
   });
 
   final SettingsStore settings;
   final AuthStore? auth;
+  final ProjectStore? store;
   final bool showAi;
 
   @override
@@ -144,6 +153,20 @@ class _SettingsPageState extends State<SettingsPage> {
                         '删除的项目会保存在应用数据目录的 recyclebin/projects_bin 中',
                       ),
                     ),
+                    ListTile(
+                      leading: const Icon(Icons.file_upload_outlined),
+                      title: const Text('导出项目 JSON'),
+                      subtitle: const Text('包含项目配置、源码与二进制资源'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: widget.store == null ? null : _exportProject,
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.file_download_outlined),
+                      title: const Text('导入项目 JSON'),
+                      subtitle: const Text('恢复项目目录与语言 type'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: _importProject,
+                    ),
                   ],
                 ),
                 SettingsSection(
@@ -188,6 +211,101 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     if (picked != null) await settings.setThemeMode(picked);
+  }
+
+  Future<void> _exportProject() async {
+    if (!AppPaths.isDesktop || widget.store == null) {
+      _showMessage('当前平台暂使用系统 Picker 导入导出');
+      return;
+    }
+    final project = await _pickProject();
+    if (project == null) return;
+    try {
+      final location = await getSaveLocation(
+        suggestedName: '${project.name}.qfli.json',
+        acceptedTypeGroups: const [
+          XTypeGroup(label: 'QFLI project', extensions: ['json']),
+        ],
+      );
+      if (location == null) return;
+      await File(location.path).writeAsString(
+        await ProjectArchiveService.exportProject(project),
+        flush: true,
+      );
+      _showMessage('项目已导出');
+    } on Object catch (error) {
+      _showMessage('导出失败：$error');
+    }
+  }
+
+  Future<void> _importProject() async {
+    if (!AppPaths.isDesktop || widget.store == null) {
+      _showMessage('当前平台暂使用系统 Picker 导入导出');
+      return;
+    }
+    try {
+      final file = await openFile(
+        acceptedTypeGroups: const [
+          XTypeGroup(label: 'QFLI project', extensions: ['json']),
+        ],
+      );
+      if (file == null) return;
+      final source = await file.readAsString();
+      final data = jsonDecode(source);
+      final name = data is Map && data['name'] is String
+          ? (data['name'] as String).trim()
+          : '';
+      if (name.isEmpty || RegExp(r'[\\/:*?"<>|]').hasMatch(name)) {
+        _showMessage('归档缺少有效项目名称');
+        return;
+      }
+      final root = await AppPaths.projectsRoot(create: true);
+      if (root == null) throw const FileSystemException('没有可写项目目录');
+      final target = p.join(root, name);
+      if (Directory(target).existsSync()) {
+        _showMessage('项目已存在：$name');
+        return;
+      }
+      await ProjectArchiveService.restoreProject(
+        source: source,
+        targetDirectory: target,
+      );
+      final result = await widget.store!.addExisting(target);
+      _showMessage(result.error ?? '项目已导入');
+    } on Object catch (error) {
+      _showMessage('导入失败：$error');
+    }
+  }
+
+  Future<Project?> _pickProject() async {
+    final projects = widget.store!.projects
+        .where(
+          (project) =>
+              !project.isCloud && Directory(project.path).existsSync(),
+        )
+        .toList();
+    if (projects.isEmpty) {
+      _showMessage('没有可导出的本地项目');
+      return null;
+    }
+    return showDialog<Project>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('选择项目'),
+        children: [
+          for (final project in projects)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, project),
+              child: Text(project.name),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   static Future<String?> _backupPath() async {

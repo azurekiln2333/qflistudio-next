@@ -6,6 +6,7 @@ import '../community/community_widgets.dart';
 import '../services/api_client.dart';
 import '../store/auth_store.dart';
 import '../store/settings_store.dart';
+import '../store/project_store.dart';
 import '../widgets/settings_section.dart';
 import 'audit_page.dart';
 import 'auth/login_page.dart';
@@ -14,10 +15,16 @@ import 'settings_page.dart';
 import 'tasks_page.dart';
 
 class ProfileTab extends StatefulWidget {
-  const ProfileTab({super.key, required this.auth, required this.settings});
+  const ProfileTab({
+    super.key,
+    required this.auth,
+    required this.settings,
+    required this.store,
+  });
 
   final AuthStore auth;
   final SettingsStore settings;
+  final ProjectStore store;
 
   @override
   State<ProfileTab> createState() => _ProfileTabState();
@@ -86,7 +93,11 @@ class _ProfileTabState extends State<ProfileTab> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) =>
-            SettingsPage(settings: widget.settings, auth: widget.auth),
+            SettingsPage(
+              settings: widget.settings,
+              auth: widget.auth,
+              store: widget.store,
+            ),
       ),
     );
   }

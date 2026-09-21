@@ -800,6 +800,7 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                             builder: (_) => SettingsPage(
                                               settings: widget.settings,
                                               auth: widget.auth,
+                                              store: widget.store,
                                               showAi:
                                                   StudioProfile
                                                       .current

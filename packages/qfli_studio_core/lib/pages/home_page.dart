@@ -94,7 +94,11 @@ class _HomePageState extends State<HomePage> {
             if (_visitedTabs.contains(4))
               TickerMode(
                 enabled: _currentIndex == 4,
-                child: ProfileTab(auth: widget.auth, settings: widget.settings),
+                child: ProfileTab(
+                  auth: widget.auth,
+                  settings: widget.settings,
+                  store: widget.store,
+                ),
               )
             else
               const SizedBox.shrink(),
