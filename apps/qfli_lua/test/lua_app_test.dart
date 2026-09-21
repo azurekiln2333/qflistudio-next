@@ -52,7 +52,7 @@ void main() {
       expect(luaProfile.filterLanguages(all), ['Lua']);
     });
 
-    test('产品名带 Lua 版后缀', () {
+    test('产品名使用 QFLIScript', () {
       expect(luaProfile.appTitle, 'QFLIScript');
       expect(luaProfile.showEditorTabs, isFalse);
     });

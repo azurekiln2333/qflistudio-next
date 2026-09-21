@@ -48,7 +48,7 @@ class _QfliAppState extends State<QfliApp> {
       builder: (context, _) => MaterialApp(
         title:
             StudioProfile.current?.appTitle ??
-            StudioProductCatalog.multiLanguageEditor,
+            StudioProductCatalog.qfliStudio,
         debugShowCheckedModeBanner: false,
         locale: StudioLocalizations.resolveLocale(
           WidgetsBinding.instance.platformDispatcher.locale,

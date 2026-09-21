@@ -81,7 +81,7 @@ void main() {
       expect(cProfile.filterLanguages(all), ['C']);
     });
 
-    test('产品名带 C 版后缀', () {
+    test('产品名使用 QFLIForge', () {
       expect(cProfile.appTitle, 'QFLIForge');
       expect(cProfile.showEditorTabs, isFalse);
     });

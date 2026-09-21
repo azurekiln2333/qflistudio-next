@@ -3,7 +3,7 @@ import 'project_templates.dart';
 /// 产品线名称登记表。语言 App 的 UI 标题从这里取，后续新增产品时不必散落硬编码。
 abstract final class StudioProductCatalog {
   static const qfliStudio = 'QFLIStudio+';
-  static const multiLanguageEditor = qfliStudio;
+  static const qfliStudioDescription = '多语言编辑器（暂定）';
   static const script = 'QFLIScript';
   static const rustCore = 'QFLIRustCore';
   static const goShift = 'QFLIGoShift';

@@ -13,7 +13,7 @@ void main() {
     previousProfile = StudioProfile.current;
     StudioProfile.current = const StudioProfile(
       id: 'c',
-      appTitle: 'QFLIStudio+ C 版',
+      appTitle: StudioProductCatalog.forge,
       templates: [],
       isOffline: true,
     );

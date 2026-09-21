@@ -52,7 +52,7 @@ void main() {
       expect(cppProfile.filterLanguages(all), ['C++']);
     });
 
-    test('产品名带 C++ 版后缀', () {
+    test('产品名使用 QFLIForge', () {
       expect(cppProfile.appTitle, 'QFLIForge');
       expect(cppProfile.showEditorTabs, isFalse);
     });

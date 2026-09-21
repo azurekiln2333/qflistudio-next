@@ -111,7 +111,7 @@ void main() {
       expect(pythonProfile.filterLanguages(all), ['Python']);
     });
 
-    test('产品名带 Python 版后缀', () {
+    test('产品名使用 QFLIPyFlow', () {
       expect(pythonProfile.appTitle, 'QFLIPyFlow');
       expect(pythonProfile.showEditorTabs, isFalse);
     });

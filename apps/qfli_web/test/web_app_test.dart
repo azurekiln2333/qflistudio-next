@@ -59,7 +59,7 @@ void main() {
       expect(webProfile.runner, isNull);
     });
 
-    test('产品名带 Web 版后缀', () {
+    test('产品名使用 QFLIWebForge', () {
       expect(webProfile.appTitle, 'QFLIWebForge');
       expect(webProfile.showEditorTabs, isFalse);
     });

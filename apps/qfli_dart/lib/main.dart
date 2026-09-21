@@ -13,7 +13,7 @@ import 'package:qfli_studio_core/store/settings_store.dart';
 import 'dart_runner.dart';
 
 /// 本 App 的产品名。窗口标题、任务切换器和应用内顶栏都读它。
-const String _appTitle = StudioProductCatalog.multiLanguageEditor;
+const String _appTitle = StudioProductCatalog.qfliStudio;
 
 /// Dart 版档位：同一套内核 UI，收窄成只服务 Dart。
 ///

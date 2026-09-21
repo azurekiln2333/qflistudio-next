@@ -52,7 +52,7 @@ void main() {
       expect(javaProfile.filterLanguages(all), ['Java']);
     });
 
-    test('产品名带 Java 版后缀', () {
+    test('产品名使用 QFLIJVMX', () {
       expect(javaProfile.appTitle, 'QFLIJVMX');
       expect(javaProfile.showEditorTabs, isFalse);
     });
