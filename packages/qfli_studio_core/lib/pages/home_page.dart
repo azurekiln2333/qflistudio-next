@@ -13,12 +13,14 @@ import '../store/auth_store.dart';
 import '../store/project_store.dart';
 import '../store/settings_store.dart';
 import 'local_content_pages.dart';
+import 'quick_tools_page.dart';
+import '../i18n/studio_localizations.dart';
 import 'community/post_list_page.dart';
 import '../widgets/project_card.dart';
 import '../widgets/project_dialogs.dart';
 import 'profile_page.dart';
 
-/// 应用外壳：联网版显示主页 / 教程 / 讨论 / 我的；离线语言版显示主页 / 教程 / 示例代码。
+/// 应用外壳：所有版本显示主页 / 快捷功能；联网版追加讨论 / 我的，离线版追加示例代码。
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
@@ -43,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final profile = StudioProfile.current;
     final offline = profile?.isOffline == true;
+    final l10n = StudioLocalizations.of(context);
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -55,9 +58,20 @@ class _HomePageState extends State<HomePage> {
           if (_visitedTabs.contains(1))
             TickerMode(
               enabled: _currentIndex == 1,
-              child: offline
-                  ? LocalTutorialsTab(language: profile!.id)
-                  : TutorialsTab(auth: widget.auth),
+              child: QuickToolsTab(
+                onOpenTerminal: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => LocalTerminalPage(store: widget.store),
+                  ),
+                ),
+                onOpenTutorial: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => offline
+                        ? LocalTutorialsTab(language: profile!.id)
+                        : TutorialsTab(auth: widget.auth),
+                  ),
+                ),
+              ),
             )
           else
             const SizedBox.shrink(),
@@ -87,26 +101,26 @@ class _HomePageState extends State<HomePage> {
           _currentIndex = index;
         }),
         destinations: [
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
-            label: '主页',
+            label: l10n.home,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.school_outlined),
-            selectedIcon: Icon(Icons.school),
-            label: '教程',
+          NavigationDestination(
+            icon: Icon(Icons.apps_outlined),
+            selectedIcon: Icon(Icons.apps),
+            label: l10n.quickTools,
           ),
           NavigationDestination(
             icon: Icon(offline ? Icons.code_outlined : Icons.forum_outlined),
             selectedIcon: Icon(offline ? Icons.code : Icons.forum),
-            label: offline ? '示例代码' : '讨论',
+            label: offline ? l10n.examples : l10n.discussion,
           ),
           if (!offline)
-            const NavigationDestination(
+            NavigationDestination(
               icon: Icon(Icons.person_outline),
               selectedIcon: Icon(Icons.person),
-              label: '我的',
+              label: l10n.profile,
             ),
         ],
       ),
@@ -185,11 +199,12 @@ class _HomeTabState extends State<HomeTab>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final l10n = StudioLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: _searchOpen
             ? IconButton(
-                tooltip: '退出搜索',
+                tooltip: l10n.exitSearch,
                 icon: const Icon(Icons.arrow_back),
                 onPressed: _closeSearch,
               )
@@ -208,12 +223,12 @@ class _HomeTabState extends State<HomeTab>
             ? const [SizedBox(width: 8)]
             : [
                 IconButton(
-                  tooltip: '搜索项目',
+                  tooltip: l10n.searchProjects,
                   icon: const Icon(Icons.search),
                   onPressed: _openSearch,
                 ),
                 PopupMenuButton<String>(
-                  tooltip: '更多',
+                  tooltip: l10n.more,
                   icon: const Icon(Icons.more_vert),
                   onSelected: (value) {
                     switch (value) {
@@ -227,35 +242,35 @@ class _HomeTabState extends State<HomeTab>
                   },
                   itemBuilder: (context) => [
                     if (AppPaths.isDesktop)
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'add_existing',
                         child: Row(
                           children: [
                             Icon(Icons.folder_open_outlined, size: 20),
                             SizedBox(width: 12),
-                            Text('添加现有项目'),
+                            Text(l10n.addExistingProject),
                           ],
                         ),
                       ),
                     if (StudioProfile.current?.isOffline != true &&
                         widget.auth.isLoggedIn)
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'new_cloud',
                         child: Row(
                           children: [
                             Icon(Icons.cloud_upload_outlined, size: 20),
                             SizedBox(width: 12),
-                            Text('新建云端项目'),
+                            Text(l10n.newCloudProject),
                           ],
                         ),
                       ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'remove_missing',
                       child: Row(
                         children: [
                           Icon(Icons.folder_delete_outlined, size: 20),
                           SizedBox(width: 12),
-                          Text('移除失效项目'),
+                            Text(l10n.removeMissingProjects),
                         ],
                       ),
                     ),
@@ -269,7 +284,7 @@ class _HomeTabState extends State<HomeTab>
           : FloatingActionButton.extended(
               onPressed: () => _createProject(context),
               icon: const Icon(Icons.create_new_folder_outlined),
-              label: const Text('新建项目'),
+              label: Text(l10n.createProject),
             ),
       body: ListenableBuilder(
         listenable: Listenable.merge([widget.store, widget.auth]),
@@ -290,11 +305,11 @@ class _HomeTabState extends State<HomeTab>
                 dividerColor: Colors.transparent,
                 labelPadding: const EdgeInsets.symmetric(horizontal: 12),
                 tabs: [
-                  const Tab(height: 36, text: '全部项目'),
-                  const Tab(height: 36, text: '历史项目'),
-                  const Tab(height: 36, text: '收藏项目'),
+                  Tab(height: 36, text: l10n.allProjects),
+                  Tab(height: 36, text: l10n.historyProjects),
+                  Tab(height: 36, text: l10n.favoriteProjects),
                   if (_scopes.contains(_ProjectScope.cloud))
-                    const Tab(height: 36, text: '云端项目'),
+                    Tab(height: 36, text: l10n.cloudProjects),
                 ],
               ),
               Expanded(
@@ -315,6 +330,7 @@ class _HomeTabState extends State<HomeTab>
 
   Widget _buildSearchField() {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = StudioLocalizations.of(context);
     return TextField(
       controller: _searchController,
       autofocus: true,
@@ -322,11 +338,11 @@ class _HomeTabState extends State<HomeTab>
       onChanged: (value) => setState(() => _query = value),
       style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(
-        hintText: '搜索项目名称或路径',
+        hintText: l10n.searchProjectHint,
         suffixIcon: _query.isEmpty
             ? null
             : IconButton(
-                tooltip: '清空',
+                tooltip: l10n.clear,
                 icon: const Icon(Icons.close, size: 20),
                 onPressed: () {
                   _searchController.clear();
@@ -396,7 +412,7 @@ class _HomeTabState extends State<HomeTab>
         Padding(
           padding: const EdgeInsets.only(right: 4),
           child: FilterChip(
-            label: const Text('全部语言'),
+            label: Text(StudioLocalizations.of(context).allLanguages),
             selected: _languageFilter.isEmpty,
             visualDensity: VisualDensity.compact,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -452,14 +468,14 @@ class _HomeTabState extends State<HomeTab>
         _ProjectScope.favorite => _buildSimpleEmpty(
           context,
           Icons.star_border_outlined,
-          '还没有收藏的项目',
-          '在项目卡片菜单中选择「收藏」',
+          StudioLocalizations.of(context).favoriteProjects,
+          StudioLocalizations.of(context).favoriteProjectHint,
         ),
         _ProjectScope.cloud => _buildSimpleEmpty(
           context,
           Icons.cloud_outlined,
-          '还没有云端项目',
-          '登录后在更多菜单中「新建云端项目」，源码自动同步到服务器',
+          StudioLocalizations.of(context).cloudProjects,
+          StudioLocalizations.of(context).cloudProjectHint,
         ),
         _ =>
           searching
@@ -525,8 +541,10 @@ class _HomeTabState extends State<HomeTab>
         SnackBar(
           content: Text(
             error is ApiException
-                ? '云端列表刷新失败：${error.message}'
-                : '暂时无法刷新项目列表，请重试',
+                ? StudioLocalizations.of(context).cloudRefreshFailed(
+                    error.message,
+                  )
+                : StudioLocalizations.of(context).refreshProjectsFailed,
           ),
         ),
       );
@@ -624,9 +642,11 @@ class _HomeTabState extends State<HomeTab>
     if (!project.isCloud && !Directory(project.path).existsSync()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('项目目录不存在：${project.path}'),
+          content: Text(
+            StudioLocalizations.of(context).missingProjectPath(project.path),
+          ),
           action: SnackBarAction(
-            label: '从列表移除',
+            label: StudioLocalizations.of(context).removeFromList,
             onPressed: () => widget.store.remove(project),
           ),
         ),
@@ -655,15 +675,18 @@ class _HomeTabState extends State<HomeTab>
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Expanded(child: Text('正在压缩备份并删除…')),
-          ],
-        ),
-      ),
+      builder: (context) {
+        final l10n = StudioLocalizations.of(context);
+        return AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 20),
+              Expanded(child: Text(l10n.backupAndDelete)),
+            ],
+          ),
+        );
+      },
     );
     final error = await widget.store.deleteProject(project);
     if (!context.mounted) return;
@@ -671,7 +694,7 @@ class _HomeTabState extends State<HomeTab>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          error ?? '已删除“${project.name}”，备份可在应用数据 recyclebin/projects_bin 找回',
+          error ?? StudioLocalizations.of(context).deletedProject(project.name),
         ),
       ),
     );
@@ -685,28 +708,35 @@ class _HomeTabState extends State<HomeTab>
     if (missing.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('没有失效项目，列表一切正常')));
+      ).showSnackBar(
+        SnackBar(content: Text(StudioLocalizations.of(context).noMissingProjects)),
+      );
       return;
     }
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('移除失效项目？'),
-        content: Text(
-          '以下 ${missing.length} 个项目的目录已不存在，将仅从列表移除：\n\n'
-          '${missing.map((p) => '· ${p.name}').join('\n')}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+      builder: (context) {
+        final l10n = StudioLocalizations.of(context);
+        return AlertDialog(
+          title: Text(l10n.removeMissingTitle),
+          content: Text(
+            l10n.removeMissingMessage(
+              missing.length,
+              missing.map((p) => '· ${p.name}').join('\n'),
+            ),
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('移除'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.remove),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed == true) {
       for (final project in missing) {
@@ -719,19 +749,20 @@ class _HomeTabState extends State<HomeTab>
     final picked = await showDialog<(String, ProjectTemplate)>(
       context: context,
       builder: (context) {
+        final l10n = StudioLocalizations.of(context);
         var template = defaultTemplate();
         final controller = TextEditingController();
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
-            title: const Text('新建云端项目'),
+            title: Text(l10n.newCloudProject),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: controller,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: '项目名称',
+                  decoration: InputDecoration(
+                    labelText: l10n.projectName,
                     prefixIcon: Icon(Icons.cloud_upload_outlined),
                   ),
                 ),
@@ -739,7 +770,7 @@ class _HomeTabState extends State<HomeTab>
                 DropdownMenu<ProjectTemplate>(
                   initialSelection: template,
                   expandedInsets: EdgeInsets.zero,
-                  label: const Text('项目类型'),
+                  label: Text(l10n.projectType),
                   onSelected: (value) {
                     if (value != null) setState(() => template = value);
                   },
@@ -757,7 +788,7 @@ class _HomeTabState extends State<HomeTab>
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('取消'),
+                child: Text(l10n.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(
@@ -765,7 +796,7 @@ class _HomeTabState extends State<HomeTab>
                       ? null
                       : (controller.text.trim(), template),
                 ),
-                child: const Text('创建'),
+                child: Text(l10n.create),
               ),
             ],
           ),
@@ -776,13 +807,15 @@ class _HomeTabState extends State<HomeTab>
     final (name, template) = picked;
     if (RegExp(r'[\\/:*?"<>|]').hasMatch(name)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(r'名称不能包含 \ / : * ? " < > |')),
+        SnackBar(
+          content: Text(StudioLocalizations.of(context).invalidProjectName),
+        ),
       );
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('正在创建云端项目…'),
+      SnackBar(
+        content: Text(StudioLocalizations.of(context).creatingCloudProject),
         duration: Duration(seconds: 1),
       ),
     );
@@ -818,7 +851,9 @@ class _HomeTabState extends State<HomeTab>
     }
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('云端项目已创建，编辑内容将自动同步到服务器')));
+    ).showSnackBar(
+      SnackBar(content: Text(StudioLocalizations.of(context).cloudProjectCreated)),
+    );
   }
 }
 
@@ -828,6 +863,7 @@ class _EmptySearchResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = StudioLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -838,10 +874,10 @@ class _EmptySearchResult extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
           const SizedBox(height: 16),
-          Text('未找到匹配的项目', style: theme.textTheme.titleMedium),
+          Text(l10n.noMatchingProjects, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(
-            '换个关键词试试，支持按名称和路径搜索',
+            l10n.searchProjectsHint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -860,6 +896,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = StudioLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -870,10 +907,12 @@ class _EmptyState extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
           const SizedBox(height: 16),
-          Text('还没有项目', style: theme.textTheme.headlineSmall),
+          Text(l10n.noProjects, style: theme.textTheme.headlineSmall),
           const SizedBox(height: 8),
           Text(
-            AppPaths.isDesktop ? '创建一个新项目，或添加磁盘上已有的文件夹' : '点击下方按钮，创建你的第一个项目',
+            AppPaths.isDesktop
+                ? l10n.desktopCreateProjectHint
+                : l10n.mobileCreateProjectHint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -882,7 +921,7 @@ class _EmptyState extends StatelessWidget {
           FilledButton.icon(
             onPressed: onCreate,
             icon: const Icon(Icons.create_new_folder_outlined),
-            label: const Text('新建项目'),
+            label: Text(l10n.createProject),
           ),
         ],
       ),

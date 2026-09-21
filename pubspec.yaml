@@ -23,6 +23,8 @@ workspace:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # 全部 IDE 能力都在共享内核里，本工程只剩一个入口壳。
   qfli_studio_core:

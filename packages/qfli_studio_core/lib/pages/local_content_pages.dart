@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../i18n/studio_localizations.dart';
 import '../models/tutorial.dart';
 import '../services/studio_profile.dart';
 import '../services/tutorial_service.dart';
@@ -34,8 +35,11 @@ class _LocalTutorialsTabState extends State<LocalTutorialsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = StudioLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('${_displayName(widget.language)} 教程')),
+      appBar: AppBar(
+        title: Text('${_displayName(widget.language)} ${l10n.tutorial}'),
+      ),
       body: FutureBuilder<Tutorial?>(
         future: _tutorial,
         builder: (context, snapshot) {
@@ -44,7 +48,7 @@ class _LocalTutorialsTabState extends State<LocalTutorialsTab> {
           }
           final tutorial = snapshot.data;
           if (tutorial == null) {
-            return const _LocalContentError(message: '本地教程文件不存在或无法读取。');
+            return _LocalContentError(message: l10n.localTutorialMissing);
           }
           return _TutorialList(tutorial: tutorial);
         },
@@ -74,8 +78,11 @@ class _ExampleCodeTabState extends State<ExampleCodeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = StudioLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('${_displayName(widget.language)} 示例代码')),
+      appBar: AppBar(
+        title: Text('${_displayName(widget.language)} ${l10n.examples}'),
+      ),
       body: FutureBuilder<Tutorial?>(
         future: _tutorial,
         builder: (context, snapshot) {
@@ -84,7 +91,7 @@ class _ExampleCodeTabState extends State<ExampleCodeTab> {
           }
           final tutorial = snapshot.data;
           if (tutorial == null) {
-            return const _LocalContentError(message: '本地示例代码不存在或无法读取。');
+            return _LocalContentError(message: l10n.localExamplesMissing);
           }
           return _ExampleCodeList(tutorial: tutorial);
         },
@@ -139,11 +146,12 @@ class _ExampleCodeList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = StudioLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
       children: [
         Text(
-          '来自本地教程的 ${tutorial.lessonCount} 个示例',
+          l10n.examplesCount(tutorial.lessonCount),
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -170,6 +178,7 @@ class _ExampleCodeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = StudioLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 12, 14),
@@ -182,14 +191,14 @@ class _ExampleCodeCard extends StatelessWidget {
                   child: Text(lesson.title, style: theme.textTheme.titleSmall),
                 ),
                 IconButton(
-                  tooltip: '复制示例代码',
+                  tooltip: l10n.copyExample,
                   icon: const Icon(Icons.copy_outlined),
                   onPressed: () async {
                     await Clipboard.setData(ClipboardData(text: lesson.code));
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(
                       context,
-                    ).showSnackBar(const SnackBar(content: Text('示例代码已复制')));
+                    ).showSnackBar(SnackBar(content: Text(l10n.exampleCopied)));
                   },
                 ),
               ],
@@ -228,6 +237,7 @@ class _RuntimeSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = StudioLocalizations.of(context);
     final runtime = tutorial.runtime;
     return Card(
       child: Padding(
@@ -237,10 +247,10 @@ class _RuntimeSummary extends StatelessWidget {
           children: [
             Text(tutorial.displayName, style: theme.textTheme.titleLarge),
             const SizedBox(height: 6),
-            Text('运行方式：${runtime.engine}'),
+            Text(l10n.runMode(runtime.engine)),
             if (runtime.limits case final limits? when limits.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text('限制：$limits'),
+              Text(l10n.limits(limits)),
             ],
           ],
         ),
@@ -257,6 +267,7 @@ class _LessonPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = StudioLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(lesson.title)),
       body: ListView(
@@ -266,22 +277,24 @@ class _LessonPage extends StatelessWidget {
           const SizedBox(height: 12),
           Text(lesson.explain),
           const SizedBox(height: 20),
-          Text('示例代码', style: theme.textTheme.titleMedium),
+          Text(l10n.sampleCode, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           _ExampleCodeCard(lesson: lesson),
           const SizedBox(height: 16),
-          Text('预期输出', style: theme.textTheme.titleMedium),
+          Text(l10n.expectedOutput, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           SelectableText(lesson.output),
           if (lesson.tasks.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Text('练习', style: theme.textTheme.titleMedium),
+            Text(l10n.practice, style: theme.textTheme.titleMedium),
             for (final task in lesson.tasks)
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.task_alt_outlined),
                 title: Text(task.prompt),
-                subtitle: Text('提示：${task.hint}\n参考：${task.answer}'),
+                subtitle: Text(
+                  '${l10n.hint(task.hint)}\n${l10n.reference(task.answer)}',
+                ),
               ),
           ],
         ],

@@ -53,7 +53,7 @@ class FormatIntent extends Intent {
   const FormatIntent();
 }
 
-/// 编辑器页：左侧文件树卡片 + TabBar 标签 + re_editor 代码编辑区
+/// 编辑器页：左侧文件树卡片 + 可选文件标签栏 + re_editor 代码编辑区
 /// + minimap 鸟瞰 + 本地终端面板 + 运行。
 class EditorPage extends StatefulWidget {
   const EditorPage({
@@ -800,7 +800,11 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                             builder: (_) => SettingsPage(
                                               settings: widget.settings,
                                               auth: widget.auth,
-                                              showAi: StudioProfile.current?.isOffline != true,
+                                              showAi:
+                                                  StudioProfile
+                                                      .current
+                                                      ?.isOffline !=
+                                                  true,
                                             ),
                                           ),
                                         );
@@ -947,7 +951,8 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ),
-                                    if (StudioProfile.current?.isOffline != true)
+                                    if (StudioProfile.current?.isOffline !=
+                                        true)
                                       PopupMenuItem(
                                         value: 'ai',
                                         child: Row(
@@ -967,12 +972,16 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ),
-                                    if (StudioProfile.current?.isOffline != true)
+                                    if (StudioProfile.current?.isOffline !=
+                                        true)
                                       const PopupMenuItem(
                                         value: 'online_terminal',
                                         child: Row(
                                           children: [
-                                            Icon(Icons.cloud_outlined, size: 20),
+                                            Icon(
+                                              Icons.cloud_outlined,
+                                              size: 20,
+                                            ),
                                             SizedBox(width: 12),
                                             Text('在线终端（服务器执行）'),
                                           ],
@@ -1197,7 +1206,8 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     }
     return Column(
       children: [
-        _buildTabBar(context),
+        if (StudioProfile.current?.showEditorTabs ?? true)
+          _buildTabBar(context),
         Expanded(
           child: TabBarView(
             controller: _tabController,

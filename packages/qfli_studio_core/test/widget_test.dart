@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import 'package:qfli_studio_core/app.dart';
 import 'package:qfli_studio_core/editor/editor_delete_fix.dart';
 import 'package:qfli_studio_core/editor/highlight_themes.dart';
+import 'package:qfli_studio_core/i18n/studio_localizations.dart';
 import 'package:qfli_studio_core/services/code_formatter.dart';
 import 'package:qfli_studio_core/editor/editor_controller.dart';
 import 'package:qfli_studio_core/models/project.dart';
@@ -112,7 +113,10 @@ void main() {
       const Duration(seconds: 3),
     );
 
-    expect(find.text('还没有项目'), findsOneWidget);
+    final l10n = StudioLocalizations.of(
+      tester.element(find.byType(NavigationBar)),
+    );
+    expect(find.text(l10n.noProjects), findsOneWidget);
 
     // 添加一个已有文件夹作为项目。
     final projDir = Directory(p.join(tempDir.path, 'demo'))..createSync();
@@ -165,16 +169,19 @@ void main() {
     );
 
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.text('还没有项目'), findsOneWidget);
+    final l10n = StudioLocalizations.of(
+      tester.element(find.byType(NavigationBar)),
+    );
+    expect(find.text(l10n.noProjects), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.school_outlined));
+    await tester.tap(find.byIcon(Icons.apps_outlined));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 100),
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 3),
     );
-    // 教程 Tab 是社区列表；测试环境离线时显示重试入口。
-    expect(find.text('教程'), findsWidgets);
+    expect(find.text(l10n.quickTools), findsWidgets);
+    expect(find.text(l10n.terminal), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.forum_outlined));
     await tester.pumpAndSettle(
@@ -182,7 +189,7 @@ void main() {
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 3),
     );
-    expect(find.text('讨论'), findsWidgets);
+    expect(find.text(l10n.discussion), findsWidgets);
 
     await tester.tap(find.byIcon(Icons.person_outline));
     await tester.pumpAndSettle(
@@ -198,7 +205,7 @@ void main() {
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 3),
     );
-    expect(find.text('还没有项目'), findsOneWidget);
+    expect(find.text(l10n.noProjects), findsOneWidget);
   });
 
   testWidgets('宽屏编辑器：左上角按钮可收起/展开文件树侧栏', (tester) async {
@@ -371,7 +378,10 @@ void main() {
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 3),
     );
-    expect(find.text('未找到匹配的项目'), findsOneWidget);
+    final l10n = StudioLocalizations.of(
+      tester.element(find.byType(NavigationBar)),
+    );
+    expect(find.text(l10n.noMatchingProjects), findsOneWidget);
 
     // 退出搜索恢复完整列表。
     await tester.tap(find.byIcon(Icons.arrow_back));

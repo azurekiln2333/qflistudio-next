@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'i18n/studio_localizations.dart';
 import 'pages/home_page.dart';
 import 'services/studio_profile.dart';
 import 'splash_screen.dart';
@@ -44,8 +46,20 @@ class _QfliAppState extends State<QfliApp> {
     return ListenableBuilder(
       listenable: Listenable.merge([settings, widget.ready]),
       builder: (context, _) => MaterialApp(
-        title: StudioProfile.current?.appTitle ?? 'QFLIStudio+',
+        title:
+            StudioProfile.current?.appTitle ??
+            StudioProductCatalog.multiLanguageEditor,
         debugShowCheckedModeBanner: false,
+        locale: StudioLocalizations.resolveLocale(
+          WidgetsBinding.instance.platformDispatcher.locale,
+        ),
+        supportedLocales: StudioLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          StudioLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: settings.themeModeValue,

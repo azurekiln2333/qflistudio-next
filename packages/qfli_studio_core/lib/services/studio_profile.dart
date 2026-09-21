@@ -1,5 +1,40 @@
 import 'project_templates.dart';
 
+/// 产品线名称登记表。语言 App 的 UI 标题从这里取，后续新增产品时不必散落硬编码。
+abstract final class StudioProductCatalog {
+  static const qfliStudio = 'QFLIStudio+';
+  static const multiLanguageEditor = qfliStudio;
+  static const script = 'QFLIScript';
+  static const rustCore = 'QFLIRustCore';
+  static const goShift = 'QFLIGoShift';
+  static const jvmx = 'QFLIJVMX';
+  static const webForge = 'QFLIWebForge';
+  static const pyFlow = 'QFLIPyFlow';
+  static const forge = 'QFLIForge';
+  static const sqlab = 'QFLISQLab';
+  static const json = 'QFLIJson';
+  static const regex = 'QFLIRegex';
+  static const diff = 'QFLIDiff';
+  static const encode = 'QFLIEncode';
+  static const toolbox = 'QFLIToolbox';
+  static const note = 'QFLINote';
+
+  /// 已登记的语言产品名称。未创建独立 App 的产品也先在这里保留命名。
+  static const languageProducts = <String, String>{
+    'lua': script,
+    'java': jvmx,
+    'web': webForge,
+    'python': pyFlow,
+    'c': forge,
+    'cpp': forge,
+    'rust': rustCore,
+    'go': goShift,
+  };
+
+  static String forLanguage(String language) =>
+      languageProducts[language] ?? qfliStudio;
+}
+
 /// 语言专属 App 的「档位」。
 ///
 /// 共享内核默认是全能版（所有模板 + 桌面端原生工具链）。各语言 App 在
@@ -16,13 +51,14 @@ class StudioProfile {
     this.runner,
     this.entryFileNames = const [],
     this.isOffline = false,
+    this.showEditorTabs = true,
   });
 
   /// 档位标识，同时用于项目元数据里记录「由哪个 App 创建」。
   final String id;
 
   /// 产品名：窗口标题、任务切换器和应用内顶栏都用它，
-  /// 例如全能版 `QFLIStudio+`、C 版 `QFLIStudio+ C 版`。
+  /// 例如联网全能版 `QFLIStudio+`、C/C++ 工具 `QFLIForge`。
   final String appTitle;
 
   /// 新建项目时可选的模板。空列表表示不限制。
@@ -38,6 +74,9 @@ class StudioProfile {
   ///
   /// 根工程不设置档位，因此保持联网全能版；各语言 App 显式设置为 true。
   final bool isOffline;
+
+  /// 是否显示编辑器顶部的文件标签栏。联网全能版保留，独立语言版隐藏。
+  final bool showEditorTabs;
 
   /// 当前生效的档位。为 null 时即全能版。
   static StudioProfile? current;

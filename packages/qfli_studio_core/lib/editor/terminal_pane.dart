@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
+import '../i18n/studio_localizations.dart';
+
 /// 本地终端面板：命令响应式 shell（`sh -c` / `cmd /c`），沙箱权限内执行。
 /// 移动端系统无编译器，复杂工具（gcc/python 等）需走在线终端。
 class TerminalPane extends StatefulWidget {
@@ -42,15 +44,21 @@ class TerminalPaneState extends State<TerminalPane> {
 
   bool get _isWindows => Platform.isWindows;
 
+  bool _printedIntro = false;
+
   @override
-  void initState() {
-    super.initState();
-    _outputLines.add(_TermLine(
-      text: _isWindows
-          ? 'Windows 终端 (cmd)。工作目录：${widget.workingDirectory}'
-          : 'Shell 终端 (sh)。工作目录：${widget.workingDirectory}',
-      kind: _LineKind.info,
-    ));
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_printedIntro) return;
+    _printedIntro = true;
+    _outputLines.add(
+      _TermLine(
+        text: StudioLocalizations.of(
+          context,
+        ).terminalStarted(widget.workingDirectory),
+        kind: _LineKind.info,
+      ),
+    );
   }
 
   @override
@@ -64,6 +72,7 @@ class TerminalPaneState extends State<TerminalPane> {
   Future<void> _run(String command) async {
     final trimmed = command.trim();
     if (trimmed.isEmpty || _running) return;
+    final l10n = StudioLocalizations.of(context);
     _history.add(trimmed);
     _historyIndex = _history.length;
     setState(() {
@@ -104,17 +113,24 @@ class TerminalPaneState extends State<TerminalPane> {
         for (final line in stderr) {
           _append(_TermLine(text: line, kind: _LineKind.stderr));
         }
-        _append(_TermLine(
-          text: code == 0 ? '（退出码 0）' : '（退出码 $code）',
-          kind: code == 0 ? _LineKind.info : _LineKind.stderr,
-        ));
+        _append(
+          _TermLine(
+            text: l10n.exitCode(code),
+            kind: code == 0 ? _LineKind.info : _LineKind.stderr,
+          ),
+        );
         _running = false;
       });
       _scrollToBottom();
     } on ProcessException catch (e) {
       if (!mounted) return;
       setState(() {
-        _append(_TermLine(text: '无法执行：${e.message}', kind: _LineKind.stderr));
+        _append(
+          _TermLine(
+            text: l10n.unableToExecute(e.message),
+            kind: _LineKind.stderr,
+          ),
+        );
         _running = false;
       });
       _scrollToBottom();
@@ -194,6 +210,7 @@ class TerminalPaneState extends State<TerminalPane> {
     required Stream<String> stderr,
     required Future<int> exitCode,
   }) {
+    final l10n = StudioLocalizations.of(context);
     setState(() {
       _append(_TermLine(text: '▶ $title', kind: _LineKind.info));
       _running = true;
@@ -215,10 +232,12 @@ class TerminalPaneState extends State<TerminalPane> {
       _currentProcess = null;
       if (!mounted) return;
       setState(() {
-        _append(_TermLine(
-          text: code == 0 ? '（运行结束）' : '（运行结束，退出码 $code）',
-          kind: code == 0 ? _LineKind.info : _LineKind.stderr,
-        ));
+        _append(
+          _TermLine(
+            text: l10n.runEnded(code),
+            kind: code == 0 ? _LineKind.info : _LineKind.stderr,
+          ),
+        );
         _running = false;
       });
       _scrollToBottom();
@@ -244,6 +263,7 @@ class TerminalPaneState extends State<TerminalPane> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = StudioLocalizations.of(context);
     if (_collapsed) {
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -260,15 +280,14 @@ class TerminalPaneState extends State<TerminalPane> {
               Icon(Icons.terminal, size: 16, color: scheme.primary),
               const SizedBox(width: 8),
               Text(
-                '本地终端（已收起，点击展开）',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: scheme.onSurfaceVariant),
+                l10n.terminalCollapsed,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
               const Spacer(),
               IconButton(
-                tooltip: '关闭终端',
+                tooltip: l10n.close,
                 visualDensity: VisualDensity.compact,
                 onPressed: widget.onClose,
                 icon: const Icon(Icons.close, size: 18),
@@ -291,11 +310,10 @@ class TerminalPaneState extends State<TerminalPane> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '本地终端（沙箱）',
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelMedium
-                      ?.copyWith(color: scheme.onSurfaceVariant),
+                  l10n.terminalHeader,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               if (_running)
@@ -305,7 +323,7 @@ class TerminalPaneState extends State<TerminalPane> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               IconButton(
-                tooltip: '收起',
+                tooltip: l10n.close,
                 visualDensity: VisualDensity.compact,
                 onPressed: () {
                   setState(() => _collapsed = true);
@@ -314,7 +332,7 @@ class TerminalPaneState extends State<TerminalPane> {
                 icon: const Icon(Icons.keyboard_arrow_down, size: 20),
               ),
               IconButton(
-                tooltip: '关闭终端',
+                tooltip: l10n.close,
                 visualDensity: VisualDensity.compact,
                 onPressed: widget.onClose,
                 icon: const Icon(Icons.close, size: 18),
@@ -372,16 +390,16 @@ class TerminalPaneState extends State<TerminalPane> {
                       fontFamily: 'Consolas',
                       fontSize: 13,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       isCollapsed: true,
                       border: InputBorder.none,
-                      hintText: '输入命令，回车执行（如 ls / cat main.py）',
+                      hintText: l10n.terminalShellHint('ls / cat main.py)'),
                     ),
                     onSubmitted: (_) => _submit(),
                   ),
                 ),
                 IconButton(
-                  tooltip: '执行',
+                  tooltip: l10n.execute,
                   onPressed: _running ? null : _submit,
                   icon: const Icon(Icons.play_arrow, size: 20),
                 ),
@@ -393,8 +411,7 @@ class TerminalPaneState extends State<TerminalPane> {
     );
   }
 
-  String get _shortCwd =>
-      '${p.basename(widget.workingDirectory)}>';
+  String get _shortCwd => '${p.basename(widget.workingDirectory)}>';
 }
 
 enum _LineKind { command, stdout, stderr, info, debug }
