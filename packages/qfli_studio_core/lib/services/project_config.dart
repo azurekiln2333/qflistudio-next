@@ -30,17 +30,22 @@ abstract final class ProjectConfig {
   static String? readLanguage(String projectRoot) =>
       read(projectRoot)?['language'] as String?;
 
+  static String? readType(String projectRoot) =>
+      read(projectRoot)?['type'] as String?;
+
   /// 写入（或合并更新）项目配置；失败静默，不阻塞创建/添加流程。
   static Future<void> write({
     required String projectRoot,
     required String name,
     required String language,
+    String type = '',
   }) async {
     try {
       final existing = read(projectRoot) ?? <String, dynamic>{};
       existing['version'] = 1;
       existing['name'] = name;
       existing['language'] = language;
+      if (type.isNotEmpty) existing['type'] = type;
       if (!existing.containsKey('createdAt')) {
         existing['createdAt'] = DateTime.now().toIso8601String();
       }

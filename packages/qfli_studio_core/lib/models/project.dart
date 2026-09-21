@@ -15,6 +15,7 @@ class Project {
     this.cloudId,
     this.favorite = false,
     this.language = '',
+    this.type = '',
   });
 
   final String id;
@@ -33,6 +34,9 @@ class Project {
   /// 创建时来自模板，添加已有文件夹时按扩展名检测并写入配置。
   String language;
 
+  /// Stable source-language discriminator, for example `cpp` or `python`.
+  String type;
+
   bool get isCloud => cloudId != null;
 
   static String _newId() {
@@ -47,6 +51,7 @@ class Project {
     String? cloudId,
     bool favorite = false,
     String language = '',
+    String type = '',
   }) {
     final now = DateTime.now();
     return Project(
@@ -58,6 +63,7 @@ class Project {
       cloudId: cloudId,
       favorite: favorite,
       language: language,
+      type: type,
     );
   }
 
@@ -71,6 +77,7 @@ class Project {
     if (cloudId != null) 'cloudOrigin': ApiConfig.origin,
     'favorite': favorite,
     'language': language,
+    'type': type,
   };
 
   static Project fromJson(Map<String, dynamic> json) {
@@ -91,6 +98,7 @@ class Project {
           : null,
       favorite: json['favorite'] as bool? ?? false,
       language: json['language'] as String? ?? '',
+      type: json['type'] as String? ?? '',
     );
   }
 }

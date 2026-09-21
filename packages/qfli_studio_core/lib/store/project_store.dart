@@ -204,6 +204,7 @@ class ProjectStore extends ChangeNotifier {
         projectRoot: fullPath,
         name: trimmed,
         language: template.language,
+        type: template.type,
       );
     } on FileSystemException catch (e) {
       return (error: '创建项目失败：${e.message}', project: null);
@@ -213,6 +214,7 @@ class ProjectStore extends ChangeNotifier {
       path: fullPath,
       cloudId: cloudId,
       language: template.language,
+      type: template.type,
     );
     _projects.add(project);
     await _persist();
@@ -236,6 +238,7 @@ class ProjectStore extends ChangeNotifier {
     if (name.isEmpty) name = normalized; // 盘符根目录
     // 语言优先取项目配置文件（.qfli/project.json），没有才做扩展名检测。
     final configLanguage = ProjectConfig.readLanguage(normalized) ?? '';
+    final configType = ProjectConfig.readType(normalized) ?? '';
     final language = configLanguage.isNotEmpty
         ? configLanguage
         : detectLanguage(normalized);
@@ -243,6 +246,7 @@ class ProjectStore extends ChangeNotifier {
       projectRoot: normalized,
       name: name,
       language: language,
+      type: configType,
     );
     final project = Project.create(
       name: name,
