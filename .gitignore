@@ -80,6 +80,20 @@ app.*.map.json
 /.workbuddy-ai/
 /.zcode/
 
+# Local Trellis/agent runtime metadata. Committed task artifacts remain visible.
+/.agents/
+/.dsh/
+/.trellis/.gitignore
+/.trellis/.template-hashes.json
+/.trellis/.version
+/.trellis/agents/
+/.trellis/config.yaml
+/.trellis/scripts/
+/.trellis/spec/
+/.trellis/tasks/00-bootstrap-guidelines/
+/.trellis/workflow.md
+/.trellis/workspace/
+
 # Local diagnostic exports and shell inspection fragments
 /_*.txt
 /tmp_*.txt
