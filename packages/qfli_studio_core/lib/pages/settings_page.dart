@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
@@ -13,6 +13,7 @@ import '../store/settings_store.dart';
 import '../store/project_store.dart';
 import '../models/project.dart';
 import '../services/project_archive_service.dart';
+import '../services/picker_service.dart';
 import '../widgets/settings_section.dart';
 import 'highlight_settings_page.dart';
 
@@ -214,24 +215,27 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _exportProject() async {
-    if (!AppPaths.isDesktop || widget.store == null) {
-      _showMessage('当前平台暂使用系统 Picker 导入导出');
-      return;
-    }
+    if (widget.store == null) return;
     final project = await _pickProject();
     if (project == null) return;
     try {
-      final location = await getSaveLocation(
+      final location = await PickerService.saveDocument(
         suggestedName: '${project.name}.qfli.json',
-        acceptedTypeGroups: const [
-          XTypeGroup(label: 'QFLI project', extensions: ['json']),
-        ],
       );
       if (location == null) return;
-      await File(location.path).writeAsString(
-        await ProjectArchiveService.exportProject(project),
-        flush: true,
-      );
+      final archive = await ProjectArchiveService.exportProject(project);
+      final path = location.path;
+      final uri = location.uri;
+      if (path != null && path.isNotEmpty) {
+        await File(path).writeAsString(archive, flush: true);
+      } else if (uri != null && uri.isNotEmpty) {
+        await PickerService.writeUri(
+          uri,
+          Uint8List.fromList(utf8.encode(archive)),
+        );
+      } else {
+        throw const FileSystemException('系统未返回可写位置');
+      }
       _showMessage('项目已导出');
     } on Object catch (error) {
       _showMessage('导出失败：$error');
@@ -239,18 +243,11 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _importProject() async {
-    if (!AppPaths.isDesktop || widget.store == null) {
-      _showMessage('当前平台暂使用系统 Picker 导入导出');
-      return;
-    }
+    if (widget.store == null) return;
     try {
-      final file = await openFile(
-        acceptedTypeGroups: const [
-          XTypeGroup(label: 'QFLI project', extensions: ['json']),
-        ],
-      );
-      if (file == null) return;
-      final source = await file.readAsString();
+      final picked = await PickerService.pickDocument();
+      if (picked == null) return;
+      final source = await _readPickedDocument(picked);
       final data = jsonDecode(source);
       final name = data is Map && data['name'] is String
           ? (data['name'] as String).trim()
@@ -275,6 +272,16 @@ class _SettingsPageState extends State<SettingsPage> {
     } on Object catch (error) {
       _showMessage('导入失败：$error');
     }
+  }
+
+  Future<String> _readPickedDocument(PickedDocument picked) async {
+    final path = picked.path;
+    if (path != null && path.isNotEmpty) return File(path).readAsString();
+    final uri = picked.uri;
+    if (uri != null && uri.isNotEmpty) {
+      return utf8.decode(await PickerService.readUri(uri));
+    }
+    throw const FileSystemException('系统未返回可读文件');
   }
 
   Future<Project?> _pickProject() async {
