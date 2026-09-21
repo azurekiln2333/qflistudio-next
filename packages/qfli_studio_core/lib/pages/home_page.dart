@@ -337,11 +337,23 @@ class _HomeTabState extends State<HomeTab>
                   dividerColor: Colors.transparent,
                   labelPadding: const EdgeInsets.symmetric(horizontal: 12),
                   tabs: [
-                    Tab(height: 36, text: l10n.allProjects),
-                    Tab(height: 36, text: l10n.historyProjects),
-                    Tab(height: 36, text: l10n.favoriteProjects),
+                    Tab(
+                      height: 36,
+                      child: Center(child: Text(l10n.allProjects)),
+                    ),
+                    Tab(
+                      height: 36,
+                      child: Center(child: Text(l10n.historyProjects)),
+                    ),
+                    Tab(
+                      height: 36,
+                      child: Center(child: Text(l10n.favoriteProjects)),
+                    ),
                     if (_scopes.contains(_ProjectScope.cloud))
-                      Tab(height: 36, text: l10n.cloudProjects),
+                      Tab(
+                        height: 36,
+                        child: Center(child: Text(l10n.cloudProjects)),
+                      ),
                   ],
                 ),
               Expanded(

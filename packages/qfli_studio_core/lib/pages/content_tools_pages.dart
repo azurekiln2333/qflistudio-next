@@ -198,8 +198,8 @@ class _MarkdownToolPageState extends State<MarkdownToolPage> {
           title: Text(l10n.markdownTools),
           bottom: TabBar(
             tabs: [
-              Tab(text: l10n.markdownEdit),
-              Tab(text: l10n.markdownPreview),
+              Tab(child: Center(child: Text(l10n.markdownEdit))),
+              Tab(child: Center(child: Text(l10n.markdownPreview))),
             ],
           ),
           actions: [

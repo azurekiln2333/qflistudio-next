@@ -203,12 +203,10 @@ class SymbolsBar extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 children: [
-                  for (final symbol in symbols)
+                  for (var i = 0; i < symbols.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 6),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 3,
-                        vertical: 6,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       child: GestureDetector(
                         onLongPress: () => _editSymbols(context),
                         child: Card.filled(
@@ -217,19 +215,23 @@ class SymbolsBar extends StatelessWidget {
                               .withValues(alpha: 0.6),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(8),
-                            onTap: () => _insert(symbol),
+                            onTap: () => _insert(symbols[i]),
                             onLongPress: () => _editSymbols(context),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                symbol,
-                                style: TextStyle(
-                                  fontFamily: 'Consolas',
-                                  fontSize: 15,
-                                  color: scheme.onSurface,
+                            child: SizedBox(
+                              height: 32,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    symbols[i],
+                                    style: TextStyle(
+                                      fontFamily: 'Consolas',
+                                      fontSize: 15,
+                                      color: scheme.onSurface,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -237,6 +239,7 @@ class SymbolsBar extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),

@@ -1298,36 +1298,38 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     final scheme = Theme.of(context).colorScheme;
     final tab = Tab(
       height: 44,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            open.timeLabel != null ? Icons.history : _iconFor(open.name),
-            size: 16,
-            color: scheme.primary,
-          ),
-          const SizedBox(width: 8),
-          Text(open.tabLabel(widget.project.name)),
-          const SizedBox(width: 8),
-          if (open.dirty)
-            Container(
-              width: 7,
-              height: 7,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: scheme.primary,
-              ),
-            )
-          else
-            GestureDetector(
-              onTap: () => _closeTab(_editor.files.indexOf(open)),
-              child: Icon(
-                Icons.close,
-                size: 15,
-                color: scheme.onSurfaceVariant,
-              ),
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              open.timeLabel != null ? Icons.history : _iconFor(open.name),
+              size: 16,
+              color: scheme.primary,
             ),
-        ],
+            const SizedBox(width: 8),
+            Text(open.tabLabel(widget.project.name)),
+            const SizedBox(width: 8),
+            if (open.dirty)
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: scheme.primary,
+                ),
+              ),
+            else
+              GestureDetector(
+                onTap: () => _closeTab(_editor.files.indexOf(open)),
+                child: Icon(
+                  Icons.close,
+                  size: 15,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+          ],
+        ),
       ),
     );
     // 长按 / 右键：标签操作菜单。
