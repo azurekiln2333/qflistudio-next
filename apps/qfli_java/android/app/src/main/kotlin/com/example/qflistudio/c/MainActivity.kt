@@ -1,4 +1,4 @@
-package com.example.qflistudio.c
+package com.azurekiln.qfli.jvmx
 
 import io.flutter.embedding.android.FlutterActivity
 

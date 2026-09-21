@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.azurekiln.qflistudio.lua",
+    "bundleName": "com.azurekiln.qfli.script",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",

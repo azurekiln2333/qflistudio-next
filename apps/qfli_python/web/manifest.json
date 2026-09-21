@@ -1,6 +1,6 @@
 {
-    "name": "QFLIStudio+ Python 版",
-    "short_name": "QFLIStudio+ Python",
+    "name": "QFLIPyFlow",
+    "short_name": "QFLIPyFlow",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

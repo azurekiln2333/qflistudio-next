@@ -1,6 +1,6 @@
 {
-    "name": "QFLIStudio+ Lua 版",
-    "short_name": "QFLIStudio+ Lua",
+    "name": "QFLIScript",
+    "short_name": "QFLIScript",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

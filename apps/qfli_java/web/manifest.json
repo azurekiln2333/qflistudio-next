@@ -1,6 +1,6 @@
 {
-    "name": "QFLIStudio+ Java 版",
-    "short_name": "QFLIStudio+ Java",
+    "name": "QFLIJVMX",
+    "short_name": "QFLIJVMX",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

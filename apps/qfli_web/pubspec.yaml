@@ -1,5 +1,5 @@
 name: qfli_web
-description: "QFLIStudio+ Web 版：手机上的网页 IDE，本地静态服务器预览，console 输出回传到编辑器。"
+description: "QFLIWebForge：手机上的网页 IDE，本地静态服务器预览，console 输出回传到编辑器。"
 publish_to: 'none'
 version: 1.0.0+1
 

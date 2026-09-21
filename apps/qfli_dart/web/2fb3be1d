@@ -1,6 +1,6 @@
 {
-    "name": "QFLIStudio+ C 版",
-    "short_name": "QFLIStudio+ C",
+    "name": "QFLIDartWing",
+    "short_name": "QFLIDartWing",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

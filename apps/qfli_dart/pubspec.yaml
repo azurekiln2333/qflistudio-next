@@ -1,5 +1,5 @@
 name: qfli_dart
-description: "QFLIStudio+ Dart 版：手机上的 Dart IDE，本地解释执行。"
+description: "QFLIDartWing：手机上的 Dart IDE，本地解释执行。"
 publish_to: 'none'
 version: 1.0.0+1
 

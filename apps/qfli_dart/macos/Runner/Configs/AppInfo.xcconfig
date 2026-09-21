@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = QFLIStudio+ Dart
+PRODUCT_NAME = QFLIDartWing
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.qflistudio.dart
+PRODUCT_BUNDLE_IDENTIFIER = com.azurekiln.qfli.dartwing
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.qflistudio. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.azurekiln.qfli. All rights reserved.

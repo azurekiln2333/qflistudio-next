@@ -1,5 +1,5 @@
 /*
- * QFLIStudio+ C 版的原生执行后端（picoc）。
+ * QFLIForge的原生执行后端（picoc）。
  *
  * 这是 Dart 解释器之外的「可选加速路径」：同样是进程内解释执行，只是把
  * 解释器换成 C 写的 picoc，跑得快一些。默认不启用——Dart 解释器不需要

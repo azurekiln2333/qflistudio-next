@@ -1,5 +1,5 @@
 /*
- * QFLIStudio+ Python 版内嵌的 MicroPython 配置。
+ * QFLIPyFlow内嵌的 MicroPython 配置。
  *
  * py/mpconfig.h 第 91 行是 `#include <mpconfigport.h>`——尖括号，所以编译时
  * 必须有一条 -I 指向本目录。这一点很关键：不是「放对位置就行」，是「必须在

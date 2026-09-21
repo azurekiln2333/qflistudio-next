@@ -1,5 +1,5 @@
 /*
- * QFLIStudio+ Python 版的执行后端接口（内嵌 MicroPython）。
+ * QFLIPyFlow的执行后端接口（内嵌 MicroPython）。
  *
  * 这是 Dart 解释器之外的**唯一**执行路径：把 MicroPython 整个编进 .so，进程内
  * 解释执行。之所以不像 C 版那样再留一个纯 Dart 的备选，是因为 Python 的语义

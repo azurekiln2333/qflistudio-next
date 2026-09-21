@@ -1,6 +1,6 @@
 {
-    "name": "QFLIStudio+ Web 版",
-    "short_name": "QFLIStudio+ Web",
+    "name": "QFLIWebForge",
+    "short_name": "QFLIWebForge",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

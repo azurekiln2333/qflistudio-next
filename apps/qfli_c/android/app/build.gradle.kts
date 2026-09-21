@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.qflistudio.c"
+    namespace = "com.azurekiln.qfli.forge"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.qflistudio.c"
+        applicationId = "com.azurekiln.qfli.forge"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
