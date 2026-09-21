@@ -24,6 +24,8 @@ const StudioProfile javaProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.java],
   runner: JavaProgramRunner(),
   isOffline: true,
+  productKey: StudioProductCatalog.jvmxKey,
+  showHomeTabs: false,
   showEditorTabs: false,
   // Main.java 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['Main.java', 'src/Main.java'],

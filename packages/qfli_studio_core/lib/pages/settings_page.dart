@@ -82,6 +82,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       onChanged: settings.setMinimap,
                     ),
                     SwitchListTile(
+                      secondary: const Icon(Icons.tab_outlined),
+                      title: const Text('文件标签栏'),
+                      subtitle: const Text('在编辑器顶部显示已打开的文件'),
+                      value: settings.showEditorTabs,
+                      onChanged: settings.setShowEditorTabs,
+                    ),
+                    SwitchListTile(
                       secondary: const Icon(Icons.autorenew_outlined),
                       title: const Text('自动保存'),
                       subtitle: const Text('停止输入 2.5 秒后保存修改'),

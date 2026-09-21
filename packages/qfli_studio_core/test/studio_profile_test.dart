@@ -14,7 +14,7 @@ void main() {
   setUp(() {
     previousProfile = StudioProfile.current;
     StudioProfile.current = const StudioProfile(
-      id: 'forge',
+      id: 'c',
       appTitle: StudioProductCatalog.forge,
       templates: [],
       isOffline: true,

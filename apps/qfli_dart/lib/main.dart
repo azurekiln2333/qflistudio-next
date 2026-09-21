@@ -24,6 +24,8 @@ const StudioProfile dartProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.dart],
   runner: DartProgramRunner(),
   isOffline: true,
+  productKey: StudioProductCatalog.dartWingKey,
+  showHomeTabs: false,
   showEditorTabs: false,
   // main.dart 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.dart', 'src/main.dart'],

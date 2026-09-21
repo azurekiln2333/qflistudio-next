@@ -23,6 +23,8 @@ const StudioProfile luaProfile = StudioProfile(
   appTitle: _appTitle,
   templates: [ProjectTemplate.empty, ProjectTemplate.lua],
   isOffline: true,
+  productKey: StudioProductCatalog.scriptKey,
+  showHomeTabs: false,
   showEditorTabs: false,
   runner: LuaProgramRunner(),
   // main.lua 排在默认入口表前面，保证本版一定先命中它。

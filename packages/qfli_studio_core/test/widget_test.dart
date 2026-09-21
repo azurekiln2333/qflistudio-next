@@ -180,7 +180,7 @@ void main() {
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 3),
     );
-    expect(find.text(l10n.quickTools), findsWidgets);
+    expect(find.text(l10n.functions), findsWidgets);
     expect(find.text(l10n.terminal), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.forum_outlined));

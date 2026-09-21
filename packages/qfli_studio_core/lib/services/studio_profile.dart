@@ -88,6 +88,8 @@ class StudioProfile {
     this.runner,
     this.entryFileNames = const [],
     this.isOffline = false,
+    this.productKey = StudioProductCatalog.qfliStudioKey,
+    this.showHomeTabs = true,
     this.showEditorTabs = true,
   });
 
@@ -97,6 +99,9 @@ class StudioProfile {
   /// 产品名：窗口标题、任务切换器和应用内顶栏都用它，
   /// 例如联网全能版 `QFLIStudio+`、C/C++ 工具 `QFLIForge`。
   final String appTitle;
+
+  /// Stable product key used by platform identifiers and exported metadata.
+  final String productKey;
 
   /// 新建项目时可选的模板。空列表表示不限制。
   final List<ProjectTemplate> templates;
@@ -111,6 +116,9 @@ class StudioProfile {
   ///
   /// 根工程不设置档位，因此保持联网全能版；各语言 App 显式设置为 true。
   final bool isOffline;
+
+  /// Whether homepage project-scope and language tabs are shown.
+  final bool showHomeTabs;
 
   /// 是否显示编辑器顶部的文件标签栏。联网全能版保留，独立语言版隐藏。
   final bool showEditorTabs;

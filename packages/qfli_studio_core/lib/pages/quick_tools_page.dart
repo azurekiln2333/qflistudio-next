@@ -7,22 +7,20 @@ import '../i18n/studio_localizations.dart';
 import '../services/app_paths.dart';
 import '../store/project_store.dart';
 
-/// 主页第二页的快捷功能入口。
-class QuickToolsTab extends StatelessWidget {
-  const QuickToolsTab({
+/// 主页的功能页。
+class FunctionsTab extends StatelessWidget {
+  const FunctionsTab({
     super.key,
     required this.onOpenTerminal,
-    required this.onOpenTutorial,
   });
 
   final VoidCallback onOpenTerminal;
-  final VoidCallback onOpenTutorial;
 
   @override
   Widget build(BuildContext context) {
     final l10n = StudioLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.quickTools)),
+      appBar: AppBar(title: Text(l10n.functions)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
@@ -32,18 +30,14 @@ class QuickToolsTab extends StatelessWidget {
             subtitle: l10n.terminalSubtitle,
             onTap: onOpenTerminal,
           ),
-          const SizedBox(height: 12),
-          _QuickToolTile(
-            icon: Icons.menu_book_outlined,
-            title: l10n.tutorial,
-            subtitle: l10n.tutorialSubtitle,
-            onTap: onOpenTutorial,
-          ),
         ],
       ),
     );
   }
 }
+
+@Deprecated('Use FunctionsTab')
+typedef QuickToolsTab = FunctionsTab;
 
 class _QuickToolTile extends StatelessWidget {
   const _QuickToolTile({

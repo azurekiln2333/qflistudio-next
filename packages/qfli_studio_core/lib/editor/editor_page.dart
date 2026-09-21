@@ -1206,7 +1206,7 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     }
     return Column(
       children: [
-        if (StudioProfile.current?.showEditorTabs ?? true)
+        if (widget.settings.showEditorTabs)
           _buildTabBar(context),
         Expanded(
           child: TabBarView(

@@ -205,7 +205,10 @@ class SymbolsBar extends StatelessWidget {
                 children: [
                   for (final symbol in symbols)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 3,
+                        vertical: 6,
+                      ),
                       child: GestureDetector(
                         onLongPress: () => _editSymbols(context),
                         child: Card.filled(

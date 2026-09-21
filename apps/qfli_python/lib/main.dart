@@ -24,6 +24,8 @@ const StudioProfile pythonProfile = StudioProfile(
   templates: [ProjectTemplate.empty, ProjectTemplate.python],
   runner: PythonProgramRunner(),
   isOffline: true,
+  productKey: StudioProductCatalog.pyFlowKey,
+  showHomeTabs: false,
   showEditorTabs: false,
   // main.py 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.py', 'src/main.py'],

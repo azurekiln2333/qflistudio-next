@@ -20,7 +20,7 @@ import '../widgets/project_card.dart';
 import '../widgets/project_dialogs.dart';
 import 'profile_page.dart';
 
-/// 应用外壳：所有版本显示主页 / 快捷功能；联网版追加讨论 / 我的，离线版追加示例代码。
+/// 应用外壳：功能、教程、示例/讨论均为独立页面。
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
@@ -58,17 +58,10 @@ class _HomePageState extends State<HomePage> {
           if (_visitedTabs.contains(1))
             TickerMode(
               enabled: _currentIndex == 1,
-              child: QuickToolsTab(
+              child: FunctionsTab(
                 onOpenTerminal: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => LocalTerminalPage(store: widget.store),
-                  ),
-                ),
-                onOpenTutorial: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => offline
-                        ? LocalTutorialsTab(language: profile!.id)
-                        : TutorialsTab(auth: widget.auth),
                   ),
                 ),
               ),
@@ -79,15 +72,24 @@ class _HomePageState extends State<HomePage> {
             TickerMode(
               enabled: _currentIndex == 2,
               child: offline
+                  ? LocalTutorialsTab(language: profile!.id)
+                  : TutorialsTab(auth: widget.auth),
+            )
+          else
+            const SizedBox.shrink(),
+          if (_visitedTabs.contains(3))
+            TickerMode(
+              enabled: _currentIndex == 3,
+              child: offline
                   ? ExampleCodeTab(language: profile!.id)
                   : DiscussionTab(auth: widget.auth),
             )
           else
             const SizedBox.shrink(),
           if (!offline)
-            if (_visitedTabs.contains(3))
+            if (_visitedTabs.contains(4))
               TickerMode(
-                enabled: _currentIndex == 3,
+                enabled: _currentIndex == 4,
                 child: ProfileTab(auth: widget.auth, settings: widget.settings),
               )
             else
@@ -109,7 +111,12 @@ class _HomePageState extends State<HomePage> {
           NavigationDestination(
             icon: Icon(Icons.apps_outlined),
             selectedIcon: Icon(Icons.apps),
-            label: l10n.quickTools,
+            label: l10n.functions,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.menu_book_outlined),
+            selectedIcon: Icon(Icons.menu_book),
+            label: l10n.tutorial,
           ),
           NavigationDestination(
             icon: Icon(offline ? Icons.code_outlined : Icons.forum_outlined),
@@ -156,7 +163,9 @@ class _HomeTabState extends State<HomeTab>
   String _languageFilter = '';
   Future<void>? _refreshRequest;
   late final List<_ProjectScope> _scopes =
-      StudioProfile.current?.isOffline == true
+      StudioProfile.current?.showHomeTabs == false
+      ? const [_ProjectScope.all]
+      : StudioProfile.current?.isOffline == true
       ? const [_ProjectScope.all, _ProjectScope.history, _ProjectScope.favorite]
       : _ProjectScope.values;
   late final TabController _projectTabs = TabController(
@@ -298,20 +307,21 @@ class _HomeTabState extends State<HomeTab>
           }
           return Column(
             children: [
-              TabBar(
-                controller: _projectTabs,
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                dividerColor: Colors.transparent,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 12),
-                tabs: [
-                  Tab(height: 36, text: l10n.allProjects),
-                  Tab(height: 36, text: l10n.historyProjects),
-                  Tab(height: 36, text: l10n.favoriteProjects),
-                  if (_scopes.contains(_ProjectScope.cloud))
-                    Tab(height: 36, text: l10n.cloudProjects),
-                ],
-              ),
+              if (StudioProfile.current?.showHomeTabs ?? true)
+                TabBar(
+                  controller: _projectTabs,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  dividerColor: Colors.transparent,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                  tabs: [
+                    Tab(height: 36, text: l10n.allProjects),
+                    Tab(height: 36, text: l10n.historyProjects),
+                    Tab(height: 36, text: l10n.favoriteProjects),
+                    if (_scopes.contains(_ProjectScope.cloud))
+                      Tab(height: 36, text: l10n.cloudProjects),
+                  ],
+                ),
               Expanded(
                 child: TabBarView(
                   controller: _projectTabs,
@@ -448,7 +458,7 @@ class _HomeTabState extends State<HomeTab>
       // 语言标签栏只在完整的 QFLI Studio 里出现；语言专属 App（只服务一门语言）
       // 显示这排芯片既没有筛选意义，也白占一行高度。
       final showLanguageChips =
-          StudioProfile.current == null || chipList.length > 1;
+          StudioProfile.current == null && chipList.length > 1;
       return Column(
         children: [
           if (showLanguageChips)

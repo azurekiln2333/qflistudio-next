@@ -63,6 +63,9 @@ class SettingsStore extends ChangeNotifier {
   /// 编辑器代码鸟瞰图可见。
   bool minimap = true;
 
+  /// 编辑器顶部的打开文件标签栏可见。
+  bool showEditorTabs = true;
+
   /// 自动保存：编辑停止 2.5 秒后写盘，写盘前把上一版本备份到 files_backup。
   bool autoSave = false;
 
@@ -106,6 +109,7 @@ class SettingsStore extends ChangeNotifier {
         final data = jsonDecode(await _storage!.readAsString());
         if (data is Map) {
           minimap = data['minimap'] as bool? ?? minimap;
+          showEditorTabs = data['showEditorTabs'] as bool? ?? showEditorTabs;
           autoSave = data['autoSave'] as bool? ?? autoSave;
           themeMode = data['themeMode'] as String? ?? themeMode;
           syntaxHighlighting = data['syntaxHighlighting'] as bool? ?? true;
@@ -176,6 +180,7 @@ class SettingsStore extends ChangeNotifier {
     final encoded = const JsonEncoder.withIndent('  ').convert({
       'version': 1,
       'minimap': minimap,
+      'showEditorTabs': showEditorTabs,
       'autoSave': autoSave,
       'themeMode': themeMode,
       'syntaxHighlighting': syntaxHighlighting,
@@ -342,6 +347,13 @@ class SettingsStore extends ChangeNotifier {
   Future<void> setMinimap(bool value) async {
     if (minimap == value) return;
     minimap = value;
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> setShowEditorTabs(bool value) async {
+    if (showEditorTabs == value) return;
+    showEditorTabs = value;
     notifyListeners();
     await _persist();
   }
