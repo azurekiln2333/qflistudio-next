@@ -90,39 +90,21 @@ void main() {
     });
   });
 
-  group('运行后端', () {
-    test('本语言文件被接管，并说明解释器还在开发中', () async {
-      write('data.json', '// 示例');
-      final result = await jsonProfile.runner!.run(
-        projectPath: project.path,
-        entryFile: p.join(project.path, 'data.json'),
-      );
-      expect(result, isNotNull, reason: '运行后端没有接管本语言文件');
-      expect(result!.title, contains('JSON 解释器开发中'));
-      expect(await result.stdout.toList(), isNotEmpty);
-      expect(await result.exitCode, kProgramNotRunExitCode);
-    });
-
-    test('别的语言文件交回内核', () async {
-      write('main.py', 'x');
-      final result = await jsonProfile.runner!.run(
-        projectPath: project.path,
-        entryFile: p.join(project.path, 'main.py'),
-      );
-      expect(result, isNull);
+  group('运行能力', () {
+    test('JSON 版不注入程序运行后端', () {
+      expect(jsonProfile.runner, isNull);
     });
   });
 
   group('运行按钮分流', () {
-    test('点运行拿到结果，而不是掉进「移动端跑不了」的兜底提示', () async {
+    test('JSON 文件显示不可运行说明，编辑与结构化工具保持独立', () async {
       write('data.json', '// 示例');
       final result = await RunnerService.runProject(
         projectPath: project.path,
         entryFile: p.join(project.path, 'data.json'),
       );
       expect(result, isNotNull);
-      expect(result!.hint, isNull, reason: '后端接管了就不该走兜底提示');
-      expect(result.title, contains('JSON 解释器开发中'));
+      expect(result!.hint, contains('无法识别'));
     });
   });
 }
