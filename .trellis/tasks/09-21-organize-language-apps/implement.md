@@ -69,6 +69,97 @@
 - Run `git diff --check` and inspect `git status --short --untracked-files=all`.
 - Validate HarmonyOS sources with the available DevEco/Hvigor toolchain; document any device-only Picker limitation.
 
+## Phase 8: twelve-product HarmonyOS runtime and content release
+
+This phase supersedes the earlier placeholder-runtime milestone. It is a
+release blocker: no product is called runnable until its target fixture passes
+on a HarmonyOS device or emulator.
+
+### 8.1 Contracts and release gates
+
+- [ ] Add `ContentRepository`, aggregate `tutorials.json` and `examples.json`
+  schemas, API adapter boundary, locale/type filtering, and schema validation.
+- [ ] Add a content linter requiring 100 substantive tutorials and 100
+  substantive examples for each language type: C, C++, Lua, JavaScript,
+  TypeScript, Shell, Rust, Go, Java, HTML, CSS, Python, Dart, SQL, JSON and
+  Markdown.
+- [ ] Add `NativeRuntime` and `ProcessSupervisor` contracts with capability
+  status, version, diagnostics, cancellation and disposal semantics.
+- [ ] Add release checks that reject placeholder strings such as “开发中” or
+  “未就绪” from a product marked `available`.
+
+### 8.2 Parallel subagent tracks
+
+Each track runs in its own worktree through a Trellis channel. Workers must
+commit focused changes and include tests; the main agent reviews and merges
+only after the track's device/host evidence is attached.
+
+1. **content-catalog**: aggregate JSON, repository adapters, validator,
+   migration from the seven existing asset files, and substantive catalogs.
+2. **forge-clang**: pin Clang/LLVM, build the shared native bridge, implement
+   C/C++ language modes, diagnostics, target runtime, and C/C++ device fixtures.
+3. **sql-native**: compile SQLite amalgamation for HarmonyOS, bridge open/query/
+   transaction/close, project database lifecycle, and SQL tests.
+4. **script-python**: normalize Lua/QuickJS/TypeScript/Shell and MicroPython
+   native bridges, probe contracts, limits and script fixtures.
+5. **systems-runtimes**: implement or integrate verified Rust, Go, Java and
+   Dart runtimes through the common native/Wasm boundary; no placeholder output.
+6. **process-safety**: implement process-tree supervision, cancellation,
+   editor/terminal ownership, watchdogs, and CPU/process leak regression tests.
+7. **ohos-release**: mirror channels/ABI registration across all twelve Apps,
+   verify package/signing manifests, build HAPs, and run release smoke tests.
+
+### 8.3 Forge Clang/LLVM sequence
+
+- [ ] Confirm the local DevEco LLVM/Clang version and target triples from the
+  checked SDK; do not assume desktop clang is usable in a HAP.
+- [ ] Add the pinned upstream source/license manifest and a reproducible native
+  build script with size and ABI reports.
+- [ ] Build one shared `qfli_clang_bridge` for C and C++ and expose compile,
+  diagnostics, artifact execution and cancellation through one C API.
+- [ ] Prove C and C++ separately with headers, multiple translation units,
+  standard library, stdin, stdout/stderr, timeout and memory-limit fixtures.
+- [ ] Only after device proof, replace the C++ placeholder runner and route both
+  types through `ForgeProgramRunner`.
+
+### 8.4 SQL sequence
+
+- [ ] Remove the `Process.start('sqlite3')` dependency from
+  `SqlQueryService`.
+- [ ] Add native SQLite build and a project-local `.qfli/data.sqlite` API.
+- [ ] Test DDL, parameterized queries, transactions, errors, cancellation and
+  reopen persistence on HarmonyOS.
+- [ ] Add optional MySQL connection configuration as a remote feature; never
+  fail local SQL usage because no MySQL service is installed.
+
+### 8.5 Dart residual-process gate
+
+- [ ] Replace returned unowned `Process` values with managed run handles.
+- [ ] Audit `TerminalPane`, `RunnerService`, Lua runner, local terminal and
+  Web-server opener for missing `await process.exitCode`, stream cancellation,
+  disposal and process-tree termination.
+- [ ] Add an infinite-loop fixture and assert after cancel/page close/app
+  shutdown that no Dart child remains. On Windows inspect descendants, not only
+  the direct PID.
+- [ ] Run the leak suite repeatedly under CPU monitoring before any HAP build.
+
+### 8.6 Verification commands
+
+```text
+flutter analyze --no-pub
+flutter test --concurrency=1 packages/qfli_studio_core/test
+flutter test --concurrency=1 packages/qfli_c_runtime/test
+flutter test --concurrency=1 apps/*/test
+dart run tool/validate_content.dart
+dart run tool/verify_runtime_matrix.dart
+git diff --check
+hvigorw assembleHap --analyze=normal
+```
+
+The full test command is run per App when the aggregate command exceeds the
+machine's memory limit. A test pass without a real HarmonyOS fixture is not
+accepted as native runtime evidence.
+
 ## Risk checkpoints
 
 - Before changing navigation, capture the existing root/community route behavior in widget tests.

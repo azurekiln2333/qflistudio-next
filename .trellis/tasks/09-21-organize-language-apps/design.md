@@ -120,3 +120,129 @@ Each session has an id, working directory, command history, output lines, runnin
 - Existing `settings.json` loads with default `showEditorTabs=true` and an empty user example catalog.
 - Existing projects without `.qfli/project.json` keep extension-derived language detection; imports add explicit metadata.
 - If native Picker compilation fails on an SDK variant, the Dart PickerService remains usable through file-level desktop/fallback flows while the native host change is isolated and can be reverted without reverting the content/editor work.
+
+## 2026-09-22 release target addendum
+
+The release target is now explicit: all twelve installable products must have a
+real runnable path on HarmonyOS. A product may use a compiler, interpreter, VM,
+WebAssembly runtime, or embedded database, but it must not report success from
+a placeholder runner. Desktop-only fallbacks are allowed during development but
+cannot be advertised as HarmonyOS support.
+
+### Unified content repositories
+
+The bundled content contract is split into two aggregate documents rather than
+one file per language:
+
+```text
+assets/content/tutorials.json
+assets/content/examples.json
+  -> ContentRepository
+       -> AssetContentRepository (current offline source)
+       -> ApiContentRepository (future HTTP source)
+  -> typed filter by language/type/product profile
+```
+
+Every entry carries `id`, `language`, `type`, `locale`, `level`, `title`,
+`summary`, `concepts`, `source`, `license`, and `updatedAt`. Tutorial entries
+also carry structured lessons and exercises; examples carry complete source,
+expected output, input fixtures, and a runnable project template type.
+
+The product filters are:
+
+```text
+QFLIScript    lua, javascript, typescript, shell
+QFLIRustCore  rust
+QFLIGoShift   go
+QFLIJVMX      java
+QFLIWebForge  html, css, javascript
+QFLIPyFlow    python
+QFLIForge     c, cpp
+QFLIDartWing  dart
+QFLISQLab     sql
+QFLIJson      json
+QFLINote      markdown
+```
+
+The seed catalog must contain at least 100 substantive tutorial entries and
+100 substantive examples for every language type above. The validator rejects
+missing types, duplicate ids, empty runnable code, missing source/license
+metadata, and counts below the release threshold. Official documentation is
+used only where its license permits redistribution; otherwise the entry keeps
+an official source link and license notice while using original explanations
+and examples.
+
+### Native runtime boundary
+
+All language execution goes through a typed `NativeRuntime` contract with
+`probe`, `compile`, `run`, `cancel`, and `dispose`. The contract returns
+capability/version/diagnostic data and never infers availability from file
+existence. Each native runtime has a watchdog, output-size limit, memory limit,
+and deterministic cancellation path.
+
+QFLIForge uses one pinned Clang/LLVM runtime for both C and C++:
+
+```text
+Dart runner -> MethodChannel -> ArkTS host -> qfli_clang_bridge (C/C++)
+            -> clang frontend + target linker/runtime -> sandboxed artifact
+```
+
+The language mode, standard library and linker flags differ by `type`; the
+compiler frontend and diagnostics pipeline are shared. The runtime must prove
+both compile and execute fixtures on the target device before C++ is marked
+available. A C-only interpreter is not a C++ fallback.
+
+The safe execution target for mobile is an in-process sandbox (preferably a
+Wasm artifact and embedded Wasm runtime, or an LLVM JIT only after a device
+security proof). The implementation must not write an executable and launch it
+as a child process on HarmonyOS. The Clang/LLVM source version, patches,
+licenses, target triple, libc/libc++ runtime and size budget are recorded in the
+native build manifest.
+
+Other runtimes are separate native modules but share the same bridge contract:
+
+- Script: embedded Lua, QuickJS/TypeScript transpilation, and shell capability
+  reporting with no fake shell on mobile.
+- Python: the existing MicroPython bridge, promoted only after every App host
+  copies the same ABI and probe contract.
+- Rust, Go, Java and Dart: a real embedded VM/compiler or a verified Wasm
+  pipeline; placeholder Dart runners are removed before release.
+- Web: local HTML/CSS/JavaScript preview in the existing server/bridge path.
+- JSON and Markdown: validated structured execution/preview workflows rather
+  than a misleading program-run action.
+- SQL: SQLite amalgamation compiled into a native module, with a project-local
+  database by default. MySQL is an optional remote connector and is never
+  assumed to be installed on the device.
+
+### Process and CPU safety
+
+Every external process is owned by a `ManagedProcess`/`ProcessSupervisor`.
+Starting a process registers it before any await; completion, cancellation,
+page disposal and app shutdown all converge on one idempotent cleanup path.
+Cleanup cancels stream subscriptions, closes stdin, kills the process tree on
+Windows (`taskkill /T`) or the process group on POSIX, awaits `exitCode`, and
+removes the registry entry. No runner may return a live unowned `Process`.
+
+Native runtimes use the same cancellation token and watchdog. Regression tests
+start infinite-loop Dart and shell fixtures, close the editor/page, interrupt a
+run, and assert that no child process remains and CPU returns to idle. The
+Trellis worker guard is also configured with a bounded live-worker count and
+idle timeout so parallel implementation cannot create another resource leak.
+
+### Parallel delivery boundary
+
+Subagents work in isolated worktrees/branches and report through a Trellis
+channel. Parallel tracks are:
+
+1. Content schema/repository/validator and the aggregate seed catalogs.
+2. Forge Clang/LLVM bridge and C/C++ device fixtures.
+3. SQL SQLite native module and query/database tests.
+4. Script/Python embedded runtime normalization.
+5. Rust/Go/Java/Dart runtime feasibility and implementations.
+6. ProcessSupervisor, editor integration and CPU leak tests.
+7. Cross-App HarmonyOS host wiring, manifests and release verification.
+
+The main agent merges only tested commits. Shared interfaces and generated
+content schemas land first; runtime tracks then consume those contracts. A
+track that cannot demonstrate a real device fixture remains blocked and cannot
+mark its product `available`.
