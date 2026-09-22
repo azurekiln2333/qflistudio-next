@@ -34,30 +34,74 @@ class TerminalPane extends StatefulWidget {
 }
 
 class TerminalPaneState extends State<TerminalPane> {
-  final _outputLines = <_TermLine>[];
-  final _inputController = TextEditingController();
-  final _listController = ScrollController();
-  final _history = <String>[];
-  int _historyIndex = -1;
-  bool _running = false;
-  Process? _currentProcess;
+  final _sessions = <_TerminalSession>[];
+  var _selectedSessionIndex = 0;
+  var _nextSessionId = 1;
   bool _collapsed = false;
 
   static const _maxLines = 500;
 
   bool get _isWindows => Platform.isWindows;
+  _TerminalSession get _session => _sessions[_selectedSessionIndex];
+  List<_TermLine> get _outputLines => _session.outputLines;
+  TextEditingController get _inputController => _session.inputController;
+  ScrollController get _listController => _session.listController;
+  List<String> get _history => _session.history;
+  int get _historyIndex => _session.historyIndex;
+  set _historyIndex(int value) => _session.historyIndex = value;
+  bool get _running => _session.running;
+  set _running(bool value) => _session.running = value;
+  set _currentProcess(Process? value) => _session.currentProcess = value;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessions.add(_TerminalSession(id: _nextSessionId++));
+  }
 
   @override
   void dispose() {
-    _currentProcess?.kill();
-    _inputController.dispose();
-    _listController.dispose();
+    for (final session in _sessions) {
+      session.dispose();
+    }
     super.dispose();
+  }
+
+  void _newSession() {
+    setState(() {
+      _sessions.add(_TerminalSession(id: _nextSessionId++));
+      _selectedSessionIndex = _sessions.length - 1;
+    });
+  }
+
+  void _selectSession(int index) {
+    if (index == _selectedSessionIndex ||
+        index < 0 ||
+        index >= _sessions.length) {
+      return;
+    }
+    setState(() => _selectedSessionIndex = index);
+  }
+
+  void _closeSession(int index) {
+    if (_sessions.length == 1 || index < 0 || index >= _sessions.length) {
+      return;
+    }
+    final session = _sessions.removeAt(index);
+    session.dispose();
+    setState(() {
+      if (_selectedSessionIndex > index) {
+        _selectedSessionIndex--;
+      } else if (_selectedSessionIndex >= _sessions.length) {
+        _selectedSessionIndex = _sessions.length - 1;
+      }
+    });
   }
 
   Future<void> _run(String command) async {
     final trimmed = command.trim();
-    if (trimmed.isEmpty || _running) return;
+    final session = _session;
+    if (trimmed.isEmpty || session.running) return;
     final l10n = StudioLocalizations.of(context);
     _history.add(trimmed);
     _historyIndex = _history.length;
@@ -76,7 +120,7 @@ class TerminalPaneState extends State<TerminalPane> {
         workingDirectory: widget.workingDirectory,
         runInShell: false,
       );
-      _currentProcess = process;
+      session.currentProcess = process;
       final stdoutFuture = process.stdout
           .transform(systemEncoding.decoder)
           .transform(const LineSplitter())
@@ -90,26 +134,27 @@ class TerminalPaneState extends State<TerminalPane> {
       });
       final code = await process.exitCode;
       timer.cancel();
-      _currentProcess = null;
+      session.currentProcess = null;
       final stdout = await stdoutFuture;
       final stderr = await stderrFuture;
       if (!mounted) return;
       setState(() {
         for (final line in stdout) {
-          _append(_TermLine(text: line, kind: _LineKind.stdout));
+          _append(_TermLine(text: line, kind: _LineKind.stdout), session);
         }
         for (final line in stderr) {
-          _append(_TermLine(text: line, kind: _LineKind.stderr));
+          _append(_TermLine(text: line, kind: _LineKind.stderr), session);
         }
         _append(
           _TermLine(
             text: l10n.exitCode(code),
             kind: code == 0 ? _LineKind.info : _LineKind.stderr,
           ),
+          session,
         );
-        _running = false;
+        session.running = false;
       });
-      _scrollToBottom();
+      _scrollToBottom(session);
     } on ProcessException catch (e) {
       if (!mounted) return;
       setState(() {
@@ -118,24 +163,30 @@ class TerminalPaneState extends State<TerminalPane> {
             text: l10n.unableToExecute(e.message),
             kind: _LineKind.stderr,
           ),
+          session,
         );
-        _running = false;
+        session.running = false;
       });
-      _scrollToBottom();
+      _scrollToBottom(session);
     }
   }
 
-  void _append(_TermLine line) {
-    _outputLines.add(line);
-    if (_outputLines.length > _maxLines) {
-      _outputLines.removeRange(0, _outputLines.length - _maxLines);
+  void _append(_TermLine line, [_TerminalSession? target]) {
+    final session = target ?? _session;
+    session.outputLines.add(line);
+    if (session.outputLines.length > _maxLines) {
+      session.outputLines.removeRange(
+        0,
+        session.outputLines.length - _maxLines,
+      );
     }
   }
 
-  void _scrollToBottom() {
+  void _scrollToBottom([_TerminalSession? target]) {
+    final controller = (target ?? _session).listController;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_listController.hasClients) {
-        _listController.jumpTo(_listController.position.maxScrollExtent);
+      if (controller.hasClients) {
+        controller.jumpTo(controller.position.maxScrollExtent);
       }
     });
   }
@@ -199,25 +250,36 @@ class TerminalPaneState extends State<TerminalPane> {
     required Future<int> exitCode,
   }) {
     final l10n = StudioLocalizations.of(context);
+    final session = _session;
     setState(() {
-      _append(_TermLine(text: '▶ $title', kind: _LineKind.info));
-      _running = true;
+      _append(_TermLine(text: '▶ $title', kind: _LineKind.info), session);
+      session.running = true;
     });
-    _scrollToBottom();
+    _scrollToBottom(session);
     unawaited(() async {
       final outDone = stdout.listen((line) {
         if (!mounted) return;
-        setState(() => _append(_TermLine(text: line, kind: _LineKind.stdout)));
-        _scrollToBottom();
+        setState(
+          () => _append(
+            _TermLine(text: line, kind: _LineKind.stdout),
+            session,
+          ),
+        );
+        _scrollToBottom(session);
       }).asFuture<void>();
       final errDone = stderr.listen((line) {
         if (!mounted) return;
-        setState(() => _append(_TermLine(text: line, kind: _LineKind.stderr)));
-        _scrollToBottom();
+        setState(
+          () => _append(
+            _TermLine(text: line, kind: _LineKind.stderr),
+            session,
+          ),
+        );
+        _scrollToBottom(session);
       }).asFuture<void>();
       await Future.wait([outDone, errDone]);
       final code = await exitCode;
-      _currentProcess = null;
+      session.currentProcess = null;
       if (!mounted) return;
       setState(() {
         _append(
@@ -225,10 +287,11 @@ class TerminalPaneState extends State<TerminalPane> {
             text: l10n.runEnded(code),
             kind: code == 0 ? _LineKind.info : _LineKind.stderr,
           ),
+          session,
         );
-        _running = false;
+        session.running = false;
       });
-      _scrollToBottom();
+      _scrollToBottom(session);
     }());
   }
 
@@ -316,20 +379,19 @@ class TerminalPaneState extends State<TerminalPane> {
             children: [
               Icon(Icons.terminal, size: 16, color: scheme.onSurfaceVariant),
               const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l10n.terminalHeader,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
+              Expanded(child: _buildSessionTabs(context)),
               if (_running)
                 const SizedBox(
                   width: 14,
                   height: 14,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
+              IconButton(
+                tooltip: l10n.newTerminal,
+                visualDensity: VisualDensity.compact,
+                onPressed: _newSession,
+                icon: const Icon(Icons.add, size: 20),
+              ),
               IconButton(
                 tooltip: l10n.close,
                 visualDensity: VisualDensity.compact,
@@ -405,7 +467,7 @@ class TerminalPaneState extends State<TerminalPane> {
                     decoration: InputDecoration(
                       isCollapsed: true,
                       border: InputBorder.none,
-                      hintText: l10n.terminalShellHint('ls / cat main.py)'),
+                      hintText: null,
                     ),
                     onSubmitted: (_) => _submit(),
                   ),
@@ -426,6 +488,49 @@ class TerminalPaneState extends State<TerminalPane> {
   String get _prompt => Platform.isWindows
       ? '${p.normalize(widget.workingDirectory)}>'
       : '${p.normalize(widget.workingDirectory)}\$';
+
+  Widget _buildSessionTabs(BuildContext context) {
+    final l10n = StudioLocalizations.of(context);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (var index = 0; index < _sessions.length; index++)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: InputChip(
+                label: Text('${l10n.terminal} ${_sessions[index].id}'),
+                selected: index == _selectedSessionIndex,
+                visualDensity: VisualDensity.compact,
+                onSelected: (_) => _selectSession(index),
+                onDeleted: _sessions.length == 1
+                    ? null
+                    : () => _closeSession(index),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TerminalSession {
+  _TerminalSession({required this.id});
+
+  final int id;
+  final outputLines = <_TermLine>[];
+  final inputController = TextEditingController();
+  final listController = ScrollController();
+  final history = <String>[];
+  var historyIndex = -1;
+  var running = false;
+  Process? currentProcess;
+
+  void dispose() {
+    currentProcess?.kill();
+    inputController.dispose();
+    listController.dispose();
+  }
 }
 
 enum _LineKind { command, stdout, stderr, info, debug }
