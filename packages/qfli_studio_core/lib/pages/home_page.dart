@@ -14,6 +14,7 @@ import '../store/project_store.dart';
 import '../store/settings_store.dart';
 import 'local_content_pages.dart';
 import 'quick_tools_page.dart';
+import 'terminax_terminal_page.dart';
 import '../i18n/studio_localizations.dart';
 import 'community/post_list_page.dart';
 import '../widgets/project_card.dart';
@@ -137,7 +138,7 @@ class _HomePageState extends State<HomePage> {
       1 => FunctionsTab(
         onOpenTerminal: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => LocalTerminalPage(store: widget.store),
+            builder: (_) => TerminaxTerminalPage(store: widget.store),
           ),
         ),
         onOpenContentTool: _isContentProduct
