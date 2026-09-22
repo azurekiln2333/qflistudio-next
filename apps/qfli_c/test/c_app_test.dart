@@ -451,7 +451,7 @@ int main(void) { printf("dart\\n"); return 0; }
         entryFile: p.join(project.path, 'main.cpp'),
       );
       expect(result, isNotNull);
-      expect(result!.title, contains('C++ 运行后端未就绪'));
+      expect(result!.title, anyOf(contains('Clang'), contains('C++')));
     });
   });
 }

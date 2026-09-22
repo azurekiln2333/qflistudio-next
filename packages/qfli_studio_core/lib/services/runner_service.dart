@@ -25,6 +25,7 @@ class RunResult {
     this.stdout,
     this.stderr,
     this.exitCode,
+    this.cancel,
   });
 
   final String title;
@@ -39,13 +40,15 @@ class RunResult {
   final Stream<String>? stdout;
   final Stream<String>? stderr;
   final Future<int>? exitCode;
+  final Future<void> Function()? cancel;
 }
 
 /// 「运行」按钮逻辑：按文件/项目类型分流。
 abstract final class RunnerService {
   static final ProcessSupervisor _processSupervisor = ProcessSupervisor();
-  static const MethodChannel _ohosChannel =
-      MethodChannel('qflistudio/platform');
+  static const MethodChannel _ohosChannel = MethodChannel(
+    'qflistudio/platform',
+  );
 
   /// 判断项目根目录下的主入口文件。
   ///
@@ -106,6 +109,7 @@ abstract final class RunnerService {
           stdout: result.stdout,
           stderr: result.stderr,
           exitCode: result.exitCode,
+          cancel: result.cancel,
         );
       }
     }
@@ -127,13 +131,15 @@ abstract final class RunnerService {
           if (result != null) return result;
           return RunResult(
             title: '运行',
-            hint: '未找到工具链（python/dart/javac/gcc），请安装后在桌面端运行，'
+            hint:
+                '未找到工具链（python/dart/javac/gcc），请安装后在桌面端运行，'
                 '或在「终端」中使用在线终端执行。',
           );
         }
         return RunResult(
           title: '运行',
-          hint: '移动端无法本地运行 $ext 程序（系统无编译器/解释器）。'
+          hint:
+              '移动端无法本地运行 $ext 程序（系统无编译器/解释器）。'
               '请在编辑器中打开「在线终端」，由服务器编译执行并回显输出。',
         );
       default:
@@ -173,10 +179,7 @@ abstract final class RunnerService {
         workingDirectory: projectPath,
         runInShell: Platform.isWindows,
       );
-      return RunResult(
-        title: command.join(' '),
-        managedProcess: process,
-      );
+      return RunResult(title: command.join(' '), managedProcess: process);
     } on ProcessException {
       return null;
     }

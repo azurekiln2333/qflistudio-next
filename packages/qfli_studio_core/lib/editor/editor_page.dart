@@ -568,7 +568,9 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     final open = _editor.current;
     if (open == null) return;
     final extension = p.extension(open.name).toLowerCase();
-    if (extension != '.json' && extension != '.md' && extension != '.markdown') {
+    if (extension != '.json' &&
+        extension != '.md' &&
+        extension != '.markdown') {
       return;
     }
     final page = extension == '.json'
@@ -648,18 +650,25 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     final stdout = result?.stdout;
     final stderr = result?.stderr;
     final exitCode = result?.exitCode;
-    if (stdout != null && stderr != null && exitCode != null) {
+    if (result != null &&
+        stdout != null &&
+        stderr != null &&
+        exitCode != null) {
       _terminalKey.currentState?.attachOutput(
-        title: result!.title,
+        title: result.title,
         stdout: stdout,
         stderr: stderr,
         exitCode: exitCode,
+        cancel: result.cancel,
       );
       return;
     }
     final managedProcess = result?.managedProcess;
     if (managedProcess != null) {
-      _terminalKey.currentState?.attachManagedProcess(result!.title, managedProcess);
+      _terminalKey.currentState?.attachManagedProcess(
+        result!.title,
+        managedProcess,
+      );
       return;
     }
     final process = result?.process;
@@ -899,14 +908,32 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ),
-                                    if (p.extension(_editor.current?.name ?? '').toLowerCase() == '.json' ||
-                                        p.extension(_editor.current?.name ?? '').toLowerCase() == '.md' ||
-                                        p.extension(_editor.current?.name ?? '').toLowerCase() == '.markdown')
+                                    if (p
+                                                .extension(
+                                                  _editor.current?.name ?? '',
+                                                )
+                                                .toLowerCase() ==
+                                            '.json' ||
+                                        p
+                                                .extension(
+                                                  _editor.current?.name ?? '',
+                                                )
+                                                .toLowerCase() ==
+                                            '.md' ||
+                                        p
+                                                .extension(
+                                                  _editor.current?.name ?? '',
+                                                )
+                                                .toLowerCase() ==
+                                            '.markdown')
                                       const PopupMenuItem(
                                         value: 'content_tool',
                                         child: Row(
                                           children: [
-                                            Icon(Icons.preview_outlined, size: 20),
+                                            Icon(
+                                              Icons.preview_outlined,
+                                              size: 20,
+                                            ),
                                             SizedBox(width: 12),
                                             Text('内容工具'),
                                           ],
@@ -1098,10 +1125,13 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
                           },
                           onResizeDelta: (delta) {
                             if (!mounted) return;
-                            final maxHeight = MediaQuery.sizeOf(context).height * 0.7;
+                            final maxHeight =
+                                MediaQuery.sizeOf(context).height * 0.7;
                             setState(() {
-                              _terminalHeight =
-                                  (_terminalHeight + delta).clamp(150.0, maxHeight);
+                              _terminalHeight = (_terminalHeight + delta).clamp(
+                                150.0,
+                                maxHeight,
+                              );
                             });
                           },
                           onClose: () {
@@ -1253,8 +1283,7 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
     }
     return Column(
       children: [
-        if (widget.settings.showEditorTabs)
-          _buildTabBar(context),
+        if (widget.settings.showEditorTabs) _buildTabBar(context),
         Expanded(
           child: TabBarView(
             controller: _tabController,

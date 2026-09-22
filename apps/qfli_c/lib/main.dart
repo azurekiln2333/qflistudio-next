@@ -19,7 +19,7 @@ const String _appTitle = StudioProductCatalog.forge;
 ///
 /// 新建项目只出现 C 模板，运行按钮交给应用内的 C 解释器。
 /// 单独提出来是为了让测试能直接断言档位，而不必为了一个常量去跑 `main()`。
-const StudioProfile forgeProfile = StudioProfile(
+final StudioProfile forgeProfile = StudioProfile(
   id: StudioProductCatalog.forgeKey,
   appTitle: _appTitle,
   templates: [ProjectTemplate.empty, ProjectTemplate.c, ProjectTemplate.cpp],
@@ -31,7 +31,7 @@ const StudioProfile forgeProfile = StudioProfile(
 );
 
 /// Backwards-compatible name for integrations that imported the former C profile.
-const StudioProfile cProfile = forgeProfile;
+final StudioProfile cProfile = forgeProfile;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
