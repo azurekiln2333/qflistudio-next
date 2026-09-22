@@ -657,6 +657,11 @@ class _EditorPageState extends State<EditorPage> with TickerProviderStateMixin {
       );
       return;
     }
+    final managedProcess = result?.managedProcess;
+    if (managedProcess != null) {
+      _terminalKey.currentState?.attachManagedProcess(result!.title, managedProcess);
+      return;
+    }
     final process = result?.process;
     if (process != null) {
       _terminalKey.currentState?.attachProcess(result!.title, process);

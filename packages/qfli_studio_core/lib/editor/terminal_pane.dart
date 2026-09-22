@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
 import '../i18n/studio_localizations.dart';
+import '../services/process_supervisor.dart';
 
 /// 本地终端面板：命令响应式 shell（`sh -c` / `cmd /c`），沙箱权限内执行。
 /// 移动端系统无编译器，复杂工具（gcc/python 等）需走在线终端。
@@ -38,6 +39,7 @@ class TerminalPaneState extends State<TerminalPane> {
   var _selectedSessionIndex = 0;
   var _nextSessionId = 1;
   bool _collapsed = false;
+  final ProcessSupervisor _processSupervisor = ProcessSupervisor();
 
   static const _maxLines = 500;
 
@@ -61,6 +63,7 @@ class TerminalPaneState extends State<TerminalPane> {
 
   @override
   void dispose() {
+    unawaited(_processSupervisor.dispose());
     for (final session in _sessions) {
       session.dispose();
     }
@@ -114,13 +117,13 @@ class TerminalPaneState extends State<TerminalPane> {
     _scrollToBottom();
 
     try {
-      final process = await Process.start(
+      final process = await _processSupervisor.start(
         _isWindows ? 'cmd' : 'sh',
         _isWindows ? ['/c', trimmed] : ['-c', trimmed],
         workingDirectory: widget.workingDirectory,
         runInShell: false,
       );
-      session.currentProcess = process;
+      session.currentManagedProcess = process;
       final stdoutFuture = process.stdout
           .transform(systemEncoding.decoder)
           .transform(const LineSplitter())
@@ -130,11 +133,11 @@ class TerminalPaneState extends State<TerminalPane> {
           .transform(const LineSplitter())
           .toList();
       final timer = Timer(const Duration(seconds: 30), () {
-        process.kill();
+        unawaited(process.cancel());
       });
       final code = await process.exitCode;
       timer.cancel();
-      session.currentProcess = null;
+      session.currentManagedProcess = null;
       final stdout = await stdoutFuture;
       final stderr = await stderrFuture;
       if (!mounted) return;
@@ -239,6 +242,23 @@ class TerminalPaneState extends State<TerminalPane> {
     );
   }
 
+  /// Attaches a process already owned by a [ProcessSupervisor].
+  void attachManagedProcess(String title, ManagedProcess process) {
+    final session = _session;
+    session.currentManagedProcess = process;
+    attachOutput(
+      title: title,
+      stdout: process.stdout
+          .transform(systemEncoding.decoder)
+          .transform(const LineSplitter()),
+      stderr: process.stderr
+          .transform(systemEncoding.decoder)
+          .transform(const LineSplitter()),
+      exitCode: process.exitCode,
+      cancel: process.cancel,
+    );
+  }
+
   /// 运行按钮：接管任意一对输出流。
   ///
   /// 外部进程和「应用内运行时」（语言 App 自带的解释器/编译器）都走这里，
@@ -248,9 +268,11 @@ class TerminalPaneState extends State<TerminalPane> {
     required Stream<String> stdout,
     required Stream<String> stderr,
     required Future<int> exitCode,
+    Future<void> Function()? cancel,
   }) {
     final l10n = StudioLocalizations.of(context);
     final session = _session;
+    session.cancelAction = cancel;
     setState(() {
       _append(_TermLine(text: '▶ $title', kind: _LineKind.info), session);
       session.running = true;
@@ -280,6 +302,8 @@ class TerminalPaneState extends State<TerminalPane> {
       await Future.wait([outDone, errDone]);
       final code = await exitCode;
       session.currentProcess = null;
+      session.currentManagedProcess = null;
+      session.cancelAction = null;
       if (!mounted) return;
       setState(() {
         _append(
@@ -525,8 +549,14 @@ class _TerminalSession {
   var historyIndex = -1;
   var running = false;
   Process? currentProcess;
+  ManagedProcess? currentManagedProcess;
+  Future<void> Function()? cancelAction;
 
   void dispose() {
+    final cancel = cancelAction;
+    if (cancel != null) unawaited(cancel());
+    final managed = currentManagedProcess;
+    if (managed != null) unawaited(managed.cancel());
     currentProcess?.kill();
     inputController.dispose();
     listController.dispose();

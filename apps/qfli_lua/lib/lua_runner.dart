@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:qfli_studio_core/services/process_supervisor.dart';
 import 'package:qfli_studio_core/services/studio_profile.dart';
 
 /// Runtime adapter for the shared scripting product.
 class LuaProgramRunner implements ProgramRunner {
   const LuaProgramRunner();
+
+  static final ProcessSupervisor _processSupervisor = ProcessSupervisor();
 
   static const Set<String> _sourceExtensions = {
     '.lua',
@@ -32,7 +35,7 @@ class LuaProgramRunner implements ProgramRunner {
     final command = await _commandFor(extension, entryFile);
     if (command == null) return _notReady(p.basename(entryFile), runtime);
     try {
-      final process = await Process.start(
+      final process = await _processSupervisor.start(
         command.first,
         command.skip(1).toList(growable: false),
         workingDirectory: projectPath,
@@ -47,6 +50,7 @@ class LuaProgramRunner implements ProgramRunner {
             .transform(systemEncoding.decoder)
             .transform(const LineSplitter()),
         exitCode: process.exitCode,
+        cancel: process.cancel,
       );
     } on ProcessException {
       return _notReady(p.basename(entryFile), runtime);

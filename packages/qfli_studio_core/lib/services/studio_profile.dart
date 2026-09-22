@@ -186,6 +186,7 @@ class ProgramRunResult {
     required this.stdout,
     required this.stderr,
     required this.exitCode,
+    this.cancel,
   });
 
   /// 终端首行显示的标题，例如 `运行 main.c（本地解释器）`。
@@ -194,4 +195,7 @@ class ProgramRunResult {
   final Stream<String> stdout;
   final Stream<String> stderr;
   final Future<int> exitCode;
+
+  /// Cancels an external or native run when the editor is disposed.
+  final Future<void> Function()? cancel;
 }

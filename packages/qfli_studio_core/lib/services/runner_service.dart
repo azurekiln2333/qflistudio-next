@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 
 import 'app_paths.dart';
 import 'local_web_server.dart';
+import 'process_supervisor.dart';
 import 'studio_profile.dart';
 
 /// 运行结果：输出行由终端面板显示。
@@ -18,6 +19,7 @@ class RunResult {
   const RunResult({
     required this.title,
     this.process,
+    this.managedProcess,
     this.webServer,
     this.hint,
     this.stdout,
@@ -27,6 +29,7 @@ class RunResult {
 
   final String title;
   final Process? process;
+  final ManagedProcess? managedProcess;
   final LocalWebServer? webServer;
 
   /// 无法本机运行时的说明（例如移动端无编译器，引导走在线终端）。
@@ -40,6 +43,7 @@ class RunResult {
 
 /// 「运行」按钮逻辑：按文件/项目类型分流。
 abstract final class RunnerService {
+  static final ProcessSupervisor _processSupervisor = ProcessSupervisor();
   static const MethodChannel _ohosChannel =
       MethodChannel('qflistudio/platform');
 
@@ -163,13 +167,16 @@ abstract final class RunnerService {
       final which = Platform.isWindows ? 'where' : 'which';
       final probe = await Process.run(which, [command.first]);
       if (probe.exitCode != 0) return null;
-      final process = await Process.start(
+      final process = await _processSupervisor.start(
         command.first,
         command.sublist(1),
         workingDirectory: projectPath,
         runInShell: Platform.isWindows,
       );
-      return RunResult(title: command.join(' '), process: process);
+      return RunResult(
+        title: command.join(' '),
+        managedProcess: process,
+      );
     } on ProcessException {
       return null;
     }
