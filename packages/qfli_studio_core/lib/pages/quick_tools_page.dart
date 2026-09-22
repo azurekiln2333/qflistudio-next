@@ -215,8 +215,7 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildSessionBar(context),
-              Expanded(child: _buildOutput()),
-              _buildInput(path, l10n),
+              Expanded(child: _buildOutput(path)),
             ],
           );
         },
@@ -273,7 +272,7 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
     );
   }
 
-  Widget _buildOutput() {
+  Widget _buildOutput(String path) {
     final scheme = Theme.of(context).colorScheme;
     final session = _session;
     return Container(
@@ -281,8 +280,11 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
       child: ListView.builder(
         controller: session.listController,
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-        itemCount: session.outputLines.length,
+        itemCount: session.outputLines.length + 1,
         itemBuilder: (context, index) {
+          if (index == session.outputLines.length) {
+            return _buildPromptLine(path);
+          }
           final line = session.outputLines[index];
           return Text(
             line.text,
@@ -304,63 +306,51 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
     );
   }
 
-  Widget _buildInput(String path, StudioLocalizations l10n) {
+  Widget _buildPromptLine(String path) {
     final scheme = Theme.of(context).colorScheme;
     final session = _session;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        border: Border(top: BorderSide(color: scheme.outlineVariant)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Focus(
-          onKeyEvent: _onKey,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  _prompt(path),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Consolas',
-                    fontFamilyFallback: const ['Courier New', 'monospace'],
-                    fontSize: 13,
-                    color: scheme.primary,
-                  ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 8),
+      child: Focus(
+        onKeyEvent: _onKey,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(
+                _prompt(path),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: 'Consolas',
+                  fontFamilyFallback: const ['Courier New', 'monospace'],
+                  fontSize: 13,
+                  color: scheme.primary,
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: session.inputController,
-                  focusNode: _inputFocusNode,
-                  autofocus: true,
-                  enabled: !session.running,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontFamily: 'Consolas',
-                    fontFamilyFallback: ['Courier New', 'monospace'],
-                    fontSize: 13,
-                  ),
-                  decoration: const InputDecoration(
-                    isCollapsed: true,
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: (_) => _submit(),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: session.inputController,
+                focusNode: _inputFocusNode,
+                autofocus: true,
+                enabled: !session.running,
+                maxLines: 1,
+                style: TextStyle(
+                  fontFamily: 'Consolas',
+                  fontFamilyFallback: const ['Courier New', 'monospace'],
+                  fontSize: 13,
+                  color: scheme.onSurface,
                 ),
+                decoration: const InputDecoration(
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                ),
+                onSubmitted: (_) => _submit(),
               ),
-              IconButton(
-                tooltip: l10n.execute,
-                visualDensity: VisualDensity.compact,
-                onPressed: session.running ? null : _submit,
-                icon: const Icon(Icons.arrow_upward),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
