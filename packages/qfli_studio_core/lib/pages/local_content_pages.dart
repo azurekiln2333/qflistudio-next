@@ -1,40 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../content/asset_content_repository.dart';
+import '../content/content_repository.dart';
+import '../content/local_content_adapter.dart';
 import '../i18n/studio_localizations.dart';
 import '../models/tutorial.dart';
 import '../services/studio_profile.dart';
-import '../services/tutorial_service.dart';
 import '../store/auth_store.dart';
 import '../store/project_store.dart';
 import '../services/example_code_store.dart';
 
 /// 离线语言 App 的第二页：从随包 JSON 加载入门教程。
 class LocalTutorialsTab extends StatefulWidget {
-  const LocalTutorialsTab({super.key, required this.language});
+  const LocalTutorialsTab({super.key, required this.language, this.repository});
 
   final String language;
+  final ContentRepository? repository;
 
   @override
   State<LocalTutorialsTab> createState() => _LocalTutorialsTabState();
 }
 
 class _LocalTutorialsTabState extends State<LocalTutorialsTab> {
+  late ContentRepository _repository;
   late Future<Tutorial?> _tutorial;
 
   @override
   void initState() {
     super.initState();
-    _tutorial = TutorialService.load(widget.language);
+    _repository = widget.repository ?? AssetContentRepository();
+    _tutorial = _loadTutorial();
   }
 
   @override
   void didUpdateWidget(covariant LocalTutorialsTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.language != widget.language) {
-      _tutorial = TutorialService.load(widget.language);
+    if (oldWidget.language != widget.language ||
+        oldWidget.repository != widget.repository) {
+      _repository = widget.repository ?? AssetContentRepository();
+      _tutorial = _loadTutorial();
     }
   }
+
+  Future<Tutorial?> _loadTutorial() => LocalContentAdapter.loadTutorial(
+    repository: _repository,
+    language: widget.language,
+    displayName: _displayName(widget.language),
+    productKey: StudioProfile.current?.productKey,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +79,14 @@ class ExampleCodeTab extends StatefulWidget {
   const ExampleCodeTab({
     super.key,
     required this.language,
+    this.repository,
     this.store,
     this.auth,
     this.examples,
   });
 
   final String language;
+  final ContentRepository? repository;
   final ProjectStore? store;
   final AuthStore? auth;
   final ExampleCodeStore? examples;
@@ -80,13 +96,31 @@ class ExampleCodeTab extends StatefulWidget {
 }
 
 class _ExampleCodeTabState extends State<ExampleCodeTab> {
-  late Future<Tutorial?> _tutorial;
+  late ContentRepository _repository;
+  late Future<List<ExampleCode>> _examples;
 
   @override
   void initState() {
     super.initState();
-    _tutorial = TutorialService.load(widget.language);
+    _repository = widget.repository ?? AssetContentRepository();
+    _examples = _loadExamples();
   }
+
+  @override
+  void didUpdateWidget(covariant ExampleCodeTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.language != widget.language ||
+        oldWidget.repository != widget.repository) {
+      _repository = widget.repository ?? AssetContentRepository();
+      _examples = _loadExamples();
+    }
+  }
+
+  Future<List<ExampleCode>> _loadExamples() => LocalContentAdapter.loadExamples(
+    repository: _repository,
+    language: widget.language,
+    productKey: StudioProfile.current?.productKey,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -95,18 +129,18 @@ class _ExampleCodeTabState extends State<ExampleCodeTab> {
       appBar: AppBar(
         title: Text('${_displayName(widget.language)} ${l10n.examples}'),
       ),
-      body: FutureBuilder<Tutorial?>(
-        future: _tutorial,
+      body: FutureBuilder<List<ExampleCode>>(
+        future: _examples,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
-          final tutorial = snapshot.data;
-          if (tutorial == null) {
+          final examples = snapshot.data;
+          if (examples == null || examples.isEmpty) {
             return _LocalContentError(message: l10n.localExamplesMissing);
           }
           return _ExampleCodeList(
-            tutorial: tutorial,
+            items: examples,
             store: widget.store,
             auth: widget.auth,
             examples: widget.examples,
@@ -157,13 +191,13 @@ class _TutorialList extends StatelessWidget {
 
 class _ExampleCodeList extends StatelessWidget {
   const _ExampleCodeList({
-    required this.tutorial,
+    required this.items,
     this.store,
     this.auth,
     this.examples,
   });
 
-  final Tutorial tutorial;
+  final List<ExampleCode> items;
   final ProjectStore? store;
   final AuthStore? auth;
   final ExampleCodeStore? examples;
@@ -176,13 +210,13 @@ class _ExampleCodeList extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
       children: [
         Text(
-          l10n.examplesCount(tutorial.lessonCount),
+          l10n.examplesCount(items.length),
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
-        for (final example in tutorial.examples)
+        for (final example in items)
           _ExampleCodeCard(
             example: example,
             onTap: () => Navigator.of(context).push(
@@ -216,50 +250,55 @@ class _ExampleCodeCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 12, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(example.title, style: theme.textTheme.titleSmall),
-                ),
-                Text(example.type),
-                IconButton(
-                  tooltip: l10n.copyExample,
-                  icon: const Icon(Icons.copy_outlined),
-                  onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: example.code));
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(l10n.exampleCopied)));
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(6),
+          padding: const EdgeInsets.fromLTRB(16, 12, 12, 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      example.title,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  ),
+                  Text(example.type),
+                  IconButton(
+                    tooltip: l10n.copyExample,
+                    icon: const Icon(Icons.copy_outlined),
+                    onPressed: () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: example.code),
+                      );
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.exampleCopied)),
+                      );
+                    },
+                  ),
+                ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SelectableText(
-                    example.code,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontFamily: 'monospace',
+              const SizedBox(height: 8),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SelectableText(
+                      example.code,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontFamily: 'monospace',
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );
@@ -285,8 +324,9 @@ class ExampleDetailPage extends StatefulWidget {
 }
 
 class _ExampleDetailPageState extends State<ExampleDetailPage> {
-  late final TextEditingController _code =
-      TextEditingController(text: widget.example.code);
+  late final TextEditingController _code = TextEditingController(
+    text: widget.example.code,
+  );
 
   @override
   void dispose() {
@@ -357,9 +397,7 @@ class _ExampleDetailPageState extends State<ExampleDetailPage> {
   void _reset() => setState(() => _code.text = widget.example.code);
 
   Future<void> _save() async {
-    await widget.examples!.upsert(
-      widget.example.copyWith(code: _code.text),
-    );
+    await widget.examples!.upsert(widget.example.copyWith(code: _code.text));
   }
 
   Future<void> _importProject() async {
@@ -369,7 +407,11 @@ class _ExampleDetailPageState extends State<ExampleDetailPage> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result.error ?? StudioLocalizations.of(context).projectImported)),
+      SnackBar(
+        content: Text(
+          result.error ?? StudioLocalizations.of(context).projectImported,
+        ),
+      ),
     );
   }
 }
