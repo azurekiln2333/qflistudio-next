@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+import '../../services/process_supervisor.dart';
 import 'shell_backend.dart';
 
 /// Creates a shell backed by real OS processes.
@@ -107,7 +108,8 @@ class LocalShellBackend extends BaseShellBackend {
       '[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;'
       r'$OutputEncoding=[System.Text.Encoding]::UTF8;';
 
-  Process? _process;
+  final ProcessSupervisor _processSupervisor = ProcessSupervisor();
+  ManagedProcess? _process;
 
   /// Directory that `~` stands for.
   ///
@@ -189,9 +191,9 @@ QFLI 终端 · $shellLabel
     final workingDirectory = directory.existsSync() ? cwd : Directory.current.path;
 
     final argv = _buildCommand(shell, command);
-    final Process process;
+    final ManagedProcess process;
     try {
-      process = await Process.start(
+      process = await _processSupervisor.start(
         argv.first,
         argv.sublist(1),
         workingDirectory: workingDirectory,
@@ -279,13 +281,13 @@ QFLI 终端 · $shellLabel
     final process = _process;
     if (process == null) return;
     emitLine('^C', OutputKind.system);
-    process.kill();
+    await process.cancel();
     _process = null;
   }
 
   @override
   Future<void> shutdown() async {
-    _process?.kill();
+    await _processSupervisor.dispose();
     _process = null;
     await super.shutdown();
   }
