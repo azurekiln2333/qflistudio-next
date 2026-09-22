@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
 class JsonAnalysis {
@@ -58,62 +58,53 @@ class SqlExecutionResult {
 }
 
 abstract final class SqlQueryService {
+  static const MethodChannel _channel = MethodChannel('qfli_sql/native');
+
   static Future<SqlExecutionResult> execute({
     required String source,
     String? projectPath,
   }) async {
-    if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
-      return const SqlExecutionResult(
-        available: false,
-        exitCode: 127,
-        output: '',
-        error: 'SQLite command-line runtime is unavailable on this platform.',
-      );
-    }
-    final probe = await Process.run(
-      Platform.isWindows ? 'where' : 'which',
-      ['sqlite3'],
-      runInShell: Platform.isWindows,
-    );
-    if (probe.exitCode != 0) {
-      return const SqlExecutionResult(
-        available: false,
-        exitCode: 127,
-        output: '',
-        error: 'sqlite3 was not found on the desktop.',
-      );
-    }
     final database = projectPath == null || projectPath.isEmpty
         ? ':memory:'
         : p.join(projectPath, '.qfli', 'data.sqlite');
     try {
-      final process = await Process.start(
-        'sqlite3',
-        ['-header', '-column', database],
-        workingDirectory: projectPath,
-        runInShell: Platform.isWindows,
-      );
-      process.stdin.write(source);
-      await process.stdin.close();
-      final stdout = await process.stdout
-          .transform(utf8.decoder)
-          .join();
-      final stderr = await process.stderr
-          .transform(utf8.decoder)
-          .join();
-      final exitCode = await process.exitCode;
+      final raw = await _channel.invokeMethod<Object?>('execute', {
+        'source': source,
+        'databasePath': database,
+      });
+      if (raw is! Map) {
+        return const SqlExecutionResult(
+          available: false,
+          exitCode: 127,
+          output: '',
+          error: 'SQLite 原生桥返回了无效响应。',
+        );
+      }
+      final available = raw['available'] == true;
+      final output = '${raw['output'] ?? ''}';
+      final error = raw['error'] == null ? null : '${raw['error']}';
+      final exitCode = raw['exitCode'] is num
+          ? (raw['exitCode'] as num).toInt()
+          : (available ? 0 : 127);
       return SqlExecutionResult(
-        available: true,
-        exitCode: exitCode,
-        output: stdout,
-        error: stderr.isEmpty ? null : stderr,
+        available: available,
+        exitCode: available ? exitCode : 127,
+        output: output,
+        error: error,
       );
-    } on ProcessException catch (error) {
+    } on MissingPluginException {
       return SqlExecutionResult(
         available: false,
         exitCode: 127,
         output: '',
-        error: error.message,
+        error: 'SQLite 原生桥未安装；当前构建不能执行 SQL。',
+      );
+    } on PlatformException catch (error) {
+      return SqlExecutionResult(
+        available: false,
+        exitCode: 127,
+        output: '',
+        error: 'SQLite 原生桥调用失败：${error.message ?? error.code}',
       );
     }
   }

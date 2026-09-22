@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import '../i18n/studio_localizations.dart';
 import '../services/studio_profile.dart';
 import '../services/app_paths.dart';
+import '../services/process_supervisor.dart';
 import '../store/project_store.dart';
 import 'content_tools_pages.dart';
 
@@ -141,6 +142,7 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
   var _selectedSession = 0;
   var _nextSessionId = 1;
   final _inputFocusNode = FocusNode();
+  final ProcessSupervisor _processSupervisor = ProcessSupervisor();
 
   _LocalTerminalSession get _session => _sessions[_selectedSession];
 
@@ -154,6 +156,7 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
 
   @override
   void dispose() {
+    unawaited(_processSupervisor.dispose());
     _inputFocusNode.dispose();
     for (final session in _sessions) {
       session.dispose();
@@ -466,13 +469,13 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
     _scrollToBottom(session);
 
     try {
-      final process = await Process.start(
+      final process = await _processSupervisor.start(
         _isWindows ? 'cmd' : 'sh',
         _isWindows ? ['/c', trimmed] : ['-c', trimmed],
         workingDirectory: path,
         runInShell: false,
       );
-      session.currentProcess = process;
+      session.currentManagedProcess = process;
       final stdoutDone = process.stdout
           .transform(systemEncoding.decoder)
           .transform(const LineSplitter())
@@ -481,14 +484,17 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
           .transform(systemEncoding.decoder)
           .transform(const LineSplitter())
           .listen((line) => _appendProcessLine(session, line, true));
-      final timer = Timer(const Duration(seconds: 30), process.kill);
+      final timer = Timer(
+        const Duration(seconds: 30),
+        () => unawaited(process.cancel()),
+      );
       final code = await process.exitCode;
       timer.cancel();
       await Future.wait([
         stdoutDone.asFuture<void>(),
         stderrDone.asFuture<void>(),
       ]);
-      session.currentProcess = null;
+      session.currentManagedProcess = null;
       if (!mounted || session.disposed) return;
       setState(() {
         _append(
@@ -575,11 +581,12 @@ class _LocalTerminalSession {
   var historyIndex = -1;
   var running = false;
   var disposed = false;
-  Process? currentProcess;
+  ManagedProcess? currentManagedProcess;
 
   void dispose() {
     disposed = true;
-    currentProcess?.kill();
+    final managed = currentManagedProcess;
+    if (managed != null) unawaited(managed.cancel());
     inputController.dispose();
     listController.dispose();
   }
