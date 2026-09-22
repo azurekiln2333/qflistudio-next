@@ -21,7 +21,7 @@ import '../widgets/project_card.dart';
 import '../widgets/project_dialogs.dart';
 import 'profile_page.dart';
 
-/// 应用外壳：功能、教程、示例/讨论均为独立页面。
+/// 应用外壳：功能、教程、示例和个人页均为独立页面。
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
     final profile = StudioProfile.current;
     final offline = profile?.isOffline == true;
     final l10n = StudioLocalizations.of(context);
-    final pageCount = offline ? 4 : 5;
+    const pageCount = 4;
     return Scaffold(
       body: PageView.builder(
         key: const ValueKey('home-page-view'),
@@ -108,16 +108,10 @@ class _HomePageState extends State<HomePage> {
             label: l10n.tutorial,
           ),
           NavigationDestination(
-            icon: Icon(offline ? Icons.code_outlined : Icons.forum_outlined),
-            selectedIcon: Icon(offline ? Icons.code : Icons.forum),
-            label: offline ? l10n.examples : l10n.discussion,
+            icon: Icon(offline ? Icons.code_outlined : Icons.person_outline),
+            selectedIcon: Icon(offline ? Icons.code : Icons.person),
+            label: offline ? l10n.examples : l10n.profile,
           ),
-          if (!offline)
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: l10n.profile,
-            ),
         ],
       ),
     );
@@ -158,12 +152,11 @@ class _HomePageState extends State<HomePage> {
               store: widget.store,
               auth: widget.auth,
             )
-          : DiscussionTab(auth: widget.auth),
-      4 => ProfileTab(
-        auth: widget.auth,
-        settings: widget.settings,
-        store: widget.store,
-      ),
+          : ProfileTab(
+            auth: widget.auth,
+            settings: widget.settings,
+            store: widget.store,
+          ),
       _ => const SizedBox.shrink(),
     };
   }

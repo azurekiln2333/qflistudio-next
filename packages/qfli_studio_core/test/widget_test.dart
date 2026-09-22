@@ -158,7 +158,7 @@ void main() {
     expect(find.text('src'), findsOneWidget);
   });
 
-  testWidgets('底部导航：主页/教程/讨论/我的 四个 Tab 切换', (tester) async {
+  testWidgets('底部导航：主页/功能/教程/我的 四个 Tab 切换', (tester) async {
     final store = ProjectStore(storageFile: storage);
     await tester.runAsync(() => store.load());
     await tester.pumpWidget(QfliApp(store: store, auth: AuthStore()));
@@ -170,6 +170,8 @@ void main() {
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byKey(const ValueKey('home-page-view')), findsOneWidget);
+    expect(find.byType(NavigationDestination), findsNWidgets(4));
+    expect(find.byIcon(Icons.forum_outlined), findsNothing);
     final l10n = StudioLocalizations.of(
       tester.element(find.byType(NavigationBar)),
     );
@@ -184,13 +186,13 @@ void main() {
     expect(find.text(l10n.functions), findsWidgets);
     expect(find.text(l10n.terminal), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.forum_outlined));
+    await tester.tap(find.byIcon(Icons.menu_book_outlined));
     await tester.pumpAndSettle(
       const Duration(milliseconds: 100),
       EnginePhase.sendSemanticsUpdate,
       const Duration(seconds: 3),
     );
-    expect(find.text(l10n.discussion), findsWidgets);
+    expect(find.text(l10n.tutorial), findsWidgets);
 
     await tester.tap(find.byIcon(Icons.person_outline));
     await tester.pumpAndSettle(
