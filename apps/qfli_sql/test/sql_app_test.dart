@@ -91,15 +91,16 @@ void main() {
   });
 
   group('运行后端', () {
-    test('本语言文件被接管，并说明解释器还在开发中', () async {
+    test('本语言文件被接管，并明确报告 SQLite 引擎状态', () async {
       write('main.sql', '// 示例');
       final result = await sqlProfile.runner!.run(
         projectPath: project.path,
         entryFile: p.join(project.path, 'main.sql'),
       );
       expect(result, isNotNull, reason: '运行后端没有接管本语言文件');
-      expect(result!.title, contains('SQL 解释器开发中'));
-      expect(await result.stdout.toList(), isNotEmpty);
+      expect(result!.title, contains('SQLite 运行时不可用'));
+      expect(await result.stdout.toList(), isEmpty);
+      expect(await result.stderr.toList(), isNotEmpty);
       expect(await result.exitCode, kProgramNotRunExitCode);
     });
 
@@ -122,7 +123,7 @@ void main() {
       );
       expect(result, isNotNull);
       expect(result!.hint, isNull, reason: '后端接管了就不该走兜底提示');
-      expect(result.title, contains('SQL 解释器开发中'));
+      expect(result.title, contains('SQLite 运行时不可用'));
     });
   });
 }
