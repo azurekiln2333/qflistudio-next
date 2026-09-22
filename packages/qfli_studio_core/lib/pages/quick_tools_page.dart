@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
 
-import '../editor/terminal_pane.dart';
 import '../i18n/studio_localizations.dart';
 import '../services/studio_profile.dart';
 import '../services/app_paths.dart';
@@ -122,7 +125,7 @@ class _QuickToolTile extends StatelessWidget {
   }
 }
 
-/// 独立的本地终端页，复用编辑器中的终端执行和输出组件。
+/// 独立的全屏本地终端页，与编辑器内的终端面板分开维护。
 class LocalTerminalPage extends StatefulWidget {
   const LocalTerminalPage({super.key, required this.store});
 
@@ -134,10 +137,29 @@ class LocalTerminalPage extends StatefulWidget {
 
 class _LocalTerminalPageState extends State<LocalTerminalPage> {
   late final Future<String?> _workingDirectory = _resolveWorkingDirectory();
-  final _sessions = <int>[0];
+  final _sessions = <_LocalTerminalSession>[];
   var _selectedSession = 0;
   var _nextSessionId = 1;
-  var _terminalHeight = 420.0;
+  final _inputFocusNode = FocusNode();
+
+  _LocalTerminalSession get _session => _sessions[_selectedSession];
+
+  bool get _isWindows => Platform.isWindows;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessions.add(_LocalTerminalSession(id: _nextSessionId++));
+  }
+
+  @override
+  void dispose() {
+    _inputFocusNode.dispose();
+    for (final session in _sessions) {
+      session.dispose();
+    }
+    super.dispose();
+  }
 
   Future<String?> _resolveWorkingDirectory() async {
     for (final project in widget.store.projects) {
@@ -156,6 +178,11 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
       appBar: AppBar(
         title: Text(l10n.terminal),
         actions: [
+          IconButton(
+            tooltip: l10n.clear,
+            onPressed: _clearSession,
+            icon: const Icon(Icons.clear_all),
+          ),
           IconButton(
             tooltip: l10n.newTerminal,
             onPressed: _newSession,
@@ -182,53 +209,14 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
           }
           final path = snapshot.data;
           if (path == null || path.isEmpty) {
-            return Center(
-              child: Text(l10n.noWorkingDirectory),
-            );
+            return Center(child: Text(l10n.noWorkingDirectory));
           }
-          final maxHeight = MediaQuery.sizeOf(context).height * 0.78;
-          final height = _terminalHeight.clamp(180.0, maxHeight);
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
-                height: 48,
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _sessions.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final id = _sessions[index];
-                    return InputChip(
-                      label: Text('${l10n.terminal} ${id + 1}'),
-                      selected: index == _selectedSession,
-                      onSelected: (_) => setState(() => _selectedSession = index),
-                      onDeleted: _sessions.length == 1
-                          ? null
-                          : () => _closeSession(id),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                height: height,
-                child: IndexedStack(
-                  index: _selectedSession,
-                  children: [
-                    for (final id in _sessions)
-                      TerminalPane(
-                        key: ValueKey(id),
-                        workingDirectory: path,
-                        onResizeDelta: (delta) => setState(() {
-                          _terminalHeight =
-                              (_terminalHeight + delta).clamp(180.0, maxHeight);
-                        }),
-                        onClose: () => _closeSession(id),
-                      ),
-                  ],
-                ),
-              ),
+              _buildSessionBar(context),
+              Expanded(child: _buildOutput()),
+              _buildInput(path, l10n),
             ],
           );
         },
@@ -236,26 +224,373 @@ class _LocalTerminalPageState extends State<LocalTerminalPage> {
     );
   }
 
+  Widget _buildSessionBar(BuildContext context) {
+    final l10n = StudioLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _sessions.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final session = _sessions[index];
+                return InputChip(
+                  label: Text('${l10n.terminal} ${session.id}'),
+                  selected: index == _selectedSession,
+                  visualDensity: VisualDensity.compact,
+                  onSelected: (_) => _selectSession(index),
+                  onDeleted: _sessions.length == 1
+                      ? null
+                      : () => _closeSession(session.id),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: l10n.newTerminal,
+            visualDensity: VisualDensity.compact,
+            onPressed: _newSession,
+            icon: const Icon(Icons.add),
+          ),
+          IconButton(
+            tooltip: l10n.copyTerminal,
+            visualDensity: VisualDensity.compact,
+            onPressed: _copySession,
+            icon: const Icon(Icons.copy_outlined),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOutput() {
+    final scheme = Theme.of(context).colorScheme;
+    final session = _session;
+    return Container(
+      color: scheme.surfaceContainerLowest,
+      child: ListView.builder(
+        controller: session.listController,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+        itemCount: session.outputLines.length,
+        itemBuilder: (context, index) {
+          final line = session.outputLines[index];
+          return Text(
+            line.text,
+            style: TextStyle(
+              fontFamily: 'Consolas',
+              fontFamilyFallback: const ['Courier New', 'monospace'],
+              fontSize: 13,
+              height: 1.45,
+              color: switch (line.kind) {
+                _LocalLineKind.command => scheme.primary,
+                _LocalLineKind.stderr => scheme.error,
+                _LocalLineKind.info => scheme.onSurfaceVariant,
+                _LocalLineKind.stdout => scheme.onSurface,
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildInput(String path, StudioLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final session = _session;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        border: Border(top: BorderSide(color: scheme.outlineVariant)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Focus(
+          onKeyEvent: _onKey,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  _prompt(path),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Consolas',
+                    fontFamilyFallback: const ['Courier New', 'monospace'],
+                    fontSize: 13,
+                    color: scheme.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: session.inputController,
+                  focusNode: _inputFocusNode,
+                  autofocus: true,
+                  enabled: !session.running,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontFamily: 'Consolas',
+                    fontFamilyFallback: ['Courier New', 'monospace'],
+                    fontSize: 13,
+                  ),
+                  decoration: const InputDecoration(
+                    isCollapsed: true,
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (_) => _submit(),
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.execute,
+                visualDensity: VisualDensity.compact,
+                onPressed: session.running ? null : _submit,
+                icon: const Icon(Icons.arrow_upward),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _prompt(String path) =>
+      _isWindows ? '${p.normalize(path)}>' : '${p.normalize(path)}\$';
+
   void _newSession() {
     setState(() {
-      _sessions.add(_nextSessionId++);
+      _sessions.add(_LocalTerminalSession(id: _nextSessionId++));
       _selectedSession = _sessions.length - 1;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _inputFocusNode.requestFocus();
+    });
+  }
+
+  void _selectSession(int index) {
+    if (index == _selectedSession || index < 0 || index >= _sessions.length) {
+      return;
+    }
+    setState(() => _selectedSession = index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _inputFocusNode.requestFocus();
+        _scrollToBottom(_session);
+      }
     });
   }
 
   void _closeSession(int id) {
     if (_sessions.length == 1) {
-      Navigator.of(context).maybePop();
       return;
     }
+    final oldIndex = _sessions.indexWhere((session) => session.id == id);
+    if (oldIndex < 0) return;
+    final session = _sessions.removeAt(oldIndex);
+    session.dispose();
     setState(() {
-      final oldIndex = _sessions.indexOf(id);
-      _sessions.remove(id);
-      if (_selectedSession >= _sessions.length) {
-        _selectedSession = _sessions.length - 1;
-      } else if (oldIndex < _selectedSession) {
+      if (oldIndex < _selectedSession) {
         _selectedSession--;
+      } else if (_selectedSession >= _sessions.length) {
+        _selectedSession = _sessions.length - 1;
       }
     });
+    _inputFocusNode.requestFocus();
+  }
+
+  void _clearSession() {
+    setState(() => _session.outputLines.clear());
+  }
+
+  Future<void> _copySession() async {
+    await Clipboard.setData(
+      ClipboardData(
+        text: _session.outputLines.map((line) => line.text).join('\n'),
+      ),
+    );
+  }
+
+  void _submit() {
+    final command = _session.inputController.text;
+    _session.inputController.clear();
+    unawaited(_run(command));
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    final session = _session;
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp &&
+        session.historyIndex > 0) {
+      session.historyIndex--;
+      session.inputController.text = session.history[session.historyIndex];
+      session.inputController.selection = TextSelection.collapsed(
+        offset: session.inputController.text.length,
+      );
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown &&
+        session.historyIndex < session.history.length) {
+      session.historyIndex++;
+      session.inputController.text =
+          session.historyIndex == session.history.length
+          ? ''
+          : session.history[session.historyIndex];
+      session.inputController.selection = TextSelection.collapsed(
+        offset: session.inputController.text.length,
+      );
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  Future<void> _run(String command) async {
+    final trimmed = command.trim();
+    final session = _session;
+    if (trimmed.isEmpty || session.running || session.disposed) return;
+    final path = await _workingDirectory;
+    if (path == null || path.isEmpty || !mounted || session.disposed) return;
+    session.history.add(trimmed);
+    session.historyIndex = session.history.length;
+    setState(() {
+      _append(
+        _LocalTermLine(
+          text: '${_prompt(path)} $trimmed',
+          kind: _LocalLineKind.command,
+        ),
+        session,
+      );
+      session.running = true;
+    });
+    _scrollToBottom(session);
+
+    try {
+      final process = await Process.start(
+        _isWindows ? 'cmd' : 'sh',
+        _isWindows ? ['/c', trimmed] : ['-c', trimmed],
+        workingDirectory: path,
+        runInShell: false,
+      );
+      session.currentProcess = process;
+      final stdoutDone = process.stdout
+          .transform(systemEncoding.decoder)
+          .transform(const LineSplitter())
+          .listen((line) => _appendProcessLine(session, line, false));
+      final stderrDone = process.stderr
+          .transform(systemEncoding.decoder)
+          .transform(const LineSplitter())
+          .listen((line) => _appendProcessLine(session, line, true));
+      final timer = Timer(const Duration(seconds: 30), process.kill);
+      final code = await process.exitCode;
+      timer.cancel();
+      await Future.wait([
+        stdoutDone.asFuture<void>(),
+        stderrDone.asFuture<void>(),
+      ]);
+      session.currentProcess = null;
+      if (!mounted || session.disposed) return;
+      setState(() {
+        _append(
+          _LocalTermLine(
+            text: StudioLocalizations.of(context).runEnded(code),
+            kind: code == 0 ? _LocalLineKind.info : _LocalLineKind.stderr,
+          ),
+          session,
+        );
+        session.running = false;
+      });
+      _scrollToBottom(session);
+    } on ProcessException catch (error) {
+      if (!mounted || session.disposed) return;
+      setState(() {
+        _append(
+          _LocalTermLine(
+            text: StudioLocalizations.of(
+              context,
+            ).unableToExecute(error.message),
+            kind: _LocalLineKind.stderr,
+          ),
+          session,
+        );
+        session.running = false;
+      });
+      _scrollToBottom(session);
+    }
+  }
+
+  void _appendProcessLine(
+    _LocalTerminalSession session,
+    String line,
+    bool isError,
+  ) {
+    if (!mounted || session.disposed) return;
+    setState(() {
+      _append(
+        _LocalTermLine(
+          text: line,
+          kind: isError ? _LocalLineKind.stderr : _LocalLineKind.stdout,
+        ),
+        session,
+      );
+    });
+    _scrollToBottom(session);
+  }
+
+  void _append(_LocalTermLine line, _LocalTerminalSession session) {
+    session.outputLines.add(line);
+    if (session.outputLines.length > 1000) {
+      session.outputLines.removeRange(0, session.outputLines.length - 1000);
+    }
+  }
+
+  void _scrollToBottom(_LocalTerminalSession session) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!session.disposed && session.listController.hasClients) {
+        session.listController.jumpTo(
+          session.listController.position.maxScrollExtent,
+        );
+      }
+    });
+  }
+}
+
+enum _LocalLineKind { command, stdout, stderr, info }
+
+class _LocalTermLine {
+  const _LocalTermLine({required this.text, required this.kind});
+
+  final String text;
+  final _LocalLineKind kind;
+}
+
+class _LocalTerminalSession {
+  _LocalTerminalSession({required this.id});
+
+  final int id;
+  final outputLines = <_LocalTermLine>[];
+  final inputController = TextEditingController();
+  final listController = ScrollController();
+  final history = <String>[];
+  var historyIndex = -1;
+  var running = false;
+  var disposed = false;
+  Process? currentProcess;
+
+  void dispose() {
+    disposed = true;
+    currentProcess?.kill();
+    inputController.dispose();
+    listController.dispose();
   }
 }

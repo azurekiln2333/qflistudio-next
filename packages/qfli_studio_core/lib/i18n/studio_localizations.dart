@@ -55,6 +55,7 @@ class StudioLocalizations {
   String get close => _text('close');
   String get execute => _text('execute');
   String get clear => _text('clear');
+  String get copyTerminal => _text('copyTerminal');
   String get loading => _text('loading');
   String get noWorkingDirectory => _text('noWorkingDirectory');
   String get localTutorialMissing => _text('localTutorialMissing');
@@ -178,6 +179,7 @@ class StudioLocalizations {
     'close': '关闭',
     'execute': '执行',
     'clear': '清屏',
+    'copyTerminal': '复制终端内容',
     'loading': '正在加载…',
     'noWorkingDirectory': '没有可用的本地工作目录。',
     'localTutorialMissing': '本地教程文件不存在或无法读取。',
@@ -279,6 +281,7 @@ class StudioLocalizations {
     'close': '關閉',
     'execute': '執行',
     'clear': '清除畫面',
+    'copyTerminal': '複製終端內容',
     'loading': '載入中…',
     'noWorkingDirectory': '沒有可用的本機工作目錄。',
     'localTutorialMissing': '本機教學檔案不存在或無法讀取。',
@@ -380,6 +383,7 @@ class StudioLocalizations {
     'close': 'Close',
     'execute': 'Run',
     'clear': 'Clear',
+    'copyTerminal': 'Copy terminal output',
     'loading': 'Loading…',
     'noWorkingDirectory': 'No local working directory is available.',
     'localTutorialMissing': 'The local tutorial file is missing or unreadable.',
