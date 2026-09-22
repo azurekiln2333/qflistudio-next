@@ -39,3 +39,4 @@ flutter:
   # 用目录形式声明，新增语言时不必改这里。
   assets:
     - assets/tutorials/
+    - assets/content/
