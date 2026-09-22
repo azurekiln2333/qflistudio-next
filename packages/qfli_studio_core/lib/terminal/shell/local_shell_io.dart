@@ -140,7 +140,7 @@ class LocalShellBackend extends BaseShellBackend {
   }
 
   @override
-  String get prompt => Platform.isWindows ? 'PS $displayCwd>' : '$displayCwd \$';
+  String get prompt => Platform.isWindows ? '$cwd>' : '$cwd \$';
 
   @override
   bool get canInterrupt => true;
