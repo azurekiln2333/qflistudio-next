@@ -39,84 +39,57 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final Set<int> _visitedTabs = {0};
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _selectPage(int index) {
+    if (index == _currentIndex) return;
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final profile = StudioProfile.current;
     final offline = profile?.isOffline == true;
     final l10n = StudioLocalizations.of(context);
+    final pageCount = offline ? 4 : 5;
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          HomeTab(
-            store: widget.store,
-            auth: widget.auth,
-            settings: widget.settings,
+      body: PageView.builder(
+        key: const ValueKey('home-page-view'),
+        controller: _pageController,
+        itemCount: pageCount,
+        allowImplicitScrolling: true,
+        onPageChanged: (index) {
+          if (_currentIndex != index) {
+            setState(() => _currentIndex = index);
+          }
+        },
+        itemBuilder: (context, index) => _KeepAlivePage(
+          key: ValueKey('home-page-$index'),
+          child: TickerMode(
+            enabled: _currentIndex == index,
+            child: _buildPage(context, index, offline, profile),
           ),
-          if (_visitedTabs.contains(1))
-            TickerMode(
-              enabled: _currentIndex == 1,
-              child: FunctionsTab(
-                onOpenTerminal: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => LocalTerminalPage(store: widget.store),
-                  ),
-                ),
-                onOpenContentTool: _isContentProduct
-                    ? () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ContentToolsPage(store: widget.store),
-                        ),
-                      )
-                    : null,
-              ),
-            )
-          else
-            const SizedBox.shrink(),
-          if (_visitedTabs.contains(2))
-            TickerMode(
-              enabled: _currentIndex == 2,
-              child: offline
-                  ? LocalTutorialsTab(language: profile!.id)
-                  : TutorialsTab(auth: widget.auth),
-            )
-          else
-            const SizedBox.shrink(),
-          if (_visitedTabs.contains(3))
-            TickerMode(
-              enabled: _currentIndex == 3,
-              child: offline
-                  ? ExampleCodeTab(
-                      language: profile!.id,
-                      store: widget.store,
-                      auth: widget.auth,
-                    )
-                  : DiscussionTab(auth: widget.auth),
-            )
-          else
-            const SizedBox.shrink(),
-          if (!offline)
-            if (_visitedTabs.contains(4))
-              TickerMode(
-                enabled: _currentIndex == 4,
-                child: ProfileTab(
-                  auth: widget.auth,
-                  settings: widget.settings,
-                  store: widget.store,
-                ),
-              )
-            else
-              const SizedBox.shrink(),
-        ],
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) => setState(() {
-          _visitedTabs.add(index);
-          _currentIndex = index;
-        }),
+        onDestinationSelected: _selectPage,
         destinations: [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -149,12 +122,78 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildPage(
+    BuildContext context,
+    int index,
+    bool offline,
+    StudioProfile? profile,
+  ) {
+    return switch (index) {
+      0 => HomeTab(
+        store: widget.store,
+        auth: widget.auth,
+        settings: widget.settings,
+      ),
+      1 => FunctionsTab(
+        onOpenTerminal: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => LocalTerminalPage(store: widget.store),
+          ),
+        ),
+        onOpenContentTool: _isContentProduct
+            ? () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ContentToolsPage(store: widget.store),
+                ),
+              )
+            : null,
+      ),
+      2 => offline
+          ? LocalTutorialsTab(language: profile!.id)
+          : TutorialsTab(auth: widget.auth),
+      3 => offline
+          ? ExampleCodeTab(
+              language: profile!.id,
+              store: widget.store,
+              auth: widget.auth,
+            )
+          : DiscussionTab(auth: widget.auth),
+      4 => ProfileTab(
+        auth: widget.auth,
+        settings: widget.settings,
+        store: widget.store,
+      ),
+      _ => const SizedBox.shrink(),
+    };
+  }
+
   bool get _isContentProduct => switch (StudioProfile.current?.productKey) {
     StudioProductCatalog.jsonKey ||
     StudioProductCatalog.noteKey ||
     StudioProductCatalog.sqlabKey => true,
     _ => false,
   };
+}
+
+class _KeepAlivePage extends StatefulWidget {
+  const _KeepAlivePage({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
 }
 
 /// 主页 Tab：项目列表 + 搜索 + 更多操作。

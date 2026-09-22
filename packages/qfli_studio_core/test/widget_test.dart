@@ -169,6 +169,7 @@ void main() {
     );
 
     expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byKey(const ValueKey('home-page-view')), findsOneWidget);
     final l10n = StudioLocalizations.of(
       tester.element(find.byType(NavigationBar)),
     );
