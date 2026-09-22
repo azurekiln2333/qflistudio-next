@@ -12,6 +12,7 @@ import { common, Want, ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
+import { registerQfliSqlNativeChannel } from '../plugins/QfliSqlNative';
 import { handlePickerCall, isPickerMethod } from './PickerBridge';
 
 const CHANNEL_PLATFORM = 'qflistudio/platform';
@@ -36,6 +37,7 @@ export default class EntryAbility extends FlutterAbility {
   configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     GeneratedPluginRegistrant.registerWith(flutterEngine)
+    registerQfliSqlNativeChannel(flutterEngine)
 
     const abilityContext = this.context as common.UIAbilityContext;
 
