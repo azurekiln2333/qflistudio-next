@@ -26,6 +26,9 @@ const StudioProfile goProfile = StudioProfile(
   runner: GoProgramRunner(),
   productKey: StudioProductCatalog.goShiftKey,
   showHomeTabs: false,
+  runtimeKind: 'embedded-go-runtime',
+  runtimeStatus: 'unavailable',
+  supportedFileExtensions: ['.go'],
   // main.go 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: ['main.go', 'src/main.go'],
 );

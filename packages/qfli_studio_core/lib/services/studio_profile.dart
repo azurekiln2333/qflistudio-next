@@ -90,6 +90,9 @@ class StudioProfile {
     this.isOffline = false,
     this.productKey = StudioProductCatalog.qfliStudioKey,
     this.showHomeTabs = true,
+    this.runtimeKind = 'unavailable',
+    this.runtimeStatus = 'unavailable',
+    this.supportedFileExtensions = const [],
   });
 
   /// 档位标识，同时用于项目元数据里记录「由哪个 App 创建」。
@@ -118,6 +121,15 @@ class StudioProfile {
 
   /// Whether homepage project-scope and language tabs are shown.
   final bool showHomeTabs;
+
+  /// Concrete execution or preview boundary advertised by this product.
+  final String runtimeKind;
+
+  /// `available` is reserved for a tested target-platform path.
+  final String runtimeStatus;
+
+  /// File types that the declared runtime handles.
+  final List<String> supportedFileExtensions;
 
   /// 当前生效的档位。为 null 时即全能版。
   static StudioProfile? current;

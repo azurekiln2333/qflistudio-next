@@ -23,6 +23,9 @@ const StudioProfile webProfile = StudioProfile(
   isOffline: true,
   productKey: StudioProductCatalog.webForgeKey,
   showHomeTabs: false,
+  runtimeKind: 'html-css-javascript-preview',
+  runtimeStatus: 'available',
+  supportedFileExtensions: ['.html', '.css', '.js'],
   // 本版不注入运行后端：`.html` 交给内核已有的分流逻辑——它会起一个本地静态
   // 服务器、注入调试桥，并把 console 输出回传到编辑器。也就是说 Web 版的
   // 「运行」能力内核已经具备，这里少写一行反而是完整的。

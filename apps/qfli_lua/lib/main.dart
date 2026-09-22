@@ -31,6 +31,9 @@ const StudioProfile luaProfile = StudioProfile(
   isOffline: true,
   productKey: StudioProductCatalog.scriptKey,
   showHomeTabs: false,
+  runtimeKind: 'lua-quickjs-shell-native',
+  runtimeStatus: 'unavailable',
+  supportedFileExtensions: ['.lua', '.js', '.ts', '.sh'],
   runner: LuaProgramRunner(),
   // main.lua 排在默认入口表前面，保证本版一定先命中它。
   entryFileNames: [

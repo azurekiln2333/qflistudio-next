@@ -27,6 +27,9 @@ final StudioProfile forgeProfile = StudioProfile(
   isOffline: true,
   productKey: StudioProductCatalog.forgeKey,
   showHomeTabs: false,
+  runtimeKind: 'clang-c-cpp-native-and-desktop',
+  runtimeStatus: 'unavailable',
+  supportedFileExtensions: ['.c', '.h', '.cpp', '.cc', '.cxx', '.hpp', '.hh'],
   entryFileNames: ['main.c', 'src/main.c', 'main.cpp', 'src/main.cpp'],
 );
 
