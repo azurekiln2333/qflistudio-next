@@ -20,57 +20,57 @@ const _products = <ProductPackage>[
   ),
   ProductPackage(
     key: 'script',
-    appScopePath: 'apps/qfli_lua/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_lua/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.script',
   ),
   ProductPackage(
     key: 'rustcore',
-    appScopePath: 'apps/qfli_rust/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_rust/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.rustcore',
   ),
   ProductPackage(
     key: 'goshift',
-    appScopePath: 'apps/qfli_go/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_go/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.goshift',
   ),
   ProductPackage(
     key: 'jvmx',
-    appScopePath: 'apps/qfli_java/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_java/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.jvmx',
   ),
   ProductPackage(
     key: 'webforge',
-    appScopePath: 'apps/qfli_web/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_web/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.webforge',
   ),
   ProductPackage(
     key: 'pyflow',
-    appScopePath: 'apps/qfli_python/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_python/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.pyflow',
   ),
   ProductPackage(
     key: 'forge',
-    appScopePath: 'apps/qfli_c/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_c/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.forge',
   ),
   ProductPackage(
     key: 'dartwing',
-    appScopePath: 'apps/qfli_dart/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_dart/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.dartwing',
   ),
   ProductPackage(
     key: 'sqlab',
-    appScopePath: 'apps/qfli_sql/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_sql/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.sqlab',
   ),
   ProductPackage(
     key: 'json',
-    appScopePath: 'apps/qfli_json/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_json/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.json',
   ),
   ProductPackage(
     key: 'note',
-    appScopePath: 'apps/qfli_note/ohos/AppScope/app.json5',
+    appScopePath: '../qfli_note/ohos/AppScope/app.json5',
     bundleName: 'com.azurekiln.qfli.note',
   ),
 ];
@@ -221,11 +221,8 @@ List<File> _discoverAppScopes(String root) {
   final rootManifest = File(_join(root, 'ohos/AppScope/app.json5'));
   if (rootManifest.existsSync()) files.add(rootManifest);
 
-  final apps = Directory(_join(root, 'apps'));
-  if (!apps.existsSync()) return files;
-  for (final entry in apps.listSync()) {
-    if (entry is! Directory) continue;
-    final manifest = File(_join(entry.path, 'ohos/AppScope/app.json5'));
+  for (final product in _products.skip(1)) {
+    final manifest = File(_join(root, product.appScopePath));
     if (manifest.existsSync()) files.add(manifest);
   }
   return files;

@@ -1,5 +1,7 @@
 # 语言专属 App 与鸿蒙上的本地编译
 
+> 本文中的 `apps/`、`packages/` 和 pub workspace 路径来自拆分前布局。当前 C App 位于主仓库的并列目录 `../qfli_c`，共享内核位于 `../qfli_studio_core`；检出与构建命令见 [README](../README.md#仓库结构)。
+
 记录「一个语言做一个 App」这个方向在 HarmonyOS 上到底能做到哪一步，以及 C 版是怎么落地的。
 
 ## 结论先说

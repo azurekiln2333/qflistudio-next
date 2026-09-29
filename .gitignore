@@ -96,6 +96,8 @@ app.*.map.json
 
 # Local diagnostic exports and shell inspection fragments
 /_*.txt
+/.artifacts/repository-split-staging/
+/.artifacts/repository-split-backup-*/
 /tmp_*.txt
 /s[1-5].txt
 /rc[1-2].txt

@@ -30,7 +30,7 @@ winpath() {
   if command -v cygpath >/dev/null 2>&1; then cygpath -w "$1"; else printf '%s' "$1"; fi
 }
 
-OHOS_DIR="$REPO_ROOT/apps/$APP/ohos"
+OHOS_DIR="$REPO_ROOT/../$APP/ohos"
 if [[ ! -d "$OHOS_DIR" ]]; then
   echo "找不到 $OHOS_DIR" >&2
   exit 2
@@ -68,42 +68,11 @@ cat > "$SHIM_DIR/ohpm.bat" <<EOF
 EOF
 export ohpmBin="$(winpath "$SHIM_DIR/ohpm.bat")"
 
-# ── 把 workspace 根的插件清单补到 app 目录 ────────────────────────────────────
-#
-# flutter-hvigor-plugin 只认 <app 目录>/.flutter-plugins-dependencies：
-#
-#   const nativePlugins = findFlutterPlugins(
-#       path.join(flutterProjectPath, '.flutter-plugins-dependencies'))
-#   nativePlugins.forEach(p => {
-#     overrides[p.name] = `file:${path.join(p.path, 'ohos')}`  // app 级 override
-#     dependenciesOpt[p.name] = ''                             // entry 级依赖
-#   })
-#
-# 没这个文件 → 没有 override、没有依赖 → entry/oh_modules 里不会建出
-# path_provider_ohos 软链 → ArkTS 报
-# `Cannot find module 'path_provider_ohos'`（生成的 GeneratedPluginRegistrant.ets
-# 里 import 了它）。
-#
-# 问题是 flutter tool 在 pub workspace 下**只往工作区根写一份**：
-# project.dart 里是 `directory.childFile('.flutter-plugins-dependencies')`，
-# 而 workspace 模式下 FlutterProject 就是根包，`flutter pub get` 输出也印证了
-# （"Got dependencies in <仓库根>"）。它不会给每个 workspace 成员各写一份，
-# ohos 那条链也没有像 widget_preview 那样遍历 workspaceProjects。
-# 而且这个文件被 .gitignore 忽略（生成物，含本机绝对路径），所以新克隆的仓库
-# 必然缺它——四个新 app 就是这么中招的。
-#
-# 五个 app 共用同一个 workspace，插件集合完全一样（根那份和 qfli_c 那份逐字节
-# 只差 date_created），所以从根复制过来就是 tool 本来会写出的内容。
+# Each app now resolves its own dependencies and writes its own plugin manifest.
 ensure_plugin_manifest() {
-  local root_manifest="$REPO_ROOT/.flutter-plugins-dependencies"
-  local app_manifest="$REPO_ROOT/apps/$APP/.flutter-plugins-dependencies"
-  if [[ ! -f "$root_manifest" ]]; then
-    echo "缺少 $root_manifest。" >&2
-    echo "先在仓库根跑一次 flutter pub get 让 tool 生成它，再重试。" >&2
+  local app_manifest="$REPO_ROOT/../$APP/.flutter-plugins-dependencies"
+  if [[ ! -f "$app_manifest" ]]; then
+    echo "缺少 $app_manifest。先在 ../$APP 运行 flutter pub get。" >&2
     return 1
-  fi
-  if ! cmp -s "$root_manifest" "$app_manifest"; then
-    cp "$root_manifest" "$app_manifest"
-    echo "已补齐 apps/$APP/.flutter-plugins-dependencies（插件清单）"
   fi
 }

@@ -70,7 +70,7 @@ const _docs = <String, String>{
 
 void main() {
   final directory = Directory(
-    '${Directory.current.path}/packages/qfli_studio_core/assets/content',
+    '${Directory.current.path}/../qfli_studio_core/assets/content',
   )..createSync(recursive: true);
   final tutorials = <Map<String, Object?>>[];
   final examples = <Map<String, Object?>>[];

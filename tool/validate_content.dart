@@ -7,10 +7,10 @@ import 'package:qfli_studio_core/content/content_validator.dart';
 Future<void> main() async {
   final root = Directory.current.path;
   final tutorials = await File(
-    '$root/packages/qfli_studio_core/assets/content/tutorials.json',
+    '$root/../qfli_studio_core/assets/content/tutorials.json',
   ).readAsString();
   final examples = await File(
-    '$root/packages/qfli_studio_core/assets/content/examples.json',
+    '$root/../qfli_studio_core/assets/content/examples.json',
   ).readAsString();
   final catalog = ContentCatalog.fromJson(
     tutorialsSource: tutorials,

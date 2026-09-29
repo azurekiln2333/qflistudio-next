@@ -357,10 +357,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.2"
+  qfli_studio_core:
+    dependency: "direct main"
+    description:
+      path: "../qfli_studio_core"
+      relative: true
+    source: path
+    version: "1.0.0+1"
   re_editor:
     dependency: "direct overridden"
     description:
-      path: "vendor/re_editor"
+      path: "../qfli_studio_core/vendor/re_editor"
       relative: true
     source: path
     version: "0.10.0"

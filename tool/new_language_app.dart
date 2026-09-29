@@ -1,4 +1,4 @@
-// 从 apps/qfli_c 生成一个新的语言专属 App。
+// 从并列仓库 qfli_c 生成一个新的语言专属 App。
 //
 // 用法：
 //   dart run tool/new_language_app.dart              # 生成全部尚未生成的 App
@@ -25,10 +25,12 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 /// 模板来源：C 版已经跑通，作为所有语言 App 的骨架。
-const String _templateApp = 'apps/qfli_c';
+const String _templateApp = '../qfli_c';
 
 /// 复制时整目录跳过的名字（构建产物与 IDE/包管理缓存）。
 const Set<String> _skipDirs = <String>{
+  '.git',
+  'packages',
   'build',
   '.dart_tool',
   '.idea',
@@ -43,6 +45,7 @@ const Set<String> _skipDirs = <String>{
 
 /// 复制时跳过的文件（生成物，构建时会重新产出；或属于 C 版专有）。
 const Set<String> _skipFiles = <String>{
+  'pubspec.lock',
   '.flutter-plugins-dependencies',
   '.flutter',
   '.flutter_tool_state',
@@ -72,7 +75,7 @@ class _Spec {
     this.packageKey,
   });
 
-  /// 目录名后缀，也是档位 id：`web` → `apps/qfli_web`。
+  /// 目录名后缀，也是档位 id：`web` → `../qfli_web`。
   final String id;
 
   /// 展示名，例如 `Python`。
@@ -109,7 +112,7 @@ class _Spec {
   /// macOS 的 PRODUCT_NAME 不带「版」。
   String get macName => title;
 
-  String get appDir => 'apps/qfli_$id';
+  String get appDir => '../qfli_$id';
 
   String get runtimePackage => 'qfli_${id}_runtime';
 
@@ -283,9 +286,7 @@ void main(List<String> args) {
     _generate(root, spec, force: force);
   }
 
-  // 所有 App 都要登记进 workspace，否则 pub get 不认识它们。
-  _registerWorkspace(root, selected);
-  stdout.writeln('\n完成。下一步：在仓库根跑 `flutter pub get`。');
+  stdout.writeln('\n完成。请在每个新 App 目录运行 `flutter pub get`。');
 }
 
 void _generate(String root, _Spec spec, {required bool force}) {
@@ -301,12 +302,26 @@ void _generate(String root, _Spec spec, {required bool force}) {
   final copied = _copyTree(Directory(p.join(root, _templateApp)), dest);
   _brand(spec, dest);
   _writeSources(spec, dest);
-  // Workspace 成员的测试/工具链需要这个 Flutter 项目标记；它被 gitignore，
+  // Flutter 测试/工具链需要这个项目标记；它被 gitignore，
   // 但不能依赖用户手动再跑一次 flutter create 才出现。
   _write(p.join(dest.path, '.flutter'), '');
   _write(p.join(dest.path, '.flutter_tool_state'), '{\n  "is-bot": true\n}\n');
+  _initGitRepository(dest);
   _bootstrapOhos(dest, spec);
   stdout.writeln('生成 ${spec.appDir}（写入 $copied 个骨架文件）');
+}
+
+void _initGitRepository(Directory dest) {
+  if (Directory(p.join(dest.path, '.git')).existsSync()) return;
+  final result = Process.runSync(
+    'git',
+    ['init', '-b', 'main'],
+    workingDirectory: dest.path,
+    runInShell: Platform.isWindows,
+  );
+  if (result.exitCode != 0) {
+    throw StateError('无法初始化 ${dest.path} 的 Git 仓库：${result.stderr}');
+  }
 }
 
 /// 把新 App 的 `ohos/` 依赖装上，否则一在 DevEco 里 Sync 就报
@@ -576,8 +591,6 @@ description: "${spec.description}"
 publish_to: 'none'
 version: 1.0.0+1
 
-resolution: workspace
-
 environment:
   sdk: ^3.11.5
 
@@ -586,9 +599,13 @@ dependencies:
     sdk: flutter
 
   qfli_studio_core:
-    path: ../../packages/qfli_studio_core
+    path: ../qfli_studio_core
 
   cupertino_icons: ^1.0.8
+
+dependency_overrides:
+  re_editor:
+    path: ../qfli_studio_core/vendor/re_editor
 
 dev_dependencies:
   flutter_test:
@@ -1040,47 +1057,19 @@ Future<String> _get(String url) async {
 ''';
 }
 
-/// 把新 App 追加进根 pubspec 的 workspace 列表。
-void _registerWorkspace(String root, List<_Spec> specs) {
-  final file = File(p.join(root, 'pubspec.yaml'));
-  final lines = file.readAsLinesSync();
-
-  final start = lines.indexWhere((l) => l.trimRight() == 'workspace:');
-  if (start < 0) {
-    stderr.writeln('根 pubspec.yaml 里没找到 workspace: 段，需要手动登记。');
-    return;
-  }
-
-  // workspace 段一直延伸到第一个非「  - xxx」行。
-  var end = start + 1;
-  while (end < lines.length && lines[end].startsWith('  - ')) {
-    end++;
-  }
-
-  final added = <String>[];
-  for (final spec in specs) {
-    final entry = '  - ${spec.appDir}';
-    if (!lines.sublist(start, end).contains(entry)) added.add(entry);
-  }
-  if (added.isEmpty) return;
-
-  lines.insertAll(end, added);
-  file.writeAsStringSync('${lines.join('\n')}\n');
-  stdout.writeln('已登记进 workspace：${added.join('、')}');
-}
-
-/// 从脚本自身位置往上找到含 pubspec.yaml 且带 workspace 段的目录。
+/// 从工作目录往上找到主 App 仓库。
 String _findRepoRoot() {
   var dir = Directory.current;
   for (var i = 0; i < 6; i++) {
     final pubspec = File(p.join(dir.path, 'pubspec.yaml'));
     if (pubspec.existsSync() &&
-        pubspec.readAsStringSync().contains('\nworkspace:')) {
+        RegExp(r'^name:\s*qflistudio\s*$', multiLine: true)
+            .hasMatch(pubspec.readAsStringSync())) {
       return dir.path;
     }
     final parent = dir.parent;
     if (parent.path == dir.path) break;
     dir = parent;
   }
-  throw StateError('没找到仓库根目录（应含带 workspace: 段的 pubspec.yaml）');
+  throw StateError('没找到 qflistudio 主 App 仓库');
 }

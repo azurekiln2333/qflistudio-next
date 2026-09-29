@@ -4,25 +4,30 @@
 
 ## 仓库结构
 
-仓库用 Dart pub workspace 组织：一次 `pub get` 解析全部子包，共用一份 `pubspec.lock`。
+主应用、11 个语言 App 和共享内核是 13 个并列的 Git 仓库。开发时把它们检出到同一父目录，
+各应用通过相对路径引用共享内核，并各自维护 `pubspec.lock`。
 
 ```
-pubspec.yaml                 根工程（全能版壳）+ workspace 声明 + 唯一的 dependency_overrides
-packages/qfli_studio_core/   共享 IDE 内核：编辑器、文件树、高亮、主题、项目管理、教程加载
-packages/qfli_c_runtime/     C 运行时：预处理 / 词法 / 语法 / 解释执行 + 标准库
-apps/qfli_c/                 QFLIStudio+ C 版（能跑）
-apps/qfli_cpp/               QFLIStudio+ C++ 版（运行时开发中）
-apps/qfli_web/               QFLIStudio+ Web 版（能跑）
-apps/qfli_python/            QFLIStudio+ Python 版（解释器待写）
-apps/qfli_java/              QFLIStudio+ Java 版（解释器待写）
-apps/qfli_lua/               QFLIStudio+ Lua 版（解释器待写）
-apps/qfli_dart/              QFLIStudio+ Dart 版（解释器待写）
-tool/new_language_app.dart   从 apps/qfli_c 生成新的语言 App
-vendor/re_editor/            本地补丁版 re_editor（ohos 的 IME 退格与移动选择手柄）
+checkout-parent/
+  qflistudio/                主应用与跨产品校验工具
+  qfli_studio_core/          共享 IDE 内核，内含补丁版 vendor/re_editor
+  qfli_c/                    C/C++ App，内含 packages/qfli_c_runtime
+  qfli_dart/ ... qfli_web/   其余 10 个语言 App
 ```
 
-根工程是全能版（所有语言模板 + 桌面端原生工具链）；`apps/qfli_*` 是同一套 UI 收窄成的
-单语言产品。加一门语言 = 加一个 App 目录，内核不用改一行。
+主应用是全能版；各 `qfli_*` App 是独立仓库、独立构建的单语言产品。
+所有应用仓库都要与 `qfli_studio_core` 并列检出；仅克隆一个 App 时，本地路径依赖无法解析。
+
+每个仓库单独设置 GitHub 远端、提交并推送。例如先为共享包创建 GitHub 仓库，再执行：
+
+```bash
+git -C ../qfli_studio_core remote add origin <共享包仓库 URL>
+git -C ../qfli_studio_core push -u origin main
+git -C ../qfli_c remote add origin <C App 仓库 URL>
+git -C ../qfli_c push -u origin main
+```
+
+其他 App 和主应用同理。当前本地迁移不自动创建 GitHub 仓库或设置远端。
 
 每个语言 App 里只有三个文件与语言相关（`lib/main.dart` 档位、`lib/<id>_runner.dart`
 运行后端、`test/<id>_app_test.dart` 接线测试），其余都是复制来的平台工程。
@@ -78,7 +83,7 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
 - 登录注册：账号密码 + AZK OAuth2 网关（授权页换登录码）+ 华为账号 Account Kit（仅鸿蒙）
 - 我的：MD3 资料卡、积分与签到统计、创作入口和偏好设置；浅色/深色外观全局生效
 
-软件服务统一连接 `https://qfli.lqsxm666.top`。地址只在 [api_config.dart](packages/qfli_studio_core/lib/config/api_config.dart) 中维护，登录和设置不提供自定义软件服务器入口。个人 AI 接口、Git 远程仓库和本地网页预览保留各自用途。
+软件服务统一连接 `https://qfli.lqsxm666.top`。地址只在共享内核的 `lib/config/api_config.dart` 中维护，登录和设置不提供自定义软件服务器入口。个人 AI 接口、Git 远程仓库和本地网页预览保留各自用途。
 
 后端不在当前仓库中，部署方式见 [官方服务配置](docs/deployment.md)。
 
@@ -90,20 +95,19 @@ flutter pub get
 # 全能版（根工程）
 flutter run -d windows   # 或鸿蒙设备
 
-# 单语言版（把 qfli_c 换成 qfli_cpp / qfli_python / qfli_java / qfli_lua / qfli_web / qfli_dart）
-cd apps/qfli_c && flutter run -d windows
+# 单语言版（在主仓库的并列目录）
+cd ../qfli_c && flutter pub get && flutter run -d windows
 
 flutter analyze --no-pub
 ```
 
-新增一个语言 App（先生成骨架，再补 `lib/<id>_runner.dart` 里的运行后端）：
+为尚不存在的语言生成独立 App 仓库（再补运行后端）：
 
 ```bash
-dart run tool/new_language_app.dart go    # 生成 apps/qfli_go 并登记进 workspace
-flutter pub get
+dart run tool/new_language_app.dart go    # 已存在的目标会跳过；新目标生成在并列目录
 ```
 
-生成器会一并装好 `apps/qfli_go/ohos` 的依赖（`npm install` + `ohpm install`）。
+生成器会一并装好新 App 的 `ohos/` 依赖（`npm install` + `ohpm install`）。
 **这一步不能省**：本机上 flutter 工具不会替你做（`installHvigorPlugin` 排在
 `updateLocalProperties` 后面，后者找不到 HarmonyOS SDK 就退出了），缺了它一在
 DevEco 里 Sync 就报 `Cannot find module 'flutter-hvigor-plugin'`。
@@ -112,73 +116,71 @@ DevEco 里 Sync 就报 `Cannot find module 'flutter-hvigor-plugin'`。
 想在命令行里跑 hvigor（不走 DevEco 图形界面）：
 
 ```bash
-tool/sync_ohos.sh qfli_c        # Sync：设 DEVECO_SDK_HOME、绕开 ohpm.bat 的递归、补插件清单
+tool/sync_ohos.sh qfli_c        # Sync：设 DEVECO_SDK_HOME、绕开 ohpm.bat 的递归
 tool/build_hap.sh qfli_c        # 出 HAP（unsigned，签名见下）
 ```
 
-两个脚本都会先检查 `apps/<app>/.flutter-plugins-dependencies` 是否存在，缺了就
-从仓库根复制一份。**这个文件不能少**：`flutter-hvigor-plugin` 只认 App 目录下这一份，
-它决定了 `entry/oh_modules/<插件>` 软链建不建，缺了 ArkTS 会报
-`Cannot find module 'path_provider_ohos'`（指向生成的
-`GeneratedPluginRegistrant.ets`）。而 pub workspace 模式下 flutter 工具只往仓库根写
-一份，且该文件被 gitignore——所以新克隆的仓库必然缺它。详见
-[docs/multi-language-apps.md](docs/multi-language-apps.md)。
+两个脚本都会检查对应 App 的 `.flutter-plugins-dependencies`。缺少时先进入那个 App
+目录运行 `flutter pub get`；每个仓库现在自行生成插件清单。
 
 `build_hap.sh` 产出的是 **unsigned** HAP：仓库里的 `.p7b` 绑的是别的 bundleName，
 要装真机得先在 DevEco 里配签名（File → Project Structure → Signing Configs →
 勾 *Automatically generate signature*）。
 
-测试分布在两个共享包和七个语言 App 里（根工程没有 test 目录）：
+各仓库分别运行测试：
 
 ```bash
-(cd packages/qfli_studio_core && flutter test)
-(cd packages/qfli_c_runtime    && flutter test)
-(cd apps/qfli_c                && flutter test --no-pub)
-(cd apps/qfli_cpp              && flutter test --no-pub)
-(cd apps/qfli_python           && flutter test --no-pub)
-(cd apps/qfli_java             && flutter test --no-pub)
-(cd apps/qfli_lua              && flutter test --no-pub)
-(cd apps/qfli_web              && flutter test --no-pub)
-(cd apps/qfli_dart             && flutter test --no-pub)
+(cd ../qfli_studio_core && flutter test)
+(cd ../qfli_c/packages/qfli_c_runtime && flutter test)
+(cd ../qfli_c && flutter test --no-pub)
+(cd ../qfli_python && flutter test --no-pub)
+(cd ../qfli_java && flutter test --no-pub)
+(cd ../qfli_lua && flutter test --no-pub)
+(cd ../qfli_web && flutter test --no-pub)
+(cd ../qfli_dart && flutter test --no-pub)
 ```
 
-> `apps/` 下的包必须加 `--no-pub`。它们带了 `ohos/` 平台目录，`flutter test` 不加这个
+> 语言 App 的测试建议加 `--no-pub`。它们带了 `ohos/` 平台目录，`flutter test` 不加这个
 > 参数时会先做一遍全平台工具链校验，本机没有 HarmonyOS SDK 就报
 > `No Hmos SDK found` 并**直接退出 1，一个用例都不跑**——看起来像测试挂了，
-> 其实是环境检查没过。`packages/` 下的包没有 `ohos/`，不加也能跑。
+> 其实是环境检查没过。共享包没有 `ohos/`，不加也能跑。
 
 > 本机如果挂了 HTTP 代理，跑 `flutter test` 前需要
 > `export NO_PROXY="localhost,127.0.0.1,::1"`，否则测试用的本地 WebSocket 会被代理拦掉。
 
 ## 语言专属 App
 
-一个语言一个 App，共享同一套 IDE 内核。现有七个目标语言 App，另有根联网全能版：
+一个语言一个 App，共享同一套 IDE 内核。现有 11 个语言 App，另有主联网全能版：
 
 | App | 运行方式 | 状态 |
 | --- | --- | --- |
-| `apps/qfli_c` | 应用内 C 解释器（纯 Dart，+ 可选 picoc 原生后端） | 能跑 |
-| `apps/qfli_cpp` | C++ 本地运行时接入点 | 运行时开发中 |
-| `apps/qfli_web` | 本地静态服务器 + 调试桥（内核自带，无需解释器） | 能跑 |
-| `apps/qfli_python` | 应用内 Python 子集解释器 | 解释器待写 |
-| `apps/qfli_java` | 应用内 Java 子集解释器 | 解释器待写 |
-| `apps/qfli_lua` | 应用内 Lua 子集解释器 | 解释器待写 |
-| `apps/qfli_dart` | 应用内 Dart 子集解释器 | 解释器待写 |
+| `../qfli_c` | C/C++ Forge | 独立仓库 |
+| `../qfli_web` | WebForge | 独立仓库 |
+| `../qfli_python` | PyFlow | 独立仓库 |
+| `../qfli_java` | JVMX | 独立仓库 |
+| `../qfli_lua` | Script | 独立仓库 |
+| `../qfli_dart` | DartWing | 独立仓库 |
+| `../qfli_rust` | RustCore | 独立仓库 |
+| `../qfli_go` | GoShift | 独立仓库 |
+| `../qfli_sql` | SQLab | 独立仓库 |
+| `../qfli_json` | QFLIJson | 独立仓库 |
+| `../qfli_note` | QFLINote | 独立仓库 |
 
 C、C++、Python、Java、Lua、Web、Dart 的可行性、教程 JSON、离线页面和路线图，见
 [多语言 App：各语言在鸿蒙上的可行性与现状](docs/multi-language-apps.md)。
 
-语言 App 的第二页由 `TutorialService` 从 `packages/qfli_studio_core/assets/tutorials/<language>.json`
+语言 App 的第二页由 `TutorialService` 从共享仓库的 `assets/tutorials/<language>.json`
 加载本地教程，第三页从同一份类型化数据展示可复制示例代码。后续把服务实现替换为 API
 时不需要改页面模型；语言运行时仍按各 App 的实际状态展示，未实现的解释器不会伪造运行结果。
 
 之所以是「解释」而不是「编译」（鸿蒙普通应用 exec 不了任何可执行文件），
 以及 C 版是怎么落地的，见 [语言专属 App 与鸿蒙上的本地编译](docs/c-app-and-harmonyos.md)。
 
-原生 picoc 后端（可选，需要 NDK）见 [apps/qfli_c/native/README.md](apps/qfli_c/native/README.md)。
+原生 picoc 后端（可选，需要 NDK）见 `../qfli_c/native/README.md`。
 
 ### 在 DevEco 里构建 C 版
 
-用 DevEco Studio **Open `apps/qfli_c/ohos`**（不是 `apps/qfli_c`）。等 Sync 跑完
+用 DevEco Studio **Open `../qfli_c/ohos`**。等 Sync 跑完
 （它会 `npm install` 装 `flutter-hvigor-plugin`、再 `ohpm install`），点 Run 即可。
 Flutter 产物由 hvigor 插件自动 `flutter assemble` 并拷贝，不用手动跑 `flutter build hap`。
 

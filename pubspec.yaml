@@ -7,32 +7,15 @@ version: 1.0.0+1
 environment:
   sdk: ^3.11.5
 
-# Dart pub workspace：一次 pub get 解析全部子包，共用一份 pubspec.lock。
-# 新增语言专属 App 时，在下面追加一行即可，不必再各自维护锁文件。
-workspace:
-  - packages/qfli_studio_core
-  - packages/qfli_c_runtime
-  - apps/qfli_c
-  - apps/qfli_web
-  - apps/qfli_python
-  - apps/qfli_java
-  - apps/qfli_dart
-  - apps/qfli_lua
-  - apps/qfli_rust
-  - apps/qfli_go
-  - apps/qfli_sql
-  - apps/qfli_json
-  - apps/qfli_note
-
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
 
-  # 全部 IDE 能力都在共享内核里，本工程只剩一个入口壳。
+  # IDE 能力由并列仓库的共享内核提供。
   qfli_studio_core:
-    path: packages/qfli_studio_core
+    path: ../qfli_studio_core
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -40,10 +23,9 @@ dependencies:
 
 # 本地补丁版 re_editor：ohos 上启用 IME 前缀退格与移动选择手柄
 # （原包用 kIsAndroid/kIsIOS 判断，flutter_ohos 下均为 false）
-# workspace 模式下只有根 pubspec 的 dependency_overrides 生效，所有子包共用。
 dependency_overrides:
   re_editor:
-    path: vendor/re_editor
+    path: ../qfli_studio_core/vendor/re_editor
 
 dev_dependencies:
   flutter_test:

@@ -76,7 +76,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'script',
-    sourcePath: 'apps/qfli_lua/lib/main.dart',
+    sourcePath: '../qfli_lua/lib/main.dart',
     catalogToken: 'script',
     profileName: 'luaProfile',
     types: ['lua', 'javascript', 'typescript', 'shell'],
@@ -84,7 +84,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'rustcore',
-    sourcePath: 'apps/qfli_rust/lib/main.dart',
+    sourcePath: '../qfli_rust/lib/main.dart',
     catalogToken: 'rustCore',
     profileName: 'rustProfile',
     types: ['rust'],
@@ -92,7 +92,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'goshift',
-    sourcePath: 'apps/qfli_go/lib/main.dart',
+    sourcePath: '../qfli_go/lib/main.dart',
     catalogToken: 'goShift',
     profileName: 'goProfile',
     types: ['go'],
@@ -100,7 +100,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'jvmx',
-    sourcePath: 'apps/qfli_java/lib/main.dart',
+    sourcePath: '../qfli_java/lib/main.dart',
     catalogToken: 'jvmx',
     profileName: 'javaProfile',
     types: ['java'],
@@ -108,7 +108,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'webforge',
-    sourcePath: 'apps/qfli_web/lib/main.dart',
+    sourcePath: '../qfli_web/lib/main.dart',
     catalogToken: 'webForge',
     profileName: 'webProfile',
     types: ['html', 'css', 'javascript'],
@@ -116,7 +116,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'pyflow',
-    sourcePath: 'apps/qfli_python/lib/main.dart',
+    sourcePath: '../qfli_python/lib/main.dart',
     catalogToken: 'pyFlow',
     profileName: 'pythonProfile',
     types: ['python'],
@@ -124,7 +124,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'forge',
-    sourcePath: 'apps/qfli_c/lib/main.dart',
+    sourcePath: '../qfli_c/lib/main.dart',
     catalogToken: 'forge',
     profileName: 'forgeProfile',
     types: ['c', 'cpp'],
@@ -132,7 +132,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'dartwing',
-    sourcePath: 'apps/qfli_dart/lib/main.dart',
+    sourcePath: '../qfli_dart/lib/main.dart',
     catalogToken: 'dartWing',
     profileName: 'dartProfile',
     types: ['dart'],
@@ -140,7 +140,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'sqlab',
-    sourcePath: 'apps/qfli_sql/lib/main.dart',
+    sourcePath: '../qfli_sql/lib/main.dart',
     catalogToken: 'sqlab',
     profileName: 'sqlProfile',
     types: ['sql'],
@@ -148,7 +148,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'json',
-    sourcePath: 'apps/qfli_json/lib/main.dart',
+    sourcePath: '../qfli_json/lib/main.dart',
     catalogToken: 'json',
     profileName: 'jsonProfile',
     types: ['json'],
@@ -156,7 +156,7 @@ const _products = <ProductSpec>[
   ),
   ProductSpec(
     key: 'note',
-    sourcePath: 'apps/qfli_note/lib/main.dart',
+    sourcePath: '../qfli_note/lib/main.dart',
     catalogToken: 'note',
     profileName: 'noteProfile',
     types: ['markdown'],
@@ -426,11 +426,8 @@ List<File> _discoverProfileSources(String root) {
   final files = <File>[];
   final rootMain = File(_join(root, 'lib/main.dart'));
   if (rootMain.existsSync()) files.add(rootMain);
-  final apps = Directory(_join(root, 'apps'));
-  if (!apps.existsSync()) return files;
-  for (final entry in apps.listSync()) {
-    if (entry is! Directory) continue;
-    final main = File(_join(entry.path, 'lib/main.dart'));
+  for (final product in _products.where((item) => !item.isRoot)) {
+    final main = File(_join(root, product.sourcePath));
     if (main.existsSync()) files.add(main);
   }
   return files;
