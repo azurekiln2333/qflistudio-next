@@ -39,7 +39,8 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
 
 - 底部导航：主页（项目列表）/ 教程 / 讨论 / 我的
 - 根工程是联网全能版，保留社区教程、讨论、云端项目和在线终端；语言 App 是本地版，底部导航为本地项目 / 本地 JSON 教程 / 示例代码。
-- 新建项目：选择类型（空项目/Java/Python/C/C++/HTML/Dart），自动创建初始 demo 代码并直接打开
+- 新建项目：按语言保存到 `projects/cProjects`、`projects/javaProjects` 等目录，自动创建模板代码并打开
+- 项目允许重名：目录冲突时使用 `demo_<时间戳>`，显示名称从 `.qfli/project.json` 读取；新建、示例和归档导入使用同一规则
 - 项目卡片显示名称与路径，支持打开、在资源管理器中显示、从列表移除；列表持久化
 - 右上角搜索栏（按名称/路径实时过滤）、更多菜单（添加现有项目、移除失效项目）
 - 启动：原生窗口与 Flutter 主题 surface 同色（亮 #F8F9FF / 暗 #111418），首帧后加载本地数据，去掉固定 900 毫秒等待，社区页面按需初始化
@@ -60,7 +61,7 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
   - Python / Dart：桌面端直接运行，输出进终端面板
   - Java / C / C++：桌面端编译+运行；移动端引导使用在线终端
 - 本地终端：沙箱内命令响应式 shell（30 秒超时）
-- 在线终端：命令发送到 azurekiln-qfli-server 执行（每用户隔离目录，15 秒超时）
+- 在线终端：业务 API 将已认证请求转交独立的 gVisor 沙箱执行服务；部署和限额见 [安全终端 README](azurekiln-qfli-terminal/README.md)
 
 ## 云端项目与 Git
 
@@ -70,9 +71,8 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
   支持手动「从云端拉取」（服务器覆盖本地）
 - **Git**：
   - 本地项目（桌面端）：本机 git CLI —— init / 状态 / 提交 / 历史 / 远程仓库 / 推送 / 拉取
-  - 云端项目：服务器端 git（服务器需安装 git）——提交自动注入身份，无需部署机配置；
-    远程仓库可指向 GitHub/Gitee（https 地址内嵌凭据）
-  - 移动端本地项目没有 git 二进制，可用在线终端手动操作
+  - 云端项目：原宿主机 Git 接口已关闭；云端文件与同步继续可用
+  - 移动端本地项目没有 git 二进制；在线终端为无网络的临时沙箱，不能直接连接 GitHub/Gitee
 
 ## 社区（azurekiln-qfli-server）
 
@@ -83,7 +83,7 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
 - 登录注册：账号密码 + AZK OAuth2 网关（授权页换登录码）+ 华为账号 Account Kit（仅鸿蒙）
 - 我的：MD3 资料卡、积分与签到统计、创作入口和偏好设置；浅色/深色外观全局生效
 
-软件服务统一连接 `https://qfli.lqsxm666.top`。地址只在共享内核的 `lib/config/api_config.dart` 中维护，登录和设置不提供自定义软件服务器入口。个人 AI 接口、Git 远程仓库和本地网页预览保留各自用途。
+软件服务统一连接 `https://qfli.suanxiwanjie.cn`。地址只在共享内核的 `lib/config/api_config.dart` 中维护，登录和设置不提供自定义软件服务器入口。个人 AI 接口、Git 远程仓库和本地网页预览保留各自用途。
 
 后端不在当前仓库中，部署方式见 [官方服务配置](docs/deployment.md)。
 
@@ -147,6 +147,21 @@ tool/build_hap.sh qfli_c        # 出 HAP（unsigned，签名见下）
 
 > 本机如果挂了 HTTP 代理，跑 `flutter test` 前需要
 > `export NO_PROXY="localhost,127.0.0.1,::1"`，否则测试用的本地 WebSocket 会被代理拦掉。
+
+验证 AI 编程（Vibe Coding）是否真的跑通：
+
+```bash
+# 在 qfli_studio_core 目录，驱动一个场景并写出 JSON 报告
+dart run tool/vibe_e2e.dart --scenario python_fix_loop
+
+# 在本仓库，检查环境、调度驱动、把报告读成表格
+dart run tool/verify_vibe_e2e.dart --dry-run
+dart run tool/verify_vibe_e2e.dart --env-file <仓库外的凭据文件>
+```
+
+凭据只从 `QFLI_DEBUG_BASE_URL`、`QFLI_DEBUG_API_KEY`、`QFLI_DEBUG_MODEL` 三个环境变量
+读取，报告只记主机名和长度。缺变量时全部场景记为跳过，不伪造通过。
+详见 [docs/vibe-acceptance.md](docs/vibe-acceptance.md)。
 
 ## 语言专属 App
 
