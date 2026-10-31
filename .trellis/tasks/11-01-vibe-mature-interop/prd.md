@@ -8,10 +8,10 @@ Make in-app Vibe Coding usable end to end: one sentence builds a small project i
 
 | Child | Pi pane | Scope |
 | --- | --- | --- |
-| vibe-agent-skills | w2R:p2 | Skills, rules, plan tool, loop hardening |
-| ai-protocols-websearch | w2R:p6 | Three endpoint protocols, web_search, web_fetch |
-| ohos-app-interop | w2R:p4 | Studio to `qfli_*` app launch, compile, run |
-| vibe-e2e-acceptance | w2R:p5 | Real-API e2e, specs, OHOS build, docs |
+| vibe-agent-skills | w37:p2 | Skills, rules, plan tool, loop hardening |
+| ai-protocols-websearch | w37:p3 | Three endpoint protocols, web_search, web_fetch |
+| ohos-app-interop | w37:p4 | Studio to `qfli_*` app launch, compile, run |
+| vibe-e2e-acceptance | w37:p5 | Real-API e2e, specs, OHOS build, docs |
 
 ## Shared constraints
 
