@@ -17,10 +17,6 @@
       "value": "用于读取剪贴板内容以粘贴到编辑器"
     },
     {
-      "name": "bundle_info_reason",
-      "value": "用于确认配套应用是否已安装，再决定在本机运行还是在在线终端运行"
-    },
-    {
       "name": "InteropBridgeAbility_desc",
       "value": "接收配套应用的编译运行回调"
     },

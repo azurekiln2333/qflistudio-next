@@ -386,3 +386,94 @@ Next round needs one thing from a human: unlock the device (or disable the scree
 
 `qfli_studio_core/test/interop_arkts_contract_test.dart` and the new tests were run from `qfli_studio_core`, so the contract test resolved its sibling path as `Directory.current.parent`. That works only when the working directory is inside `qflistudio`. The helper reads `qflistudio` and `qfli_java` as siblings of `D:/MyNewProjects`, which holds in this machine's layout; a CI checkout with a different parent directory would need the same two checkouts side by side.
 
+
+## Device run 3
+
+Recorded 2026-11-02 ~01:40-01:55 on `192.168.68.207:46551`, screen unlocked by the user, `power-shell setmode 602` accepted (`Set Mode Success!`).
+
+This round tested the probe change on the device and found that the bundle-query approach does not work at all. It was replaced with a start-based probe. The Run button now does reach the sibling app, but the run itself stalls; the cause is named at the end.
+
+### 1. The bundle query cannot work on this device
+
+`GET_BUNDLE_INFO` is a system permission. On the device the query fails before it answers:
+
+```
+BMS: GetBundleInfoV9: verify permission failed
+BMSQuery: GetBundleInfoV9 fail -n com.azurekiln.qfli.java -u 100 error: 8521226
+```
+
+So the previous probe could only ever answer `unknown`, and the Run button would never take the cross-app path. `ohos.permission.GET_BUNDLE_INFO` and `bundle_info_reason` were removed from `module.json5` and `string.json`.
+
+### 2. What replaced it
+
+The probe now starts the receiver with a request it is safe to send and reads the platform's own verdict:
+
+- `action: 'analyze'`, empty `entry`, empty `payloadDirectory`, a fresh `sessionId`. The receiver's `parseRequest` accepts this and `compileAndRun` returns after one `done` event, so no compiler runs and no payload is copied.
+- `startAbility` errors `16000001` (ability missing) and `16000003` (bundle missing) mean not installed.
+- Any other start error leaves the answer `unknown`, and Run keeps its original path with a one-time hint.
+
+`probe()` became async; the channel handler resolves it through the promise.
+
+Why not the URI scheme route: `canOpenLink` needs a `querySchemes` declaration plus a `uris` entry in the receiver's `skills`, which opens a second way into the ability from any app that can open a link. The start-based probe needs no new permission and no new entry point, and it tests the exact call the run uses, so a passing probe is also evidence that the run can start.
+
+### 3. Device results
+
+Installed vs not installed, measured with `aa` on the same device:
+
+```
+aa start -a InteropAbility -b com.azurekiln.qfli.java    -> start ability successfully.
+aa start -a InteropAbility -b com.azurekiln.qfli.cpp     -> Error Code:10104001 (ability does not exist)
+aa start -a InteropAbility -b com.azurekiln.qfli.pyflow  -> Error Code:10104001 (ability does not exist)
+```
+
+`bm dump -a` confirms `com.azurekiln.qfli.java` is installed and `com.azurekiln.qfli.cpp` / `com.azurekiln.qfli.pyflow` are not, so both branches have a real app on this device without uninstalling anything.
+
+The studio-side probe is confirmed to reach the receiver. Pressing the real Run button (not a menu item) produced:
+
+```
+01:50:24.545 AppMS: change from 2 to 4. bundle: com.azurekiln.qfli.java, ability: InteropAbility.
+01:50:24.545 qfli.java/UIAbility: name:InteropAbility,targeState:0,isNewWant:0
+01:50:24.546 AMS: [ABMS8608]OnAbilityRequestDone com.azurekiln.qfli.java-InteropAbility state:4
+01:50:24.556 AMS: [ABR893]TerminateAbility:InteropAbility
+```
+
+and the dialog title named the app:
+
+```
+正在本机运行 · QFLIJVMX
+QFLIJVMX · com.azurekiln.qfli.java
+```
+
+That is the probe's analyze start succeeding. The `未知的配套应用` text is gone.
+
+### 4. What still fails
+
+The run never starts. After the probe's ability terminated, the real `start` did not appear in AMS logs, and the receiver reported:
+
+```
+01:50:24.452 qfli.java/JSAPP: QFLI_INTEROP_WINDOW_FAILED 0
+01:50:24.499 qfli.java/JSAPP: QFLI_INTEROP_REFUSAL_UNSENT 16200001
+```
+
+`16200001` is the platform refusing a start attempt across apps. The dialog stayed on `正在连接 QFLIJVMX…` and never reached a compile stage, so **no javac exit code, no java exit code and no stdout were obtained in this round**.
+
+Two candidate causes, not yet separated:
+
+1. `InteropAbility` is `launchType: singleton`. The probe's analyze start and the run's start are two starts on one singleton, and the second one lands while the first is terminating.
+2. The payload path handoff. `payloadDirectory` points into Studio's `cacheDir`, which the receiver reads. Studio's data directory is mode `700` and the shell user cannot create anything there (verified: `mkdir: ... Permission denied`), so this can only be tested through Studio.
+
+The most likely fix is to stop using a real start for the probe: either give the receiver a separate short-lived probe ability, or let the probe tolerate `singleton`. That is a design change, so it is recorded here rather than guessed at in this round.
+
+### 5. Other device notes
+
+- `aa start` refuses every ability while the screen is locked (`10106102`). After the user unlocked, `EntryAbility` and `InteropAbility` both started normally.
+- `power-shell setmode 602` works on this device and kept the screen awake for the whole session.
+- The Studio UI was driven entirely by text: `uitest dumpLayout` for the tree, `uitest uiInput click` for the taps. Run button at `[907,182][1076,350]`, project card at `[42,672][1230,952]`.
+- The dialog is `barrierDismissible: false`, so the back key does not close a hung run. `aa force-stop com.azurekiln.qflistudio` was used once to clear it.
+
+### 6. Tests
+
+- `flutter test` on the interop suites, `editor_run_target_test`, `interop_probe_decision_test`: 107 passed.
+- New contract assertions: the bridge must not call `getBundleInfoSync` / `getBundleInfo` / `getBundleInfoForSelfSync`, must not import `bundleManager`, must name both `16000001` and `16000003`, and its probe must send `action: 'analyze'`. `module.json5` and `string.json` must not mention `GET_BUNDLE_INFO` or `bundle_info_reason`.
+- OHOS build: `hvigorw assembleHap` → `BUILD SUCCESSFUL`, installed with `hdc install -r` → `install bundle successfully`.
+

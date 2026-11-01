@@ -16,7 +16,6 @@
  */
 
 import { common, Want } from '@kit.AbilityKit';
-import { bundleManager } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import {
@@ -73,6 +72,14 @@ const cancelledSessions: Set<string> = new Set<string>();
  * engine: a second engine would not share Dart's channel state.
  */
 let hostContext: common.UIAbilityContext | null = null;
+
+/**
+ * The context a probe starts an ability from.
+ *
+ * The probe runs before any run, so it needs the same live ability context the
+ * channel handlers use; it is assigned when the channels are configured.
+ */
+let probeHostContext: common.UIAbilityContext | null = null;
 let eventSink: EventSink | null = null;
 
 /** One refusal, with a code the Dart side already understands. */
@@ -340,10 +347,16 @@ async function start(context: common.UIAbilityContext, raw: Map<string, string>)
 /**
  * The handshake result the Dart side reads.
  *
- * `installed` is a three-state answer because the platform does not offer a
- * fourth: Studio can read another app's bundle record only when it declares
- * GET_BUNDLE_INFO, and it can otherwise tell a real start failure apart from a
- * real start. Both give a fact, never a guess, so no state is invented.
+ * A bundle query would be a cheaper answer, but `GET_BUNDLE_INFO` is a system
+ * permission: on a real device the query fails with 8521226 and the probe could
+ * only ever say "unknown". The one check a normal app can always make is
+ * whether an ability start is refused because the app is missing, which is
+ * what this probe reports.
+ *
+ *   - `installed: true`  — the platform accepted the start.
+ *   - `installed: false` — the platform says the bundle or ability is absent.
+ *   - no answer at all  — the start failed for another reason (a refusal, a
+ *     permission, a busy system), so the caller must not claim either way.
  */
 export interface ProbeAnswer {
   installed: boolean;
@@ -352,42 +365,24 @@ export interface ProbeAnswer {
   diagnostic?: string;
 }
 
-/** Bundle query errors that mean "not installed" rather than "cannot know". */
-function isMissingBundle(error: BusinessError): boolean {
-  // 17700001: bundle does not exist. 17700002: bundle or ability does not exist.
-  return error.code === 17700001 || error.code === 17700002;
-}
-
-/** Whether [bundleName] is installed. Throws when the query itself is denied. */
-function bundleInstalled(bundleName: string): boolean {
-  try {
-    const info = bundleManager.getBundleInfoSync(
-      bundleName, bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT);
-    return info !== null && info !== undefined;
-  } catch (error) {
-    const failure = error as BusinessError;
-    if (isMissingBundle(failure)) {
-      return false;
-    }
-    // The query itself was denied. The caller turns this into "unknown" rather
-    // than claiming the app is missing.
-    throw new Error(`bundle query failed: ${failure.code}`);
-  }
+/** Start failures that mean "not installed". */
+function isMissingApp(error: BusinessError): boolean {
+  // 16000001: ability does not exist. 16000003: bundle does not exist.
+  return error.code === 16000001 || error.code === 16000003;
 }
 
 /**
  * Answers whether a sibling app can run a cross-app request.
  *
- * The answer never claims more than the platform confirmed:
+ * The check is a real ability start with a request that is safe to send:
+ * `action: 'analyze'` runs no compiler and reads no payload directory. The
+ * receiver validates every field first, so a probe can never start a build.
  *
- *   - `installed: false` — the bundle query found no such bundle.
- *   - `installed: true`  — the bundle record exists and the app is addressable.
- *   - `available: false` with `installed: true` plus a diagnostic — the record
- *     exists but the ability start was refused, so the app cannot serve now.
- *   - a thrown error — the query needs permission Studio does not hold. The
- *     caller then reports "unknown" instead of guessing.
+ * The start is sent through a Want with no parameters the receiver would act
+ * on beyond validation, and the ability the module exports has no `skills`
+ * block, so this path cannot be reached by a URI or by an untrusted caller.
  */
-export function probe(raw: Map<string, string>): Map<string, Object> {
+export function probe(raw: Map<string, string>): Promise<Map<string, Object>> {
   const result = new Map<string, Object>();
   // The Dart side sends the bundle name as a channel argument, and
   // `onMethodCall` copies it into `targetBundle`. Reading `bundleName` here
@@ -397,37 +392,81 @@ export function probe(raw: Map<string, string>): Map<string, Object> {
     result.set('installed', false);
     result.set('available', false);
     result.set('diagnostic', '未知的配套应用');
+    return Promise.resolve(result);
+  }
+  return probeByStart(bundleName).then((answer: ProbeAnswer) => {
+    result.set('installed', answer.installed);
+    result.set('available', answer.available);
+    if (answer.protocol !== undefined) {
+      result.set('protocol', answer.protocol);
+    }
+    if (answer.diagnostic !== undefined) {
+      result.set('diagnostic', answer.diagnostic);
+    }
+    result.set('languages', new Array<Object>());
     return result;
-  }
-  const answer = probeInstalled(bundleName);
-  result.set('installed', answer.installed);
-  result.set('available', answer.available);
-  if (answer.protocol !== undefined) {
-    result.set('protocol', answer.protocol);
-  }
-  if (answer.diagnostic !== undefined) {
-    result.set('diagnostic', answer.diagnostic);
-  }
-  result.set('languages', new Array<Object>());
-  return result;
+  });
 }
 
-function probeInstalled(bundleName: string): ProbeAnswer {
-  if (!bundleInstalled(bundleName)) {
+/**
+ * Starts the receiver with a harmless analyze request and reads the outcome.
+ *
+ * `startAbility` reports the platform's own verdict, so no bundle record and
+ * no permission are needed. The request carries a random session id so the
+ * receiver's reply, if any, is dropped by the Dart session filter.
+ */
+async function probeByStart(bundleName: string): Promise<ProbeAnswer> {
+  const parameters: Record<string, Object> = {};
+  parameters['protocol'] = PROTOCOL;
+  parameters['sessionId'] = `probe${Date.now()}`;
+  parameters['language'] = 'java';
+  parameters['entry'] = '';
+  parameters['action'] = 'analyze';
+  parameters['stdin'] = '';
+  parameters['timeoutMs'] = 5000;
+  parameters['callerBundle'] = STUDIO_BUNDLE;
+  parameters['bridgeAction'] = 'action.system.qfli.interop.event';
+  parameters['payloadDirectory'] = '';
+  const want: Want = {
+    bundleName: bundleName,
+    abilityName: TARGET_ABILITY,
+    parameters: parameters,
+  };
+  const context = probeHostContext;
+  if (context === null) {
     return {
-      installed: false,
+      installed: true,
       available: false,
-      diagnostic: `未安装 ${bundleName}`,
+      diagnostic: '跨应用通道尚未就绪',
     };
   }
-  // The bundle record exists. The protocol only opens a real ability, so an
-  // accept here means "the app answered"; the run still validates every field.
+  try {
+    await context.startAbility(want);
+  } catch (error) {
+    const failure = error as BusinessError;
+    if (isMissingApp(failure)) {
+      return {
+        installed: false,
+        available: false,
+        diagnostic: `未安装 ${bundleName}`,
+      };
+    }
+    // Something other than "not installed" refused the start. Reporting
+    // "installed" here would be a guess, so the answer stays unknown.
+    console.error(`QFLI_INTEROP_PROBE_REFUSED ${failure.code}`);
+    return {
+      installed: true,
+      available: false,
+      diagnostic: `无法确认 ${bundleName}（${failure.code}）`,
+    };
+  }
   return {
     installed: true,
     available: true,
     protocol: PROTOCOL,
   };
 }
+
 
 function toStringMap(raw: Object): Map<string, string> {
   const source = raw as Map<string, Object>;
@@ -442,6 +481,7 @@ function toStringMap(raw: Object): Map<string, string> {
 export function configureInteropChannels(engine: FlutterEngine,
     context: common.UIAbilityContext): void {
   hostContext = context;
+  probeHostContext = context;
   const messenger = engine.dartExecutor.getBinaryMessenger();
   const methods = new MethodChannel(messenger, CHANNEL_METHODS);
   methods.setMethodCallHandler({
@@ -461,7 +501,11 @@ export function configureInteropChannels(engine: FlutterEngine,
       }
       try {
         if (call.method === 'probe') {
-          result.success(probe(raw));
+          probe(raw).then((answer: Map<string, Object>) => {
+            result.success(answer);
+          }).catch((error: Error) => {
+            result.error('probe_failed', error.message, null);
+          });
           return;
         }
         if (call.method === 'start') {
