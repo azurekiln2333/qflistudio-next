@@ -45,5 +45,8 @@ flutter:
   uses-material-design: true
 
   # 启动页图标由每个 App 自己声明；内核里的 AssetImage 用同一路径字符串引用。
+  # assets/content/ 是由 tool/generate_studio_content.dart 生成的组合内容目录：
+  # 主 App 的教程/示例读取所有语言产品各自发布的本地课程，见 provenance.json。
   assets:
     - assets/app_icon.png
+    - assets/content/
