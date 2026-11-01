@@ -95,3 +95,109 @@ tracked), so the four spec files were added with an explicit `git add -f`. The
 - **C (`ohos-app-interop`) + A**: `tool/verify_ohos_products.dart` fails on 7
   bundle names. Either the manifests or the product table must move before an
   OHOS release claim.
+
+## Result 2 — live host moved under `flutter test`
+
+Committed in `qfli_studio_core` as `8349ed6` (code) and `b3e43d2` (README), and
+in `qflistudio` as `edfda67` (operator script, README, docs).
+
+### What changed
+
+- `tool/vibe_e2e_runner.dart` — the scenario runner and report assembly, shared
+  by both hosts. It also holds a narrow `ApiClient` stand-in that only
+  implements `aiChat` and refuses a relay endpoint.
+- `tool/vibe_e2e_transport.dart` — direct debug-upstream client built on
+  `AiService.encodeRequest`, `decodeReply` and `headers`, so the three protocols
+  share one code path. Every error string is redacted before it can reach a
+  report.
+- `tool/vibe_e2e.dart` — CLI kept for a future SDK-side adapter.
+- `test/vibe_live_e2e_test.dart` — live host. The whole file skips unless all
+  three `QFLI_DEBUG_*` variables are present. With variables present it fails
+  when every scenario skips, so an unreachable upstream cannot look like a pass.
+  It also asserts the report on disk does not contain the key.
+- `test/vibe_e2e_runner_test.dart` — offline checks of the runtime, the skip
+  semantics and the redacted environment summary.
+- `qflistudio/tool/verify_vibe_e2e.dart` now forwards to
+  `flutter test --no-pub test/vibe_live_e2e_test.dart` with the parsed `--env-file`
+  values in the child environment.
+
+### Not verified yet — blocked on the shared package compiling
+
+At 08:47 local time `flutter analyze --no-pub lib` in `qfli_studio_core` failed
+with one error owned by B:
+
+```
+lib/vibe_coding/vibe_coding_controller.dart:824:13 - The named parameter
+'abortTrigger' isn't defined - undefined_named_parameter
+```
+
+`ApiClient.terminalEvents` (uncommitted working tree, 08:37) lost the
+`abortTrigger` parameter that the controller passes. `test/vibe_live_e2e_test.dart`
+and `test/vibe_e2e_runner_test.dart` therefore cannot load yet. Both analyze
+clean on their own; the failure is a single missing named parameter in B's file.
+Re-run as soon as B restores it:
+
+```
+(cd qfli_studio_core && flutter test --no-pub test/vibe_e2e_runner_test.dart)
+(cd qflistudio && dart run tool/verify_vibe_e2e.dart --env-file <outside-repo path>)
+```
+
+`test/vibe_live_integration_test.dart` (untracked, written 2026-10-28 06:22, the
+`QFLI_VIBE_LIVE_ORIGIN` loopback variant) was left untouched.
+
+## Result 3 — bundleName drift: 7 of 12 disagree (read-only investigation)
+
+`dart run tool/verify_ohos_products.dart` fails on rustcore, goshift, jvmx,
+webforge, forge, dartwing and sqlab. pyflow and the main app agree.
+
+### Dates
+
+| Side | Written | Commit |
+| --- | --- | --- |
+| Product table `tool/verify_ohos_products.dart` | 2026-09-22 17:29 | `3c2a405` |
+| Pre-split manifests (`apps/qfli_*/ohos/AppScope/app.json5`) | 2026-09-22 04:44 | `cefe73f` |
+| Split into sibling repositories | 2026-09-29 08:36 | `13c63a1` |
+| Current drift | 2026-10-15 to 2026-10-17 | per-App `fix(ohos)` commits |
+
+Not introduced today. The split happened 33 days ago:
+
+- `qfli_c` — both `ohos` and Android became `com.azurekiln.qfli.forge` in
+  `fae9550` (2026-09-22), the same short name the table expects.
+- `qfli_java` — `ohos` and Android became `com.azurekiln.qfli.jvmx` in
+  `bf1d66f` (2026-09-22), matching the table.
+- The pre-split monorepo (`13c63a1^`) already had the `*.jvmx`, `*.forge`,
+  `*.dartwing` short names in both `ohos` and Android.
+
+### Which side is stale
+
+**The `ohos` manifests are the stale side; the product table still holds the
+intended names.** Evidence:
+
+1. In every sibling repository the Android `applicationId` still uses the short
+   product name (`com.azurekiln.qfli.jvmx`, `*.forge`, `*.dartwing`, `*.goshift`,
+   `*.rustcore`, `*.webforge`, `*.sqlab`), while `ohos` uses the truncated one
+   (`*.java`, `*.cpp`, `*.dart`, `*.go`, `*.rust`, `*.web`, `*.sql`). One product
+   naming two bundle ids on two platforms is the drift, not the table.
+2. The `ohos` values changed later, inside per-App `fix(ohos)` commits on
+   2026-10-15 to 2026-10-17, for example `395f62f` in `qfli_java` which states it
+   "preserve[s] the current bundle … and signing configuration". Those commits
+   locked in the truncated name that was already in the tree.
+3. The signed HAPs built on 2026-11-01 08:12 carry the truncated names
+   (`com.azurekiln.qfli.java`), and `qfli_java/ohos/build-profile.json5` still
+   references `D:/Keystore/Profile/jvmxRelease.p7b`, so the release keystore and
+   the `ohos` bundle id already disagree inside that repository.
+
+### Consequence for the release
+
+Renaming the `ohos` manifests to the table's names changes the HarmonyOS bundle
+id of seven apps. That invalidates their current signing material and any
+AppGallery record keyed by bundle name. The decision belongs to the owners of
+those manifests (A and C), not to this task. Until then the gate correctly
+stays red.
+
+One smaller inconsistency found on the way: `lib/interop/interop_targets.dart`
+(C) now maps `java` to `com.azurekiln.qfli.java` and `python` to
+`com.azurekiln.qfli.pyflow`. For Java that follows the manifest, which is the
+stale side above, while `qfli_python` is the single product whose two platforms
+agree. Interop launches by that table, so the Java entry will keep working only
+while the manifest keeps the truncated name.
