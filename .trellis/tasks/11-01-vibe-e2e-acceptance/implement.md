@@ -562,3 +562,89 @@ the other two on this host and that is where a 524 would surface first.
 
 `web_search` will be re-run separately once B lands the redirect fix, as
 instructed.
+
+## Result 6 — final 3x3 acceptance (in progress, last run 2026-11-01 12:21 local)
+
+Status: **not final**. The python_fix_loop row is still being closed. Written
+now because the operator asked for the raw table before it is complete.
+
+Reports: `report-20261101T042139.json` (chat). responses and messages rows come
+from `report-20261101T041351.json` / `report-20261101T041445.json`, run before
+the last executor change, so treat those two columns as provisional.
+
+### 3x3 result
+
+| Protocol | static_site | python_fix_loop | web_search |
+| --- | --- | --- | --- |
+| chat | **passed** | failed — `runs_at_least_two`, `verification_marker` | failed — `reply_cites_url` |
+| responses | **passed** | failed — same two | failed — `reply_cites_url` |
+| messages | **passed** | failed — same two | failed — `reply_cites_url` |
+
+No overloaded or 524 was seen in any of these runs, so no retry was needed.
+
+### static_site — 3 of 3 passed, without a login token
+
+This is the operator's requirement (1) and it holds. `phase=succeeded` in all
+three protocols with `QFLI_E2E_TERMINAL_TOKEN` unset. The HTML check is
+identical everywhere:
+
+```
+{"file":"index.html","parsed":true,"stylesheets":["style.css"],
+ "scripts":["app.js"],"problems":[]}
+```
+
+`scriptLogic=true` — `app.js` really implements add and remove. A
+`run_command` call is still attempted at the end and still gets the cloud
+terminal 401, but A's `aa890e1` now lets a clean written project finish the
+turn instead of failing it.
+
+### python_fix_loop — the failure is in my executor, not in A's fix
+
+`run_command` calls, chat, in order:
+
+| # | Command | Exit code | Where it ran |
+| --- | --- | --- | --- |
+| 1 | `python3 verify.py` | **1** | local, real `AssertionError` |
+| 2 | `python3 verify.py; echo "exit=$?"; wc -c result.txt; od -c result.txt` | none | cloud terminal, `未登录或登录已过期` |
+
+The first run genuinely fails with a real Python traceback, so
+`first_run_failed` passes. The second run never executed locally, because the
+command chains `echo` / `wc` / `od` and my parser only accepted
+interpreter-plus-one-script. It fell back to the cloud terminal, got a 401, and
+returned no exit code.
+
+That is why `runs_at_least_two` reports `带退出码的运行 1 次 / 共 2 次` and why
+`verification_marker` finds no `QFLI_VIBE_VERIFIED_42`: the passing run has not
+happened yet.
+
+To be clear about the interop runner: acceptance does not depend on the OHOS
+cross-app path. `VibeLocalExecutionTransport` implements `InteropTransport` and
+serves the `start` call itself, with a local `Process`. The label
+`跨应用 · 退出码 1` is only the controller's wording for "the runner returned a
+run". No sibling app, bridge or device is involved.
+
+### web_search — same root cause as Result 5, one protocol closer
+
+All three protocols retrieved through the direct fallback on every call, four
+search calls each, `直连：8 条结果`, plus one `web_fetch` returning
+`直连：33 字符`. `citations_from_tool_output` passes trivially because the answer
+cites nothing. `reply_cites_url` fails: the answers are 44 to 95 characters of
+"let me search again", and the no-progress guard stops the turn before any
+summary is written.
+
+chat, `web_search`, last assistant message:
+
+> 搜索结果里没有直接的版本号和发布日期信息，我再抓取官方页面确认。
+
+The web_fetch result is 33 characters, so the fetched page contributed almost
+nothing back to the model.
+
+### Unfinished items
+
+1. Extend the local executor's allowlist to the segments models actually
+   write: `echo` (with `$?` filled from the previous real exit code), `wc -c`,
+   `od -c`. Work in progress. `echo` and `wc`/`od` are now accepted and served
+   in-process so nothing external is required on Windows.
+2. Re-run all three protocols after that and replace this table.
+3. `web_search` still cannot pass while the guard treats a successful search as
+   no progress. Not mine to change.
