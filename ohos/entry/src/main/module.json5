@@ -37,6 +37,24 @@
             ]
           }
         ]
+      },
+      {
+        "name": "InteropBridgeAbility",
+        "srcEntry": "./ets/interop/InteropBridgeAbility.ets",
+        "description": "$string:InteropBridgeAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:InteropBridgeAbility_label",
+        "startWindowIcon": "$media:icon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "launchType": "singleton",
+        "skills": [
+          {
+            "actions": [
+              "action.system.qfli.interop.event"
+            ]
+          }
+        ]
       }
     ],
     "requestPermissions": [

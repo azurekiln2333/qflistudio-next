@@ -15,6 +15,14 @@
     {
       "name": "pasteboard_reason",
       "value": "用于读取剪贴板内容以粘贴到编辑器"
+    },
+    {
+      "name": "InteropBridgeAbility_desc",
+      "value": "接收配套应用的编译运行回调"
+    },
+    {
+      "name": "InteropBridgeAbility_label",
+      "value": "跨应用回调"
     }
   ]
 }
