@@ -7,6 +7,7 @@ POST {AZK_OAUTH2_BASE_URL}/oauth2/account/erase
 - 200：{"user_id","status":"deleted"|"already_deleted","deleted_at":"ISO8601","tokens_revoked":true}；幂等，500 可重试。
 - 错误 {error,error_description}：400 invalid_request；401 invalid_client；403 access_denied / insufficient_scope；404 user_not_found；409 conflict；429 rate_limited；500 server_error。
 - 效果：吊销该用户全部令牌、授权码、会话；删除外部身份绑定、TOTP、应用使用记录；用户行变墓碑并清空个人信息，之后无法登录；法定登录日志保留但用户名与用户ID不可逆去标识化。同一华为账号可重新注册，得到新用户ID。
+- 网关确认（2026-11-02）：base URL 用现有 AZK_OAUTH2_BASE_URL（网关 issuer 根地址）；client_id/secret 用现有 qfli 客户端，client_id 必须以 qfli 开头（不区分大小写）。scope `qfli_account_erase` 须由用户本人在网关后台勾选，未授予前调用会得到 403 insufficient_scope：实现要把这种情况当作可重试的失败，记审计并提示，不得假装注销成功。
 
 ## B. W1 审核服务 API
 唯一来源：D:/MyNewProjects/azurekiln-moderation/README.md（W1-core 先写）。W2b 与 W4 只通过 packages/client 接入。
