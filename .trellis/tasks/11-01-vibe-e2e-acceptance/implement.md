@@ -884,3 +884,109 @@ attention, not a flaky skip.
    page when the terminal is unreachable. That is the controller's turn rule.
 3. No assertion was loosened. `verification_marker` kept both of its original
    data requirements and gained a third.
+
+## Result 6d — per-cell pass counts (2026-11-01 14:24-14:30 local)
+
+Runs: static_site twice per protocol, python_fix_loop once, web_search once.
+No overloaded and no 524, so no retry was needed.
+
+| Report | Protocol | Scope |
+| --- | --- | --- |
+| `report-20261101T062415.json` | chat | static_site 1/2 |
+| `report-20261101T062449.json` | chat | static_site 2/2 |
+| `report-20261101T062530.json` | responses | static_site 1/2 |
+| `report-20261101T062620.json` | responses | static_site 2/2 |
+| `report-20261101T062702.json` | messages | static_site 1/2 |
+| `report-20261101T062734.json` | messages | static_site 2/2 |
+| `report-20261101T062824.json` | chat | python_fix_loop, web_search |
+| `report-20261101T062911.json` | responses | python_fix_loop, web_search |
+| `report-20261101T063011.json` | messages | python_fix_loop, web_search |
+
+### Pass counts
+
+| Protocol | static_site | python_fix_loop | web_search |
+| --- | --- | --- | --- |
+| chat | **2/2** | 0/1 | **1/1** |
+| responses | **2/2** | 0/1 | **1/1** |
+| messages | **2/2** | 0/1 | **1/1** |
+
+static_site **6/6**, web_search **3/3**, python_fix_loop **0/3**.
+No assertion was loosened.
+
+### static_site — 6 of 6, and the terminal no longer decides the outcome
+
+| Protocol | Run | Rounds | Model calls | Total | htmlCheck |
+| --- | --- | --- | --- | --- | --- |
+| chat | 1 | 2 | 4 | 30,832 ms | parsed, 0 problems |
+| chat | 2 | 4 | 4 | 37,095 ms | parsed, 0 problems |
+| responses | 1 | 2 | 6 | 47,412 ms | parsed, 0 problems |
+| responses | 2 | 2 | 5 | 38,584 ms | parsed, 0 problems |
+| messages | 1 | 3 | 4 | 27,908 ms | parsed, 0 problems |
+| messages | 2 | 4 | 4 | 28,601 ms | parsed, 0 problems |
+
+Every run: `stylesheets=[style.css]`, `scripts=[app.js]`, `scriptLogic=true`.
+A's `b9514d3` did what it claimed — a failed terminal transport is now
+classified as unavailable, so a fully written page closes as `succeeded`
+instead of `failed`.
+
+### web_search — 3 of 3, every URL traced
+
+| Protocol | Rounds | Model calls | Answer length | URLs cited | All from tool output |
+| --- | --- | --- | --- | --- | --- |
+| chat | 5 | 6 | 1,550 chars | 5 | true |
+| responses | 3 | 7 | 1,362 chars | 6 | true |
+| messages | 3 | 7 | 1,604 chars | 8 | true |
+
+No retrieval had a missing exit code, so no cloud-terminal detour occurred.
+No fabricated URL.
+
+### python_fix_loop — 0 of 3, all three blocked by the executor allowlist
+
+This is the honest state: the loop itself is not what fails. Each protocol's
+model wrote its verification command in a shape my executor refuses, the call
+fell to the cloud terminal, and no second real exit code exists.
+
+| Protocol | Phase | Real exit codes | Rejected command that broke it |
+| --- | --- | --- | --- |
+| chat | failed | none | `python3 verify.py; echo "EXIT=$?"` |
+| responses | succeeded | 1 | `python3 verify.py && od -c result.txt` |
+| messages | succeeded | 1 | `python3 -c "print(repr(open('result.txt','rb').read()))"` |
+
+Failing assertions, verbatim:
+
+chat:
+
+> runs_at_least_two: 带退出码的运行 0 次 / 共 1 次
+> edit_applied: 0 次 edit_file
+> verification_marker: 没有任何带退出码的 run_command
+> error: 终端不可用（未登录或登录已过期），无法运行命令验证
+
+responses and messages, identical text:
+
+> runs_at_least_two: 带退出码的运行 1 次 / 共 2 次
+> verification_marker: 最后一个带退出码的运行 exit=1，输出不含标记，更早存在非零退出码：false，无退出码的调用 1 次
+
+Note the responses `python3 verify.py && od -c result.txt` case: `&&` means the
+`od` part only runs when `verify.py` succeeds, and it did not, so refusing the
+chain was semantically harmless there. The chat and messages cases were refused
+for their own reasons — `;` chaining in chat, `python3 -c` in messages — even
+though both shapes are accepted by the current parser in isolation. The live
+path goes through `InteropRunner.tryRunCommand`, whose own allowlist only
+accepts `python3 <one file>`, so a chained command never reaches my parser at
+all. That gate is in `lib/interop/interop_runner.dart` and belongs to A.
+
+Per instruction, the rejected commands are recorded here and the allowlist work
+stops. `extra.rejectedCommands` now carries these verbatim in every report.
+
+### What static_site additionally shows about command shapes
+
+All six static_site runs had their `run_command` verification refused, with
+commands like:
+
+- `ls -la && echo '--- refs ---' && grep -nE 'style.css|app.js' index.html && echo '--- js syntax ---' && node --check app.js && echo 'JS OK'`
+- `set -e for f in index.html style.css app.js; do [ -f "$f" ] && echo "OK 存在: $f" || echo "缺失: $f"; done ...`
+
+Those are shell loops and pipelines. Refusing them did not matter, because the
+in-process HTML check already establishes the same facts and the assertion
+grades those files directly. This is the reason static_site passes while
+python_fix_loop does not: its evidence does not depend on running a command.
