@@ -193,3 +193,43 @@ is still unverified.
 - `flutter test --no-pub` on the four interop test files: 85 passed.
 - `flutter analyze --no-pub lib`: one pre-existing error in
   `lib/vibe_coding/vibe_coding_controller.dart`, owned by A.
+
+### 6. Main app wiring (done)
+
+`qflistudio` commit `6153ea7`.
+
+`lib/main.dart` now passes `interopRunner: const InteropRunner(),` into
+`qfliStudioProfile`, with
+`import 'package:qfli_studio_core/interop/interop_runner.dart';`.
+
+Only the main app starts the link. The language apps are receivers, so their
+`main.dart` files were not touched.
+
+That file already held 51 lines of another session's uncommitted work
+(`contentRepositoryFactory`, `StudioContentRepository`, the startup binding,
+and more). The committed change is 4 insertions and 0 deletions: the import,
+one comment pair and the runner line. The index was built from HEAD plus only
+that change, so the other session's 52/9 diff is still unstaged in the working
+tree exactly as it was.
+
+`flutter analyze --no-pub lib/main.dart`: no issues.
+
+**This entry is verified only at compile and unit-test level.** No OHOS device
+or emulator is available (`hdc list targets` is empty), so nothing here shows
+that a tap on the entry reaches a sibling app, that the receiver compiles, or
+that output comes back. What is verified: the editor's entry decision, the
+protocol codec, the payload limits, the command routing, the install hint and
+the ArkTS contract, all by tests, plus both OHOS builds.
+
+### 7. Correction on commit discipline
+
+My first attempt at this wiring used `git commit -F <file> -- lib/main.dart`.
+That pathspec did not restrict the commit: it committed the working-tree file,
+which carried the other session's 51 lines. I reverted it immediately with
+`git reset --soft`, restored the index with `git restore --staged --source=HEAD`,
+confirmed the working tree still held the 52/9 diff, and committed again with no
+pathspec after verifying `git diff --cached --stat` showed 4 insertions.
+
+The lesson, for the next pass: `-- <path>` on `git commit` selects which files
+join the commit, not which content. To commit a subset of one file, build the
+index first and commit without a pathspec.
