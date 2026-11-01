@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:qfli_studio_core/app.dart';
+import 'package:qfli_studio_core/interop/interop_runner.dart';
 import 'package:qfli_studio_core/services/project_templates.dart';
 import 'package:qfli_studio_core/services/studio_profile.dart';
 import 'package:qfli_studio_core/splash_screen.dart';
@@ -19,6 +20,9 @@ final StudioProfile qfliStudioProfile = StudioProfile(
   showHomeTabs: true,
   runtimeKind: 'multi-runtime',
   runtimeStatus: 'unavailable',
+  // 主 App 是联动发起方：项目入口属于哪门语言，就交给对应的 qfli_* 子 App
+  // 用它的本地工具链编译运行。
+  interopRunner: const InteropRunner(),
   supportedFileExtensions: [
     '.c',
     '.h',
