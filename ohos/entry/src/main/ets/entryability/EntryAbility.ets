@@ -12,6 +12,7 @@ import { common, Want, ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
+import { configureInteropChannels } from '../interop/StudioInterop';
 
 const CHANNEL_PLATFORM = 'qflistudio/platform';
 const CHANNEL_HUAWEI = 'qflistudio/huawei_account';
@@ -36,8 +37,11 @@ export default class EntryAbility extends FlutterAbility {
     super.configureFlutterEngine(flutterEngine)
     GeneratedPluginRegistrant.registerWith(flutterEngine)
 
-    const abilityContext = this.context as common.UIAbilityContext;
+    // Cross-app compile and run: Dart asks a sibling app to build and execute a
+    // project, and the sibling app streams events back to this engine.
+    configureInteropChannels(flutterEngine, this.context as common.UIAbilityContext);
 
+    const abilityContext = this.context as common.UIAbilityContext;
     // 通用平台能力：打开系统浏览器（HTML 预览用）。
     const platformChannel = new MethodChannel(
       flutterEngine.dartExecutor.getBinaryMessenger(),
