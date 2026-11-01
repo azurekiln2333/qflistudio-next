@@ -1,0 +1,752 @@
+{
+  "schemaVersion": 1,
+  "task": "10-23-studio-release-ux-workspaces",
+  "scope": "Exact main-bundle text synchronization of two authoritative Java fields; no generator implementation or sibling modification.",
+  "startedAtUtc": "2026-10-23T07:59:42.269414+00:00",
+  "completedAtUtc": "2026-10-23T07:59:45.819692+00:00",
+  "status": "source-sync-verified-official-gates-pending",
+  "serializationProof": {
+    "tutorials": {
+      "indent2_final_lf_byte_identical": false,
+      "existing_bytes": 5898687,
+      "indent2_bytes": 7164019
+    },
+    "examples": {
+      "indent2_final_lf_byte_identical": false,
+      "existing_bytes": 3389464,
+      "indent2_bytes": 3902732
+    }
+  },
+  "replacementMethod": "Exact serialized-string token replacements, each unique globally and within its single matching entries object; provenance uses exact field tokens scoped by path.",
+  "modifiedFields": [
+    {
+      "id": "java-tutorial-107",
+      "field": "lessons[0].exercises[0].prompt",
+      "before": "把 42 输出成宽度 5、右侧补零的字符串。",
+      "after": "把 42 输出成宽度 5、左侧补零的字符串。"
+    },
+    {
+      "id": "java-tutorial-161",
+      "field": "lessons[0].exercises[0].answer",
+      "before": "Path sub = Files.createDirectories(dir.resolve(\"sub\")); Files.delete(sub);",
+      "after": "Path sub = Files.createDirectories(dir.resolve(\"sub\")); Path child = sub.resolve(\"note.txt\"); Files.writeString(child, \"练习\", StandardCharsets.UTF_8); Files.delete(child); Files.delete(sub);"
+    }
+  ],
+  "provenanceModifiedFields": [
+    "outputs[0].bytes",
+    "outputs[0].fingerprint",
+    "sources[25].bytes",
+    "sources[25].fingerprint"
+  ],
+  "sourceDriftBeforeRefresh": [
+    {
+      "path": "../qfli_studio_core/assets/content/tutorials.json",
+      "before_bytes": 4728982,
+      "before_fingerprint": "2bacdb5b",
+      "current": {
+        "bytes": 4729105,
+        "fingerprint_fnv1a32": "0f688d29",
+        "sha256": "7d858d27e440cb0de93cbfa2cd2469ed99005c3cedf6a846d95ebbb355f694ba"
+      }
+    }
+  ],
+  "assetHashes": {
+    "tutorials": {
+      "before": {
+        "bytes": 5898687,
+        "fingerprint_fnv1a32": "a9f5e7e6",
+        "sha256": "69c60889da29580bb499308cd45f8b57346c24910f3b506b7cd703a794a9147e"
+      },
+      "after": {
+        "bytes": 5898810,
+        "fingerprint_fnv1a32": "89db4cfe",
+        "sha256": "6bf853f54ec794257cc5412e60dc36d8cd07cbabf008a64379fdcef2b85e5b0a"
+      }
+    },
+    "examples": {
+      "before": {
+        "bytes": 3389464,
+        "fingerprint_fnv1a32": "ae9ef7bf",
+        "sha256": "83460b5a0d6509e9a16d2ad20b53dd0834473ac9432d6b284fec97247ae865f6"
+      },
+      "after": {
+        "bytes": 3389464,
+        "fingerprint_fnv1a32": "ae9ef7bf",
+        "sha256": "83460b5a0d6509e9a16d2ad20b53dd0834473ac9432d6b284fec97247ae865f6"
+      }
+    },
+    "provenance": {
+      "before": {
+        "bytes": 11509,
+        "fingerprint_fnv1a32": "00c70eb4",
+        "sha256": "74d478dfe26c2e173e3c3816e491225de767770db520b37bc25fe67a0f59bd31"
+      },
+      "after": {
+        "bytes": 11509,
+        "fingerprint_fnv1a32": "07619a77",
+        "sha256": "1a0312d45a60ce68a4f762df61e8dc239403f87003c1a577b25f4f08fb66c2c2"
+      }
+    }
+  },
+  "checks": {
+    "sourceInventoryMatchesOfficialGenerator": true,
+    "sourceCount": 27,
+    "allSourceBytesUnchangedBeforeAfter": true,
+    "allFullyComposedRowsEqualCurrentSources": true,
+    "allComposedRowOrderingMatchesOfficialSubjectThenIdOrder": true,
+    "tutorialCount": 2180,
+    "exampleCount": 2613,
+    "changedTutorialRows": 2,
+    "changedTutorialFields": 2,
+    "changedExampleRows": 0,
+    "examplesByteIdentical": true,
+    "otherTutorialFieldsAndOrderingPreserved": true,
+    "provenanceOnlyFourAuthorizedFieldsChanged": true,
+    "officialGeneratorSourceUnchanged": true,
+    "officialGeneratorSha256": "ee31890a49326b4a64b12a93a40bb0b884192f5a84dfec7dc69439fc9bd0d85a"
+  },
+  "compositionEffects": [
+    {
+      "path": "../qfli_c/tool/forge_content/staging/forge_tutorials.json",
+      "kind": "tutorials",
+      "included": 200,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_c/tool/forge_content/staging/forge_examples.json",
+      "kind": "examples",
+      "included": 200,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_lua/assets/content/lua_tutorials.json",
+      "kind": "tutorials",
+      "included": 23,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_lua/assets/content/lua_examples.json",
+      "kind": "examples",
+      "included": 240,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_web/assets/content/tutorials.json",
+      "kind": "tutorials",
+      "included": 481,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_web/assets/content/examples.json",
+      "kind": "examples",
+      "included": 481,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_rust/assets/content_rust/tutorials.json",
+      "kind": "tutorials",
+      "included": 166,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_rust/assets/content_rust/examples.json",
+      "kind": "examples",
+      "included": 166,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_go/assets/curriculum/tutorials.json",
+      "kind": "tutorials",
+      "included": 120,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_go/assets/curriculum/examples.json",
+      "kind": "examples",
+      "included": 120,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_dart/assets/content/dart_tutorials.json",
+      "kind": "tutorials",
+      "included": 120,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_dart/assets/content/dart_examples.json",
+      "kind": "examples",
+      "included": 120,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_sql/assets/content/sql_tutorials.json",
+      "kind": "tutorials",
+      "included": 126,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_sql/assets/content/sql_examples.json",
+      "kind": "examples",
+      "included": 126,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_json/assets/content/tutorials.json",
+      "kind": "tutorials",
+      "included": 340,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_json/assets/content/examples.json",
+      "kind": "examples",
+      "included": 340,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_tutorials.json",
+      "kind": "tutorials",
+      "included": 4,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_blocks.json",
+      "kind": "examples",
+      "included": 49,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_documents.json",
+      "kind": "examples",
+      "included": 28,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_gfm.json",
+      "kind": "examples",
+      "included": 23,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_inline.json",
+      "kind": "examples",
+      "included": 30,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_languages.json",
+      "kind": "examples",
+      "included": 23,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_links.json",
+      "kind": "examples",
+      "included": 29,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_math.json",
+      "kind": "examples",
+      "included": 18,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_tables.json",
+      "kind": "examples",
+      "included": 20,
+      "skipped_by_owned_subject": 0,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_studio_core/assets/content/tutorials.json",
+      "kind": "tutorials",
+      "included": 600,
+      "skipped_by_owned_subject": 1220,
+      "superseded_ids": 0
+    },
+    {
+      "path": "../qfli_studio_core/assets/content/examples.json",
+      "kind": "examples",
+      "included": 600,
+      "skipped_by_owned_subject": 1220,
+      "superseded_ids": 0
+    }
+  ],
+  "sourceSnapshots": [
+    {
+      "path": "../qfli_c/tool/forge_content/staging/forge_tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 472105,
+        "fingerprint_fnv1a32": "26aa3d7c",
+        "sha256": "2e0169ba45f9b438f327f46afca6a5e28a06a527478cb0ace26e55cee369aa31"
+      },
+      "after": {
+        "bytes": 472105,
+        "fingerprint_fnv1a32": "26aa3d7c",
+        "sha256": "2e0169ba45f9b438f327f46afca6a5e28a06a527478cb0ace26e55cee369aa31"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_c/tool/forge_content/staging/forge_examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 236704,
+        "fingerprint_fnv1a32": "84524eec",
+        "sha256": "91c92ac7265b0dc777f154bb8a51ff35cb94cab4ec0b7548f4c8409ed3455cac"
+      },
+      "after": {
+        "bytes": 236704,
+        "fingerprint_fnv1a32": "84524eec",
+        "sha256": "91c92ac7265b0dc777f154bb8a51ff35cb94cab4ec0b7548f4c8409ed3455cac"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_lua/assets/content/lua_tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 514034,
+        "fingerprint_fnv1a32": "22856345",
+        "sha256": "a19779a0de72ef641fe73d9559d6bc202938f5e847ed38aef5046b257d66f5f7"
+      },
+      "after": {
+        "bytes": 514034,
+        "fingerprint_fnv1a32": "22856345",
+        "sha256": "a19779a0de72ef641fe73d9559d6bc202938f5e847ed38aef5046b257d66f5f7"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_lua/assets/content/lua_examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 298082,
+        "fingerprint_fnv1a32": "ea935422",
+        "sha256": "bc5bbe860024d67ffe2cf0199da2cec35ae39af13cd8db7f52009e97f01b3376"
+      },
+      "after": {
+        "bytes": 298082,
+        "fingerprint_fnv1a32": "ea935422",
+        "sha256": "bc5bbe860024d67ffe2cf0199da2cec35ae39af13cd8db7f52009e97f01b3376"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_web/assets/content/tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 1395900,
+        "fingerprint_fnv1a32": "6a914a06",
+        "sha256": "fe05fd1b3164219bba9b259b1aa3564b2052dd816c857c0e076cfed15d077f89"
+      },
+      "after": {
+        "bytes": 1395900,
+        "fingerprint_fnv1a32": "6a914a06",
+        "sha256": "fe05fd1b3164219bba9b259b1aa3564b2052dd816c857c0e076cfed15d077f89"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_web/assets/content/examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 800054,
+        "fingerprint_fnv1a32": "ad00647e",
+        "sha256": "b40f900eaf6caa44abc2d1d9fb26d695f8571f8a7394408b99b4dd11632a57cd"
+      },
+      "after": {
+        "bytes": 800054,
+        "fingerprint_fnv1a32": "ad00647e",
+        "sha256": "b40f900eaf6caa44abc2d1d9fb26d695f8571f8a7394408b99b4dd11632a57cd"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_rust/assets/content_rust/tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 859446,
+        "fingerprint_fnv1a32": "63d4d690",
+        "sha256": "a3deb7b93512f0486ef1de6cefbb551cf00235cce4bb7c80d08b7d393e77a857"
+      },
+      "after": {
+        "bytes": 859446,
+        "fingerprint_fnv1a32": "63d4d690",
+        "sha256": "a3deb7b93512f0486ef1de6cefbb551cf00235cce4bb7c80d08b7d393e77a857"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_rust/assets/content_rust/examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 424798,
+        "fingerprint_fnv1a32": "ce713bcc",
+        "sha256": "b03b3ccff6bd61fb7e86e5e5c17daf60d907f66997ecbdc5a01c9c2139c3e023"
+      },
+      "after": {
+        "bytes": 424798,
+        "fingerprint_fnv1a32": "ce713bcc",
+        "sha256": "b03b3ccff6bd61fb7e86e5e5c17daf60d907f66997ecbdc5a01c9c2139c3e023"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_go/assets/curriculum/tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 479874,
+        "fingerprint_fnv1a32": "9f47419d",
+        "sha256": "a4f3d2b1a081cb89f4666f97c2f50c6623a305b058f20d6d7b74165a1ab984bc"
+      },
+      "after": {
+        "bytes": 479874,
+        "fingerprint_fnv1a32": "9f47419d",
+        "sha256": "a4f3d2b1a081cb89f4666f97c2f50c6623a305b058f20d6d7b74165a1ab984bc"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_go/assets/curriculum/examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 246757,
+        "fingerprint_fnv1a32": "7f17f603",
+        "sha256": "f9674e28f6c199b15e8ff2b97a76f7f2b7c1c6f373c71d2eec1e13b5f6707ab1"
+      },
+      "after": {
+        "bytes": 246757,
+        "fingerprint_fnv1a32": "7f17f603",
+        "sha256": "f9674e28f6c199b15e8ff2b97a76f7f2b7c1c6f373c71d2eec1e13b5f6707ab1"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_dart/assets/content/dart_tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 336768,
+        "fingerprint_fnv1a32": "7ae35a17",
+        "sha256": "2f0a65bbe05b652a3f54b86e6e9fda6c3ea124091bd37958d10a61f07050d194"
+      },
+      "after": {
+        "bytes": 336768,
+        "fingerprint_fnv1a32": "7ae35a17",
+        "sha256": "2f0a65bbe05b652a3f54b86e6e9fda6c3ea124091bd37958d10a61f07050d194"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_dart/assets/content/dart_examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 134940,
+        "fingerprint_fnv1a32": "c761e20a",
+        "sha256": "dbf85c172bfd92ae2f1d81af87698f93bf76ba8f116183db4e325b15820ce05d"
+      },
+      "after": {
+        "bytes": 134940,
+        "fingerprint_fnv1a32": "c761e20a",
+        "sha256": "dbf85c172bfd92ae2f1d81af87698f93bf76ba8f116183db4e325b15820ce05d"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_sql/assets/content/sql_tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 343909,
+        "fingerprint_fnv1a32": "b4a9133d",
+        "sha256": "0ea1071c1aa9a6611ebceba7c4b4a832f6f635f4b57e052406f6455c99e5a2e0"
+      },
+      "after": {
+        "bytes": 343909,
+        "fingerprint_fnv1a32": "b4a9133d",
+        "sha256": "0ea1071c1aa9a6611ebceba7c4b4a832f6f635f4b57e052406f6455c99e5a2e0"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_sql/assets/content/sql_examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 192421,
+        "fingerprint_fnv1a32": "d2fee795",
+        "sha256": "cacfbf628a56fc42635764e3767981da14325eb9c8802cda94f5be0270276049"
+      },
+      "after": {
+        "bytes": 192421,
+        "fingerprint_fnv1a32": "d2fee795",
+        "sha256": "cacfbf628a56fc42635764e3767981da14325eb9c8802cda94f5be0270276049"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_json/assets/content/tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 941971,
+        "fingerprint_fnv1a32": "6ef5c694",
+        "sha256": "8cb0b9e82ba0185d6cf0c988458f7e16ac0ea3c45fea1c541ce22c50c7869ca2"
+      },
+      "after": {
+        "bytes": 941971,
+        "fingerprint_fnv1a32": "6ef5c694",
+        "sha256": "8cb0b9e82ba0185d6cf0c988458f7e16ac0ea3c45fea1c541ce22c50c7869ca2"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_json/assets/content/examples.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 508014,
+        "fingerprint_fnv1a32": "b4d8c72d",
+        "sha256": "20a555e3f0671dfc0cafd09adb4895ba57ace25babdca332dd6bc59e33f33675"
+      },
+      "after": {
+        "bytes": 508014,
+        "fingerprint_fnv1a32": "b4d8c72d",
+        "sha256": "20a555e3f0671dfc0cafd09adb4895ba57ace25babdca332dd6bc59e33f33675"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_tutorials.json",
+      "kind": "tutorials",
+      "role": "product-owned",
+      "before": {
+        "bytes": 37332,
+        "fingerprint_fnv1a32": "18b35d98",
+        "sha256": "ca03090b4d8c8b1e9d67763c71c5ca3303c9272ca9907872ff8cbd9207a856e2"
+      },
+      "after": {
+        "bytes": 37332,
+        "fingerprint_fnv1a32": "18b35d98",
+        "sha256": "ca03090b4d8c8b1e9d67763c71c5ca3303c9272ca9907872ff8cbd9207a856e2"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_blocks.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 35464,
+        "fingerprint_fnv1a32": "82bfefe6",
+        "sha256": "3221f85a20cc9746100cd229dce561c85ecd93255211f39cc93de1f8344643a9"
+      },
+      "after": {
+        "bytes": 35464,
+        "fingerprint_fnv1a32": "82bfefe6",
+        "sha256": "3221f85a20cc9746100cd229dce561c85ecd93255211f39cc93de1f8344643a9"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_documents.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 30198,
+        "fingerprint_fnv1a32": "c5883529",
+        "sha256": "a9948d520b77a2e432b2bfc36efa1e1e91bfec457cc906b40fa2029268ccdd16"
+      },
+      "after": {
+        "bytes": 30198,
+        "fingerprint_fnv1a32": "c5883529",
+        "sha256": "a9948d520b77a2e432b2bfc36efa1e1e91bfec457cc906b40fa2029268ccdd16"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_gfm.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 17377,
+        "fingerprint_fnv1a32": "67cb5a04",
+        "sha256": "c0b4b2469b646ef257499f1139b5a633c42361d3aff1865ee13e587ca3b52e36"
+      },
+      "after": {
+        "bytes": 17377,
+        "fingerprint_fnv1a32": "67cb5a04",
+        "sha256": "c0b4b2469b646ef257499f1139b5a633c42361d3aff1865ee13e587ca3b52e36"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_inline.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 21479,
+        "fingerprint_fnv1a32": "7c6de353",
+        "sha256": "3ec5e8c89856d9c3cfeffcd97c5948f41e72ccdc407efeac8a85df13541fa9da"
+      },
+      "after": {
+        "bytes": 21479,
+        "fingerprint_fnv1a32": "7c6de353",
+        "sha256": "3ec5e8c89856d9c3cfeffcd97c5948f41e72ccdc407efeac8a85df13541fa9da"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_languages.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 19640,
+        "fingerprint_fnv1a32": "0bf52ae4",
+        "sha256": "51d11a881d4d14f68e7c4189f65373e3aa87eafde632c52c62c9384c7a51fcb6"
+      },
+      "after": {
+        "bytes": 19640,
+        "fingerprint_fnv1a32": "0bf52ae4",
+        "sha256": "51d11a881d4d14f68e7c4189f65373e3aa87eafde632c52c62c9384c7a51fcb6"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_links.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 22380,
+        "fingerprint_fnv1a32": "48a610b5",
+        "sha256": "9fe3e0e4151e4e78c18a8df0bf2bd8351fb3de8954c121f423c7439cc6aba832"
+      },
+      "after": {
+        "bytes": 22380,
+        "fingerprint_fnv1a32": "48a610b5",
+        "sha256": "9fe3e0e4151e4e78c18a8df0bf2bd8351fb3de8954c121f423c7439cc6aba832"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_math.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 13360,
+        "fingerprint_fnv1a32": "4d1aa31a",
+        "sha256": "10f0f6bd3ceb523114913ab408c695f4bd25dbf44e724e36b9a8a9bdd5c71569"
+      },
+      "after": {
+        "bytes": 13360,
+        "fingerprint_fnv1a32": "4d1aa31a",
+        "sha256": "10f0f6bd3ceb523114913ab408c695f4bd25dbf44e724e36b9a8a9bdd5c71569"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_note/assets/content/note_examples_tables.json",
+      "kind": "examples",
+      "role": "product-owned",
+      "before": {
+        "bytes": 14525,
+        "fingerprint_fnv1a32": "88c5f59f",
+        "sha256": "823c7dec136e4912ebb5229b9050997c104567324f40b536cadc350f0cc29fe1"
+      },
+      "after": {
+        "bytes": 14525,
+        "fingerprint_fnv1a32": "88c5f59f",
+        "sha256": "823c7dec136e4912ebb5229b9050997c104567324f40b536cadc350f0cc29fe1"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_studio_core/assets/content/tutorials.json",
+      "kind": "tutorials",
+      "role": "shared-fallback",
+      "before": {
+        "bytes": 4729105,
+        "fingerprint_fnv1a32": "0f688d29",
+        "sha256": "7d858d27e440cb0de93cbfa2cd2469ed99005c3cedf6a846d95ebbb355f694ba"
+      },
+      "after": {
+        "bytes": 4729105,
+        "fingerprint_fnv1a32": "0f688d29",
+        "sha256": "7d858d27e440cb0de93cbfa2cd2469ed99005c3cedf6a846d95ebbb355f694ba"
+      },
+      "bytes_identical_before_after": true
+    },
+    {
+      "path": "../qfli_studio_core/assets/content/examples.json",
+      "kind": "examples",
+      "role": "shared-fallback",
+      "before": {
+        "bytes": 2286562,
+        "fingerprint_fnv1a32": "fed281d5",
+        "sha256": "df0555c005d4230ad8248fc0d0a44073d393e60fc3ae152254be3ca20f4306b6"
+      },
+      "after": {
+        "bytes": 2286562,
+        "fingerprint_fnv1a32": "fed281d5",
+        "sha256": "df0555c005d4230ad8248fc0d0a44073d393e60fc3ae152254be3ca20f4306b6"
+      },
+      "bytes_identical_before_after": true
+    }
+  ],
+  "pendingOfficialGates": [
+    "dart run tool/generate_studio_content.dart (official reproducibility gate; not run)",
+    "dart run tool/verify_studio_content.dart (official full content verifier; not run)",
+    "main app official bundle/build gate (not run)"
+  ],
+  "commandsExcluded": [
+    "Dart",
+    "Flutter",
+    "formatter",
+    "analyzer",
+    "tests",
+    "build",
+    "device"
+  ],
+  "modifiedPaths": [
+    "assets/content/tutorials.json",
+    "assets/content/provenance.json",
+    ".trellis/tasks/10-23-studio-release-ux-workspaces/research/content-refresh-20261023.json"
+  ]
+}

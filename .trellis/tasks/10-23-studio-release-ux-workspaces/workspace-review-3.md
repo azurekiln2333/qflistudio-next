@@ -1,0 +1,8 @@
+Active task: .trellis/tasks/10-23-studio-release-ux-workspaces
+
+Root source audit after checkpoint: two remaining explorer bugs, please fix within file_explorer + new/existing main tests; page remains C-locked. No Flutter runs until root window.
+
+1. didUpdateWidget when workspace id stays W but primary A disappears and widget.project becomes B: membersChanged path updates _workspaceProjects excluding B but leaves _browsing=A. _workspace then yields [A] and loses B. Ensure current browsing is still an allowed member, otherwise set to effective widget.project. Handle primary change itself too, not only workspace/member-list changes. Preserve surviving dirty tabs in same live host. Test actual mounted host/page/tree, not just controller.projects.
+2. Claimed expansion merge still discards removed root state: _captureWorkspaceExpansion starts empty maps and replaces whole map; _manageWorkspace constructs maps only for current members. Removing B drops B entry permanently so readding cannot recover B expansion. Merge captured active-root entries into existing per-root maps, preserve removed-root entries, and restore by normalized key. didUpdateWidget rebuild likewise must capture outgoing live state before rebuilding/restoration. Add remove+readd root expansion test. A root not currently member cannot open files simply because its expansion metadata is retained.
+
+Current _editor.project remains original A (controller final). Most opens pass explicit owners, but please audit default owner/new-file behavior after fallback; don't edit controller (C owned). Report any needed API change to root/C.

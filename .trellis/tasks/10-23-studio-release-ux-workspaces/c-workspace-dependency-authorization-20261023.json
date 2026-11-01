@@ -1,0 +1,102 @@
+{
+  "purpose": "C285/293/301 exact main-owned workspace editor publication dependency authorization",
+  "base_head": "e025805b60435fdedafd33e60082dc660afebe5a",
+  "authorization": "C coordinator is explicitly authorized to selectively stage and commit these exact13 main-owned files as part of the composed editor/workspace integration, alongside the preserved main workspace hunks in the C-owned editor_page.dart. No additional main approval is required for this listed batch.",
+  "publication_order": "retained_editor_host.dart calls EditorPage workspace/workspaceMembers/workspaceStore/onWorkspaceSaved parameters absent at base HEAD. Land that host change with the composed page API in one coherent commit, or land model/store prerequisites first and host/page together. Do not publish a broken host-only intermediate commit.",
+  "excluded": "Home page and SavedWorkspacesTab surface; main_workspace_actions and main_saved_workspaces_tab tests; content; points; tools; diagnostics module; shared spec index mixed hunks; all assets and unrelated dirty paths. C-owned page/controller/debug/output/terminal remain under C authority, not copied or staged by main.",
+  "verification": "Source-only review and scoped git diff --check pass. Earlier evidence: store21, explorer4, main sessions6 and child workspace4/explorer12 passed at their tested checkpoints. Current C composed tests/frozen-staged validation still required; C297110 passes followed by hang is not full acceptance. No new Dart/Flutter/analyzer/build/device process started.",
+  "ignored_spec_note": "saved-workspaces.md is ignored by root .gitignore rule /.trellis/spec/; selective force-add of this exact listed spec path is authorized. Do not force-add the directory.",
+  "files": [
+    {
+      "path": "lib/workspace/editor_workspace.dart",
+      "bytes": 1869,
+      "sha256": "07E8B0CE9745A2E907434075B75D6684849D8DD605C2134398212A1CD655BDC3",
+      "git_blob": "f1124627eb6ea53e0cd02628ad10fd9ea4e278b4",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/saved_workspace.dart",
+      "bytes": 8220,
+      "sha256": "1464673830EEDEDA2C0EAF658FC7E2AED46C60CAEC372C69B066D1AE5369F4EF",
+      "git_blob": "258ce49bb1308a02447ff5ee7b49d807fbb0c822",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/workspace_store.dart",
+      "bytes": 14316,
+      "sha256": "1C1CD747F3B3C66B92399AA92A6F61703774A6E1754423CA61ACF222A9FECF8D",
+      "git_blob": "c8b8255fbe00d6c9fd5a81f5a1d6d30f5953ffa8",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/workspace_dialogs.dart",
+      "bytes": 9287,
+      "sha256": "30A591AABDDB669AEE89D43ACC4C383A35BA2F2B33CEDD67506BF64035E61D40",
+      "git_blob": "673de9049f7e67f456de84c02473b1dbd9c45751",
+      "tracked": false
+    },
+    {
+      "path": "lib/editor/file_explorer.dart",
+      "bytes": 50141,
+      "sha256": "016D10FFDC94F738FC86C7E96D5DFD3E817FDE6E548F64B6FCAC572478EA415F",
+      "git_blob": "b4b0f7532f104169458d06698a9bf85893fdf7bf",
+      "tracked": true
+    },
+    {
+      "path": "lib/editor/retained_editor_host.dart",
+      "bytes": 25006,
+      "sha256": "4EEF3C537783B13D5940821CBC09ADD66B85E9311616976064ED21FF65E714EE",
+      "git_blob": "588516c9891243b0eca264d8a419eef889c82888",
+      "tracked": true
+    },
+    {
+      "path": "test/workspace_store_test.dart",
+      "bytes": 22760,
+      "sha256": "8666AB05765E05BFF8E1CF63BBBC6C5B046D852A12F765DD2959B182D5E9DC6A",
+      "git_blob": "dd272cb066c35517e599f6e9d1f6c6975ff06105",
+      "tracked": false
+    },
+    {
+      "path": "test/main_workspace_explorer_test.dart",
+      "bytes": 11980,
+      "sha256": "952997ED54573EACBFCC8E0826022A4CF58FF944CF66904F14ABD5339B013061",
+      "git_blob": "2d49b58f64adea3a8b2689b04cbc77860c3547bd",
+      "tracked": false
+    },
+    {
+      "path": "test/main_workspace_sessions_test.dart",
+      "bytes": 18920,
+      "sha256": "CF0EF6CC4EC0578071DC240DAB25D97469F631D73C87BE8189223C2DBAF17E31",
+      "git_blob": "1c63508b8dae7c1b9376a97ce297e8fb0a7792a0",
+      "tracked": false
+    },
+    {
+      "path": "test/workspace_editor_session_test.dart",
+      "bytes": 11752,
+      "sha256": "C41A060C10E9EF6B1C51F13D45A0A0D0918F98422AB68C1A663889C753178258",
+      "git_blob": "61b9228e1d84bdc98b39d4327a0aca1a7e75f8b7",
+      "tracked": true
+    },
+    {
+      "path": "test/file_explorer_state_test.dart",
+      "bytes": 20589,
+      "sha256": "2B853186CAE51E1727EBD104D58A5BFD1E4836B0863180C0FDE3FCF906EE19CA",
+      "git_blob": "e447d7eab11b2e0f1f0c493ef1fe25c093aae0ed",
+      "tracked": true
+    },
+    {
+      "path": ".trellis/spec/frontend/saved-workspaces.md",
+      "bytes": 5242,
+      "sha256": "6E032FBC9E903798FF6ECFDCAD8E97A70B7E93DCDA66C22C3FB48C61A2D0736D",
+      "git_blob": "0f189ba04c24086955ce398bfed3559a753323bd",
+      "tracked": false
+    },
+    {
+      "path": ".trellis/spec/frontend/offline-workspace.md",
+      "bytes": 5667,
+      "sha256": "0A64342FE7B8BFEEF2C7A25CA01FF3ECB26B32E00EA079ECFFEA5AAC48E61A73",
+      "git_blob": "587b46dcffb8d528635e3783147b5d1b12dc322e",
+      "tracked": true
+    }
+  ]
+}

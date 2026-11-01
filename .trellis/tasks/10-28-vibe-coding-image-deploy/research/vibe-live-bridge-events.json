@@ -1,0 +1,168 @@
+[
+  {
+    "type": "upstream_shape",
+    "status": 200,
+    "messageKeys": [
+      "role",
+      "content",
+      "tool_calls"
+    ],
+    "contentType": "string",
+    "callsType": "object",
+    "calls": [
+      {
+        "keys": [
+          "id",
+          "type",
+          "function"
+        ],
+        "id": "call_00_lldNsh1B8z2PprupNlc76613",
+        "type": "function",
+        "functionKeys": [
+          "name",
+          "arguments"
+        ],
+        "name": "run_command",
+        "argumentType": "string"
+      },
+      {
+        "keys": [
+          "id",
+          "type",
+          "function"
+        ],
+        "id": "call_01_ezwUGUpVjybNe9k6sAD32068",
+        "type": "function",
+        "functionKeys": [
+          "name",
+          "arguments"
+        ],
+        "name": "read_file",
+        "argumentType": "string"
+      }
+    ]
+  },
+  {
+    "type": "model",
+    "model": "deepseek-v4.1-flash",
+    "tools": [
+      "run_command",
+      "read_file"
+    ]
+  },
+  {
+    "type": "command",
+    "command": "python3 verify.py",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/workspace/.qfli-run-6e2bc27d09f6edbde78750e922482b6c/verify.py\", line 3, in <module>\n    assert add(20, 22) == 42\n           ^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  {
+    "type": "upstream_shape",
+    "status": 200,
+    "messageKeys": [
+      "role",
+      "content",
+      "tool_calls"
+    ],
+    "contentType": "string",
+    "callsType": "object",
+    "calls": [
+      {
+        "keys": [
+          "id",
+          "type",
+          "function"
+        ],
+        "id": "call_00_qJXqaCbhQkhcTCrPBl6M8792",
+        "type": "function",
+        "functionKeys": [
+          "name",
+          "arguments"
+        ],
+        "name": "edit_file",
+        "argumentType": "string"
+      },
+      {
+        "keys": [
+          "id",
+          "type",
+          "function"
+        ],
+        "id": "call_01_YPpzRbkMrGP41ClIkdVd4388",
+        "type": "function",
+        "functionKeys": [
+          "name",
+          "arguments"
+        ],
+        "name": "write_file",
+        "argumentType": "string"
+      }
+    ]
+  },
+  {
+    "type": "model",
+    "model": "deepseek-v4.1-flash",
+    "tools": [
+      "edit_file",
+      "write_file"
+    ]
+  },
+  {
+    "type": "upstream_shape",
+    "status": 200,
+    "messageKeys": [
+      "role",
+      "content",
+      "tool_calls"
+    ],
+    "contentType": "object",
+    "callsType": "object",
+    "calls": [
+      {
+        "keys": [
+          "id",
+          "type",
+          "function"
+        ],
+        "id": "call_00_tM1L1l0gNWNQmO3pA1AM3678",
+        "type": "function",
+        "functionKeys": [
+          "name",
+          "arguments"
+        ],
+        "name": "run_command",
+        "argumentType": "string"
+      }
+    ]
+  },
+  {
+    "type": "model",
+    "model": "deepseek-v4.1-flash",
+    "tools": [
+      "run_command"
+    ]
+  },
+  {
+    "type": "command",
+    "command": "python3 verify.py; echo \"---\"; wc -c result.txt",
+    "exitCode": 0,
+    "stdout": "QFLI_VIBE_VERIFIED_42\n---\n3 result.txt\n",
+    "stderr": ""
+  },
+  {
+    "type": "upstream_shape",
+    "status": 200,
+    "messageKeys": [
+      "role",
+      "content"
+    ],
+    "contentType": "string",
+    "callsType": "undefined"
+  },
+  {
+    "type": "model",
+    "model": "deepseek-v4.1-flash",
+    "tools": []
+  }
+]

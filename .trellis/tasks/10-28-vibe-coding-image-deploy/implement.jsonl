@@ -1,0 +1,4 @@
+{"file":".trellis/spec/backend/gateway-auth.md","reason":"Reuse authenticated session and Express errors"}
+{"file":".trellis/spec/backend/terminal-isolation.md","reason":"Preserve isolated command execution"}
+{"file":".trellis/spec/frontend/editor-terminal.md","reason":"Reuse snapshots and terminal execution"}
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"Shared editor belongs to sibling repository"}

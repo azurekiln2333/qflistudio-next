@@ -1,0 +1,230 @@
+{
+  "purpose": "Exact18-path C publication dependency authorization; actual OHOS workspace-settings black-overlay fix",
+  "created_utc": "2026-10-23T14:13:51.996608+00:00",
+  "supersedes": {
+    "path": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\c-publication-dependency-authorization-20261023-v2.json",
+    "sha256": "87D438BD7E4E55DD0305E0766AE7A6A82B17606ABBE91FA8D8313DF93BB0DD08"
+  },
+  "authorization": "Under the user actual-settings fix request, C may selectively refresh only the three replacement candidate blobs and add the one new regression test, then integrate this exact18 dependency batch with the previously authorized composed C page. Other14 prior versions, exclusions and ordering constraints remain unchanged. No further main approval required; neither index was mutated by main.",
+  "change_scope": "Both workspace-management dialogs explicitly scroll at AlertDialog level with intrinsically measurable ordinary project children; no shrink-wrapping ListView/capped nested viewport. Same checkbox/save/delete behavior. Saved-workspace spec records OHOS/keyboard contract. Added five representative actual retained EditorPage regressions.",
+  "page_dependency": "Composed page API remains required. Main made no editor_page/controller/debug/output-panel/terminal/retained-host change in this fix. C retains page ownership.",
+  "replacements": [
+    {
+      "old": {
+        "path": "lib/workspace/workspace_dialogs.dart",
+        "bytes": 9287,
+        "sha256": "30A591AABDDB669AEE89D43ACC4C383A35BA2F2B33CEDD67506BF64035E61D40",
+        "git_blob": "673de9049f7e67f456de84c02473b1dbd9c45751",
+        "tracked": false
+      },
+      "new": {
+        "path": "lib/workspace/workspace_dialogs.dart",
+        "bytes": 9058,
+        "sha256": "A947571B26FB23F513221E2955A5E81123BEB0931D4031CD2CE2C3C424C00481",
+        "git_blob": "ea0a59f99e94197dbfb44d1d8599fc8616e2526d",
+        "tracked": false
+      }
+    },
+    {
+      "old": {
+        "path": "lib/editor/file_explorer.dart",
+        "bytes": 50141,
+        "sha256": "016D10FFDC94F738FC86C7E96D5DFD3E817FDE6E548F64B6FCAC572478EA415F",
+        "git_blob": "b4b0f7532f104169458d06698a9bf85893fdf7bf",
+        "tracked": true
+      },
+      "new": {
+        "path": "lib/editor/file_explorer.dart",
+        "bytes": 50098,
+        "sha256": "A2C1CD64F6892CA220EA1B1E91A711B352E7C2940B235E7ACB4276BBECB9003E",
+        "git_blob": "ca2f5cf5eba4799541b0ceede9f77f2d64170f8a",
+        "tracked": true
+      }
+    },
+    {
+      "old": {
+        "path": ".trellis/spec/frontend/saved-workspaces.md",
+        "bytes": 5242,
+        "sha256": "6E032FBC9E903798FF6ECFDCAD8E97A70B7E93DCDA66C22C3FB48C61A2D0736D",
+        "git_blob": "0f189ba04c24086955ce398bfed3559a753323bd",
+        "tracked": false
+      },
+      "new": {
+        "path": ".trellis/spec/frontend/saved-workspaces.md",
+        "bytes": 6404,
+        "sha256": "3720B61AB484E09064F87910B0498C52AFFD153BE5FA4A1593B7C732AA6AFD08",
+        "git_blob": "09c045b03b45387ade58997bc62c60ad6f18825a",
+        "tracked": false
+      }
+    }
+  ],
+  "added_paths": [
+    "test/workspace_dialog_layout_test.dart"
+  ],
+  "unchanged_prior_paths": 14,
+  "files": [
+    {
+      "path": "lib/workspace/editor_workspace.dart",
+      "bytes": 1869,
+      "sha256": "07E8B0CE9745A2E907434075B75D6684849D8DD605C2134398212A1CD655BDC3",
+      "git_blob": "f1124627eb6ea53e0cd02628ad10fd9ea4e278b4",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/saved_workspace.dart",
+      "bytes": 8220,
+      "sha256": "1464673830EEDEDA2C0EAF658FC7E2AED46C60CAEC372C69B066D1AE5369F4EF",
+      "git_blob": "258ce49bb1308a02447ff5ee7b49d807fbb0c822",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/workspace_store.dart",
+      "bytes": 14316,
+      "sha256": "1C1CD747F3B3C66B92399AA92A6F61703774A6E1754423CA61ACF222A9FECF8D",
+      "git_blob": "c8b8255fbe00d6c9fd5a81f5a1d6d30f5953ffa8",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/workspace_dialogs.dart",
+      "bytes": 9058,
+      "sha256": "A947571B26FB23F513221E2955A5E81123BEB0931D4031CD2CE2C3C424C00481",
+      "git_blob": "ea0a59f99e94197dbfb44d1d8599fc8616e2526d",
+      "tracked": false
+    },
+    {
+      "path": "lib/editor/file_explorer.dart",
+      "bytes": 50098,
+      "sha256": "A2C1CD64F6892CA220EA1B1E91A711B352E7C2940B235E7ACB4276BBECB9003E",
+      "git_blob": "ca2f5cf5eba4799541b0ceede9f77f2d64170f8a",
+      "tracked": true
+    },
+    {
+      "path": "lib/editor/retained_editor_host.dart",
+      "bytes": 25006,
+      "sha256": "4EEF3C537783B13D5940821CBC09ADD66B85E9311616976064ED21FF65E714EE",
+      "git_blob": "588516c9891243b0eca264d8a419eef889c82888",
+      "tracked": true
+    },
+    {
+      "path": "test/workspace_store_test.dart",
+      "bytes": 22760,
+      "sha256": "8666AB05765E05BFF8E1CF63BBBC6C5B046D852A12F765DD2959B182D5E9DC6A",
+      "git_blob": "dd272cb066c35517e599f6e9d1f6c6975ff06105",
+      "tracked": false
+    },
+    {
+      "path": "test/main_workspace_explorer_test.dart",
+      "bytes": 11978,
+      "sha256": "250347ABBB908F3C3604E1B663E3B9F4324E9A2072C17E781B597BA0D9DFF4ED",
+      "git_blob": "7dd24af5f3421c79ef0efe1d46cd373877fecae5",
+      "tracked": false
+    },
+    {
+      "path": "test/main_workspace_sessions_test.dart",
+      "bytes": 18919,
+      "sha256": "CB20407508CF7B15C8286FA1DDF5A5BD3E3DB751FF07401CAE38219DD6B5B606",
+      "git_blob": "bdd4c32e2f078e673f1fedf670af20fcd1d291b3",
+      "tracked": false
+    },
+    {
+      "path": "test/workspace_editor_session_test.dart",
+      "bytes": 11752,
+      "sha256": "C41A060C10E9EF6B1C51F13D45A0A0D0918F98422AB68C1A663889C753178258",
+      "git_blob": "61b9228e1d84bdc98b39d4327a0aca1a7e75f8b7",
+      "tracked": true
+    },
+    {
+      "path": "test/file_explorer_state_test.dart",
+      "bytes": 20589,
+      "sha256": "2B853186CAE51E1727EBD104D58A5BFD1E4836B0863180C0FDE3FCF906EE19CA",
+      "git_blob": "e447d7eab11b2e0f1f0c493ef1fe25c093aae0ed",
+      "tracked": true
+    },
+    {
+      "path": ".trellis/spec/frontend/saved-workspaces.md",
+      "bytes": 6404,
+      "sha256": "3720B61AB484E09064F87910B0498C52AFFD153BE5FA4A1593B7C732AA6AFD08",
+      "git_blob": "09c045b03b45387ade58997bc62c60ad6f18825a",
+      "tracked": false
+    },
+    {
+      "path": ".trellis/spec/frontend/offline-workspace.md",
+      "bytes": 5667,
+      "sha256": "0A64342FE7B8BFEEF2C7A25CA01FF3ECB26B32E00EA079ECFFEA5AAC48E61A73",
+      "git_blob": "587b46dcffb8d528635e3783147b5d1b12dc322e",
+      "tracked": true
+    },
+    {
+      "path": "lib/editor/editor_problems_bar.dart",
+      "bytes": 5893,
+      "sha256": "DAFBFC6AEC077AFB715484861198D269B564A2BF248BB13A78EEA7C184FD470F",
+      "git_blob": "19109e535c982dd79df850076d3ecbde7a6ed304",
+      "head_blob": "58a1e27375c7f568f4e359da71753329e351389a",
+      "index_blob_at_capture": "58a1e27375c7f568f4e359da71753329e351389a"
+    },
+    {
+      "path": "test/editor_problems_visibility_test.dart",
+      "bytes": 3342,
+      "sha256": "5EC41AEE68A27A2179CC8895F0ED3F79802B6C45D39C8422033C3BD966000A8B",
+      "git_blob": "b37bba5fe4d2251348be413a9a05c023f2065069",
+      "head_blob": null,
+      "index_blob_at_capture": null
+    },
+    {
+      "path": "test/main_output_no_analyzer_test.dart",
+      "bytes": 4489,
+      "sha256": "6F564A4BA0F25116060E1C7250CE1D67EA18C76CE9AB73FE2405307620BEE28B",
+      "git_blob": "0f9e7c838828f20109d60c19990d2e03618ee663",
+      "head_blob": null,
+      "index_blob_at_capture": null
+    },
+    {
+      "path": ".trellis/spec/frontend/offline-editor-analysis.md",
+      "bytes": 4494,
+      "sha256": "A8D524F4D5B6F0047CDD2CB02C9C3D6FABA79F38C6F440A290D196812D3F8DB8",
+      "git_blob": "801c2123b34c452147bb117411f62e4edd7d5edd",
+      "head_blob": "f2d43e08d3f30d45ad13648ea8841cbdacf3bf3b",
+      "index_blob_at_capture": "f2d43e08d3f30d45ad13648ea8841cbdacf3bf3b"
+    },
+    {
+      "path": "test/workspace_dialog_layout_test.dart",
+      "bytes": 12010,
+      "sha256": "0BE9FB45E6F097E5577DA29D86B3061221620EA28688D1B35260A2845E6B101E",
+      "git_blob": "027cc1d1ae27e52f953ad312f9eaea62f8590f5c",
+      "tracked": false
+    }
+  ],
+  "verification": {
+    "focused5": {
+      "report": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\main-workspace-dialog-gate-20261023T140856Z-67b7a9b8\\process-handle-report.json",
+      "sha256": "66036F5D46CB7274F4C33A154AE468878B6F664F8E027896D55DA3339E4F3D02",
+      "result": "PASS",
+      "elapsed_seconds": 7.807928,
+      "all_observed_handles_terminal": true
+    },
+    "related37": {
+      "report": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\main-workspace-dialog-regressions-gate-20261023T141030Z-a7844c1c\\process-handle-report.json",
+      "sha256": "29B12EC0682C1D87AF1B228C5FE115FCE9241265AB49ADCFB029AE5CE026032C",
+      "result": "PASS",
+      "elapsed_seconds": 38.919707,
+      "all_observed_handles_terminal": true
+    },
+    "analysis3": {
+      "report": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\main-workspace-dialog-analysis-gate-20261023T141149Z-fa1dab2d\\process-handle-report.json",
+      "sha256": "C5A910B899A0DEC4EB74A89C58C30B4A1269E8F4FAEBB25C8F3B85E7E7325CCA",
+      "result": "PASS",
+      "elapsed_seconds": 4.610726,
+      "all_observed_handles_terminal": true
+    }
+  },
+  "baseline_failure": "main-workspace-dialog-gate-20261023T135813Z-a91e04f4: actual OHOS retained EditorPage drawer click throws RenderShrinkWrappingViewport intrinsic-dimensions at workspace_dialogs.dart AlertDialog.",
+  "page_sha256": "6D4E56D1F5CC6E95F4BBA48BFDA8582DF676BBFC25D8BB93F6BC7B46C18C4B89",
+  "real_index_sha256_observed": "29299AB25BF221D7B41EBD1341019D2D2E7521ECE9B478AD731EB71AD2F90B1C",
+  "patch": {
+    "path": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\workspace-dialog-black-overlay-fix.patch",
+    "sha256": "10C8941F683150BD841AADC41E6EF18D48331FF784D870CCD74B2BFAA0C118C2",
+    "scope": "three replacement paths only; new regression separately included by exact hash"
+  },
+  "known_separate_issue": "Same-id saved workspace edits leave retained controller label/member snapshot stale until reopen: composed page notifies onWorkspaceSaved only when id changes. This is pre-existing and outside this dialog-layout fix; reported to C for its page batch. Current visible tree/settings and stored workspace update correctly.",
+  "limitations": "Widget tests and scoped analysis, no physical device install/run or native product build. Broader formatter proposal remains unapplied and is not authorized by this amendment."
+}

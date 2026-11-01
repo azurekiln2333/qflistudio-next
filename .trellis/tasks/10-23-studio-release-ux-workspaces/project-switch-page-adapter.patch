@@ -1,0 +1,45 @@
+--- a/lib/editor/editor_page.dart
++++ b/lib/editor/editor_page.dart
+@@ -103,6 +103,7 @@
+     this.workspaceMembers = const [],
+     this.workspaceStore,
+     this.onWorkspaceSaved,
++    this.onProjectSelected,
+   });
+ 
+   final Project project;
+@@ -137,6 +138,9 @@
+   /// its identity without rebuilding (and losing) the live editor state.
+   final void Function(SavedWorkspace workspace, List<Project> members)?
+   onWorkspaceSaved;
++
++  /// Lets the retained owner open external projects as standalone sessions.
++  final ValueChanged<Project>? onProjectSelected;
+ 
+   @override
+   State<EditorPage> createState() => _EditorPageState();
+@@ -2729,6 +2733,24 @@
+       workspaceMembers: _workspaceMembers,
+       workspaceStore: widget.workspaceStore,
+       onWorkspaceChanged: _onWorkspaceChanged,
++      onProjectSelected: (project) {
++        final select = widget.onProjectSelected;
++        if (select != null) {
++          select(project);
++          return;
++        }
++        Navigator.of(context).push<void>(
++          MaterialPageRoute(
++            builder: (_) => EditorPage(
++              project: project,
++              auth: widget.auth,
++              store: widget.store,
++              settings: widget.settings,
++              workspaceStore: widget.workspaceStore,
++            ),
++          ),
++        );
++      },
+       onEntryDeleted: _cloud == null
+           ? null
+           : (path) async {

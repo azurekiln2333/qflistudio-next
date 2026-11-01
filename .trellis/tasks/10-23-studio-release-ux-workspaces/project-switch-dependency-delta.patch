@@ -1,0 +1,169 @@
+--- a/.trellis/spec/frontend/saved-workspaces.md
++++ b/.trellis/spec/frontend/saved-workspaces.md
+@@ -20,6 +20,8 @@
+   `projects`, `missing`, `primary`, `primaryMissing`, and `isEmpty`.
+ - `openEditorPage(..., workspace?, workspaceProjects?, workspaceStore?)` opens
+   a standalone session when `workspace` is null.
++- `EditorPage(..., onProjectSelected?)` lets the retained owner open a project
++  outside the active workspace; without an owner it pushes a standalone page.
+ 
+ ## 3. Contracts
+ 
+@@ -45,6 +47,17 @@
+ disappears resumes W with survivor B and preserves B's live dirty buffers.
+ Main standalone history ignores foreign-owner documents and remembered foreign
+ tree roots. Child products continue restoring legacy multi-root history.
++
++The explorer's project selector is independent of saved-workspace membership.
++Selecting a member changes the browsing/default creation target only: retain
++all roots in primary/member order, their loaded children, expansion and scroll.
++Never derive that membership by prepending the selected project to a list that
++excludes the primary; that drops the primary when a secondary is selected.
++Selecting an external project opens/resumes a separate standalone editor with
++`workspace: null`, so its tree, file ownership, history and run identity agree.
++Keep the original workspace and its dirty buffers live and recoverable. A bare
++saved-workspace explorer without a navigation owner disables external choices.
++Legacy language-product unsaved browsing retains its history contract.
+ 
+ On reopening, validate registry membership and actual directories. Skip missing
+ members and report them; select a surviving primary. Reconcile retained tabs:
+@@ -73,6 +86,8 @@
+ | Session save after deletion | No-op; never resurrect metadata. |
+ | Metadata save after deletion | Return a save-as-new error. |
+ | Root removed then re-added | Restore its stored expansion; preserve other roots. |
++| Selector chooses current workspace member | Preserve the complete ordered tree and its view state. |
++| Selector chooses external project | Replace visible tree through a standalone editor; never add it to the workspace. |
+ 
+ ## 5. Good/Base/Bad Cases
+ 
+@@ -100,6 +115,16 @@
+ returning toolbar input. Include the explicit language-product legacy dialog.
+ Advance the initial frame and the keyboard-inset animation before scrolling
+ or clicking; finder presence alone does not establish a visible dialog.
++`workspace_project_switch_test.dart` must physically use the project selector:
++select B/A within W(A,B), then external C, restore W and select C again. Assert
++unchanged root order/expansion/scroll and dirty buffers for internal switches,
++standalone identity and correct owner for C, unchanged W membership, retained
++session reuse, and a non-host page's route/Back fallback.
++Also cover standalone-to-standalone selection and resuming an existing session.
++Open the initially collapsed explorer through its toolbar before clicking rows;
++mounted tree text can be clipped and is not evidence that it receives input.
++Use a nonzero scroll offset and drain each project's queued history via
++`ProjectHistory.load` after unmounting before deleting a temporary fixture.
+ 
+ ## 7. Wrong vs Correct
+ 
+@@ -107,3 +132,9 @@
+ the primary path as a required identity component. Correct: update only an
+ existing disk document in the serialized transaction and locate a retained
+ workspace by id; update its effective primary/members without rebuilding buffers.
++
++Wrong: derive saved roots from `[selected, ...membersWithoutPrimary]` or only
++replace the explorer's root when an external project is selected. Correct:
++derive saved roots from the primary and configured members, update only the
++member creation target, and delegate external selection to a standalone editor
++whose project, file ownership and history all identify the chosen project.
+--- a/lib/editor/file_explorer.dart
++++ b/lib/editor/file_explorer.dart
+@@ -45,6 +45,7 @@
+     this.workspaceMembers = const [],
+     this.workspaceStore,
+     this.onWorkspaceChanged,
++    this.onProjectSelected,
+   });
+ 
+   /// 是否由本组件自绘 MD3 outlined 卡片外观（圆角 + 细描边）。
+@@ -82,6 +83,9 @@
+   /// Reports workspace metadata or tree-expansion changes back to the editor so
+   /// the session can be persisted into the workspace document (not history).
+   final ValueChanged<EditorWorkspaceState>? onWorkspaceChanged;
++
++  /// Opens an external project in its own editor session.
++  final ValueChanged<Project>? onProjectSelected;
+ 
+   /// 项目内按名称递归搜索文件（跳过 .git/node_modules/build 等重目录）。
+   static List<FileNode> searchFiles(String rootPath, String query) {
+@@ -142,9 +146,12 @@
+       widget.workspaceStore ?? WorkspaceStore.instance;
+ 
+   List<Project> get _workspace => [
+-    _browsing,
++    if (_savedWorkspace != null) widget.project else _browsing,
+     for (final project in _workspaceProjects)
+-      if (!p.equals(project.path, _browsing.path)) project,
++      if (!p.equals(
++        project.path,
++        _savedWorkspace != null ? widget.project.path : _browsing.path,
++      )) project,
+   ];
+ 
+   List<FileNode> get _roots => [
+@@ -529,14 +536,35 @@
+     );
+   }
+ 
+-  /// 跨项目浏览：切换文件树根目录。
++  /// Workspace members share a stable tree; external projects own a session.
+   void _switchProject(Project project) {
+-    if (identical(project, _browsing) || project.path == _browsing.path) {
++    if (workspacePathKey(project.path) == workspacePathKey(_browsing.path)) {
+       return;
+     }
+-    setState(() => _browsing = project);
++    if (_savedWorkspace != null) {
++      final member = _workspace.any(
++        (candidate) =>
++            workspacePathKey(candidate.path) == workspacePathKey(project.path),
++      );
++      if (member) {
++        setState(() {
++          _browsing = project;
++          _root = FileNode(path: project.path, name: project.name, isDir: true);
++        });
++      } else {
++        widget.onProjectSelected?.call(project);
++      }
++      return;
++    }
++    if (isMainStudioRelease && widget.onProjectSelected != null) {
++      widget.onProjectSelected!(project);
++      return;
++    }
++    setState(() {
++      _browsing = project;
++      _rebuildRoot();
++    });
+     widget.store.setBrowsedProject(project);
+-    _rebuildRoot();
+   }
+ 
+   /// Finds the stored key for [path] in a workspace session map, tolerating
+@@ -1141,6 +1169,12 @@
+                       for (final p in widget.store.projects)
+                         PopupMenuItem(
+                           value: p,
++                          enabled: _savedWorkspace == null ||
++                              widget.onProjectSelected != null ||
++                              _workspace.any(
++                                (member) => workspacePathKey(member.path) ==
++                                    workspacePathKey(p.path),
++                              ),
+                           child: Row(
+                             children: [
+                               Icon(
+--- a/lib/editor/retained_editor_host.dart
++++ b/lib/editor/retained_editor_host.dart
+@@ -679,6 +679,13 @@
+       workspaceStore: session.workspaceStore,
+       onWorkspaceSaved: (workspace, members) =>
+           controller.attachWorkspace(sessionKey, workspace, members),
++      onProjectSelected: (project) => controller.open(
++        project: project,
++        auth: session.auth,
++        store: session.store,
++        settings: session.settings,
++        workspaceStore: session.workspaceStore,
++      ),
+       onMinimize: controller.minimize,
+       onClose: () => controller._close(sessionKey),
+     ),

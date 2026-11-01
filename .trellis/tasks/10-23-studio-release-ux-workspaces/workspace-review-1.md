@@ -1,0 +1,4 @@
+Read-only current-code review findings (verify current file before fixes):
+1. P1 retained_editor_host.dart116-125: standalone A saved as W stays at standalone:A key. A new standalone open allocates standalone:A#2, but next open starts from promoted base and loops all occupied keys, allocating #3 rather than reusing #2. This loses expected live standalone buffers on repeated opens. Search for existing same-project session whose workspace==null before allocating a new key; test save W, open standalone A twice, same live editor/buffer retained and distinct W.
+2. file_explorer.dart181-184: main standalone currently restores global lastBrowsedProjectId. Last B causes opening A tree to show B. Main standalone must start widget.project; child legacy behavior can remain.
+3. Root note reiterated: workspace reopens must validate even retained sessions; missing primary should keep valid survivor. Do not rewrite child legacy tests to narrower scope.

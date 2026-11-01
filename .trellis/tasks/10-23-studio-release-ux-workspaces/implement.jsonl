@@ -1,0 +1,4 @@
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"Sibling repository boundaries"}
+{"file":".trellis/spec/frontend/project-storage.md","reason":"Existing project ownership and storage"}
+{"file":".trellis/spec/frontend/editor-paging.md","reason":"Retained pages and scoped rebuilds"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Trace UI, persistence and catalog boundaries"}

@@ -1,0 +1,248 @@
+{
+  "purpose": "Exact19 dependency authorization and isolated C page adapter for project selector correction",
+  "created_utc": "2026-10-23T15:19:48.841400+00:00",
+  "supersedes": {
+    "path": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\c-publication-dependency-authorization-20261023-v3.json",
+    "sha256": "E3BCF3EE83BAE4DC8DFF2C6FD529A6F441780017F6DECE1A262C89AB80E934D4"
+  },
+  "authorization": "C may refresh only the three replacement dependency blobs and add the new selector test, then integrate these exact19 dependencies with its composed page plus the separately authorized exact adapter patch. Other15 v3 versions, exclusions and ordering constraints remain unchanged. No further main approval required; main mutated neither Git index.",
+  "change_scope": "Saved member selection retains stable roots/order/children/expansion/scroll and dirty buffers, changing only browsing/default creation target. External main/saved selection opens or resumes a standalone editor. Legacy unsaved language-product browsing is preserved.",
+  "replacements": [
+    {
+      "old": {
+        "path": "lib/editor/file_explorer.dart",
+        "bytes": 50098,
+        "sha256": "A2C1CD64F6892CA220EA1B1E91A711B352E7C2940B235E7ACB4276BBECB9003E",
+        "git_blob": "ca2f5cf5eba4799541b0ceede9f77f2d64170f8a",
+        "tracked": true
+      },
+      "new": {
+        "path": "lib/editor/file_explorer.dart",
+        "bytes": 51318,
+        "sha256": "DC3130632D2B1371421E68B46804C4ECB7382828521A26539C396493DA759A36",
+        "git_blob": "85293182db725258f0e53242b2bfd738a192f834",
+        "tracked": true
+      }
+    },
+    {
+      "old": {
+        "path": "lib/editor/retained_editor_host.dart",
+        "bytes": 25006,
+        "sha256": "4EEF3C537783B13D5940821CBC09ADD66B85E9311616976064ED21FF65E714EE",
+        "git_blob": "588516c9891243b0eca264d8a419eef889c82888",
+        "tracked": true
+      },
+      "new": {
+        "path": "lib/editor/retained_editor_host.dart",
+        "bytes": 25238,
+        "sha256": "AF9F514AF1CD1EC7D94BBD2378CFC3029960AE7EAAB0826761475AB01676FC77",
+        "git_blob": "31f2b6db7a35b4a7adcdf1fde0c4038737919cbb",
+        "tracked": true
+      }
+    },
+    {
+      "old": {
+        "path": ".trellis/spec/frontend/saved-workspaces.md",
+        "bytes": 6404,
+        "sha256": "3720B61AB484E09064F87910B0498C52AFFD153BE5FA4A1593B7C732AA6AFD08",
+        "git_blob": "09c045b03b45387ade58997bc62c60ad6f18825a",
+        "tracked": false
+      },
+      "new": {
+        "path": ".trellis/spec/frontend/saved-workspaces.md",
+        "bytes": 8705,
+        "sha256": "15F50F9DD6BA702496D438FC79FA8023BDDB091AF1E81F0B40CE154CCC933F46",
+        "git_blob": "d7a44ef2d640bc57bf5240541586c0ef5e278da3",
+        "tracked": false
+      }
+    }
+  ],
+  "added_paths": [
+    "test/workspace_project_switch_test.dart"
+  ],
+  "unchanged_prior_paths": 15,
+  "files": [
+    {
+      "path": "lib/workspace/editor_workspace.dart",
+      "bytes": 1869,
+      "sha256": "07E8B0CE9745A2E907434075B75D6684849D8DD605C2134398212A1CD655BDC3",
+      "git_blob": "f1124627eb6ea53e0cd02628ad10fd9ea4e278b4",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/saved_workspace.dart",
+      "bytes": 8220,
+      "sha256": "1464673830EEDEDA2C0EAF658FC7E2AED46C60CAEC372C69B066D1AE5369F4EF",
+      "git_blob": "258ce49bb1308a02447ff5ee7b49d807fbb0c822",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/workspace_store.dart",
+      "bytes": 14316,
+      "sha256": "1C1CD747F3B3C66B92399AA92A6F61703774A6E1754423CA61ACF222A9FECF8D",
+      "git_blob": "c8b8255fbe00d6c9fd5a81f5a1d6d30f5953ffa8",
+      "tracked": false
+    },
+    {
+      "path": "lib/workspace/workspace_dialogs.dart",
+      "bytes": 9058,
+      "sha256": "A947571B26FB23F513221E2955A5E81123BEB0931D4031CD2CE2C3C424C00481",
+      "git_blob": "ea0a59f99e94197dbfb44d1d8599fc8616e2526d",
+      "tracked": false
+    },
+    {
+      "path": "lib/editor/file_explorer.dart",
+      "bytes": 51318,
+      "sha256": "DC3130632D2B1371421E68B46804C4ECB7382828521A26539C396493DA759A36",
+      "git_blob": "85293182db725258f0e53242b2bfd738a192f834",
+      "tracked": true
+    },
+    {
+      "path": "lib/editor/retained_editor_host.dart",
+      "bytes": 25238,
+      "sha256": "AF9F514AF1CD1EC7D94BBD2378CFC3029960AE7EAAB0826761475AB01676FC77",
+      "git_blob": "31f2b6db7a35b4a7adcdf1fde0c4038737919cbb",
+      "tracked": true
+    },
+    {
+      "path": "test/workspace_store_test.dart",
+      "bytes": 22760,
+      "sha256": "8666AB05765E05BFF8E1CF63BBBC6C5B046D852A12F765DD2959B182D5E9DC6A",
+      "git_blob": "dd272cb066c35517e599f6e9d1f6c6975ff06105",
+      "tracked": false
+    },
+    {
+      "path": "test/main_workspace_explorer_test.dart",
+      "bytes": 11978,
+      "sha256": "250347ABBB908F3C3604E1B663E3B9F4324E9A2072C17E781B597BA0D9DFF4ED",
+      "git_blob": "7dd24af5f3421c79ef0efe1d46cd373877fecae5",
+      "tracked": false
+    },
+    {
+      "path": "test/main_workspace_sessions_test.dart",
+      "bytes": 18919,
+      "sha256": "CB20407508CF7B15C8286FA1DDF5A5BD3E3DB751FF07401CAE38219DD6B5B606",
+      "git_blob": "bdd4c32e2f078e673f1fedf670af20fcd1d291b3",
+      "tracked": false
+    },
+    {
+      "path": "test/workspace_editor_session_test.dart",
+      "bytes": 11752,
+      "sha256": "C41A060C10E9EF6B1C51F13D45A0A0D0918F98422AB68C1A663889C753178258",
+      "git_blob": "61b9228e1d84bdc98b39d4327a0aca1a7e75f8b7",
+      "tracked": true
+    },
+    {
+      "path": "test/file_explorer_state_test.dart",
+      "bytes": 20589,
+      "sha256": "2B853186CAE51E1727EBD104D58A5BFD1E4836B0863180C0FDE3FCF906EE19CA",
+      "git_blob": "e447d7eab11b2e0f1f0c493ef1fe25c093aae0ed",
+      "tracked": true
+    },
+    {
+      "path": ".trellis/spec/frontend/saved-workspaces.md",
+      "bytes": 8705,
+      "sha256": "15F50F9DD6BA702496D438FC79FA8023BDDB091AF1E81F0B40CE154CCC933F46",
+      "git_blob": "d7a44ef2d640bc57bf5240541586c0ef5e278da3",
+      "tracked": false
+    },
+    {
+      "path": ".trellis/spec/frontend/offline-workspace.md",
+      "bytes": 5667,
+      "sha256": "0A64342FE7B8BFEEF2C7A25CA01FF3ECB26B32E00EA079ECFFEA5AAC48E61A73",
+      "git_blob": "587b46dcffb8d528635e3783147b5d1b12dc322e",
+      "tracked": true
+    },
+    {
+      "path": "lib/editor/editor_problems_bar.dart",
+      "bytes": 5893,
+      "sha256": "DAFBFC6AEC077AFB715484861198D269B564A2BF248BB13A78EEA7C184FD470F",
+      "git_blob": "19109e535c982dd79df850076d3ecbde7a6ed304",
+      "head_blob": "58a1e27375c7f568f4e359da71753329e351389a",
+      "index_blob_at_capture": "58a1e27375c7f568f4e359da71753329e351389a"
+    },
+    {
+      "path": "test/editor_problems_visibility_test.dart",
+      "bytes": 3342,
+      "sha256": "5EC41AEE68A27A2179CC8895F0ED3F79802B6C45D39C8422033C3BD966000A8B",
+      "git_blob": "b37bba5fe4d2251348be413a9a05c023f2065069",
+      "head_blob": null,
+      "index_blob_at_capture": null
+    },
+    {
+      "path": "test/main_output_no_analyzer_test.dart",
+      "bytes": 4489,
+      "sha256": "6F564A4BA0F25116060E1C7250CE1D67EA18C76CE9AB73FE2405307620BEE28B",
+      "git_blob": "0f9e7c838828f20109d60c19990d2e03618ee663",
+      "head_blob": null,
+      "index_blob_at_capture": null
+    },
+    {
+      "path": ".trellis/spec/frontend/offline-editor-analysis.md",
+      "bytes": 4494,
+      "sha256": "A8D524F4D5B6F0047CDD2CB02C9C3D6FABA79F38C6F440A290D196812D3F8DB8",
+      "git_blob": "801c2123b34c452147bb117411f62e4edd7d5edd",
+      "head_blob": "f2d43e08d3f30d45ad13648ea8841cbdacf3bf3b",
+      "index_blob_at_capture": "f2d43e08d3f30d45ad13648ea8841cbdacf3bf3b"
+    },
+    {
+      "path": "test/workspace_dialog_layout_test.dart",
+      "bytes": 12010,
+      "sha256": "0BE9FB45E6F097E5577DA29D86B3061221620EA28688D1B35260A2845E6B101E",
+      "git_blob": "027cc1d1ae27e52f953ad312f9eaea62f8590f5c",
+      "tracked": false
+    },
+    {
+      "tracked": false,
+      "path": "test/workspace_project_switch_test.dart",
+      "bytes": 18920,
+      "sha256": "A3038B6A2D0F2511D9F1C7AC5BA437DC74D409E1C721B7F8B514CF37D9C7B1A4",
+      "git_blob": "89e3090a4b8325241258d357f9c80ae1d76ce419"
+    }
+  ],
+  "frozen_copies": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\project-switch-publication-v4",
+  "page_adapter": {
+    "path": "lib/editor/editor_page.dart",
+    "bytes": 133563,
+    "sha256": "CDA391339EC043AAFADD4D72E39F357628AD790041DC3AEAF858BE2B4594A77A",
+    "git_blob": "c0b3e82a9d09109166915e4e45b54e90f6cfb154",
+    "baseline_sha256": "6D4E56D1F5CC6E95F4BBA48BFDA8582DF676BBFC25D8BB93F6BC7B46C18C4B89",
+    "baseline_bytes": 132883,
+    "patch": {
+      "path": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\project-switch-page-adapter.patch",
+      "sha256": "F32373FDBE3A4E8BD0B6358DD8684052BFCF03B7B6C293394047777D3CA2D950"
+    },
+    "authorization": "Only this exact three-hunk adapter delta on the composed C page; no whole-page staging authority."
+  },
+  "patch": {
+    "path": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\project-switch-dependency-delta.patch",
+    "sha256": "425776226A02EA48C764075E6DE2586202B48E82FBF21AB1206106C3F69328A7"
+  },
+  "real_index_sha256_observed": "29299AB25BF221D7B41EBD1341019D2D2E7521ECE9B478AD731EB71AD2F90B1C",
+  "verification": {
+    "focused3": {
+      "report": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\main-project-switch-gate-20261023T151454Z-17f2de49\\process-handle-report.json",
+      "sha256": "B0D3F5096A28E5B20D42F6D3A87B08EF196F419F2BB5054FE0005EB2A0D77E1F",
+      "result": "PASS",
+      "elapsed_seconds": 8.289711,
+      "all_observed_handles_terminal": true
+    },
+    "related40": {
+      "report": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\main-project-switch-regressions-gate-20261023T151546Z-daf488d1\\process-handle-report.json",
+      "sha256": "C477F4F5503A0E37FD05613A8DA824B421978B784C8190DA6DE1C74A34506F4A",
+      "result": "PASS",
+      "elapsed_seconds": 43.531942,
+      "all_observed_handles_terminal": true
+    },
+    "analysis4": {
+      "report": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\10-23-studio-release-ux-workspaces\\.artifacts\\main-project-switch-analysis-gate-20261023T151707Z-dc2565dd\\process-handle-report.json",
+      "sha256": "7EF494820A4BF428650E4BD93FA76E0E6E8715E2CE4C7EEF6A7517B95B6D7A91",
+      "result": "PASS",
+      "elapsed_seconds": 5.393512,
+      "all_observed_handles_terminal": true
+    }
+  },
+  "baseline_failure": "main-project-switch-gate-20261023T151117Z-a533f62d: actual popup selecting B leaves only B; no-host external C never changes editor identity. Earlier attempt stopped in hidden-tree fixture and is not selector failure evidence.",
+  "known_separate_issue": "Same-id saved workspace edits leave retained controller label/member snapshot stale until reopen: composed page notifies onWorkspaceSaved only when id changes. This is pre-existing and outside this dialog-layout fix; reported to C for its page batch. Current visible tree/settings and stored workspace update correctly.",
+  "limitations": "Widget tests and scoped analysis only, no device install or native build. Separate broad formatting proposal remains unapplied and outside this authorization."
+}

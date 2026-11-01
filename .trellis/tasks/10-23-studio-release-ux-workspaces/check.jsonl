@@ -1,0 +1,3 @@
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"Protect language product consumers"}
+{"file":".trellis/spec/frontend/editor-paging.md","reason":"Check retained page and async state behavior"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Full-scope cross-layer acceptance audit"}

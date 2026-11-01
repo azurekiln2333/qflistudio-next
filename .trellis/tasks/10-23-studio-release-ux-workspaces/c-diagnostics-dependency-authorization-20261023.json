@@ -1,0 +1,51 @@
+{
+  "purpose": "Narrow publication diagnostics addendum to C314 main workspace dependency authorization",
+  "base_head": "e025805b60435fdedafd33e60082dc660afebe5a",
+  "extends": {
+    "manifest": ".trellis/tasks/10-23-studio-release-ux-workspaces/c-workspace-dependency-authorization-20261023.json",
+    "sha256": "CE442557ADCA636EDFDE4C96EDDA8DCA52063668BE7F7E74D3A76588C8670057",
+    "original_files": 13,
+    "additional_files": 4,
+    "combined_files": 17
+  },
+  "authorization": "C coordinator is explicitly authorized to selectively stage and commit these exact four additional main-owned file versions with the composed C-owned page. This supersedes the original diagnostics exclusion only for these four listed paths. The original13 file authorization remains unchanged. No further main approval is required for this addendum.",
+  "source_scope": "editor_problems_bar.dart: main/null-profile analyzer-null return-child guard and StudioProfile import; language-product unavailable status and configured analyzers remain. offline-editor-analysis.md: only current main visibility contract addition. Two listed tests are the exact full candidate versions.",
+  "page_dependency": "C page retains main Problems menu gate and221 analyzer-null Output guard. main_output_no_analyzer_test.dart requires both the bar hide and page Output guard; candidate staged/frozen validation must include them together, with C-owned editor_output_panel and coherent workspace/page dependencies.",
+  "publication_integrity": "Hash-check each candidate before selective staging, and verify staged Git blob IDs equal the recorded git_blob values. A full-worktree pass does not validate an index or frozen tree retaining the old unconditional bar. Do not replace the C-owned page or silently include excluded files.",
+  "exclusions_remaining": "All other diagnostics changes, Home/SavedWorkspacesTab/action-card tests, content, points, tools, assets and mixed shared spec index remain outside this additional authorization.",
+  "verification": "Source-only HEAD/index/worktree comparison and scoped tracked diff whitespace check. Earlier19 analyzer/visibility tests and mounted main Output1 passed at their recorded working-tree checkpoints; this addendum makes no new current staged/frozen-tree or full composed acceptance claim. No source/page/index mutation or Dart/Flutter/analyzer/build/device process was started.",
+  "files": [
+    {
+      "path": "lib/editor/editor_problems_bar.dart",
+      "bytes": 5893,
+      "sha256": "DAFBFC6AEC077AFB715484861198D269B564A2BF248BB13A78EEA7C184FD470F",
+      "git_blob": "19109e535c982dd79df850076d3ecbde7a6ed304",
+      "head_blob": "58a1e27375c7f568f4e359da71753329e351389a",
+      "index_blob_at_capture": "58a1e27375c7f568f4e359da71753329e351389a"
+    },
+    {
+      "path": "test/editor_problems_visibility_test.dart",
+      "bytes": 3342,
+      "sha256": "5EC41AEE68A27A2179CC8895F0ED3F79802B6C45D39C8422033C3BD966000A8B",
+      "git_blob": "b37bba5fe4d2251348be413a9a05c023f2065069",
+      "head_blob": null,
+      "index_blob_at_capture": null
+    },
+    {
+      "path": "test/main_output_no_analyzer_test.dart",
+      "bytes": 4489,
+      "sha256": "6F564A4BA0F25116060E1C7250CE1D67EA18C76CE9AB73FE2405307620BEE28B",
+      "git_blob": "0f9e7c838828f20109d60c19990d2e03618ee663",
+      "head_blob": null,
+      "index_blob_at_capture": null
+    },
+    {
+      "path": ".trellis/spec/frontend/offline-editor-analysis.md",
+      "bytes": 4494,
+      "sha256": "A8D524F4D5B6F0047CDD2CB02C9C3D6FABA79F38C6F440A290D196812D3F8DB8",
+      "git_blob": "801c2123b34c452147bb117411f62e4edd7d5edd",
+      "head_blob": "f2d43e08d3f30d45ad13648ea8841cbdacf3bf3b",
+      "index_blob_at_capture": "f2d43e08d3f30d45ad13648ea8841cbdacf3bf3b"
+    }
+  ]
+}
