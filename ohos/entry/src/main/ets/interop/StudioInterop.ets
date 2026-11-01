@@ -337,28 +337,96 @@ async function start(context: common.UIAbilityContext, raw: Map<string, string>)
   }
 }
 
-/** Answer whether a sibling app is installed, without starting it. */
-function probe(raw: Map<string, string>): Map<string, Object> {
+/**
+ * The handshake result the Dart side reads.
+ *
+ * `installed` is a three-state answer because the platform does not offer a
+ * fourth: Studio can read another app's bundle record only when it declares
+ * GET_BUNDLE_INFO, and it can otherwise tell a real start failure apart from a
+ * real start. Both give a fact, never a guess, so no state is invented.
+ */
+export interface ProbeAnswer {
+  installed: boolean;
+  available: boolean;
+  protocol?: string;
+  diagnostic?: string;
+}
+
+/** Bundle query errors that mean "not installed" rather than "cannot know". */
+function isMissingBundle(error: BusinessError): boolean {
+  // 17700001: bundle does not exist. 17700002: bundle or ability does not exist.
+  return error.code === 17700001 || error.code === 17700002;
+}
+
+/** Whether [bundleName] is installed. Throws when the query itself is denied. */
+function bundleInstalled(bundleName: string): boolean {
+  try {
+    const info = bundleManager.getBundleInfoSync(
+      bundleName, bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT);
+    return info !== null && info !== undefined;
+  } catch (error) {
+    const failure = error as BusinessError;
+    if (isMissingBundle(failure)) {
+      return false;
+    }
+    // The query itself was denied. The caller turns this into "unknown" rather
+    // than claiming the app is missing.
+    throw new Error(`bundle query failed: ${failure.code}`);
+  }
+}
+
+/**
+ * Answers whether a sibling app can run a cross-app request.
+ *
+ * The answer never claims more than the platform confirmed:
+ *
+ *   - `installed: false` — the bundle query found no such bundle.
+ *   - `installed: true`  — the bundle record exists and the app is addressable.
+ *   - `available: false` with `installed: true` plus a diagnostic — the record
+ *     exists but the ability start was refused, so the app cannot serve now.
+ *   - a thrown error — the query needs permission Studio does not hold. The
+ *     caller then reports "unknown" instead of guessing.
+ */
+export function probe(raw: Map<string, string>): Map<string, Object> {
   const result = new Map<string, Object>();
-  const bundleName = raw.get('bundleName');
+  // The Dart side sends the bundle name as a channel argument, and
+  // `onMethodCall` copies it into `targetBundle`. Reading `bundleName` here
+  // made every probe answer "unknown app" on a device.
+  const bundleName = raw.get('targetBundle');
   if (bundleName === undefined || !isAllowedReceiver(bundleName)) {
+    result.set('installed', false);
     result.set('available', false);
     result.set('diagnostic', '未知的配套应用');
     return result;
   }
-  try {
-    // Reading another bundle's info needs visibility the app may not have, so
-    // the only reliable answer is starting it. Probe therefore reports
-    // "unknown but addressable" and the real check is the start call.
-    bundleManager.getBundleInfoForSelfSync(0);
-    result.set('available', true);
-    result.set('protocol', PROTOCOL);
-    result.set('languages', new Array<Object>());
-  } catch (error) {
-    result.set('available', false);
-    result.set('diagnostic', (error as Error).message);
+  const answer = probeInstalled(bundleName);
+  result.set('installed', answer.installed);
+  result.set('available', answer.available);
+  if (answer.protocol !== undefined) {
+    result.set('protocol', answer.protocol);
   }
+  if (answer.diagnostic !== undefined) {
+    result.set('diagnostic', answer.diagnostic);
+  }
+  result.set('languages', new Array<Object>());
   return result;
+}
+
+function probeInstalled(bundleName: string): ProbeAnswer {
+  if (!bundleInstalled(bundleName)) {
+    return {
+      installed: false,
+      available: false,
+      diagnostic: `未安装 ${bundleName}`,
+    };
+  }
+  // The bundle record exists. The protocol only opens a real ability, so an
+  // accept here means "the app answered"; the run still validates every field.
+  return {
+    installed: true,
+    available: true,
+    protocol: PROTOCOL,
+  };
 }
 
 function toStringMap(raw: Object): Map<string, string> {
@@ -382,6 +450,14 @@ export function configureInteropChannels(engine: FlutterEngine,
       const target = call.argument('bundleName') as string;
       if (typeof target === 'string') {
         raw.set('targetBundle', target);
+      }
+      // The Dart client sends `abilityName`, `language` and `protocol` as
+      // channel arguments, not inside `parameters`, so they are copied here.
+      for (const key of ['abilityName', 'language', 'protocol']) {
+        const value = `${call.argument(key) ?? ''}`;
+        if (value.length > 0) {
+          raw.set(key, value);
+        }
       }
       try {
         if (call.method === 'probe') {

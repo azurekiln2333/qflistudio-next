@@ -296,3 +296,93 @@ Result: `start ability successfully.` then `start ability successfully.` again a
 - `hdc shell` runs as the `shell` user. Cross-app payload injection needs a writable directory on the receiver side only.
 
 
+
+## Device run 2
+
+Recorded 2026-11-01 ~19:00-19:30 on `192.168.68.207:46551` (HarmonyOS, developer mode). This round fixes a real device bug and moves the cross-app run onto the Run button. Both are described here together because they were verified in one build.
+
+### 1. The bug the user saw
+
+`StudioInterop.ets` `probe()` read `raw.get('bundleName')`. The Dart client sends `bundleName` as a channel argument and `onMethodCall` stored it as `targetBundle`, so the probe always read `undefined`. Every probe therefore answered `available: false` with `diagnostic: '未知的配套应用'`, for an installed app and for an absent one. The entry in the More menu always took the install-hint branch.
+
+The old tests could not see it. They compared text against the protocol string, the bundle allowlist and the caps. The two sides never disagreed on any of those, so nothing failed.
+
+Fix, both sides changed together:
+
+- `probe()` reads `targetBundle`. `onMethodCall` also copies `abilityName`, `language` and `protocol` from the channel arguments, so the probe can name what it asked about.
+- `probe()` no longer asks `getBundleInfoForSelfSync`, which only ever described Studio itself and answered `true` for every input. It now queries the target bundle with `bundleManager.getBundleInfoSync(bundleName, GET_BUNDLE_INFO_DEFAULT)`.
+- `17700001` / `17700002` mean "not installed". Any other error means the query was refused, and that throws instead of inventing an answer, so the caller reports "unknown".
+- `ohos.permission.GET_BUNDLE_INFO` is declared in `qflistudio/ohos/entry/src/main/module.json5` with `bundle_info_reason` in `string.json`.
+- The probe answer is now three-state on the Dart side: `installed`, `missing`, `unknown` (`InteropProbeStatus`). `available` stays as a derived getter so the old call sites keep compiling; it is `true` for `installed` and for `unknown`, because an explicit request may still try.
+
+### 2. Run button (product decision)
+
+`editor_page.dart`:
+
+- `_runProject` asks `_answeringSiblingApp(entry)` before it starts its own path. Only a confirmed `installed` probe moves the tap into the sibling app; `missing` and `unknown` leave the original path unchanged.
+- The More menu keeps an explicit cross-app item, now labelled `运行（QFLIJVMX）`, and a new `改用在线终端运行` item so the user can stay in Studio instead of silently ending up in another app.
+- `_runInSiblingApp` runs on an explicit menu request even when the probe is `unknown`; it only refuses on `missing`.
+- The Run tooltip becomes `运行（在 QFLIJVMX 中，长按运行当前文件）` once a probe confirmed the app. The answer is cached in `_runButtonProduct`, refreshed at `initState` and on each Run.
+- `InteropRunDialog` titles now read `正在本机运行 · QFLIJVMX` / `运行结束 · QFLIJVMX`, and the empty body line reads `正在连接 QFLIJVMX…`.
+
+No Vibe wiring was touched. The 08:18 loss stays as it is.
+
+### 3. Tests
+
+New and changed:
+
+- `qfli_studio_core/test/interop_arkts_contract_test.dart` — new group `channel argument contract`. It parses the keys the Dart transport sends with `probe` and `start`, the keys `onMethodCall` copies, and the key `probe()` reads, and compares them. Reverting `targetBundle` to `bundleName` fails this test.
+- `qfli_studio_core/test/interop_probe_decision_test.dart` — the three probe states and what each means for the Run decision.
+- `qfli_studio_core/test/editor_run_target_test.dart` — four widget tests that press the real Run button: installed takes the tap and never runs locally, missing keeps the original path, unknown keeps the original path, and an entry with no receiver probes nothing at all.
+
+Results:
+
+- `flutter analyze --no-pub lib`: no issues.
+- `flutter analyze --no-pub lib test`: the only issue in the files touched here is one `unnecessary_string_escapes` info in the new contract test.
+- interop, editor-run, output-panel and analysis suites: 157 tests passed.
+- Full `qfli_studio_core` suite: 1237 passed, 7 failed. The failures are `editor_reload_from_disk_test` (`reloadFromDisk` missing), `points_page_test` and `tasks_page_checkin_test` (named parameters missing), `vibe_e2e_harness_test`, `vibe_e2e_local_executor_test`, `vibe_e2e_runner_test`, `vibe_live_e2e_test` and `vibe_coding_controller_test`. None of them touch the files changed here, and the working tree carried them before this round.
+- Full `qflistudio` suite: 5 failures in `studio_home_release_test` / `studio_content_repository_test` (tab count and tutorial catalog), unrelated to interop and unchanged by this round.
+- OHOS build: `hvigorw assembleHap --mode module -p product=default -p buildMode=debug` → `BUILD SUCCESSFUL`, `SignHap` finished, `entry-default-signed.hap` written at 18:58.
+
+### 4. Device steps actually done
+
+```
+hdc -t 192.168.68.207:46551 install -r entry-default-signed.hap   # install bundle successfully
+hdc -t 192.168.68.207:46551 shell "hilog -r"
+hdc -t 192.168.68.207:46551 shell "uitest uiInput keyEvent 2050"
+hdc -t 192.168.68.207:46551 shell "aa start -a EntryAbility -b com.azurekiln.qflistudio"
+```
+
+The install succeeded. The launch did not: `aa start` and any ability start are refused with
+
+```
+error: failed to start ability.
+Error Code:10106102  Error Message:The device screen is locked during the application launch, unlock screen failed.
+```
+
+and hilog shows the reason:
+
+```
+11-01 19:24:56.941  1688  2102 E C01336/foundation/AMS: [ABMS840]need passord to unlock
+```
+
+The device is on a password lock screen. `uitest uiInput keyEvent 2050` (unlock), `2` (home), `2054`, swipes and `snapshot_display` all returned `No Error`, but the lock stayed. `uitest dumpLayout` dumped the launcher (`bundleName: com.ohos.sceneboard`, no app text), so the Studio UI could not be reached. A screenshot was saved to `C:\Users\lichengyu\AppData\Local\Temp\qfli_screen1.jpeg` (1272x2860, 216387 bytes) and was **not** read into the conversation.
+
+Verified by text only, without the UI:
+
+- The installed HAP contains the new logic. Unpacking `entry-default-signed.hap` and reading `ets/modules.abc` as UTF-8 shows `targetBundle: True`, `installed: True`, `bundle query failed: True`, `GET_BUNDLE_INFO: True`, and the packed `module.json` contains the permission.
+- The sibling app's ability is still exported and still addressable: `bm dump` shows `InteropAbility`, `exported: true`, `launchType: singleton`, and `aa` records `[AMC153]StartAbility com.azurekiln.qfli.java/InteropAbility` before the lock check refuses it.
+
+### 5. What is NOT verified
+
+- The menu no longer shows `未知的配套应用`. This needs a press on the real Run button with the screen unlocked; the lock screen blocked every UI path in this round.
+- That a Run tap really reaches `qfli_java` and that output comes back, with or without an installed sibling app.
+- Whether `GET_BUNDLE_INFO` is granted to a debug-signed build on this device. If HiddenApi or user-level grants deny it, the probe answers `unknown` by design and the Run path stays on the original route. That behaviour is covered by `editor_run_target_test.dart`, but the device answer to the permission query itself is unknown.
+- The `改用在线终端运行` menu item was not pressed on a device.
+
+Next round needs one thing from a human: unlock the device (or disable the screen lock for the test window), then rerun the `aa start` and the `uitest uiInput click` steps below.
+
+### 6. Pre-existing failure found while testing
+
+`qfli_studio_core/test/interop_arkts_contract_test.dart` and the new tests were run from `qfli_studio_core`, so the contract test resolved its sibling path as `Directory.current.parent`. That works only when the working directory is inside `qflistudio`. The helper reads `qflistudio` and `qfli_java` as siblings of `D:/MyNewProjects`, which holds in this machine's layout; a CI checkout with a different parent directory would need the same two checkouts side by side.
+
