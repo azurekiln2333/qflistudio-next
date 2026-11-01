@@ -1,0 +1,33 @@
+{
+  "id": "compliance-2026-11",
+  "name": "compliance-2026-11",
+  "title": "2026-11 compliance remediation (W1-W3)",
+  "description": "Police app-security review remediation per docs/compliance/2026-11-整改任务书.md: W1 moderation service, W2 QFLI server+deploy, W3 client+release, acceptance",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P0",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-02",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "11-02-w1-moderation-core",
+    "11-02-w1-moderation-ext",
+    "11-02-w2a-server-identity-logs",
+    "11-02-w2b-server-moderation",
+    "11-02-w3a-client-shell-login",
+    "11-02-w3b-client-settings-community-ai"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}
