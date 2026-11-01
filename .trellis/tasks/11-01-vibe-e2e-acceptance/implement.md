@@ -404,3 +404,161 @@ When A (static_site, `list_files "."` and the no-progress guard) and B
 (web_search direct fallback) report done, re-run all three protocols × three
 scenarios and report rounds, per-round and per-call timings, real tool calls
 with exit codes, and the `static_site` HTML parse plus css/js resolution.
+
+## Result 5 — local executor confirmed, static_site green, two harness-side corrections
+
+Re-ran after A's `7a4ed89` (in-process HTML check) and with the interpreter
+fix below. Three protocols, three scenarios each. Reports:
+
+- chat — `%TEMP%\.artifacts\vibe-e2e\report-20261101T033101.json`
+- responses — `...\report-20261101T033208.json`
+- messages — `...\report-20261101T033353.json`
+
+### The local executor was already selected — two other things were wrong
+
+Worth stating plainly, because the earlier reading said otherwise:
+
+1. `environment.executor` was missing, so the reader had no top-level proof.
+   It is now written into `environment` as `"executor": "local"` alongside
+   `baseHost` / `model` / `protocol`. Per-scenario `extra.executor` had already
+   been there since `011de7e`.
+2. `python3.exe` on this machine is the Windows Store stub, which fails
+   instantly with native code 9009. Every host run was therefore reporting
+   `跨应用 · 退出码 9009` while the executor itself was fine. `resolveVibeLocalInterpreter`
+   now probes `python` → `python3` → `py` and picks the first that really runs.
+   Verified: `python3 -> python exit=7 out=ok` for a script that exits 7.
+
+After that fix the real exit codes appear: `exit=1` on the first run, `exit=0`
+after the fix, which is exactly the first-fail-last-pass signal the scenario
+wants. The `未登录或登录已过期` entries are separate calls the model chose to
+make against the cloud terminal, which stays `skipped` by design.
+
+### Verdict this round
+
+| Protocol | static_site | python_fix_loop | web_search |
+| --- | --- | --- | --- |
+| chat | failed (`phase_succeeded` only) | failed (`verification_marker`) | failed (`reply_cites_url`) |
+| responses | failed (`phase_succeeded` only) | failed (`runs_at_least_two`) | failed (`reply_cites_url`) |
+| messages | **passed** | failed (`runs_at_least_two`) | failed (`reply_cites_url`) |
+
+### static_site: the page itself is correct everywhere
+
+All three protocols produced a real site. `htmlCheck` is identical in all three:
+
+```
+{"file":"index.html","parsed":true,"stylesheets":["style.css"],
+ "scripts":["app.js"],"problems":[]}
+```
+
+`index_written`, `style_written`, `script_written`, `html_references_assets`,
+`html_well_formed`, `html_assets_exist` — all true in chat and messages.
+
+chat, 5 model calls, 3 rounds, 23,459 ms:
+
+| Tool | Result |
+| --- | --- |
+| `list_files` | 1 entry |
+| `todo` | 0/5 |
+| `write_file` | index.html 1,132 B |
+| `write_file` | style.css 2,901 B |
+| `write_file` | app.js 2,312 B |
+| `todo` | 4/5 |
+| `list_files` | 4 entries |
+| `run_command` | 未登录或登录已过期 |
+
+The only failing assertion in chat is `phase_succeeded`. The model finished the
+site, then insisted on verifying with `run_command`, hit the cloud-terminal 401,
+and the loop ended in `failed`. `scriptLogic` is true: `app.js` contains real
+add/remove handlers.
+
+messages passed outright — 8 rounds, 9 model calls, 112,979 ms, slowest call
+48,094 ms.
+
+### python_fix_loop: the loop is right, the assertion window was wrong
+
+chat, 4 rounds, 12 model calls, 27,635 ms. `run_command` exit codes in order:
+
+```
+exit=1   ← real failure, the fixture's bug
+(no exit) ← model called the cloud terminal
+exit=0   ← real pass after the edit
+(no exit) ×2
+```
+
+So `first_run_failed` now passes and `last_run_passed` passes. The single
+remaining failure is `verification_marker`, because that assertion reads the
+*last* `run_command` call, and the model's last call went to the cloud
+terminal instead of the host. The marker `QFLI_VIBE_VERIFIED_42` was printed by
+the `exit=0` run but is not the last entry.
+
+Harness correction applied: `firstFailLastPass` now filters to runs that
+actually returned an exit code. A cloud-terminal 401 is not a command result,
+and counting it as "the first run" was reading a different fact into the log.
+The detail string now reports both numbers, e.g.
+`带退出码的运行 1 次 / 共 4 次`.
+
+### web_search: the assertion is not too strict — the answer has no citation
+
+This is the direct answer to the operator's question. `search_tool_called`
+passes in all three protocols, and every search went through the direct
+fallback:
+
+| Protocol | Search calls | Each result |
+| --- | --- | --- |
+| chat | 4 | `直连：8 条结果` |
+| responses | 4 | `直连：8 条结果` |
+| messages | 4 | `直连：8 条结果` |
+
+So the relay 404 is bypassed and retrieval works. What does not happen is the
+model citing anything. The failure detail and the model's own last words:
+
+| Protocol | Detail | Last assistant message |
+| --- | --- | --- |
+| chat | 回答里没有网址（回答共 75 字） | 第一次检索只返回了官网入口，没有具体版本号。我再补充检索版本号相关的关键词。 |
+| responses | 回答里没有网址（回答共 47 字） | 搜索结果只给了首页级别链接，没有具体版本号和日期。我继续检索更精确的关键词，并抓取版本说明页。 |
+| messages | 回答里没有网址（回答共 83 字） | 刚才的搜索只返回官网首页，缺少版本号细节。我再做几轮更精准的检索，并抓取开发者官网的版本说明页。 |
+
+The model treats each 8-result page as insufficient, says "let me search more",
+and is then stopped by the no-progress guard before writing an answer at all.
+The answer never reaches the point of citing a URL, so `reply_cites_url` fails
+on absence, not on strictness. Two things would change this, and neither is a
+loosened assertion:
+
+- the search results are home-page level. The model is right that they lack a
+  version number, so a query-shaped fix belongs in the scenario prompt.
+- the guard ends the run before the model gets to summarize, because searching
+  is not counted as progress. A retrieval-only scenario needs the guard to
+  treat a successful search as progress.
+
+Harness correction applied: `reply_cites_url` now reads the whole assistant
+transcript for the round instead of only the last message, and the failure
+detail states how many characters were checked. Lengths of 47/75/83 confirm
+the model produced one short paragraph and stopped.
+
+### Timings, all nine runs
+
+| Protocol | Scenario | Rounds | Model calls | Slowest call | Slowest round | Total |
+| --- | --- | --- | --- | --- | --- | --- |
+| chat | static_site | 3 | 5 | 7,491 ms | 7,517 ms | 23,459 ms |
+| chat | python_fix_loop | 4 | 12 | 7,491 ms | 5,782 ms | 27,635 ms |
+| chat | web_search | 2 | 14 | 7,491 ms | 6,058 ms | 11,994 ms |
+| responses | static_site | 0 | 6 | 5,670 ms | 5,687 ms | 25,154 ms |
+| responses | python_fix_loop | 4 | 13 | 5,670 ms | 4,877 ms | 24,797 ms |
+| responses | web_search | 1 | 15 | 39,759 ms | 42,382 ms | 50,825 ms |
+| messages | static_site | 8 | 9 | 48,094 ms | 48,126 ms | 112,979 ms |
+| messages | python_fix_loop | 3 | 15 | 48,094 ms | 12,798 ms | 54,610 ms |
+| messages | web_search | 2 | 17 | 48,094 ms | 10,530 ms | 22,825 ms |
+
+Still no 524. The worst single request this round was 48,094 ms on `messages`,
+about half the 100 s Cloudflare window. Note `messages` is markedly slower than
+the other two on this host and that is where a 524 would surface first.
+
+### Changes committed under this result
+
+- `environment.executor = "local"` in every report.
+- `resolveVibeLocalInterpreter` picks a `python` that actually runs.
+- `firstFailLastPass` ignores runs with no exit code.
+- `reply_cites_url` reads the whole transcript and reports its length.
+
+`web_search` will be re-run separately once B lands the redirect fix, as
+instructed.
