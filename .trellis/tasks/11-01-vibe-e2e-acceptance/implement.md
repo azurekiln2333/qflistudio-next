@@ -145,7 +145,7 @@ Re-run as soon as B restores it:
 `test/vibe_live_integration_test.dart` (untracked, written 2026-10-28 06:22, the
 `QFLI_VIBE_LIVE_ORIGIN` loopback variant) was left untouched.
 
-## Result 3 — bundleName drift: 7 of 12 disagree (read-only investigation)
+## Result 2b — bundleName drift: 7 of 12 disagree (read-only investigation)
 
 `dart run tool/verify_ohos_products.dart` fails on rustcore, goshift, jvmx,
 webforge, forge, dartwing and sqlab. pyflow and the main app agree.
@@ -201,3 +201,206 @@ One smaller inconsistency found on the way: `lib/interop/interop_targets.dart`
 stale side above, while `qfli_python` is the single product whose two platforms
 agree. Interop launches by that table, so the Java entry will keep working only
 while the manifest keeps the truncated name.
+
+## Result 3 — live R1 run against the real upstream (2026-11-01, 10:30-10:33 local)
+
+Ran with `flutter test --no-pub test/vibe_live_e2e_test.dart`, credentials from
+`QFLI_DEBUG_*` exported into the child process only. Three protocols, three
+scenarios each. Reports:
+
+- `%TEMP%\.artifacts\vibe-e2e\report-20261101T023043.json` (chat)
+- `%TEMP%\.artifacts\vibe-e2e\report-20261101T023159.json` (responses)
+- `%TEMP%\.artifacts\vibe-e2e\report-20261101T023306.json` (messages)
+
+Outside every Git root. `environment` holds host `newapi.azurekiln.cn`, model
+`deepseek-v4.1-flash`, `protocol`, `keyPresent: true`, `keyLength: 51`. No key
+in any report, log line or command above.
+
+### Verdict: 0 of 9 scenario runs passed, 0 skipped. Three separate causes.
+
+| # | Cause | Owner | Blocks |
+| --- | --- | --- | --- |
+| 1 | `run_command` needs a site login token. `QFLI_E2E_TERMINAL_TOKEN` is not set | operator / C | python_fix_loop, every site check |
+| 2 | `/api/ai/web_search` and `/api/ai/web_fetch` answer **404** | server (B) | web_search |
+| 3 | `static_site` never writes a file. The loop guard stops after 2 no-progress rounds | A | static_site |
+
+None of the three was masked: each shows up as a `failed` assertion with a real
+detail string.
+
+### Per-scenario evidence (chat protocol)
+
+| Scenario | Rounds | Model calls | Slowest call | Slowest round | Total | Real tool calls |
+| --- | --- | --- | --- | --- | --- | --- |
+| static_site | 1 | 2 | 7,796 ms | 7,830 ms | 15,311 ms | `list_files` error (path `.` rejected), `todo` ok 0/4, `list_files` ok |
+| python_fix_loop | 1 (5 tool entries) | 7 | 7,796 ms | 9,584 ms | 32,814 ms | `list_files`, `run_command` → `未登录或登录已过期`, `read_file` ×2, `edit_file` ok, `write_file` ok, `run_command` ×2 → same auth error |
+| web_search | 2 | 9 | 11,199 ms | 11,789 ms | 22,720 ms | `web_search` ×3 → `服务暂时不可用（404）` |
+
+`run_command` never returned an exit code: the relay rejected the token before
+the command ran, and the harness recorded that as `未登录或登录已过期` rather than
+as a command failure. Exit-code assertions therefore fail, which is the correct
+outcome — no exit code was produced.
+
+### static_site: what was actually generated
+
+Nothing. Final project files: `{"README.md": 62}` (the fixture). HTML check on
+`index.html`:
+
+```
+{"file":"index.html","parsed":false,"stylesheets":[],"scripts":[],
+ "problems":["缺少 index.html"]}
+```
+
+So `index_written`, `style_written`, `script_written`, `html_well_formed` and
+`html_assets_exist` all failed — correctly. The model produced a 4-step `todo`
+plan and then two `list_files` calls without a write, and the loop guard
+stopped it at the second no-progress round.
+
+Behaviour worth noting: the agent did **not** claim success. Its own stop
+message says `本轮没有成功写入文件，也没有取得命令结果`, which is the honest
+signal the harness wants. The harness itself is now also honest: the HTML check
+reports `缺少 index.html` instead of inferring anything from prose.
+
+### 524 / timeout question: no 524 occurred
+
+The operator's concern was Cloudflare cutting a response at 120 s. Across all 9
+runs the slowest single model request was **11,199 ms** and the slowest single
+round (model + tool) was **11,978 ms**, both on `responses`. Roughly a tenth of
+the 100 s Cloudflare window.
+
+| Protocol | Slowest call, all scenarios | Slowest round |
+| --- | --- | --- |
+| chat | 11,199 ms (web_search) | 11,789 ms |
+| responses | 10,622 ms | 11,978 ms |
+| messages | 8,565 ms | 9,028 ms |
+
+Conditions under which 524 would still appear, none of them observed here:
+
+- the request would have to hit 100 s, i.e. roughly 8x the worst case above,
+  which needs either an upstream stall or a much larger prompt.
+- `messages` is the slowest protocol per token on this host (5,168 ms for a one
+  word answer) but still nowhere near the limit.
+- `VibeDebugTransport.timeout` is 180 s and `ApiClient._aiTimeout` is 90 s, so
+  a 524 would surface as a 524 from the edge, not as a client timeout.
+
+One protocol-level observation: `messages` shows the most tool traffic (11
+model calls for web_search) because the adapter has to merge same-role
+messages. `chat` shows the least (2 calls for static_site). No protocol produced
+a malformed tool call.
+
+### Harness changes made to get this evidence
+
+- `_TransportBackedApiClient` now forwards `terminalEvents`, `resetTerminal`,
+  `aiWebSearch` and `aiWebFetch` to the production `ApiClient`, so terminal and
+  retrieval are exercised for real instead of failing inside the stub.
+  The model turn still goes straight to the debug upstream via
+  `endpointProvider`.
+- `VibeE2eRuntime` reads `QFLI_E2E_TERMINAL_TOKEN` (a site login token, never
+  the debug key) and records `terminal: missing-token(...)` in the report when
+  it is absent, so a missing login can never be mistaken for a tool bug.
+- Reports gained `rounds`, `modelCalls`, `slowestCallMs`, `slowestRoundMs` and
+  `extra.roundDurationsMs`. Tool evidence gained `result` so an error reason is
+  visible instead of a bare `status: error`.
+- `tool/vibe_e2e_probe.dart` — one-off connectivity probe. Measured the three
+  endpoints before the run: chat 200 / 7.9 s, responses 200 / 5.2 s,
+  messages 200 / 2.1 s.
+- `tool/vibe_e2e_web_check.dart` — offline HTML parse: tag balance, `link` /
+  `script` resolution inside the project root, empty-file detection.
+- New assertions `html_well_formed` and `html_assets_exist`. The harness suite
+  is 22 offline cases, all passing.
+
+### What the operator must supply to reach a green run
+
+1. `QFLI_E2E_TERMINAL_TOKEN=<site login token>` in the same environment. With
+   it, `run_command` reaches the real executor and python_fix_loop can produce
+   `exit 1` then `exit 0` with `QFLI_VIBE_VERIFIED_42`.
+2. B: `/api/ai/web_search` currently 404s on the production host, so the search
+   scenario cannot pass no matter what the client does.
+3. A: `static_site` needs to survive the no-progress guard. Either the guard
+   should count a successful `todo` update as progress on the first round, or
+   the scenario prompt should demand a write before any listing.
+
+Re-run command, once 1-3 are addressed:
+
+```
+cd qfli_studio_core
+set QFLI_DEBUG_BASE_URL / QFLI_DEBUG_API_KEY / QFLI_DEBUG_MODEL
+set QFLI_E2E_TERMINAL_TOKEN
+set QFLI_E2E_PROTOCOL=chat
+flutter test --no-pub test/vibe_live_e2e_test.dart
+```
+
+## Result 4 — local command executor for acceptance (harness side, 2026-11-01)
+
+`run_command` previously only had two real paths: the cloud terminal (needs a
+site login token) and the OHOS cross-app bridge (needs a sibling app). On the
+host neither is available, so every exit-code assertion failed for lack of an
+executor rather than for lack of model work.
+
+### What was added
+
+`qfli_studio_core/tool/vibe_e2e_local_executor.dart` — acceptance-only, never
+referenced from `lib/**`:
+
+- `parseVibeLocalCommand` accepts exactly `python` / `python3` / `node` plus one
+  in-project script, with an optional trailing `2>&1`. Shell chaining,
+  `-c`, absolute paths and `..` are refused.
+- `runVibeLocalCommand` starts a real `Process`, streams stdout/stderr, returns
+  the real exit code, and maps a timeout to 124.
+- `VibeLocalExecutionTransport implements InteropTransport` so the run goes
+  through `InteropRunner.tryRunCommand` — the same branch the controller
+  normally uses — and only the last hop is replaced.
+- Every run records `executor: local`. The report carries
+  `executor: "local"` per scenario.
+
+Wiring: one line in `tool/vibe_e2e_runner.dart` injects
+`InteropRunner(transport: VibeLocalExecutionTransport(...))` into the
+controller. The controller is unchanged.
+
+### Cloud terminal stays skipped, with a stated reason
+
+`QFLI_E2E_TERMINAL_TOKEN` is not required and not requested. The report now
+says, per scenario:
+
+```
+"cloudTerminal": "skipped",
+"cloudTerminalReason": "云终端需要 QFLI_E2E_TERMINAL_TOKEN（本站登录令牌，
+  不是调试上游密钥），默认走本机执行器"
+```
+
+With the token set, `cloudTerminal` becomes `relay` and the real cloud path is
+used instead.
+
+### Offline proof (`test/vibe_e2e_local_executor_test.dart`, 7 cases, all green)
+
+| Case | Proves |
+| --- | --- |
+| parse accepts python3/node | 正例解析 |
+| parse refuses chaining / -c / absolute / `..` / `rm -rf .` | 越界命令不接 |
+| real non-zero exit | 脚本 `sys.exit(3)` → `exitCode == 3` |
+| passing script | `exitCode == 0` 且输出含 `QFLI_VIBE_VERIFIED_42` |
+| stderr merged | `2>&1` 时 stderr 进合并输出，退出码 1 |
+| `tryRunCommand` 走通 | 经 `InteropRunner` 拿到真实 0 与标记行 |
+| probe | 自报本机执行器，不冒充云终端 |
+
+### Blocker seen while re-running the offline suites
+
+`flutter test` on the harness/runner suites currently fails to compile, and the
+error is not in my files:
+
+```
+lib/vibe_coding/vibe_web_tools.dart:535:7: Error: Expected ';' after this.
+async function _directGet(
+```
+
+`async function` is TypeScript syntax and does not parse as Dart. That file
+belongs to B (web search direct fallback) and is mid-edit. I did not touch
+anything under `lib/**`. `git status` shows five modified and five untracked
+files there, all from other owners. The harness suites will be re-run once
+B lands a compiling version.
+
+### Next
+
+When A (static_site, `list_files "."` and the no-progress guard) and B
+(web_search direct fallback) report done, re-run all three protocols × three
+scenarios and report rounds, per-round and per-call timings, real tool calls
+with exit codes, and the `static_site` HTML parse plus css/js resolution.
