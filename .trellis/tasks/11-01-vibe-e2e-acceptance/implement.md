@@ -648,3 +648,108 @@ nothing back to the model.
 2. Re-run all three protocols after that and replace this table.
 3. `web_search` still cannot pass while the guard treats a successful search as
    no progress. Not mine to change.
+
+## Result 6b — final re-run, chat protocol only (2026-11-01 12:46 local)
+
+Status: **partial**. Only the chat column has been re-run after `c46d855` and
+`f0b09ec`. responses and messages are still pending and their cells below are
+carried over from Result 6, not measured this round.
+
+Report: `%TEMP%\.artifacts\vibe-e2e\report-20261101T044650.json`. No overloaded
+or 524 occurred, so no retry was needed.
+
+### 3x3 as it stands
+
+| Protocol | static_site | python_fix_loop | web_search |
+| --- | --- | --- | --- |
+| chat | **passed** | failed — `verification_marker` | failed — `citations_from_tool_output` |
+| responses | *pending this round* | *pending this round* | *pending this round* |
+| messages | *pending this round* | *pending this round* | *pending this round* |
+
+### chat / static_site — passed
+
+4 rounds, 5 model calls, slowest call 10,511 ms, 34,353 ms total.
+
+`{"parsed":true,"stylesheets":["style.css"],"scripts":["app.js"],"problems":[]}`,
+`scriptLogic=true`. The trailing `run_command` still returns the cloud-terminal
+401 and the turn still finishes as `succeeded`.
+
+### chat / python_fix_loop — real exit codes, one assertion left
+
+`run_command` in order:
+
+| # | Command | Exit code | Where |
+| --- | --- | --- | --- |
+| 1 | `python3 verify.py` | **1** | local, real `AssertionError` |
+| 2 | (verification after the edit) | **0** | local, real pass |
+| 3 | (extra check) | none | cloud terminal, `未登录或登录已过期` |
+
+So `first_run_failed` and `last_run_passed` both pass now. The only failure is
+`verification_marker`, whose原文 is:
+
+> 最后一次 run_command 的输出
+
+The marker search reads the **last** `run_command`, and the model's last call
+went to the cloud terminal rather than the host. `QFLI_VIBE_VERIFIED_42` was
+printed by call 2, which is no longer the last entry. `phase=succeeded`,
+5 rounds, 11 model calls, 37,106 ms.
+
+This is an assertion-window mismatch, not a broken loop. I am not loosening the
+assertion without the operator's ruling.
+
+### chat / web_search — citation now happens, provenance check fails
+
+4 rounds, 15 model calls, 38,803 ms. Retrieval, all through the direct path:
+
+| # | Tool | Result |
+| --- | --- | --- |
+| 1 | `web_search` | 直连：8 条结果 |
+| 2 | `web_search` | 直连：8 条结果 |
+| 3 | `web_fetch` | 直连：3348 字符 |
+| 4 | `web_search` | 直连：8 条结果 |
+| 5 | `web_search` | 直连：8 条结果 |
+
+`search_tool_called` true, `reply_cites_url` **true** — A's `c46d855` fixed the
+"stop before answering" problem. Answer length **1,130 characters**.
+
+Failing assertion,原文:
+
+> citations_from_tool_output: 引 4 个网址，工具未返回的：
+> https://developer.huawei.com/consumer/cn/doc/
+> https://developer.huawei.com/consumer/cn/
+> https://consumer.huawei.com/cn/harmonyos-7/
+
+The first 200 characters of the answering message, quoted verbatim:
+
+> ## 检索结论
+> **最新公开可用的开发者 SDK：HarmonyOS 开发套件 26.0.0 Beta1（对应 API 26 / HarmonyOS 7 开发者 Beta1）**
+> - **发布时间**：2026 年 6 月 12 日（在 HDC 2026 华为开发者大会上随 HarmonyOS 7 一同宣布，开发者 Beta 版即日开启招募）
+> - **版本对应关系**：HarmonyOS 7 开发者 Beta 版 = API 26 = 开发套件 26.0.0 Beta1；DevEco Studio 同步为 26.0.0 Beta1
+
+The answer itself is honest: it names IT之家 as the only source carrying a
+version number and says it could not reach the official release notes.
+
+### This failure is probably mine, not A's or B's
+
+`VibeToolCall.result` only stores the short summary (`直连：8 条结果`). The tool
+body, which is what actually lists the URLs, never reaches the scenario
+outcome. So `returnedByTools` compares citations against summaries and reports
+"not returned" for URLs the search almost certainly did return.
+
+Evidence that the tool does return URLs:
+`vibe_web_tools.dart` builds `搜索结果（引用时请给出链接）：` followed by
+`$index. title`, `   $url`, snippet — the URL is on its own line there.
+
+Until the payload is captured, `citations_from_tool_output` **cannot distinguish
+a fabricated URL from a real one**, so this cell must not be read as proof that
+the model invented anything.
+
+### Unfinished
+
+1. Capture the tool body into the scenario outcome and into `extra.toolOutput`,
+   then re-run web_search and report each URL as returned or not returned.
+2. Run responses and messages for all three scenarios.
+3. Decide `verification_marker`: either it should read the last run that
+   carries an exit code, or the scenario should require the model to finish on
+   a host run. Needs the operator's ruling, since it changes what the
+   assertion means.
