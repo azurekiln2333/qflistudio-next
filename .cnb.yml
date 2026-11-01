@@ -1,0 +1,262 @@
+# Root CI for cnb.cool/azurekiln/qflistudio-next.
+#
+# The service sources live in nested directories of this repository
+# (`azurekiln-qfli-server/`, `azurekiln-qfli-terminal/`). Their own .cnb.yml
+# files only run inside their standalone repositories, so this file owns the
+# root pipeline and builds every image from an explicit nested context:
+#   azurekiln-qfli-server                              -> qfli-server
+#   azurekiln-qfli-terminal                            -> qfli-terminal
+#   azurekiln-qfli-terminal/sandbox                    -> qfli-terminal-sandbox
+#
+# The image namespace follows this repository's CNB slug, so the root pipeline
+# never collides with images published by the standalone repositories:
+#   docker.cnb.cool/${CNB_REPO_SLUG_LOWERCASE}/<name>
+#
+# `services: [docker]` logs in automatically on trusted push/tag pipelines.
+# Pull-request pipelines validate only: no registry service, no login, no push.
+# The three build contexts must be tracked in this repository (plain directories
+# or submodules). Missing sources fail the pipeline before any test or build.
+
+main:
+  push:
+    - name: verify-services
+      docker: &node-runtime
+        image: node:24.15.0-bookworm
+      stages:
+        - name: prepare-sources
+          script: |
+            set -euo pipefail
+            # A nested Git root may be checked out as a submodule.
+            if [ -f .gitmodules ]; then
+              git submodule update --init --recursive
+            fi
+            for dir in \
+              azurekiln-qfli-server \
+              azurekiln-qfli-terminal \
+              azurekiln-qfli-terminal/sandbox
+            do
+              [ -d "$dir" ] || {
+                echo "missing service source: $dir" >&2
+                echo "root CI builds from nested directories; track them in qflistudio-next" >&2
+                exit 1
+              }
+            done
+            for file in \
+              azurekiln-qfli-server/Dockerfile \
+              azurekiln-qfli-terminal/Dockerfile \
+              azurekiln-qfli-terminal/sandbox/Dockerfile
+            do
+              [ -f "$file" ] || { echo "missing image definition: $file" >&2; exit 1; }
+            done
+        - name: root-pipeline-check
+          script: |
+            set -euo pipefail
+            node scripts/check-root-ci.mjs
+            node --test scripts/check-root-ci.test.mjs
+        - name: server-tests
+          script: |
+            set -euo pipefail
+            cd azurekiln-qfli-server
+            node --version
+            npm ci
+            node scripts/check-deployment.mjs
+            node --test test/*.test.js
+            bash -n deployment/sqlbox/bootstrap.sh
+        - name: terminal-tests
+          script: |
+            set -euo pipefail
+            cd azurekiln-qfli-terminal
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install --no-audit --no-fund
+            fi
+            npm test
+            for script in deployment/bootstrap.sh test/bootstrap-upgrade.sh; do
+              bash -n "$script"
+            done
+            python3 -m py_compile sandbox/init.py sandbox/cleanup.py \
+              sandbox/ready.py sandbox/snapshot.py deployment/smoke-isolation.py
+
+    - name: publish-images
+      docker:
+        image: cnbcool/default-dev-env:latest
+      services:
+        - docker
+      stages:
+        - name: validate-and-push
+          script: |
+            set -euo pipefail
+            # A failing test must block every image.
+            command -v node >/dev/null || { echo 'node is required in the publish image' >&2; exit 1; }
+            if [ -f .gitmodules ]; then git submodule update --init --recursive; fi
+            for dir in \
+              azurekiln-qfli-server \
+              azurekiln-qfli-terminal \
+              azurekiln-qfli-terminal/sandbox
+            do
+              [ -d "$dir" ] || { echo "missing service source: $dir" >&2; exit 1; }
+            done
+            node scripts/check-root-ci.mjs
+            (cd azurekiln-qfli-server
+            npm ci
+            node scripts/check-deployment.mjs
+            node --test test/*.test.js)
+            (cd azurekiln-qfli-terminal
+            if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+            npm test)
+
+            REGISTRY="${CNB_REGISTRY:-docker.cnb.cool}"
+            SLUG="${CNB_REPO_SLUG_LOWERCASE:?CNB_REPO_SLUG_LOWERCASE is not set}"
+            SERVER_IMAGE="${CNB_IMAGE:-$REGISTRY/$SLUG/qfli-server}"
+            EXECUTOR_IMAGE="${CNB_EXECUTOR_IMAGE:-$REGISTRY/$SLUG/qfli-terminal}"
+            SANDBOX_IMAGE="${CNB_SANDBOX_IMAGE:-$REGISTRY/$SLUG/qfli-terminal-sandbox}"
+            REVISION="${CNB_COMMIT_SHORT:-$(git rev-parse --short HEAD)}"
+            if [ -n "${CNB_REGISTRY_PASSWORD:-}" ]; then
+              printf '%s' "$CNB_REGISTRY_PASSWORD" |
+                docker login "$REGISTRY" -u "${CNB_REGISTRY_USER:-cnb}" --password-stdin
+            fi
+
+            docker build --pull -f azurekiln-qfli-server/Dockerfile \
+              -t "$SERVER_IMAGE:$REVISION" azurekiln-qfli-server
+            docker build --pull -f azurekiln-qfli-terminal/Dockerfile \
+              -t "$EXECUTOR_IMAGE:$REVISION" azurekiln-qfli-terminal
+            docker build --pull -f azurekiln-qfli-terminal/sandbox/Dockerfile \
+              -t "$SANDBOX_IMAGE:3" azurekiln-qfli-terminal/sandbox
+
+            docker push "$SERVER_IMAGE:$REVISION"
+            docker push "$EXECUTOR_IMAGE:$REVISION"
+            docker push "$SANDBOX_IMAGE:3"
+            docker tag "$SERVER_IMAGE:$REVISION" "$SERVER_IMAGE:latest"
+            docker tag "$EXECUTOR_IMAGE:$REVISION" "$EXECUTOR_IMAGE:latest"
+            docker tag "$SANDBOX_IMAGE:3" "$SANDBOX_IMAGE:latest"
+            docker push "$SERVER_IMAGE:latest"
+            docker push "$EXECUTOR_IMAGE:latest"
+            docker push "$SANDBOX_IMAGE:latest"
+            printf 'published %s:%s, %s:%s, %s:3 and :latest\n' \
+              "$SERVER_IMAGE" "$REVISION" "$EXECUTOR_IMAGE" "$REVISION" "$SANDBOX_IMAGE"
+
+  pull_request:
+    - name: verify-pull-request
+      docker: *node-runtime
+      stages:
+        - name: prepare-sources
+          script: |
+            set -euo pipefail
+            if [ -f .gitmodules ]; then
+              git submodule update --init --recursive
+            fi
+            for dir in \
+              azurekiln-qfli-server \
+              azurekiln-qfli-terminal \
+              azurekiln-qfli-terminal/sandbox
+            do
+              [ -d "$dir" ] || {
+                echo "missing service source: $dir" >&2
+                exit 1
+              }
+            done
+        - name: root-pipeline-check
+          script: |
+            set -euo pipefail
+            node scripts/check-root-ci.mjs
+            node --test scripts/check-root-ci.test.mjs
+        - name: server-tests
+          script: |
+            set -euo pipefail
+            cd azurekiln-qfli-server
+            npm ci
+            node scripts/check-deployment.mjs
+            node --test test/*.test.js
+            bash -n deployment/sqlbox/bootstrap.sh
+        - name: terminal-tests
+          script: |
+            set -euo pipefail
+            cd azurekiln-qfli-terminal
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install --no-audit --no-fund
+            fi
+            npm test
+            for script in deployment/bootstrap.sh test/bootstrap-upgrade.sh; do
+              bash -n "$script"
+            done
+            python3 -m py_compile sandbox/init.py sandbox/cleanup.py \
+              sandbox/ready.py sandbox/snapshot.py deployment/smoke-isolation.py
+
+"v*":
+  tag_push:
+    - name: publish-release-images
+      docker:
+        image: cnbcool/default-dev-env:latest
+      services:
+        - docker
+      stages:
+        - name: validate-and-push-tag
+          script: |
+            set -euo pipefail
+            command -v node >/dev/null || { echo 'node is required in the publish image' >&2; exit 1; }
+            if [ -f .gitmodules ]; then git submodule update --init --recursive; fi
+            for dir in \
+              azurekiln-qfli-server \
+              azurekiln-qfli-terminal \
+              azurekiln-qfli-terminal/sandbox
+            do
+              [ -d "$dir" ] || { echo "missing service source: $dir" >&2; exit 1; }
+            done
+            TAG="${CNB_BRANCH:?CNB_BRANCH is not set}"
+            VERSION="${TAG#v}"
+            # Reviewable tags only: vMAJOR.MINOR.PATCH with optional prerelease.
+            printf '%s' "$VERSION" | grep -Eq \
+              '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$' || {
+                echo "tag $TAG is not a semver release tag" >&2
+                exit 1
+              }
+            STABLE=0
+            case "$VERSION" in
+              *-*) echo "prerelease $VERSION, floating tags stay unchanged" ;;
+              *) STABLE=1 ;;
+            esac
+
+            node scripts/check-root-ci.mjs
+            (cd azurekiln-qfli-server
+            npm ci
+            node scripts/check-deployment.mjs
+            node --test test/*.test.js)
+            (cd azurekiln-qfli-terminal
+            if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+            npm test)
+
+            REGISTRY="${CNB_REGISTRY:-docker.cnb.cool}"
+            SLUG="${CNB_REPO_SLUG_LOWERCASE:?CNB_REPO_SLUG_LOWERCASE is not set}"
+            SERVER_IMAGE="${CNB_IMAGE:-$REGISTRY/$SLUG/qfli-server}"
+            EXECUTOR_IMAGE="${CNB_EXECUTOR_IMAGE:-$REGISTRY/$SLUG/qfli-terminal}"
+            SANDBOX_IMAGE="${CNB_SANDBOX_IMAGE:-$REGISTRY/$SLUG/qfli-terminal-sandbox}"
+            if [ -n "${CNB_REGISTRY_PASSWORD:-}" ]; then
+              printf '%s' "$CNB_REGISTRY_PASSWORD" |
+                docker login "$REGISTRY" -u "${CNB_REGISTRY_USER:-cnb}" --password-stdin
+            fi
+
+            docker build --pull -f azurekiln-qfli-server/Dockerfile \
+              -t "$SERVER_IMAGE:$TAG" azurekiln-qfli-server
+            docker build --pull -f azurekiln-qfli-terminal/Dockerfile \
+              -t "$EXECUTOR_IMAGE:$TAG" azurekiln-qfli-terminal
+            docker push "$SERVER_IMAGE:$TAG"
+            docker push "$EXECUTOR_IMAGE:$TAG"
+            if [ "$STABLE" = 1 ]; then
+              docker build --pull -f azurekiln-qfli-terminal/sandbox/Dockerfile \
+                -t "$SANDBOX_IMAGE:3" azurekiln-qfli-terminal/sandbox
+              docker push "$SANDBOX_IMAGE:3"
+              docker tag "$SERVER_IMAGE:$TAG" "$SERVER_IMAGE:latest"
+              docker tag "$EXECUTOR_IMAGE:$TAG" "$EXECUTOR_IMAGE:latest"
+              docker tag "$SANDBOX_IMAGE:3" "$SANDBOX_IMAGE:latest"
+              docker push "$SERVER_IMAGE:latest"
+              docker push "$EXECUTOR_IMAGE:latest"
+              docker push "$SANDBOX_IMAGE:latest"
+            else
+              docker build --pull -f azurekiln-qfli-terminal/sandbox/Dockerfile \
+                -t "$SANDBOX_IMAGE:$TAG-sandbox" azurekiln-qfli-terminal/sandbox
+              docker push "$SANDBOX_IMAGE:$TAG-sandbox"
+            fi
+            printf 'published release images for %s (stable=%s)\n' "$TAG" "$STABLE"
