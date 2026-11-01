@@ -753,3 +753,134 @@ the model invented anything.
    carries an exit code, or the scenario should require the model to finish on
    a host run. Needs the operator's ruling, since it changes what the
    assertion means.
+
+## Result 6c — final 3x3 after the operator's rulings (2026-11-01 13:36-13:45 local)
+
+All three protocols ran to completion. No overloaded and no 524 occurred in any
+of the three runs, so no retry was needed.
+
+| Report | Protocol |
+| --- | --- |
+| `report-20261101T053651.json` | chat |
+| `report-20261101T054309.json` | responses |
+| `report-20261101T054543.json` | messages |
+
+### Final 3x3
+
+| Protocol | static_site | python_fix_loop | web_search |
+| --- | --- | --- | --- |
+| chat | failed — `phase_succeeded` | **passed** | **passed** |
+| responses | failed — `phase_succeeded` | **passed** | **passed** |
+| messages | failed — `phase_succeeded` | failed — `runs_at_least_two`, `verification_marker` | **passed** |
+
+2 / 3 passed in chat and responses. 1 / 3 passed in messages.
+**web_search is 3 of 3.** static_site is 0 of 3 this round, having been 3 of 3
+in Result 6b — the regression is below and it is not in the page.
+
+### What the two rulings changed
+
+**(1) `verification_marker` now reads the last run that carried an exit code**,
+and keeps all three conditions: that run must be exit 0, its real output must
+contain `QFLI_VIBE_VERIFIED_42`, and an earlier run must have exited non-zero.
+Runs with no exit code are counted and reported, not hidden:
+`extra.runsWithoutExit`. It passes in chat and responses.
+
+**(2) Tool bodies are captured.** The URL check no longer reads the summary
+line. `VibeDebugTransport` now takes tool messages out of the request history
+and stores their full content, so `extra.toolOutput` holds the real
+`搜索结果（引用时请给出链接）：` block with every URL. That turned
+`citations_from_tool_output` from a false alarm into a real check, and
+web_search then passed for the first time.
+
+### web_search — 3 of 3 passed, every URL traced to a tool result
+
+| Protocol | Rounds | Model calls | Answer length | URLs cited | All from tool output |
+| --- | --- | --- | --- | --- | --- |
+| chat | 3 | 17 | 1,201 chars | 4 | true |
+| responses | 4 | 17 | 1,065 chars | 4 | true |
+| messages | 4 | 15 | 1,169 chars | 4 | true |
+
+URLs cited in all three protocols, all present in `extra.toolOutput`:
+
+- `https://www.ithome.com/0/963/594.htm`
+- `https://developer.huawei.com/consumer/cn/doc/`
+- `https://developer.huawei.com/consumer/cn/`
+- `https://consumer.huawei.com/cn/harmonyos-7/`
+
+Every retrieval went through the direct fallback: `直连：8 条结果` per search,
+`直连：3348 字符` for `web_fetch`. No fabricated URL in any protocol.
+
+### python_fix_loop — real exit codes, chat and responses passed
+
+chat, `run_command` in order (`无退出码的调用 3 次`):
+
+| # | Command | Exit |
+| --- | --- | --- |
+| 1 | `python3 verify.py; echo "EXIT=$?"` | none (cloud terminal, 401 recovered to `无法建立终端安全连接`) |
+| 2 | `python3 verify.py` | **1** |
+| 3 | `python3 verify.py; echo "EXIT=$?"; od -c result.txt` | none |
+| 4 | `python3 verify.py` | **0** ← last decided run, contains the marker |
+| 5 | `python3 -c "print(len(open('result.txt','rb').read()))"` | none |
+
+responses, same shape: run 2 `exit=1`, run 4 `exit=0`, three runs with no exit
+code. Both protocols satisfy the three conditions and pass.
+
+messages did not get there. `run_command` in order:
+
+| # | Command | Exit |
+| --- | --- | --- |
+| 1 | `python3 verify.py` | **1** |
+| 2 | `python3 verify.py && wc -c result.txt && od -c result.txt` | none |
+
+The `&&` chain was refused by my allowlist. My chain splitter accepts `;` but
+the `&&` form with `wc`/`od` did not match, so the command fell back to the
+cloud terminal, which could not connect. The fix after the edit therefore never
+ran locally, `verification` reports `exit=1`, and the two assertions above fail
+with their原文:
+
+> runs_at_least_two: 带退出码的运行 1 次 / 共 2 次
+> verification_marker: 最后一个带退出码的运行 exit=1，输出不含标记，更早存在非零退出码：false，无退出码的调用 1 次
+
+This is my parser, not the model and not A's loop.
+
+### static_site — 0 of 3, and the page is fine in all three
+
+| Protocol | Rounds | Model calls | Slowest call | Total |
+| --- | --- | --- | --- | --- |
+| chat | 2 | 5 | 54,693 ms | 139,849 ms |
+| responses | 1 | 6 | 6,989 ms | 34,419 ms |
+| messages | 1 | 7 | 7,390 ms | 37,504 ms |
+
+`htmlCheck` is identical and clean in all three:
+
+```
+{"file":"index.html","parsed":true,"stylesheets":["style.css"],
+ "scripts":["app.js"],"problems":[]}
+```
+
+`index_written` through `html_assets_exist` all pass. Only `phase_succeeded`
+fails, with these errors:
+
+- chat: `连续 2 轮没有进展，已停止。最近失败：null: 无法建立终端安全连接`
+- responses: same
+- messages: `连续 2 轮没有进展，已停止。本轮没有成功写入文件，也没有取得命令结果。`
+
+chat wrote all three files then called `run_command`, which failed with
+`无法建立终端安全连接`. messages never called `run_command` at all and still
+hit the guard after `list_files`.
+
+So the page quality is not the problem. The turn cannot close cleanly once the
+terminal refuses, and in messages it closed as no-progress even with three
+written files and a passing plan update. Both point at the progress rule rather
+than at the site assertion. This is the opposite outcome of Result 6b, where the
+same three protocols passed, so it is a real behavioural difference worth A's
+attention, not a flaky skip.
+
+### Not fixed, explicitly
+
+1. `&&`-chained segments with `wc`/`od` are still refused. That is the messages
+   python_fix_loop failure. Mine.
+2. `static_site` closing as `failed` after a fully written, structurally valid
+   page when the terminal is unreachable. That is the controller's turn rule.
+3. No assertion was loosened. `verification_marker` kept both of its original
+   data requirements and gained a third.
