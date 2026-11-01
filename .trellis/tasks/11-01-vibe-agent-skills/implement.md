@@ -192,3 +192,94 @@ site. `AiRoute.direct` bypasses the relay and sends the key from the device.
 - `handoff.md` records the concurrent `tool_calls` read-gate item. It is still
   open: a batch that creates and then edits the same file trips the gate. The
   debug upstream sends one call per turn, so it has not blocked acceptance.
+
+
+## Commit sweep
+
+A sweep of every repository owned by this session: all user changes, including
+those that predated the assignment, landed as grouped commits on the current
+branch. Nothing was pushed, no branch was switched, and no history was rewritten.
+
+### qflistudio (main)
+
+| Commit | Scope |
+| --- | --- |
+| `cb1b017` | native startup progress, `StudioContentRepository`, `assets/content` |
+| `3b618bd` | OHOS startup splash, wider device types, network permission, version 5.0.0, agreement pages |
+| `2cbd4c2` | higher resolution app icon (699 KiB) |
+| `c671f29` | `tool/generate_studio_content.dart`, `tool/verify_studio_content.dart`, content tests |
+| `4278137` | deployment docs for the isolated terminal and the host limits |
+| `2c09ccf` | root `.cnb.yml`, `scripts/check-root-ci.mjs`, `scripts/ste-lint-zh.py` |
+| `fd196eb` | `azurekiln-qfli-server`, the business backend the app talks to |
+| `d4e4df2` | Trellis task records and `AGENTS.md` |
+
+Skipped, with reasons:
+
+- `ohos/build-profile.json5` — carries signing material (`*.p12` path, key and
+  store passwords). The file is tracked upstream, so this is a pre-existing
+  exposure worth a separate decision; the sweep left it alone.
+- `.artifacts/` — commit-message scratch files.
+- `.git-commit-result*.txt` — temporary command output.
+- `Roboto_Mono.zip` — archive.
+- `新增APP - 全国互联网安全管理服务平台.html` and its `_files/` directory — a saved
+  web page.
+- `azurekiln-qfli-server/bike.html` — a standalone demo page no source refers to.
+- `azurekiln-qfli-terminal/` — a separate Git repository, so the parent cannot
+  track it.
+
+`assets/content/tutorials.json` (5.63 MB): yes, it should be tracked.
+`tool/verify_studio_content.dart` reads it along with `examples.json` and
+`provenance.json` and checks the counts recorded in provenance. `pubspec.yaml`
+declares `assets/content/` as a runtime asset and `lib/main.dart` serves it
+through `StudioContentRepository`. The file is a build input for the checks and
+a shipped asset, not a disposable build output.
+
+### qfli_studio_core (main)
+
+| Commit | Scope |
+| --- | --- |
+| `c08338d` | terminal cancellation: `abortTrigger`, `RequestAbortedException`, quiet stream end |
+| `105f3c3` | `vibe_editor_bridge.dart`, `vibe_send_coordinator.dart` and their tests |
+| `19bb5af` | `offline_text_tools.dart`, `offline_text_tool_pages.dart` and tests |
+| `e1d096c` | `points_feed.dart` and the check-in tests |
+| `bfd332b` | workspace action, reload and short-height editor tests |
+| `0bf30d9` | `tool/python_content/`, `scripts/ste-lint-zh.py` |
+| `d5025e9` | `QFLI_E2E_SCENARIOS` selection and the live integration entry |
+
+`lib/services/api_client.dart` is mostly `dart format` reflow. The behaviour
+changes are the three cancellation points, called out in the commit body.
+`lib/vibe_coding/vibe_web_tools.dart` is formatting only.
+
+Skipped: `.git-commit-*.txt` — temporary command output.
+
+### qfli_json (feat/offline-json-workbench)
+
+| Commit | Scope |
+| --- | --- |
+| `7fdc6c2` | `AGENTS.md`, `LICENSE`, `scripts/ste-lint-zh.py` |
+| `d3234e1` | `AgreementReader.ets`, route registration, generated plugin registrants |
+
+Skipped: `ohos/build-profile.json5` — signing material, same reason as above.
+
+### qfli_lua (main)
+
+| Commit | Scope |
+| --- | --- |
+| `9b53d51` | `module.json5` device types `phone`, `2in1`, `tablet` |
+| `820bd1c` | higher resolution app icon (596 KiB) |
+| `5135a1e` | `.codex`, `.trae`, `.gitattributes`, three Trellis task records, `AGENTS.md` |
+| `c4eff3f` | `AgreementReader.ets` |
+
+Skipped: `ohos/build-profile.json5` (signing material),
+`.tmp_bytecode_block.txt` (scratch buffer).
+
+### qfli_web
+
+Reassigned to another owner before the sweep reached it. Not touched.
+
+### Large tracked files
+
+- `qflistudio/assets/content/tutorials.json` — 5.63 MB, shipped asset.
+- `qflistudio/assets/content/examples.json` — 3.23 MB, shipped asset.
+- Three app icons at 596-699 KiB each, in `qflistudio` and `qfli_lua`.
+

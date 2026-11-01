@@ -233,3 +233,66 @@ pathspec after verifying `git diff --cached --stat` showed 4 insertions.
 The lesson, for the next pass: `-- <path>` on `git commit` selects which files
 join the commit, not which content. To commit a subset of one file, build the
 index first and commit without a pathspec.
+
+## Device run
+
+Round 1: Studio -> qfli_java (aa start probe). Recorded 2026-11-01, device `192.168.68.207:46551` (developer mode, screen unlocked at 16:14).
+
+## Setup
+
+Commands:
+
+```
+hdc -t 192.168.68.207:46551 shell "hilog -r"
+hdc -t 192.168.68.207:46551 shell "aa dump -l"
+hdc -t 192.168.68.207:46551 shell "uitest uiInput keyEvent 2050"   # unlock screen
+hdc -t 192.168.68.207:46551 shell "bm dump -n com.azurekiln.qfli.java"
+```
+
+## Findings from bm dump and sandbox inspection
+
+- `com.azurekiln.qfli.java` exports `InteropAbility` (`exported: true`, `launchType: singleton`, `srcEntry ./ets/interop/InteropAbility.ets`). The ability declares no `skills` block, so the platform caller identity is the only caller check. `startAbility` from `com.azurekiln.qflistudio` succeeds.
+- `com.azurekiln.qflistudio` exports `InteropBridgeAbility` with action `action.system.qfli.interop.event`.
+- `/data/app/el2/100/base/com.azurekiln.qfli.java/cache` is mode `777`. `/data/app/el2/100/base/com.azurekiln.qflistudio` is mode `700`. The `shell` user can create `cache/qfli_interop/<session>` inside the Java app but cannot write anything inside Studio.
+- `/data/app/el2/100/base/com.azurekiln.qfli.java/files/usr` does not exist on the device. The bundled JDK is not unpacked there yet.
+
+## Command
+
+Launch without any `-e` parameters, to check reachability alone:
+
+```
+hdc -t 192.168.68.207:46551 shell "aa start -a InteropAbility -b com.azurekiln.qfli.java"
+```
+
+Result: `start ability successfully.` then `start ability successfully.` again after the unlock, and once more with a hand-built `-e` payload.
+
+## Result
+
+- The sibling app process starts: pid 42260, `appstate=4` (OUT) at 16:15:39, `InteropAbility/.../entry/0(persistentId: 7489)` attached and then disappears, because `handle()` calls `terminateSelf()` when `want.parameters` is empty or invalid.
+- The ability reached the code path that refuses a request, and the refusal could not be delivered (hilog, part below). So the launch path Studio uses works, and the receiver's validation runs.
+- Not obtained: javac exit code, java exit code, program stdout. The refusal path stops before `copyPayload`, so no compile happens.
+
+## hilog excerpt
+
+```
+11-01 16:15:39.064 42260 42260 E A03D00/com.azurekiln.qfli.java/JSAPP: QFLI_INTEROP_REFUSAL_UNSENT 16000001
+11-01 16:15:39.132 42260 42260 E A03D00/com.azurekiln.qfli.java/JSAPP: QFLI_INTEROP_WINDOW_FAILED 0
+11-01 16:15:39.476 27812 38651 I C01C50/download_server/RequestCxx: OnAppStateChanged uid=20020389, bundleName=com.azurekiln.qfli.java,state=4
+```
+
+`InteropAbility` has no `bundleName` in the Want that `aa start -a ... -b ...` builds, so `refuseRaw` addresses `bundleName: ''`, and `startAbility` fails with 16000001 (ability not found). This is expected on the standalone path, not a protocol defect: the real caller always supplies `callerBundle` and the platform records the caller bundle.
+
+`QFLI_INTEROP_WINDOW_FAILED 0` means `windowStage.loadContent('pages/Index')` did not complete. The page request is unrelated to the refusal, but it is logged on every run.
+
+## Not verified on this device
+
+- End-to-end compile and run with a real Studio session. The payload directory must be written by Studio (`cacheDir/qfli_interop/out/<session>`); the shell user cannot write Studio's `700` data directory, and Studio has no CLI entry that starts a session without the UI.
+- javac and java exit codes, stdout, JDK unpack into `files/usr`.
+- Event round trip into `InteropBridgeAbility` and Dart. Session authorisation requires `activeSessions` in the Studio process, so a hand-injected event is dropped by design.
+
+## Side findings
+
+- `aa start` refuses to launch any ability while the device screen is locked: error `10106102`. Automation must unlock first (`uitest uiInput keyEvent 2050` worked).
+- `hdc shell` runs as the `shell` user. Cross-app payload injection needs a writable directory on the receiver side only.
+
+
