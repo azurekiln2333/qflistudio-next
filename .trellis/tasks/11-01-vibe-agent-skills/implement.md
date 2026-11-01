@@ -215,9 +215,10 @@ branch. Nothing was pushed, no branch was switched, and no history was rewritten
 
 Skipped, with reasons:
 
-- `ohos/build-profile.json5` — carries signing material (`*.p12` path, key and
-  store passwords). The file is tracked upstream, so this is a pre-existing
-  exposure worth a separate decision; the sweep left it alone.
+- `ohos/build-profile.json5` — carries signing material: the `.cer` and `.p12`
+  paths plus the plain-text key and store passwords. The file is tracked
+  upstream, so this is a pre-existing exposure that needs its own decision.
+  The sweep left the working-copy change uncommitted.
 - `.artifacts/` — commit-message scratch files.
 - `.git-commit-result*.txt` — temporary command output.
 - `Roboto_Mono.zip` — archive.
