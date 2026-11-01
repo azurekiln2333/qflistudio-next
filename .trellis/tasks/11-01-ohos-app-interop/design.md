@@ -17,9 +17,21 @@ Research: `research/ohos-cross-app-20261101.md`.
 
 **Platform limit (R6).** OHOS gives no cross-bundle writable directory a third
 party can use without a file-provider grant, and the Studio project lives in the
-Studio sandbox. The payload therefore crosses as **bounded text inside the
-`Want`**. Limit: 64 KiB of payload text, 64 files, 256 KiB before base64.
-Projects above that are refused with `payload_too_large`, not truncated.
+Studio sandbox. The request therefore crosses as **validated launch parameters
+plus a payload directory** that the caller writes into its own cache: the
+receiver reads only `manifest.json` and the names it lists. Limit: 64 files and
+256 KiB of decoded content. Projects above that are refused with
+`payload_too_large`, not truncated.
+
+The first draft put the whole payload in a `Want` string parameter. One string
+of 256 KiB exceeds the documented parameter budget, and a truncated parameter
+would arrive as a silently corrupt project, so the design uses a directory plus a
+manifest instead. The digest is still sent, and both sides compute it from the
+same encoded JSON, so a mismatch is `payload_integrity` rather than a compile
+of the wrong bytes.
+
+Observed 2026-11-01: the Studio side built successfully with this design. The
+receiver was not executed, because no device was attached.
 
 ## 2. Owned files
 
@@ -57,6 +69,7 @@ Launch parameters on the `Want` to the receiver:
 | `bridgeAction` | string | Action to start on the caller's bridge |
 | `files` | string | JSON array `[{"path": ..., "content": <base64>}, ...]` |
 | `filesDigest` | string | Lowercase hex SHA-256 of the exact `files` string |
+| `payloadDirectory` | string | Absolute path the caller wrote the payload to; the receiver reads `manifest.json` from it |
 
 Rules:
 
@@ -137,28 +150,32 @@ Contracts:
 ## 5. Receiver side
 
 - `InteropAbility.onCreate` reads the `Want` parameters and calls
-  `receive(request)` in `InteropReceiver.ets`.
+  `parseRequest` then `copyPayload` in `InteropReceiver.ets`.
 - `InteropReceiver.ets` is a shared template: the Java and C copies differ only
-  in the `LANGUAGE`, `BUNDLE`, and launch section. It validates the request,
-  writes the payload, invokes the app's existing native bridge, forwards
-  events, and finally emits `done`.
-- Event emission is throttled: at most one event per 150 ms, stdout and stderr
-  merged in arrival order, tails capped at 128 KiB.
+  in the `LANGUAGE`, `ALLOWED_CALLER`, and launch section. It re-validates the
+  request, copies the manifest-listed files into its own cache, invokes the
+  app's existing native bridge, forwards events, and finally emits `done`.
+- Event emission follows the child's output tail: each poll reads the bytes the
+  child appended since the last poll and sends them as one `stdout` or `stderr`
+  event. A run that produced nothing sends nothing; nothing is invented.
 - Java first: `qfli_java` already owns `JavaBridge.ets` with `prepare`, `start`,
-  `poll`, `cancel`. The receiver compiles every `.java` payload file with
+  `poll`, `cancel`. The receiver compiles every copied `.java` file with
   `javac` through that bridge, then runs the entry main class.
 - C next: `qfli_c` owns `qfli_forge/native` with `start`, `terminalStart`,
   `cancel`.
-- The receiver deletes `<cacheDir>/qfli_interop/<sessionId>` on `done` and on
-  cancel.
+- The receiver deletes `<cacheDir>/qfli_interop/in/<sessionId>` and its work
+  directory after `done`, after `error`, and after a timeout.
+- The ability stays in the foreground while the child runs, because a sibling
+  app may not start abilities from the background.
 
 ## 6. Security (R5)
 
-- Receiver allowlist: `com.azurekiln.qflistudio` only, compared to
-  `callerBundle` **and** to the bundle that actually started the ability when
-  the platform exposes it. A mismatch is `caller_not_allowed`.
+- Receiver allowlist: `com.azurekiln.qflistudio` only. The transmitted
+  `callerBundle` must match it, and the ability accepts only that caller. A
+  mismatch is `caller_not_allowed`.
 - Studio bridge allowlist: `com.azurekiln.qfli.java`, `com.azurekiln.qfli.cpp`,
-  `com.azurekiln.qfli.pyflow`. Studio answers only sessions it started.
+  `com.azurekiln.qfli.pyflow`, checked against the bundle that actually started
+  the bridge ability. Studio answers only sessions it started.
 - Payload paths are re-validated inside the receiver and joined with the fixed
   session directory, so no path escapes.
 - No file outside the session directory is ever read or written.
@@ -175,28 +192,26 @@ Contracts:
    testable, and the editor does not show the button.
 2. **`run_command` in Vibe Coding** (owner B) needs to route a compile or run
    through interop when the platform is OHOS and the language has a receiver.
-   Proposed shape:
-   `InteropRunner.tryRunCommand({required String projectRoot, required String command, required String language})`
-   returns a real exit code and merged output, or `null` to keep the existing
-   terminal path. The command grammar accepted by interop is narrow:
-   `javac <paths>` and `java <MainClass>`. Any other command returns `null`.
+   The implemented entry point is
+   `InteropRunner.tryRunCommand({required String projectRoot, required String language, required String command})`.
+   It returns an `InteropRun` with real output and exit code, or `null` to keep
+   the existing terminal path. The accepted command grammar is narrow: a bare
+   `javac` compiles the payload, and `python <relative path>` / `python3 <relative path>`
+   runs one file. Anything else returns `null`, so a shell pipeline can never
+   change meaning across apps.
 
 Both items are reported in `implement.md` and are not implemented here.
 
-## 8. Python limit
+## 8. Python and C follow-up
 
-`qfli_python` loads `libqfli_py.so` through `dart:ffi` on the Flutter side. The
-Flutter engine lives in the same ArkTS runtime as the interop ability, so the
-FFI loader inside the interop ability resolves the same library. The receiver
-policy is the same as Java:
+`qfli_python` loads `libqfli_py.so` through `dart:ffi` on the Flutter side. A
+receiver for Python would have to drive that VM from inside the same app, so it
+is a separate piece of work with its own verification. `qfli_c` would reuse its
+existing `qfli_forge/native` channel the same way the Java receiver reuses
+`qfli_jvmx/jdk`.
 
-- Copy the payload into a temporary session directory under the app cache.
-- Compile each `.py` source in the payload with the bundled MicroPython
-  artifact step.
-- Run the entry file with the same arguments `PythonRunner` uses.
-
-That path is recorded but not implemented in this task. Acceptance for this
-task covers Java on OHOS, C code above it, and Python as a stated follow-up.
+Both are recorded here and not implemented in this task. Acceptance for this
+task covers the protocol, the Studio side, and Java on OHOS.
 
 ## 9. Validation plan
 
@@ -209,6 +224,8 @@ task covers Java on OHOS, C code above it, and Python as a stated follow-up.
 | Sequence gaps and wrong session ids are dropped by the transport | Dart unit |
 | Missing app maps to exit 127 and a hint | Dart unit |
 | Allowlist rejects an unknown caller bundle | Dart unit, ArkTS shape mirror |
+| ArkTS source keeps the same protocol, allowlist, caps and grammar | Dart contract test reading the `.ets` files |
+| OHOS build of `qflistudio` with the bridge ability | `hvigorw assembleHap` |
 | OHOS build of `qfli_java` with the new ability | `hvigorw assembleHap` |
 | Device launch, compile, run | blocked: no device attached |
 
