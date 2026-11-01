@@ -80,28 +80,44 @@ Future<void> main(List<String> args) async {
     stdout.writeln('缺少变量 ${missing.join('、')}，驱动会全部跳过。');
   }
 
-  final driverArgs = <String>[
-    'run',
-    'tool/vibe_e2e.dart',
-    if (options.scenario != null) ...['--scenario', options.scenario!],
-    if (options.out != null) ...['--out', options.out!],
-    if (options.transport != null) ...['--transport', options.transport!],
-    if (options.protocol != null) ...['--protocol', options.protocol!],
-    if (options.searchTools) '--search-tools',
+  final liveArgs = <String>[
+    'test',
+    '--no-pub',
+    '--concurrency=1',
+    'test/vibe_live_e2e_test.dart',
   ];
-  stdout.writeln('运行 ${p.join(coreRoot, 'tool', 'vibe_e2e.dart')}');
-  final child = await Process.start(
-    Platform.resolvedExecutable,
-    driverArgs,
-    workingDirectory: coreRoot,
-    environment: environment,
-    runInShell: false,
+  stdout.writeln(
+    '运行 flutter test ${p.join(coreRoot, 'test', 'vibe_live_e2e_test.dart')}',
   );
+  final hint = scenarioHint(options.scenario);
+  if (hint.isNotEmpty) stdout.writeln(hint);
+  final flutter = Platform.isWindows ? 'flutter.bat' : 'flutter';
+  final Process child;
+  try {
+    child = await Process.start(
+      flutter,
+      liveArgs,
+      workingDirectory: coreRoot,
+      environment: environment,
+      runInShell: Platform.isWindows,
+    );
+  } on ProcessException catch (error) {
+    stderr.writeln('无法启动 flutter：${error.message}');
+    exitCode = 2;
+    return;
+  }
   // 原样转发驱动的输出；驱动从不打印凭据，因此这里不会泄漏。
   await Future.wait([child.stdout.pipe(stdout), child.stderr.pipe(stderr)]);
   final code = await child.exitCode;
   if (code != 0) exitCode = code;
 }
+
+/// 提示一处限制：实时宿主一次性跑完三个场景，单独跑一个场景请直接用
+/// `flutter test --no-pub --plain-name`。
+String scenarioHint(String? scenario) => scenario == null
+    ? ''
+    : '\n提示：--scenario 在实时宿主下忽略；单独跑场景请用\n'
+          '  (cd ../qfli_studio_core && flutter test --no-pub --plain-name "<场景>")\n';
 
 class _Check {
   const _Check(this.name, this.ok, this.detail);
@@ -370,11 +386,9 @@ class _Options {
 
 const String _usage =
     'dart run tool/verify_vibe_e2e.dart [选项]\n\n'
-    '  --scenario <key>    只跑一个场景：static_site / python_fix_loop / web_search\n'
     '  --env-file <路径>   从文件读取 QFLI_DEBUG_*，只作用于本次子进程\n'
     '  --report <路径>     只读已有报告，不跑驱动\n'
-    '  --transport <名称>  使用已发布的调试上游适配\n'
-    '  --protocol <名称>   记录到报告里的协议名\n'
-    '  --search-tools      声明检索工具已发布\n'
     '  --dry-run           只检查环境\n\n'
-    '凭据永不打印。缺少变量时报告记为跳过，退出码 0。';
+    '实时场景在 qfli_studio_core 里用 flutter test 宿主运行：\n'
+    '  flutter test --no-pub test/vibe_live_e2e_test.dart\n\n'
+    '凭据永不打印。缺少变量时全部场景跳过，退出码 0。';

@@ -151,10 +151,10 @@ tool/build_hap.sh qfli_c        # 出 HAP（unsigned，签名见下）
 验证 AI 编程（Vibe Coding）是否真的跑通：
 
 ```bash
-# 在 qfli_studio_core 目录，驱动一个场景并写出 JSON 报告
-dart run tool/vibe_e2e.dart --scenario python_fix_loop
+# 在 qfli_studio_core 目录，用 flutter test 宿主跑三个真实场景（缺凭据则整体跳过）
+flutter test --no-pub test/vibe_live_e2e_test.dart
 
-# 在本仓库，检查环境、调度驱动、把报告读成表格
+# 在本仓库，检查环境、调度上面的宿主、把报告读成表格
 dart run tool/verify_vibe_e2e.dart --dry-run
 dart run tool/verify_vibe_e2e.dart --env-file <仓库外的凭据文件>
 ```
