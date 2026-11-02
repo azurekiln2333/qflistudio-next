@@ -96,3 +96,11 @@
 
 1. 装机后在 Mate 60 与 Mate X5 上验直板、展开、折叠三态，确认顶部不再与状态栏、挖孔区重叠。
 2. 发版由用户与 root 另行决定。版本号、签名 release HAP、上架提交都不在本任务内。
+
+### 补充（网关更正后，2026-11-02）
+
+提交：qfli_studio_core `420538b` feat(auth): explain the missing phone number on one-tap sign-in
+
+1. `huawei.phone_required`：网关在无已验证手机号时直接拒绝一键登录。服务端把该拒绝转成 403 与这个错误码。`LoginPage.loginErrorMessage` 把它翻成“请使用已绑定手机号的华为账号”。服务端文案为空时用同句兜底，其它错误码仍原样显示服务端文案。测试放在 `test/auth_login_entry_test.dart` 的 `Huawei rejections` 组，三个用例。
+2. 头像修改入口核实结果：客户端没有改头像的路径。`updateMe` 只发 `nickname`、`bio`、`avatarColor`。`AuthStore.updateProfile` 只暴露昵称与个性签名。编辑资料对话框只有这两个输入框。`avatarUrl` 只读，来自网关 `GET /api/users/me`。代码里没有 URL 输入框，也没有图片上传依赖。不需要为网关隐藏任何入口。
+3. 跳过建号入口保留。网关更正确认 skip 是新用户唯一的建号途径。绑定页按钮文案从“跳过，创建新账号”改为“创建新账号”，与“绑定已有账号”并列。两个按钮就是网关期望的两条路径。`phoneAvailable == false` 时两个按钮都不显示。
