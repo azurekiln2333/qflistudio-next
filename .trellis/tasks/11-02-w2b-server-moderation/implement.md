@@ -150,3 +150,58 @@ SDK 补齐管理方法后只需替换 `adminCall` 一处。
 该文件属 W2a（`src/routes/auth.js` 与 `src/audit.js`）的边界，本任务未改也未提交。
 按监控通知，该项由 w37:p2 修复。W2b 不再排查也不再运行该文件。
 W2b 的 25 条与其余文件均不受影响。
+
+## Acceptance fixes（2026-11 服务端验收失败项）
+
+基线 ``af5829dd``。验收 84 条断言 79 通过、5 失败，全部修复并补回归测试。
+
+### 提交
+
+| 短哈希 | 标题 |
+| --- | --- |
+| ``10dee9b`` | fix(server): let admins see and open pending posts |
+| ``741e33f`` | fix(server): attribute the register audit row to the new user |
+| ``68a992e`` | fix(server): deidentify admin actions and audit failed deactivation |
+| ``50aebcc`` | test(server): cover the five acceptance failures through real routes |
+
+### 五处失败与修复
+
+1. **注册审计 user_id 为 null**。``POST /api/auth/register`` 只写了 username。
+   注册接口已经把账号建在网关上，因此用同一套客户端 Basic 凭据按用户名查
+   ``/oauth2/public-profile/<username>`` 取 sub，再映射到本地 users 行。
+   查不到时保留 null，不拿用户名冒充用户ID。
+   不用 ``gateway.publicProfile()``，因为它要求参数本身就是用户ID，传用户名会被判 502。
+2. **管理员看待审帖详情 404**。详情只放行作者，没放行管理员。改为已发布、作者、管理员三种情况放行。
+3. **管理员列表漏掉待审帖**。列表 SQL 只给作者本人开 pending。管理员视角改为放开 pending。
+4. **注销后审计 target 残留原用户ID**。去标识化原先只按 ``user_id`` 命中，
+   ``admin.account_mute`` 这类行的 user_id 是管理员、target 才是被注销用户。
+   改为 ``user_id = ? OR target LIKE ?`` 命中，target 与 detail 一并清洗。
+   只有主体是本人时才改 user_id，管理员身份保留。
+5. **注销失败没有审计**。网关 403 ``insufficient_scope`` 时本地数据按设计保留，
+   但审计数 44→44。现在写 ``user.deactivate_failed``，detail 带状态码与错误码。
+   网关错误码同步透传到 ``details.errorKey``（如 ``gateway.insufficient_scope``），
+   便于客户端提示与复测断言。
+
+### 测试
+
+```
+cd azurekiln-qfli-server
+node --test --test-timeout=60000 "test/*.test.js"
+→ tests 141, pass 140, fail 0, skipped 1（原有 MySQL 专用用例）
+```
+
+新增 ``test/acceptance-fixes.test.js`` 5 条，全部经过真实 Express 路由挂载
+（真实 SQLite、真实 audit 写入，只把网关 HTTP 换成替身）：
+
+- 注册审计带本地用户ID，且确实向网关查了 sub
+- 网关解析不到账号时 user_id 保持 null
+- 注销后以该用户为目标的审计目标被去标识化，两行结果一致，管理员身份不变
+- 网关注销 403 时写失败审计，用户与会话保留，重试成功后失败审计同样被去标识化
+- 缺二次确认时不写审计
+
+``test/moderation.test.js`` 增加 1 条：管理员在列表与详情都能看到待审帖，
+非作者非管理员仍 404，处置为 published 后对所有人可见。
+
+### 剩余事项
+
+验收第 1 条另有一项不计失败：超过 365 天的注册审计会被清理，长期注册信息由网关侧证据确认。
