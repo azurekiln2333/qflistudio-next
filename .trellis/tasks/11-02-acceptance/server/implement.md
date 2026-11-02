@@ -11,8 +11,8 @@
 - [x] Wait for the p3 fix commit and rerun all five failed assertions.
 - [x] Append the first retest evidence without replacing initial failures.
 - [x] Run the controlled-Chinese linter and verify evidence references.
-- [ ] Verify the remaining three failures after the follow-up fix commit.
-- [ ] Commit only server.md and these server planning files.
+- [x] Verify the remaining three failures after the follow-up fix commit.
+- [x] Commit only server.md and these server planning files.
 - [ ] Append Result with commit, tests, gaps, and required user actions.
 
 Local evidence and scripts stay in an isolated system temporary directory.
@@ -44,3 +44,15 @@ The remaining failures were reported to the coordinator and fixer.
 The detail-only cross-actor reference is a separate, unverified boundary to check.
 First retest evidence:
 D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793613015772/
+
+Second retest baseline: 390fad5a500d8f52247a63a5a12042d4f69e9436.
+Fix commits reviewed: 60732a9, 936f9d6, and 7285f82.
+The new processes passed 86 of 86 assertions with no source changes during the run.
+All five original failures pass. Two added assertions cover administrator deletions
+whose audit detail alone contains the erased user's ID. Twelve original audit rows
+and timestamps were retained, administrator actor IDs stayed intact, and raw erased
+user identifiers were absent. The local report row now survives with a pseudonym.
+Complete server tests: 145 total, 144 passed, 0 failed, 1 opt-in MySQL pool skip.
+The server code remains read-only for this worker.
+Second retest evidence:
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793614305018/

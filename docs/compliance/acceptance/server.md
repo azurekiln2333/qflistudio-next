@@ -1,5 +1,10 @@
 # QFLI 服务端验收记录（2026-11-02）
 
+最新本地复测：86 项断言全部通过。
+原先 5 项失败均已通过复测。
+线上配置和真实网关效果仍需补证。
+最终结果见文末的第二次修复复测。
+
 本报告负责 PRD 分工表的 w37:p7。
 验收范围为第 1、2、3、5、6、7、9 项。
 第 3、7、9 项仅含服务端部分。
@@ -1056,7 +1061,7 @@ node --test test/audit-log.test.js test/client-context.test.js \
 
 
 ~~~powershell
-node "D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-acceptance.mjs"
+node "D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-acceptance-retest-one.mjs"
 ~~~
 
 本次脚本 SHA-256：
@@ -1272,5 +1277,353 @@ D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc8
 
 另有仅在管理员审计 detail 引用原 ID 的场景。
 当前筛选条件没有匹配 detail。
-该边界尚未验证，已交给修复者核对。
+该边界尚未验证，已交给修复者检查。
 本节去标识化通过仅适用于本轮禁言样本。
+
+
+## 第二次修复复测（2026-11-02 18:11）
+
+本次启动全新 QFLI 与审核服务进程。
+本次另建 SQLite 和测试账号。
+真实认证、会话和实名中间件均参与请求。
+网关与 AI 仍使用本地 HTTP 夹具。
+
+
+
+~~~json
+{
+  "revision": "390fad5a500d8f52247a63a5a12042d4f69e9436",
+  "fixCommits": [
+    "60732a9",
+    "936f9d6",
+    "7285f82"
+  ],
+  "regressionTestCommit": "b6a25d7",
+  "checks": 86,
+  "passed": 86,
+  "failed": [],
+  "sourceChangesDuringRun": []
+}
+~~~
+
+**本地结论：通过。**
+本轮 86 项断言全部通过。
+原先 5 项失败断言全部通过。
+新增 2 项管理员删除审计断言也通过。
+前文保留初验及第一次复测的失败证据。
+本结论不替代生产部署或真实网关验收。
+
+| 条目 | 最新本地结论 | 原缺口或补测结果 |
+|---|---|---|
+| 1 | 通过 | 首次注册审计绑定正确的本地用户 ID |
+| 2 | 通过 | 无手机号及明确未验证手机号均受限 |
+| 3 服务端 | 通过 | 华为跳过、绑定及上游拒绝映射通过 |
+| 5 | 通过 | 删除、审计与举报处理通过 |
+| 6 | 通过 | 管理员待审详情和列表均可见 |
+| 7 服务端 | 通过 | 已测数据删除、会话失效及审计去标识化通过 |
+| 9 服务端 | 通过 | 搜索下线及 AI 响应标识通过 |
+
+**验证方法**
+
+完整重跑前述 HTTP 验收流程。
+继续验证首次注册且没有本地映射的账号。
+继续检查网关 sub 与本地 ID 的对应关系。
+在注销前另建一条帖子和一条评论。
+管理员带原因删除这两条内容。
+随后注销作者并查询审计的 detail 字段。
+该样本覆盖仅在 detail 引用原 ID 的边界。
+
+
+
+~~~powershell
+node "D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-acceptance-retest-two.mjs"
+~~~
+
+复测脚本 SHA-256：
+
+
+~~~text
+42aa73bb3eddea3b7aea229cfa0cd1b1eb3df7e72b761ca201fff3c7685e861a
+~~~
+
+**第 1 项原始结果摘录**
+
+首次注册返回 HTTP 200。
+本地映射的网关 ID 为 acceptance-new-user。
+审计用户 ID 与该映射的本地 ID 相同。
+
+
+~~~json
+{
+  "gatewaySubject": "acceptance-new-user",
+  "localUser": {
+    "id": "user_99996cd0fd2558e4045a1829d460744d",
+    "gateway_user_id": "acceptance-new-user"
+  }
+}
+~~~
+
+
+
+~~~json
+{
+  "id": "audit_dbf2e003871dde01c8bc646a2ec16cc6",
+  "user_id": "user_99996cd0fd2558e4045a1829d460744d",
+  "username": "acceptance_new",
+  "action": "auth.register",
+  "target": null,
+  "detail": null,
+  "ip": "198.51.100.17",
+  "user_agent": "node",
+  "created_at": "2026-11-02 10:11:46",
+  "port": 45678,
+  "platform": "harmonyos-app",
+  "login_type": "register"
+}
+~~~
+
+真实网关的按用户名公开资料查询尚未验证。
+此处通过仅说明 QFLI 对该接口夹具的处理。
+
+**第 6 项原始结果摘录**
+
+同一待审帖子对管理员的详情返回 200。
+
+
+~~~json
+{
+  "status": 200,
+  "post": {
+    "id": "post_d2a1da4c7110f3ca70990e13d1f4eecb",
+    "status": "pending",
+    "title": "Acceptance pending post"
+  }
+}
+~~~
+
+管理员列表也包含该帖子。
+作者可见性仍通过。
+读者与匿名视角仍返回 404。
+
+
+~~~json
+[
+  {
+    "id": "6.pending-author-visible",
+    "result": "pass",
+    "actual": 200
+  },
+  {
+    "id": "6.pending-public-hidden",
+    "result": "pass",
+    "actual": {
+      "reader": 404,
+      "anonymous": 404
+    }
+  },
+  {
+    "id": "6.pending-admin-visible",
+    "result": "pass",
+    "actual": {
+      "status": 200,
+      "body": {
+        "post": {
+          "id": "post_d2a1da4c7110f3ca70990e13d1f4eecb",
+          "type": "discussion",
+          "title": "Acceptance pending post",
+          "status": "pending",
+          "excerpt": "Acceptance local fixture body",
+          "tags": [],
+          "zoneId": "zone_8014f4f0150476dcdab923b6301144a7",
+          "zoneName": "Java",
+          "author": {
+            "id": "user_c25361a2ad2437a463a922056d89ee82",
+            "username": "accept_pending",
+            "nickname": "Acceptance pending",
+            "avatarColor": "#2196F3",
+            "bio": "",
+            "avatarUrl": "",
+            "provider": "azk"
+          },
+          "likeCount": 0,
+          "commentCount": 0,
+          "liked": false,
+          "createdAt": "2026-11-02 10:11:46",
+          "updatedAt": "2026-11-02 10:11:46",
+          "content": "Acceptance local fixture body"
+        }
+      }
+    }
+  },
+  {
+    "id": "6.pending-list-admin",
+    "result": "pass",
+    "actual": {
+      "found": true,
+      "status": 200
+    }
+  }
+]
+~~~
+
+真实认证链的管理员判定现已通过。
+测试没有向请求对象额外注入 req.user。
+
+**第 7 项原始结果摘录**
+
+管理员删除审计中的作者 ID 已替换。
+管理员自身的身份仍保留。
+
+
+~~~json
+[
+  {
+    "id": "audit_572d87a675b04cafaf7fd66e67d4eae6",
+    "user_id": "user_a130b035f9dd99d4084b4d8b9c6cf862",
+    "username": "accept_admin",
+    "action": "admin.post_delete",
+    "target": "post:post_824074e3cc29098f830db59b3e0c6827",
+    "detail": "author=deleted_5ab3ffa6925d3e6ed0dc9e0c4df968e8 reason=Acceptance deletion audit retention",
+    "created_at": "2026-11-02 10:11:47"
+  },
+  {
+    "id": "audit_d00e057fcc286390e0e588b45b318135",
+    "user_id": "user_a130b035f9dd99d4084b4d8b9c6cf862",
+    "username": "accept_admin",
+    "action": "admin.comment_delete",
+    "target": "comment:comment_10452036c2230ed9b2b8d51407787708",
+    "detail": "author=deleted_5ab3ffa6925d3e6ed0dc9e0c4df968e8 post=post_d3cbf942a8241b9c368bc1320473f2e0 reason=Acceptance deletion audit retention",
+    "created_at": "2026-11-02 10:11:47"
+  }
+]
+~~~
+
+禁言与解除禁言的目标 ID 同样已替换。
+本轮 12 条原审计行和原时间均保留。
+查询原用户 ID 的结果为空。
+
+
+~~~json
+{
+  "id": "7.audit-all-identifiers-removed",
+  "result": "pass",
+  "actual": {
+    "remaining": [],
+    "allOriginalAuditRowsPreserved": true
+  }
+}
+~~~
+
+注销失败审计正常增加一条。
+本地数据与旧会话仍保留以便重试。
+
+
+~~~json
+{
+  "before": 48,
+  "after": 49,
+  "rows": [
+    {
+      "id": "audit_8ef0525f44da0928b7a2019796606b73",
+      "user_id": "user_6cb9f367bbb57efd53e5560cec634996",
+      "username": "accept_denied",
+      "action": "user.deactivate_failed",
+      "target": "user:user_6cb9f367bbb57efd53e5560cec634996",
+      "detail": "status=403 errorKey=gateway.insufficient_scope",
+      "ip": "198.51.100.17",
+      "user_agent": "node",
+      "created_at": "2026-11-02 10:11:47",
+      "port": 45678,
+      "platform": "harmonyos-app",
+      "login_type": null
+    }
+  ]
+}
+~~~
+
+本地举报行现在保留。
+本地举报人的 ID 已去标识化。
+
+
+~~~json
+{
+  "id": "report_b7310cf44a37fe07ec57a8053dc47c16",
+  "reporter_id": "deleted_5ab3ffa6925d3e6ed0dc9e0c4df968e8",
+  "status": "open",
+  "reason": "Acceptance reporter erasure retention",
+  "created_at": "2026-11-02 10:11:46"
+}
+~~~
+
+该行证明本次注销没有删除这条举报。
+本次未验证它在真实环境中的长期清理。
+审核中心仍保存原 reporterId。
+中心侧的去标识化交给审核服务验收。
+
+**完整服务端测试**
+
+145 项测试中，144 项通过，1 项跳过。
+失败数为 0。
+跳过项为需独立 MySQL 测试库的终端池用例。
+单元测试仅作补充证据。
+本地验收结论仍依据本轮真实 HTTP 结果。
+
+
+~~~text
+✔ assertPublicHost rejects localhost names without any lookup (0.8013ms)
+✔ assertPublicHost rejects a hostname resolving to a private address (0.1918ms)
+✔ assertPublicHost accepts a hostname with only public records (0.6641ms)
+✔ fetchPage rejects non-http schemes and embedded credentials (0.4837ms)
+✔ fetchPage blocks the request before connecting to a private host (0.2175ms)
+✔ extractText strips scripts, styles and tags (0.6409ms)
+✔ normalizeText collapses blank lines and padding (0.1965ms)
+ℹ tests 145
+ℹ suites 0
+ℹ pass 144
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 1923.3782
+~~~
+
+
+
+~~~powershell
+cd D:/MyNewProjects/qflistudio/azurekiln-qfli-server
+node --test --test-timeout=60000 "test/*.test.js"
+~~~
+
+本次实际启动测试时使用隔离的环境变量。
+未继承生产数据库和应用密钥。
+
+**证据路径**
+
+
+
+~~~text
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793614305018
+~~~
+
+原始 HTTP 与数据库摘录位于 http-and-db.json。
+全部断言位于 checks.json。
+本地举报行查询位于 sqlite-final.json。
+版本和源码哈希位于 manifest.json。
+单元测试证据如下。
+
+
+~~~text
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-unit-final.log
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-unit-final-summary.json
+~~~
+
+**最终遗留项**
+
+线上配置、nginx 源端口与生产部署须部署后复测。
+真实 MySQL 分支仍未验证。
+真实网关的华为登录和永久注销仍未验证。
+真实网关的首次注册资料查询仍未验证。
+长期注册信息留存仍需真实网关证据。
+审核中心的处理同步与去标识化不在本报告结论内。
+用户本人仍须授予 qfli_account_erase。
+前文已列出部署后复测命令。
