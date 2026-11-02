@@ -205,3 +205,51 @@ node --test --test-timeout=60000 "test/*.test.js"
 ### 剩余事项
 
 验收第 1 条另有一项不计失败：超过 365 天的注册审计会被清理，长期注册信息由网关侧证据确认。
+
+## Acceptance fixes round 2（复测 ac4d0b8 后的三项失败）
+
+上一轮 3 项仍未通过，原因是修复和测试都建立在错误假设上。
+
+| 短哈希 | 标题 |
+| --- | --- |
+| ``60732a9`` | fix(server): resolve admin visibility from the session, not req.user |
+| ``936f9d6`` | fix(server): create the local user mapping on first registration |
+| ``7285f82`` | fix(server): deidentify audit details and report rows on deactivation |
+| ``b6a25d7`` | test(server): stop faking req.user and cover first registration |
+
+### 根因
+
+1. **管理员看不到待审帖（两项断言）**。真实 ``authOptional`` 只设置 ``req.userId``，
+   从不设置 ``req.user``。上一版用 ``req.user?.is_admin`` 判定，恒为 false。
+   更严重的是上一轮的测试替身自己填了 ``req.user``，比真实中间件宽松，把缺陷掩盖成通过。
+2. **注册审计 user_id 仍为 null**。首次注册时本地没有 users 行，上一版只做 ``SELECT``。
+   测试里预先插入了本地用户，所以测不出首次注册的真实路径。
+
+### 修复
+
+- 新增 ``src/admin-access.js``：按需判定管理员。有 ``req.user`` 直接用，否则解一次会话并缓存 30 秒
+  （列表逐行判定会重复访问网关）。网关不可达或会话失效按非管理员处理，宁可少放行。
+  不改 ``src/util.js``，那是 W2a 的边界。
+- 注册后按网关 sub 补建本地 users 行，并发时回退到已有行。拿不到 sub 仍保留 null。
+
+### 第 7 条静态边界（detail-only 分支）
+
+``admin.post_delete`` / ``admin.comment_delete`` 把作者ID写在 ``detail`` 的 ``author=`` 里，
+``target`` 是帖子或评论编号。只按 ``user_id`` 或 ``target`` 命中的去标识化会漏掉这类跨操作者记录。
+本轮一并修复，并补了 detail-only 断言（``7285f82``）。同时把已注销举报人的 ``reporter_id``
+换成去标识化值（该列 NOT NULL，举报要留存 365 天，不能删行也不能置空）。
+
+### 测试
+
+```
+cd azurekiln-qfli-server
+node --test --test-timeout=60000 "test/*.test.js"
+→ tests 145, pass 144, fail 0, skipped 1
+```
+
+``test/pending-visibility.test.js`` 不替换 ``src/util``：真实 ``authOptional``、
+真实 ``auth_sessions`` 与真实 token，只替身网关远端调用与审核服务。
+覆盖管理员可见、非管理员与匿名不可见、会话失效回落非管理员。
+
+``test/acceptance-fixes.test.js`` 的注册用例改为"从未有本地 users 行的首次注册"，
+并新增"已有映射时复用不重复建用户"。
