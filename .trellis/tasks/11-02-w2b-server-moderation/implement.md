@@ -219,7 +219,7 @@ node --test --test-timeout=60000 "test/*.test.js"
 
 ### 根因
 
-1. **管理员看不到待审帖（两项断言）**。真实 ``authOptional`` 只设置 ``req.userId``，
+1. **管理员看不到待审帖（两项断言）**。真实 ``authOptional`` 只赋值 ``req.userId``，
    从不设置 ``req.user``。上一版用 ``req.user?.is_admin`` 判定，恒为 false。
    更严重的是上一轮的测试替身自己填了 ``req.user``，比真实中间件宽松，把缺陷掩盖成通过。
 2. **注册审计 user_id 仍为 null**。首次注册时本地没有 users 行，上一版只做 ``SELECT``。
