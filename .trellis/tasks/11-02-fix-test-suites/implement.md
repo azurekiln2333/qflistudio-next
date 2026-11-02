@@ -100,4 +100,33 @@ core 的 6 个失败全部是 `test/java_content_render_test.dart`。用 `git sh
 
 判断：`LocalTutorialsTab` 的 Future 在第三次挂载时一直停在 `ConnectionState.waiting`，而同一代码路径在前两次挂载时都完成。前两个测试用掉的 `runAsync` 真实时间窗口是唯一剩下的差异变量。这属于测试夹具的调度问题，不是产品缺陷。
 
-没有改成放宽断言或加长等待，也没有删测试。后续需要在该测试里给 `setUpAll` 共享的临时目录做逐测试隔离，或给 `_waitFor` 建立独立的 runAsync 节拍，之后再复核。
+没有改成放宽断言或加长等待，也没有删用例。后续需要给 `setUpAll` 共享的临时目录做逐用例隔离，或给 `_waitFor` 新建独立的 runAsync 节拍，之后再复核。
+
+### 更正：主 App 不是离线产品
+
+上一版把这个用例的断言直接套在主 App profile 上，并因此把 `qfliStudioProfile` 改成了 `offlineOnly: true`。这是错的。
+
+`offlineOnly` 不只关两个开关。`ApiClient` 会拒绝联网。云项目与在线终端消失。AI 设置项消失。关于页换成离线文案。同一个 profile 里 `isOffline: false`，主 App 是联网产品。
+
+处理：
+
+1. `646c8e9` 撤销那 3 行，主 App 保持联网。
+2. `c838a7d` 把「隐藏云端 scope」的断言绑到离线产品档位。用例显式挂一个 `offlineOnly: true` 的 profile。原有断言一条未改。另加一条用例，验证主 App 联网 profile 必须显示云端 scope 与云端新建入口。
+3. core `6ac1442` 修掉我引入的两处回归：主 App 的「显示全部」捷径此前只按产品键判断，把 java 页面也吞了。改为仅当请求的语言等于产品 id 时才跳过语言过滤。`java_content_render_test` 的 6 例因此恢复。
+
+### 更正：lazy catalogue 用例的根因与修法
+
+同文件第 3 个 `testWidgets` 起，fake-async zone 不再投递 `runAsync` 之外的真实 I/O 完成回调。`w37:p2` 的独立实验得出了同一结论：同一个 adapter 在纯 `test()` 里连跑 6 次全部成功，在 `testWidgets` 里第 2 次起必然不返回。
+
+修法：在 `setUpAll` 里用 `binding.runAsync` 预热组合目录，用例内部的工厂改返回一个继承 `StudioContentRepository` 的包装器，只重放已完成的目录。`factoryCalls == 0` 的惰性与 `same(repository)` 的单实例断言语义原样保留，没有放宽任何断言，也没有加长等待。
+
+### 最终验证
+
+```
+cd D:/MyNewProjects/qfli_studio_core
+flutter test --no-pub     -> 1363 通过 / 9 跳过 / 0 失败
+dart analyze <改动文件>    -> No issues found
+
+cd D:/MyNewProjects/qflistudio
+flutter test --no-pub     -> 8 通过 / 0 失败
+```
