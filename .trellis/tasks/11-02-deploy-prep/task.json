@@ -3,7 +3,7 @@
   "name": "deploy-prep",
   "title": "Deployment prep: runbook, moderation pipeline, local end-to-end",
   "description": "Prepare W1+W2 deployment without production access",
-  "status": "planning",
+  "status": "completed",
   "dev_type": null,
   "scope": null,
   "package": null,
@@ -11,16 +11,36 @@
   "creator": "lichengyu",
   "assignee": "lichengyu",
   "createdAt": "2026-11-02",
-  "completedAt": null,
-  "branch": null,
+  "completedAt": "2026-11-02",
+  "branch": "main",
   "base_branch": "main",
   "worktree_path": null,
-  "commit": null,
+  "commit": "60f4ccd",
   "pr_url": null,
   "subtasks": [],
   "children": [],
   "parent": "11-02-compliance-2026-11",
-  "relatedFiles": [],
-  "notes": "",
-  "meta": {}
+  "relatedFiles": [
+    "docs/compliance/2026-11-上线手册.md",
+    "scripts/compliance/smoke.mjs",
+    "scripts/compliance/smoke.test.mjs",
+    "scripts/compliance/runbook.test.mjs",
+    "scripts/compliance/local-e2e.mjs",
+    "scripts/compliance/local-qfli.cjs",
+    "D:/MyNewProjects/azurekiln-moderation/.cnb.yml",
+    "D:/MyNewProjects/azurekiln-moderation/scripts/publish-ci.mjs",
+    "D:/MyNewProjects/azurekiln-moderation/scripts/publish-ci.test.mjs"
+  ],
+  "notes": "Deployment preparation complete. Production access, pushing, Docker and MySQL deployment acceptance remain operator actions.",
+  "meta": {
+    "artifactCommits": ["03868fa", "acde63e", "60f4ccd"],
+    "moderationCommits": ["8f74165", "6d6754c"],
+    "integrationDependencies": ["c07c974", "574a3f9"],
+    "validation": {
+      "deploymentTests": "15/15",
+      "localE2e": "19/19",
+      "moderationTests": "45/45",
+      "pipelineTests": "7/7"
+    }
+  }
 }
