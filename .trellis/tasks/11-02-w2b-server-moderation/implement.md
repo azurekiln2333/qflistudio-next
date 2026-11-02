@@ -89,7 +89,7 @@ SDK 未就绪（w37:p7 在做）前用同契约的直连实现。安装 `@azurek
 5. **`src/util.js` 有 W2a 的未提交改动**（实名中间件复用会话），本任务未触碰也未提交。
 6. **昵称/简介审核只在 `PATCH /api/users/me`**：网关侧（W4）也会改昵称简介，那条路径由网关工作区接入审核，
    本仓库不能替代。
-7. **数据库迁移需在线上执行**：MySQL 首次启动会自动补 `posts.status`、`comments.status` 与 4 张新表，
+7. **数据库迁移需在线上运行**：MySQL 首次启动会自动补 `posts.status`、`comments.status` 与 4 张新表，
    由部署阶段跑一次冒烟确认。
 
 ### 边界遵守
@@ -97,3 +97,56 @@ SDK 未就绪（w37:p7 在做）前用同契约的直连实现。安装 `@azurek
 未改动 W2a 边界内的 `src/audit.js`、`src/web-search.js`、AI 与注销文件、华为登录与实名中间件。
 `src/db.js` 只在末尾追加独立迁移调用。新增 `src/client-ip.js` 是只读工具（仅消费 `X-Real-IP`/`X-Real-Port`），
 不含可信代理配置本身（那是 W2a 的中间件）。
+
+## Follow-up：接入 W1 SDK（2026-11-02）
+
+### 提交
+
+| 短哈希 | 标题 |
+| --- | --- |
+| c07c974 | feat(server): call the moderation SDK from the vendored tarball |
+
+### 做了什么
+
+- 把 `azurekiln-moderation-client-0.1.0.tgz` 复制到 `azurekiln-qfli-server/vendor/`，文件名不变。
+  校验 SHA256：`e63df6cf97b73fb67dcf33d41b0a5b1c42ea20f1c1908374ef3a337c9fcaaab5`，大小 4329 字节，与下发值一致。
+- `package.json` 依赖 `@azurekiln/moderation-client` 指向 `file:vendor/azurekiln-moderation-client-0.1.0.tgz`。
+  lockfile 用 `npm install --package-lock-only` 更新，带 integrity 校验值，`npm ci` 可离线复现。
+- `Dockerfile` 在 `npm ci` 之前 `COPY vendor ./vendor`。`.dockerignore` 原本未排除 `vendor`，
+  无需改动，已逐行看过该文件。
+- 适配层 `src/moderation-client.js` 改为真正调用 SDK：
+  `checkText`、`checkIp`、`checkImage`、`submitReport` 走 `ModerationClient` 实例。
+  SDK 的 `failClosed:true` 负责把网络失败、超时、非法响应统一成 `moderation.unavailable`。
+  本层再做一次 decision 收敛，保证上层只看到 `pass|block|review`。
+- 测试替身（`__setTransport`）保留，只给 `test/moderation.test.js` 的路由级用例用。
+  新增 `test/moderation-sdk.test.js`：不注入替身，用本机 HTTP 假审核服务验证真实 SDK 路径。
+
+### 测试
+
+`
+cd azurekiln-qfli-server
+node --test test/moderation.test.js test/moderation-sdk.test.js
+→ tests 25, pass 25, fail 0
+`
+
+其余服务端测试逐个单跑全通过（ai-relay 16、deactivate 6、huawei-binding 9、points-rewards 1、
+points-upgrade 1、sqlbox 4、terminal-pool 29、web-tools 9、audit-log 前 4 条）。
+
+### SDK 能力缺口
+
+SDK 0.1.0 的导出只有 `ModerationClient`、`ModerationUnavailableError`、`ModerationHttpError`。
+方法只有 `checkText`、`checkImage`、`checkIp`、`submitReport`、`getReview`，没有管理接口。
+因此词库、IP 规则、场景开关仍由 `adminCall` 用 `MODERATION_ADMIN_KEY` 直连
+`/v1/admin/*`，与 SDK 同一套 `X-App-Id` 加 Bearer 契约。接口签名对外不变，
+SDK 补齐管理方法后只需替换 `adminCall` 一处。
+
+### 阻塞上报：W2a 的 audit-log 测试挂起
+
+`node --test test/audit-log.test.js` 第 5 条
+"a Huawei account without a phone cannot skip binding to create an account" 以 `unhandledRejection` 失败，
+错误文本是"请使用已绑定手机号的华为账号"，来自 `src/routes/auth.js:99` 的 `huaweiBinding`。
+失败发生在路由模块加载时补的 Promise 包装层之前，所以该用例直接判失败。
+进程随后不退出（残留句柄），单独跑该文件会一直挂住。
+该文件属 W2a（`src/routes/auth.js` 与 `src/audit.js`）的边界，本任务未改也未提交。
+按监控通知，该项由 w37:p2 修复。W2b 不再排查也不再运行该文件。
+W2b 的 25 条与其余文件均不受影响。
