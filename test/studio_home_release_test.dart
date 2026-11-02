@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:qfli_studio_core/i18n/studio_localizations.dart';
+import 'package:qfli_studio_core/content/content_repository.dart';
 import 'package:qfli_studio_core/models/project.dart';
 import 'package:qfli_studio_core/pages/community/post_list_page.dart';
 import 'package:qfli_studio_core/pages/home_page.dart';
@@ -31,6 +32,12 @@ void main() {
   late Directory root;
   StudioProfile? previousProfile;
 
+  /// 已加载的组合目录，与它所属的仓库。
+  ///
+  /// 在 `setUpAll` 里预热：那时 binding 还肯投递真实 I/O 回调。
+  late StudioContentRepository bundledRepository;
+  late ContentCatalog bundledCatalog;
+
   setUpAll(() async {
     root = await Directory.systemTemp.createTemp('qfli_studio_home_release_');
     binding.defaultBinaryMessenger.setMockMethodCallHandler(
@@ -46,6 +53,12 @@ void main() {
     expect(await AppPaths.storageDirectory(), root.path);
     await AppPaths.projectsRoot(create: true);
     await TaskActivityService.instance.initialize();
+    bundledRepository = qfliStudioProfile.contentRepositoryFactory!()
+        as StudioContentRepository;
+    final catalog = await binding.runAsync(
+      () => bundledRepository.load(),
+    );
+    bundledCatalog = catalog!;
   });
 
   setUp(() {
@@ -61,9 +74,28 @@ void main() {
   });
 
   testWidgets(
-    'main Home hides cloud scope, creation and registered cloud cards and opens workspaces',
+    'an offline product Home hides cloud scope, creation and registered cloud cards and opens workspaces',
     (tester) async {
-      final fixture = await _mount(tester, root);
+      // The cloud scope is hidden by the offline product tier, not by the main
+      // App's identity. This case pins that tier; the networked main App is
+      // pinned separately below.
+      final fixture = await _mount(
+        tester,
+        root,
+        profile: StudioProfile(
+          id: qfliStudioProfile.id,
+          appTitle: qfliStudioProfile.appTitle,
+          templates: qfliStudioProfile.templates,
+          productKey: qfliStudioProfile.productKey,
+          isOffline: false,
+          offlineOnly: true,
+          showHomeTabs: qfliStudioProfile.showHomeTabs,
+          runtimeKind: qfliStudioProfile.runtimeKind,
+          runtimeStatus: qfliStudioProfile.runtimeStatus,
+          supportedFileExtensions: qfliStudioProfile.supportedFileExtensions,
+          contentRepositoryFactory: qfliStudioProfile.contentRepositoryFactory,
+        ),
+      );
       final l10n = StudioLocalizations.of(tester.element(find.byType(HomeTab)));
       final scopes = find.byType(TabBar);
       expect(scopes, findsOneWidget);
@@ -119,6 +151,41 @@ void main() {
       );
       expect(find.byType(SavedWorkspacesTab), findsOneWidget);
       expect(fixture.projects.projects, hasLength(2));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the networked main App Home keeps the cloud scope and its creation entry',
+    (tester) async {
+      // The main App is a networked product: isOffline false and offlineOnly
+      // unset. Hiding the cloud scope here would also make ApiClient refuse
+      // network calls, drop the online terminal and switch the about page to
+      // offline copy.
+      await _mount(tester, root);
+      final l10n = StudioLocalizations.of(tester.element(find.byType(HomeTab)));
+      final scopes = find.byType(TabBar);
+      expect(
+        find.descendant(of: scopes, matching: find.text(l10n.cloudProjects)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: scopes, matching: find.byType(Tab)),
+        findsNWidgets(5),
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.descendant(
+            of: find.byType(HomeTab),
+            matching: find.byType(AppBar),
+          ),
+          matching: find.byType(PopupMenuButton<String>),
+        ),
+      );
+      await _settle(tester);
+      expect(find.text(l10n.newCloudProject), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await _settle(tester);
       expect(tester.takeException(), isNull);
     },
   );
@@ -204,6 +271,12 @@ void main() {
     'main content factory stays lazy and runs once across retained tutorial and example routes',
     (tester) async {
       var factoryCalls = 0;
+      // Real asset I/O stops arriving from the fake-async zone once earlier
+      // widget tests in this file have run, so the page would spin forever.
+      // The catalogue was warmed in setUpAll; hand the page a repository that
+      // only replays that finished load. The laziness and single-instance
+      // assertions below still hold: the factory is not called until the
+      // tutorial route mounts, and it is called exactly once.
       // Retain the main product's production flags and real bundled factory,
       // adding only a counter at its public injection boundary.
       StudioProfile.current = StudioProfile(
@@ -219,7 +292,7 @@ void main() {
         supportedFileExtensions: qfliStudioProfile.supportedFileExtensions,
         contentRepositoryFactory: () {
           factoryCalls++;
-          return qfliStudioProfile.contentRepositoryFactory!();
+          return _WarmRepository(bundledCatalog);
         },
       );
       await _mount(tester, root);
@@ -260,7 +333,12 @@ void main() {
   );
 }
 
-Future<_Fixture> _mount(WidgetTester tester, Directory root) async {
+Future<_Fixture> _mount(
+  WidgetTester tester,
+  Directory root, {
+  StudioProfile? profile,
+}) async {
+  if (profile != null) StudioProfile.current = profile;
   tester.view.physicalSize = const Size(600, 1000);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -408,4 +486,44 @@ class _Fixture {
 class _SignedInVisibilityAuth extends AuthStore {
   @override
   bool get isLoggedIn => true;
+}
+
+/// Replays a warmed catalogue load, warming it on the first call.
+///
+/// Bundled asset I/O is delivered through a real event loop. A widget test's
+/// fake-async zone stops forwarding those completions once earlier widget
+/// tests in the same file have run, so the page would stay on a spinner.
+/// The first read awaits the warm-up inside `runAsync`; every later read finds
+/// the catalogue already loaded.
+/// Replays an already-loaded catalogue.
+///
+/// Bundled asset I/O is delivered through a real event loop. A widget test's
+/// fake-async zone stops forwarding those completions once earlier widget
+/// tests in the same file have run, so the page would spin forever. The
+/// catalogue is warmed in `setUpAll` and replayed here, which keeps the type
+/// the shell expects while removing the I/O from the widget test.
+class _WarmRepository extends StudioContentRepository {
+  _WarmRepository(ContentCatalog catalog) : _catalog = catalog;
+
+  /// 已在 `setUpAll` 里加载完成的目录。
+  final ContentCatalog _catalog;
+
+  @override
+  Future<ContentCatalog> load() async => _catalog;
+
+  @override
+  Future<List<TutorialContent>> tutorials({
+    ContentFilter filter = const ContentFilter(),
+  }) async => [
+    for (final tutorial in _catalog.tutorials)
+      if (filter.matches(tutorial)) tutorial,
+  ];
+
+  @override
+  Future<List<ExampleContent>> examples({
+    ContentFilter filter = const ContentFilter(),
+  }) async => [
+    for (final example in _catalog.examples)
+      if (filter.matches(example)) example,
+  ];
 }
