@@ -32,7 +32,7 @@ git -C azurekiln-qfli-server diff --quiet   # 业务代码零改动
 
 ### 提交列表
 
-- `(见下)` 共 1 个提交，提交后回填短哈希
+- `c1f4382` docs(task): accept section 4 items 4 and 11 with a live moderation run
 
 ### 测试命令与结果
 
