@@ -119,8 +119,11 @@ export async function runSmoke(options, { fetchImpl = fetch, report = () => {} }
     ['terminal', '/api/terminal/pwd'], ['ai', '/api/ai/models'], ['sql', '/api/sql/databases'],
   ]) {
     await probe(`realname.${name}`, options.qfli && options.unverifiedToken, async () => {
-      const result = await call(options.qfli, path, { headers: accountHeaders(options.unverifiedToken) });
-      return expect(result, 403, body => body?.errorKey === 'realname.required', 'Expected realname.required');
+      for (const variant of [path, `${path}?compliance_smoke=1`, path.toUpperCase()]) {
+        const result = await call(options.qfli, variant, { headers: accountHeaders(options.unverifiedToken) });
+        expect(result, 403, body => body?.errorKey === 'realname.required', 'Expected realname.required for every path variant');
+      }
+      return 'HTTP 403 across canonical, query, and uppercase paths';
     }, 'QFLI URL or dedicated unverified test token missing');
   }
   await probe('publish.rate', options.qfli && options.rateToken && options.allowRate && canCheck, async () => {

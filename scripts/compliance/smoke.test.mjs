@@ -89,6 +89,24 @@ test('credentials are confined to their intended origins and never reported', as
   assert.doesNotMatch(JSON.stringify(reported), /test-key|Bearer|unverified/);
 });
 
+test('realname probes reject query and uppercase path bypasses and HTTP 401 substitutes', async () => {
+  for (const broken of ['query', 'uppercase', 'unauthorized']) {
+    const mock = fixture();
+    const fetchImpl = (url, config) => {
+      if (config.headers.authorization === 'Bearer unverified') {
+        const path = new URL(url);
+        if (broken === 'query' && path.search) return Promise.resolve(Response.json({}, { status: 200 }));
+        if (broken === 'uppercase' && path.pathname === path.pathname.toUpperCase()) return Promise.resolve(Response.json({}, { status: 200 }));
+        if (broken === 'unauthorized') return Promise.resolve(Response.json({ errorKey: 'realname.required' }, { status: 401 }));
+      }
+      return mock.fetchImpl(url, config);
+    };
+    const result = await runSmoke(options(), { fetchImpl });
+    assert.equal(result.ok, false);
+    assert.equal(result.cases.filter(item => item.name.startsWith('realname.') && item.status === 'fail').length, 5);
+  }
+});
+
 test('validates URLs and arguments without echoing credential inputs', () => {
   for (const url of ['ftp://example.cn', 'https://secret:password@example.cn', 'https://example.cn/?token=x']) {
     assert.throws(() => optionsFrom(['--qfli', url], {}), /Base URLs/);
