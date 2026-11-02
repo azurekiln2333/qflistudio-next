@@ -1,0 +1,538 @@
+{
+  "capturedAt": "2026-11-02T20:50:15.255193+00:00",
+  "evidenceRoot": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9",
+  "sourceAndAuditReview": {
+    "capturedAt": "2026-11-02T20:48:36.387565+00:00",
+    "gitLogScope": "--all --since=2026-11-02T00:00:00+08:00 (committer date)",
+    "revisions": {
+      "core": "6ac144256ca0da841b2ef8d45b107ed6f1cd7210",
+      "studio": "1a1d8df600511eaeaddd21cebf24880398abd039",
+      "server": "1a1d8df600511eaeaddd21cebf24880398abd039",
+      "moderation": "6d6754c907b1e3b6caf162a55a2292edc6469022"
+    },
+    "sourceChangesSinceFullGates": {
+      "core": [],
+      "studio": [],
+      "server": [],
+      "moderation": []
+    },
+    "auditCounts": {
+      "core": {
+        "count": 12,
+        "violations": 0
+      },
+      "studio": {
+        "count": 66,
+        "violations": 0
+      },
+      "server": {
+        "count": 24,
+        "violations": 0
+      },
+      "moderation": {
+        "count": 5,
+        "violations": 0
+      }
+    },
+    "scanCounts": {
+      "core": {
+        "files": 339,
+        "matches": 65
+      },
+      "studio": {
+        "files": 86,
+        "matches": 2
+      },
+      "server": {
+        "files": 60,
+        "matches": 6
+      },
+      "moderation": {
+        "files": 33,
+        "matches": 0
+      }
+    }
+  },
+  "commandResults": [
+    {
+      "name": "core-test",
+      "cwd": "D:\\MyNewProjects\\qfli_studio_core",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "test",
+        "--no-pub",
+        "--reporter",
+        "expanded",
+        "--timeout",
+        "2m"
+      ],
+      "timeoutSeconds": 600,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 48.056,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\core-test.log"
+    },
+    {
+      "name": "core-analyze",
+      "cwd": "D:\\MyNewProjects\\qfli_studio_core",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "analyze",
+        "--no-pub"
+      ],
+      "timeoutSeconds": 240,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 18.872,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\core-analyze.log"
+    },
+    {
+      "name": "studio-test",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "test",
+        "--no-pub",
+        "--reporter",
+        "expanded",
+        "--timeout",
+        "2m"
+      ],
+      "timeoutSeconds": 300,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 5.909,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\studio-test.log"
+    },
+    {
+      "name": "studio-preview-test",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "test",
+        "--no-pub",
+        "tool/preview_test.dart",
+        "--reporter",
+        "expanded",
+        "--timeout",
+        "1m"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 2.386,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\studio-preview-test.log"
+    },
+    {
+      "name": "studio-analyze",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "analyze",
+        "--no-pub"
+      ],
+      "timeoutSeconds": 240,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 7.984,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\studio-analyze.log"
+    },
+    {
+      "name": "studio-script-tests",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:\\ProgramFiles\\nodejs\\node.EXE",
+        "--test",
+        "--test-timeout=60000",
+        "scripts/*.test.mjs",
+        "scripts/compliance/*.test.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 1.094,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\studio-script-tests.log"
+    },
+    {
+      "name": "server-test",
+      "cwd": "D:\\MyNewProjects\\qflistudio\\azurekiln-qfli-server",
+      "command": [
+        "D:\\ProgramFiles\\nodejs\\node.EXE",
+        "--test",
+        "--test-timeout=60000",
+        "test/*.test.js"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 2.227,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\server-test.log"
+    },
+    {
+      "name": "server-lint-command",
+      "cwd": "D:\\MyNewProjects\\qflistudio\\azurekiln-qfli-server",
+      "command": [
+        "D:\\ProgramFiles\\nodejs\\npm.cmd",
+        "run",
+        "lint"
+      ],
+      "timeoutSeconds": 60,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationSeconds": 0.588,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\server-lint-command.log"
+    },
+    {
+      "name": "server-syntax",
+      "command": "node --check <each JavaScript file under src/scripts/test/packages>",
+      "timeoutSeconds": 180,
+      "exitCode": 0,
+      "durationSeconds": 4.621,
+      "checkedFiles": 60
+    },
+    {
+      "name": "moderation-test",
+      "cwd": "D:\\MyNewProjects\\azurekiln-moderation",
+      "command": [
+        "D:\\ProgramFiles\\nodejs\\npm.cmd",
+        "test"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 3.168,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\moderation-test.log"
+    },
+    {
+      "name": "moderation-ci-tests",
+      "cwd": "D:\\MyNewProjects\\azurekiln-moderation",
+      "command": [
+        "D:\\ProgramFiles\\nodejs\\node.EXE",
+        "--test",
+        "--test-timeout=60000",
+        "scripts/publish-ci.test.mjs"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 0.172,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\moderation-ci-tests.log"
+    },
+    {
+      "name": "moderation-lint",
+      "cwd": "D:\\MyNewProjects\\azurekiln-moderation",
+      "command": [
+        "D:\\ProgramFiles\\nodejs\\npm.cmd",
+        "run",
+        "lint"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 2.944,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\moderation-lint.log"
+    },
+    {
+      "name": "navigation-widget-final",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "test",
+        "--no-pub",
+        ".trellis/tasks/11-02-acceptance/client/navigation_click_test.dart",
+        "--reporter",
+        "expanded",
+        "--timeout",
+        "1m"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 4.838,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\navigation-widget-final.log"
+    },
+    {
+      "name": "ai-transport-probe-complete",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:/ProgramFiles/flutter_ohos/bin/flutter.bat",
+        "test",
+        "--no-pub",
+        ".trellis/tasks/11-02-acceptance/client/ai_transport_probe_test.dart",
+        "--reporter",
+        "expanded",
+        "--timeout",
+        "1m"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 3.574,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\ai-transport-probe-complete.log"
+    },
+    {
+      "name": "core-compliance-widgets",
+      "cwd": "D:\\MyNewProjects\\qfli_studio_core",
+      "command": [
+        "D:\\ProgramFiles\\flutter_ohos\\bin\\flutter.BAT",
+        "test",
+        "--no-pub",
+        "test/auth_login_entry_test.dart",
+        "test/settings_compliance_test.dart",
+        "test/ai_file_header_test.dart",
+        "--reporter",
+        "expanded",
+        "--timeout",
+        "1m"
+      ],
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 4.333,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\core-compliance-widgets.log"
+    },
+    {
+      "name": "owned-dart-analyze",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "D:/ProgramFiles/flutter_ohos/bin/dart.bat",
+        "analyze",
+        ".trellis/tasks/11-02-acceptance/client/navigation_click_test.dart",
+        ".trellis/tasks/11-02-acceptance/client/ai_transport_probe_test.dart"
+      ],
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 2.32,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\owned-dart-analyze.log"
+    },
+    {
+      "name": "owned-chinese-lint",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "scripts/ste-lint-zh.py",
+        "docs/compliance/acceptance/client.md",
+        "docs/compliance/2026-11-验收记录.md",
+        ".trellis/tasks/11-02-acceptance/client/design.md",
+        ".trellis/tasks/11-02-acceptance/client/implement.md"
+      ],
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationSeconds": 0.102,
+      "log": "D:\\AppData\\Local\\Temp\\qfli-client-acceptance-20261103-p7-xvt69sg9\\owned-chinese-lint.log"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "name": "ai-transport-probe-complete.json",
+      "sha256": "b430fb9054864a079c01a60d349074131efa0785f0ed3b7dde97dbba4b7ee7f2",
+      "bytes": 1198
+    },
+    {
+      "name": "ai-transport-probe-complete.log",
+      "sha256": "3c06083773726d6d54f0d08d08f7b8dc44b927ddc6c5b3c5c25a759b39bd26b1",
+      "bytes": 622
+    },
+    {
+      "name": "commit-audit.json",
+      "sha256": "d0d9d6b83c7692ee4c9cda8e780ea9e9f2d55e3ba908061e839c5549c5d406e2",
+      "bytes": 85145
+    },
+    {
+      "name": "core-analyze.json",
+      "sha256": "3d455316800ea8320961c368f177124a4225003446c27773d0a97b95d06c8eeb",
+      "bytes": 3444
+    },
+    {
+      "name": "core-analyze.log",
+      "sha256": "bf6a95b8ba656b7426fd33bab03407c8677285ea3489f4a17c801b2045d7b8ef",
+      "bytes": 153392
+    },
+    {
+      "name": "core-compliance-widgets.json",
+      "sha256": "3e0b2523a06b689663dc2a3edc5346d1d069bb78c952b04c0d139823b59f8174",
+      "bytes": 3651
+    },
+    {
+      "name": "core-compliance-widgets.log",
+      "sha256": "e7af9a65cea8ac27e5f6ae0ac334053925894051420398cb04032d53148008b4",
+      "bytes": 4947
+    },
+    {
+      "name": "core-test.json",
+      "sha256": "ce37ee518c34e521379a034117fbf87ed01a13ff169d806640ae419bafa5e711",
+      "bytes": 3769
+    },
+    {
+      "name": "core-test.log",
+      "sha256": "e381c28e89df4920ac73297f323573ef3b5dae55b99490b5ee3002ec7c2498e1",
+      "bytes": 211570
+    },
+    {
+      "name": "global-bing-scan.json",
+      "sha256": "9bbd41714cce907fa37fa867f8ff2c36b7fbfefda16d733eaea3972e5aaefbde",
+      "bytes": 94646
+    },
+    {
+      "name": "manifest.json",
+      "sha256": "65a0f4b517fe863ac739e24282ab35b9987c014ebbb5c75f88afe9a3271b01b9",
+      "bytes": 53887
+    },
+    {
+      "name": "moderation-ci-tests.json",
+      "sha256": "c97bc010920de6e08289058cb80efa819a05bfa4ccea1ee23c2838abc82d265f",
+      "bytes": 1133
+    },
+    {
+      "name": "moderation-ci-tests.log",
+      "sha256": "11c65b4d9fde8d61158b3c924a98f88904256bb986a7498433a5aa9612a22f72",
+      "bytes": 668
+    },
+    {
+      "name": "moderation-lint.json",
+      "sha256": "894658d3b4feae0a78447120eb8ed3cc89e53b66e12b8a9b4b2dddf4ed03d57e",
+      "bytes": 487
+    },
+    {
+      "name": "moderation-lint.log",
+      "sha256": "65c1462ade06b7c76af6657e6020a6bf868a14f38e975b080bd68c513611f8ce",
+      "bytes": 96
+    },
+    {
+      "name": "moderation-test.json",
+      "sha256": "860d7a3fd5e88cdd018c6d832112d4ddd178579fdf793251c9eb4d452d990b52",
+      "bytes": 1827
+    },
+    {
+      "name": "moderation-test.log",
+      "sha256": "c229cccd51cfdb2ceb21603fa2060d8ab17b2385fc69c926a5f4f71bd7580124",
+      "bytes": 4175
+    },
+    {
+      "name": "navigation-widget-final.json",
+      "sha256": "095bf12fe39731c12d9be518929df2dcfd5f4105cae90933413c40f1f00fc257",
+      "bytes": 1607
+    },
+    {
+      "name": "navigation-widget-final.log",
+      "sha256": "1a6775b6947cdd7032e6a71373ca7917a0ffa93e20429fba10d57a7a9b9dddbc",
+      "bytes": 1043
+    },
+    {
+      "name": "owned-chinese-lint.json",
+      "sha256": "920d7a843dcd8de0ddf381d38e624579a3bc9ab6d160cf96d74343339cf50fab",
+      "bytes": 1118
+    },
+    {
+      "name": "owned-chinese-lint.log",
+      "sha256": "befb278ca8dff27252e1a6dc2e79820df60db4639cca10e5c7794f87c58310f9",
+      "bytes": 524
+    },
+    {
+      "name": "owned-dart-analyze.json",
+      "sha256": "e0ada95380c94577400ecd6d1fe2b9999362fb70d7917ba04a9196599a73b9b2",
+      "bytes": 618
+    },
+    {
+      "name": "owned-dart-analyze.log",
+      "sha256": "5603b5208c266e629091cb56a292b088c5abe31e157478713417cad261f6eddc",
+      "bytes": 87
+    },
+    {
+      "name": "server-lint-command.json",
+      "sha256": "c536370df78cdc15da47516173a22e45d9f3016e9dd998551fa33b25188449ad",
+      "bytes": 736
+    },
+    {
+      "name": "server-lint-command.log",
+      "sha256": "933456ae6b0925a1bfeb937ad2827b08fe65cf062961ab0b56d600712093e81c",
+      "bytes": 315
+    },
+    {
+      "name": "server-syntax.json",
+      "sha256": "f1488aa705f77bcbed16a98ff27937c2d9354b0cbbc4d0806202659d7a21b806",
+      "bytes": 6047
+    },
+    {
+      "name": "server-test.json",
+      "sha256": "61ddd4fc078e3e82eea1e4c7d3322373e0dee234a9a14a385730dca1eee36f7b",
+      "bytes": 1848
+    },
+    {
+      "name": "server-test.log",
+      "sha256": "0c281cb587b59f38602e7a901313198e8115a09d776325ddbe78af00504a4fcd",
+      "bytes": 44480
+    },
+    {
+      "name": "source-review.json",
+      "sha256": "d19ae43d8e2a072eac471efb8cb772bdc4a0a89e0792a1d17ca1733189610439",
+      "bytes": 1100
+    },
+    {
+      "name": "studio-analyze.json",
+      "sha256": "7dcd26aa06ba69120eb41d376882cef2aced29481cbacab7f0b1a6382b489bdb",
+      "bytes": 1120
+    },
+    {
+      "name": "studio-analyze.log",
+      "sha256": "96d49f9ec856115457b031a5bc0e23daa15e2a5ee17890da39df85bb0f8de24f",
+      "bytes": 711
+    },
+    {
+      "name": "studio-preview-test.json",
+      "sha256": "d91dc4f821bd3d3c0b7d839b2f59c41d24789efb237cb2fe43b63d2b39386c6e",
+      "bytes": 1135
+    },
+    {
+      "name": "studio-preview-test.log",
+      "sha256": "bfac4c222adee6a62a16571d28e7488c574f90bdb60677c1b7d7b766de72bfd0",
+      "bytes": 622
+    },
+    {
+      "name": "studio-script-tests.json",
+      "sha256": "6a449027f9603323c72d82f34891ffad62cbb1204e3d760badc5c0cb95ef0c95",
+      "bytes": 1781
+    },
+    {
+      "name": "studio-script-tests.log",
+      "sha256": "04d03dcf0c86c3225d2b54c35002641bc87380470d33b7eb778486ae9ec030b7",
+      "bytes": 2224
+    },
+    {
+      "name": "studio-test.json",
+      "sha256": "dfd835cd88aa98c5a75b42abe8b5efe9ead6139b35b2d35fde91848e4544c66d",
+      "bytes": 1919
+    },
+    {
+      "name": "studio-test.log",
+      "sha256": "40fa13061a52fd214a1291fa1ba5eb83edb681dc35de5d372a0441592ff5e0a3",
+      "bytes": 1454
+    },
+    {
+      "name": "summary.json",
+      "sha256": "1b2b35aace88892bee2a063889e45a02bc6f0eba2ecea97ae47291806d371ace",
+      "bytes": 24699
+    }
+  ],
+  "probeSources": {
+    "ai_transport_probe_test.dart": "f528b9d6919d5b022779b932860883bd76ffefb348bd3ac5b67b12cbd6bfb995",
+    "bounded_checks.py": "c0780ceb6a4f0012236c77e92e96e17f42ca07cf982e8aa299c824b04a980081",
+    "navigation_click_test.dart": "0089af90041b9411825eca98567d82001021a681e4ad66c9ae7a74ee400e261a",
+    "supplemental_checks.py": "4593b6b51e55e675a07c135ddf618f1edf7345a762e1901e46ecf14903133aa6"
+  },
+  "artifact": {
+    "path": "D:\\MyNewProjects\\qflistudio\\ohos\\entry\\build\\default\\outputs\\default\\qflistudio-5.0.1-5000001-release-signed.hap",
+    "sha256": "788fe80a0dcea38d089a4e94212aa94d0b36a912930b5cc809dc2232616c1511",
+    "deviceSmoke": "not performed"
+  },
+  "limitations": [
+    "AI probe success characterizes a compliance defect",
+    "Default test success does not cover preview compilation failure or skipped cases",
+    "Production deployment and real gateway effects were not verified",
+    "Locked device was not operated"
+  ]
+}
