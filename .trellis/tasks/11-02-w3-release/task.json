@@ -3,7 +3,7 @@
   "name": "w3-release",
   "title": "W3 release: version bump and signed release HAP",
   "description": "W3 release build per docs/compliance/2026-11-整改任务书.md",
-  "status": "in_progress",
+  "status": "completed",
   "dev_type": null,
   "scope": null,
   "package": null,
@@ -11,7 +11,7 @@
   "creator": "lichengyu",
   "assignee": "lichengyu",
   "createdAt": "2026-11-02",
-  "completedAt": null,
+  "completedAt": "2026-11-03",
   "branch": "main",
   "base_branch": "main",
   "worktree_path": null,
@@ -26,9 +26,13 @@
     "lib/main.dart",
     "test/release_version_test.dart"
   ],
-  "notes": "Version 5.0.1/5000001 and signed release-mode trial verified. Final HAP awaits the coordinator's test-green notice. Device smoke stopped at lockscreen preflight.",
+  "notes": "Final signed release HAP 5.0.1/5000001 built after coordinator test-green approval and verified. Packaging complete. Device smoke is deferred until an explicit unlock notification.",
   "meta": {
-    "releaseState": "awaiting-test-green",
-    "lastCheckedAt": "2026-11-03T04:03:23+08:00"
+    "releaseState": "final-signed-hap-verified",
+    "lastCheckedAt": "2026-11-03T04:16:17+08:00",
+    "finalHap": "D:/MyNewProjects/qflistudio/ohos/entry/build/default/outputs/default/qflistudio-5.0.1-5000001-release-signed.hap",
+    "sha256": "788fe80a0dcea38d089a4e94212aa94d0b36a912930b5cc809dc2232616c1511",
+    "signingType": "release",
+    "smokeStatus": "deferred-device-locked"
   }
 }

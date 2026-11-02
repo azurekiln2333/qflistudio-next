@@ -5,7 +5,7 @@
 3. Test version consistency and run a release-mode trial build.
 4. Wait for the coordinator's explicit test-green notification.
 5. Build and verify the final signed HAP. Record its SHA256.
-6. Install on the specified device and collect text-only smoke evidence.
+6. Record device smoke as deferred until an explicit unlock notification.
 7. Commit explicit owned paths and append the required Result.
 
 ## Validation plan
@@ -45,7 +45,16 @@
   `D:/AppData/Local/Temp/qfli-w3-release/qflistudio-5.0.1-5000001-trial-release-signed.hap`.
   Its SHA256 is
   `53b39fa9b4006b4e390b396dfd25d8e7a40d79862b32b9273289e30419b65a18`.
-  It remains a trial artifact pending the coordinator's test-green notice.
+  It was recorded as a trial artifact before the test-green notice.
+- 2026-11-03: Received the coordinator's explicit test-green release approval.
+  Verified the recorded final results: core 1363 passed, 9 skipped, 0 failed.
+  Main app 8 passed, 0 failed.
+- Verified `offlineOnly` is absent from the production main app profile.
+  The coordinator confirmed its removal in `646c8e9`.
+- Final build source: qflistudio `20382e2`, shared core `6ac1442`.
+  Shared-core worktree is clean. Signing configuration matches its original hash.
+- Device smoke remains deferred by the coordinator's explicit instruction.
+  This packaging turn will perform no device operations.
 
 ## Local build commands
 
@@ -71,16 +80,20 @@ It does not rewrite the signing configuration or export credential values.
 
 ## Result
 
-Status: **blocked before final packaging**, checked at 2026-11-03 04:03 +08:00.
-Version changes and signed release-mode trial builds are complete.
-The PRD requires the coordinator's explicit test-green notice before the final
-HAP. That notice has not arrived. The 30-minute wait for `w37:p4` timed out.
-The coordinator confirmed that service acceptance passed and client test
-repairs remain pending. This task is not marked completed.
+Status: **completed**, verified at 2026-11-03 04:16 +08:00.
+The coordinator confirmed that tests are green and authorized the final build.
+Rebuilt the HAP after that notification and verified its release signature.
+The coordinator requested task completion with device smoke deferred until an
+explicit `设备已解锁` notification.
 
 ### Commit
 
 - `d58f72e` — `chore(release): align version 5.0.1 across app manifests and HTTP headers`
+- `20382e2` — `docs(release): record the signed trial and pending test gate`
+
+Build source: qflistudio `20382e2`, shared core `6ac1442`.
+Application sources remained unchanged throughout the final build.
+The main app retains its online profile after `646c8e9` removed `offlineOnly`.
 
 ### Artifact
 
@@ -90,16 +103,17 @@ repairs remain pending. This task is not marked completed.
 | Version code | `5000001` |
 | Pubspec version | `5.0.1+5000001` |
 | HTTP header | `harmonyos-app/5.0.1` |
-| Final HAP | Not produced. Awaiting the coordinator's test-green notice |
-| Trial HAP absolute path | `D:/AppData/Local/Temp/qfli-w3-release/qflistudio-5.0.1-5000001-trial-release-signed.hap` |
-| Trial HAP SHA256 | `53b39fa9b4006b4e390b396dfd25d8e7a40d79862b32b9273289e30419b65a18` |
+| Final HAP absolute path | `D:/MyNewProjects/qflistudio/ohos/entry/build/default/outputs/default/qflistudio-5.0.1-5000001-release-signed.hap` |
+| Final HAP SHA256 | `788fe80a0dcea38d089a4e94212aa94d0b36a912930b5cc809dc2232616c1511` |
+| Final HAP size | `83698118` bytes |
 | Signing type | **release**, existing `releaseKey`, AppGallery distribution profile |
 | Build mode | `release`. Generated HAP metadata has `debug=false` |
 | Signing material | Existing local files. No new material required |
 
-The trial artifact is verification evidence. It is not the final AGC delivery.
-After the test-green notice, rebuild against the tested source, sign the final
-HAP, verify it, and record its final path and SHA256 here.
+The versioned HAP above is the final signed package for this task.
+The earlier trial artifact remains separate under `%TEMP%`.
+The generated default `entry-default-signed.hap` uses the debug identity.
+Use the versioned release-signed path above for the final artifact.
 
 ### Commands and results
 
@@ -112,42 +126,68 @@ HAP, verify it, and record its final path and SHA256 here.
   1820 examples.
 - `hvigor.js --mode module -p module=entry@default -p product=default
   -p buildMode=release assembleHap --no-daemon --no-incremental --analyze=false`:
-  **passed**, 42 tasks executed in 1 minute 17 seconds on the aligned trial.
+  **passed**, 42 tasks executed in 1 minute 17.180 seconds on the final build.
   Existing ArkTS warnings remain in the build log.
 - `node %TEMP%/qfli-w3-release/sign-existing.cjs releaseKey <unsigned-hap>
-  <trial-release-signed-hap>`: **passed** using existing credentials in memory.
+  <final-release-signed-hap>`: **passed** using existing credentials in memory.
 - SDK `hap-sign-tool.jar verify-app`: **passed**.
   It verified the release profile, code signatures, package digest, and
   permission signature.
+- Final HAP metadata/hash check: **passed**.
+  Bundle is `com.azurekiln.qflistudio`. Version is `5.0.1/5000001`.
+  The HAP has `debug=false`. Its verified embedded profile is `release`
+  with `app_gallery` distribution.
 - `python scripts/ste-lint-zh.py <task design.md> <task implement.md>`:
   **passed**, no controlled Chinese violations.
-- Full client test suite: **pending with the coordinator and w37:p4**.
-  Local passing checks do not establish a full-suite pass.
+- Full-suite evidence from `11-02-fix-test-suites/implement.md`, confirmed by
+  the coordinator before the final build:
+  `qfli_studio_core` **1363 passed, 9 skipped, 0 failed**.
+  `qflistudio` **8 passed, 0 failed**.
+
+Final build log: `D:/AppData/Local/Temp/qfli-w3-release/final-build.log`.
+Final signature verification log:
+`D:/AppData/Local/Temp/qfli-w3-release/final-verify.log`.
+
+The signing invocation uses the local helper documented above. Verification:
+
+```powershell
+$finalHap = 'D:/MyNewProjects/qflistudio/ohos/entry/build/default/outputs/default/qflistudio-5.0.1-5000001-release-signed.hap'
+& 'D:/ProgramFiles/Huawei/DevEco Studio/jbr/bin/java.exe' -jar `
+  'D:/ProgramFiles/Huawei/DevEco Studio/sdk/default/openharmony/toolchains/lib/hap-sign-tool.jar' `
+  verify-app -inFile $finalHap `
+  -outCertChain (Join-Path $env:TEMP 'qfli-w3-release/final-certchain.cer') `
+  -outProfile (Join-Path $env:TEMP 'qfli-w3-release/final-profile.p7b')
+Get-FileHash -LiteralPath $finalHap -Algorithm SHA256
+```
 
 ### Device smoke
 
+Status: **deferred by coordinator instruction**.
 Target: `192.168.68.207:46551`.
-`hdc ... shell uitest dumpLayout` succeeded during preflight.
-The text contained `ScreenLockRootComponent` and `ScreenLockWidgetView`.
-Stopped device operations immediately and reported the lock to the coordinator.
+Earlier preflight text contained `ScreenLockRootComponent` and
+`ScreenLockWidgetView`. The coordinator confirmed that the device remains
+locked and explicitly prohibited device operations during final packaging.
+This packaging turn performed no device operations.
 No application was installed, uninstalled, or started by this task.
 No screenshots were read.
 
 Startup, the settings agreement/deletion entries, and Huawei-only login are
-**not verified on this build**. Resume smoke after an unlock notification and
-the final build. Use `install -r` and preserve installed applications.
+**not verified on this final build**. Resume smoke only after an explicit
+`设备已解锁` notification. Use `install -r` and preserve installed applications.
+Task completion records the authorized packaging scope, not a device-smoke pass.
 
 ### User actions and remaining work
 
-- Keep the specified device unlocked for the final smoke run.
+- Unlock the specified device and send `设备已解锁` for the later smoke run.
 - Publish the hosted user agreement in AGC and provide its HTTPS URL.
   `userAgreementUrl` is currently empty in the shared core.
+  Configure that URL and rebuild to make the entry open the published document.
 - Confirm the hosted privacy declaration and complete AGC version submission
-  after the final artifact is available.
+  using the final release artifact.
 - Release signing material is already available. No signing-material request
   remains for the user.
-- The coordinator must announce that client tests are green. Final packaging
-  and device smoke remain release-worker follow-up work.
+- Final packaging is complete. Device smoke is the only deferred technical
+  verification in this task.
 
 `ohos/build-profile.json5` remains byte-identical to its initial local state.
 No signing material, credential, HAP, or signing configuration was committed.
