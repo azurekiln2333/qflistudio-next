@@ -82,7 +82,7 @@ D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc8
 
 
 ~~~powershell
-node "D:\AppData\Local\Temp\qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-acceptance.mjs"
+node "D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-acceptance-initial.mjs"
 ~~~
 
 脚本 SHA-256：
@@ -998,3 +998,279 @@ node --test test/audit-log.test.js test/client-context.test.js \
 部署者须补充线上复测及实际网关证据。
 本报告未确认生产部署完成。
 本报告未验收审核服务自身的实现。
+
+
+## 第一次修复复测（2026-11-02 17:50）
+
+本节追加复测结果。
+前文保留初验结论。
+本次启动全新 QFLI 与审核服务进程。
+本次另建 SQLite 和测试账号。
+网关与 AI 仍为本地接口夹具。
+
+
+
+~~~json
+{
+  "revision": "ac4d0b85cb6f37d10df6dedbfb5b9b6d5446d1b0",
+  "fixCommits": [
+    "10dee9b",
+    "741e33f",
+    "68a992e"
+  ],
+  "testCommit": "50aebcc",
+  "taskRecordCommit": "ac4d0b8",
+  "checks": 84,
+  "passed": 81,
+  "failed": [
+    "1.fields.auth.register",
+    "6.pending-admin-visible",
+    "6.pending-list-admin"
+  ],
+  "sourceChangesDuringRun": []
+}
+~~~
+
+**结论：失败。**
+本轮 84 项断言中，81 项通过，3 项失败。
+原有 5 项失败中，2 项通过，3 项仍失败。
+线上及真实网关结论仍需补证。
+
+| 原失败断言 | 本次结论 | 实际结果 |
+|---|---|---|
+| 注册审计用户 ID | 失败 | 首次注册仍为 null |
+| 管理员待审详情 | 失败 | HTTP 404 |
+| 管理员待审列表 | 失败 | HTTP 200，但不含待审帖子 |
+| 跨操作者审计 ID | 通过 | 已测试的禁言、解除禁言记录不含原 ID |
+| 失败注销审计 | 通过 | 审计计数由 44 增至 45 |
+
+**验证方法**
+
+沿用初验 HTTP 流程。
+新增网关按用户名查询的夹具响应。
+该响应返回新注册账号的真实测试 sub。
+首次注册前不预插该账号的本地用户行。
+另加强账号 ID 一致性检查。
+注销复测还检查原审计行和时间均保留。
+
+
+
+~~~powershell
+node "D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/server-acceptance.mjs"
+~~~
+
+本次脚本 SHA-256：
+
+
+~~~text
+6812b099057d37aa5b468530b3c245f3806de8f25e99ea92df535db6bf925744
+~~~
+
+**注册审计实际结果**
+
+注册响应仍为 HTTP 200。
+网关公开资料查询也返回 200。
+本地用户映射为空，审计用户 ID 仍为空。
+
+
+~~~json
+[
+  {
+    "method": "GET",
+    "path": "/oauth2/public-profile/acceptance_new",
+    "status": 200
+  }
+]
+~~~
+
+
+
+~~~json
+{
+  "gatewaySubject": "acceptance-new-user",
+  "localUser": null
+}
+~~~
+
+
+
+~~~json
+{
+  "id": "audit_591a2c078ab0fda71e6707c71d6f229e",
+  "user_id": null,
+  "username": "acceptance_new",
+  "action": "auth.register",
+  "target": null,
+  "detail": null,
+  "ip": "198.51.100.17",
+  "user_agent": "node",
+  "created_at": "2026-11-02 09:50:16",
+  "port": 45678,
+  "platform": "harmonyos-app",
+  "login_type": "register"
+}
+~~~
+
+修复代码只查询本地用户映射。
+首次注册不会已有该映射。
+新增回归测试预插了该用户行。
+该测试无法证明首次注册场景通过。
+
+**管理员待审可见性实际结果**
+
+
+
+~~~json
+{
+  "status": 200,
+  "contentType": "application/json; charset=utf-8",
+  "body": {
+    "id": "post_acaac41cfaab1c8a7266e10255ecd92d",
+    "status": "pending"
+  }
+}
+~~~
+
+
+
+~~~json
+{
+  "status": 404,
+  "contentType": "application/json; charset=utf-8",
+  "body": {
+    "error": "内容不存在"
+  }
+}
+~~~
+
+管理员列表仍不含该帖子。
+作者与管理员使用相同的真实认证链。
+真实 authOptional 只写入 req.userId。
+修复代码却读取 req.user.is_admin。
+测试替身额外写入了 req.user。
+该差异使修复未覆盖真实认证链。
+
+**注销两项实际结果**
+
+
+
+~~~json
+[
+  {
+    "id": "7.audit-all-identifiers-removed",
+    "result": "pass",
+    "actual": {
+      "remaining": [],
+      "allOriginalAuditRowsPreserved": true
+    }
+  },
+  {
+    "id": "7.failed-erase-audited",
+    "result": "pass",
+    "actual": {
+      "before": 44,
+      "after": 45,
+      "rows": [
+        {
+          "id": "audit_888635762aa36a56e158c4f91167e145",
+          "user_id": "user_5770a38f1e5e9d4a601d74d730b37c18",
+          "username": "accept_denied",
+          "action": "user.deactivate_failed",
+          "target": "user:user_5770a38f1e5e9d4a601d74d730b37c18",
+          "detail": "status=403 errorKey=gateway.insufficient_scope",
+          "ip": "198.51.100.17",
+          "user_agent": "node",
+          "created_at": "2026-11-02 09:50:17",
+          "port": 45678,
+          "platform": "harmonyos-app",
+          "login_type": null
+        }
+      ]
+    }
+  }
+]
+~~~
+
+禁言与解除禁言审计已替换目标 ID。
+管理员自身的用户 ID 保留。
+原审计行的 ID、动作与时间均保留。
+
+
+~~~json
+[
+  {
+    "id": "audit_0061367e7426801804d89b309fca3e6e",
+    "user_id": "user_a003670975346e2bb59820b116169232",
+    "username": "accept_admin",
+    "action": "admin.account_mute",
+    "target": "user:deleted_1f590c0c5fe12aa24a89e272ef285ea9",
+    "detail": "reason=Acceptance target identity audit",
+    "created_at": "2026-11-02 09:50:17"
+  },
+  {
+    "id": "audit_31c4eeb22b0ff3420c5e08fe95cf387a",
+    "user_id": "user_a003670975346e2bb59820b116169232",
+    "username": "accept_admin",
+    "action": "admin.account_unmute",
+    "target": "user:deleted_1f590c0c5fe12aa24a89e272ef285ea9",
+    "detail": "reason=Acceptance unmute before erase",
+    "created_at": "2026-11-02 09:50:17"
+  }
+]
+~~~
+
+缺少授权范围时新增失败审计。
+审计记录 HTTP 403 与网关错误键。
+本地数据和会话保留的检查仍通过。
+
+
+~~~json
+{
+  "before": 44,
+  "after": 45,
+  "rows": [
+    {
+      "id": "audit_888635762aa36a56e158c4f91167e145",
+      "user_id": "user_5770a38f1e5e9d4a601d74d730b37c18",
+      "username": "accept_denied",
+      "action": "user.deactivate_failed",
+      "target": "user:user_5770a38f1e5e9d4a601d74d730b37c18",
+      "detail": "status=403 errorKey=gateway.insufficient_scope",
+      "ip": "198.51.100.17",
+      "user_agent": "node",
+      "created_at": "2026-11-02 09:50:17",
+      "port": 45678,
+      "platform": "harmonyos-app",
+      "login_type": null
+    }
+  ]
+}
+~~~
+
+**证据路径**
+
+
+
+~~~text
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793613015772
+~~~
+
+原始请求和响应位于 http-and-db.json。
+五项断言位于 checks.json。
+网关接口轨迹位于 gateway.json。
+完整版本及源码哈希位于 manifest.json。
+
+复现代码位置如下。
+
+- 注册映射：src/routes/auth.js 的 registeredGatewayUser 调用。
+- 管理员身份：src/util.js 的 authOptional。
+- 可见性判断：src/routes/posts.js。
+- 替身差异：test/acceptance-fixes.test.js。
+
+已向协调者和 w37:p3 回报剩余 3 项失败。
+报告仍未宣称完整验收通过。
+
+另有仅在管理员审计 detail 引用原 ID 的场景。
+当前筛选条件没有匹配 detail。
+该边界尚未验证，已交给修复者核对。
+本节去标识化通过仅适用于本轮禁言样本。

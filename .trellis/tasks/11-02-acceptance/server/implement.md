@@ -8,9 +8,10 @@
 - [x] Execute each assigned item and capture sanitized raw evidence.
 - [x] Report failures to the coordinator without business-code changes.
 - [x] Write initial server.md with verdicts and deployment retest commands.
-- [ ] Wait for the p3 fix commit and rerun all five failed assertions.
-- [ ] Append the retest evidence without replacing initial failures.
-- [ ] Run the controlled-Chinese linter and verify evidence references.
+- [x] Wait for the p3 fix commit and rerun all five failed assertions.
+- [x] Append the first retest evidence without replacing initial failures.
+- [x] Run the controlled-Chinese linter and verify evidence references.
+- [ ] Verify the remaining three failures after the follow-up fix commit.
 - [ ] Commit only server.md and these server planning files.
 - [ ] Append Result with commit, tests, gaps, and required user actions.
 
@@ -31,3 +32,15 @@ User assigned business fixes to w37:p3. This reviewer only reruns acceptance.
 
 Initial evidence:
 D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793611163252/
+
+First retest baseline: ac4d0b85cb6f37d10df6dedbfb5b9b6d5446d1b0.
+The new processes produced 81 passes and 3 failures across 84 assertions.
+First registration still lacks a user ID despite a successful gateway profile.
+Real authOptional does not populate req.user, so admin pending list/detail still fail.
+The two original erasure assertions pass. All original audit rows and timestamps
+were retained while target references were replaced and admin actor IDs stayed intact.
+The failed erasure now appends user.deactivate_failed (audit count 44 to 45).
+The remaining failures were reported to the coordinator and fixer.
+The detail-only cross-actor reference is a separate, unverified boundary to check.
+First retest evidence:
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793613015772/
