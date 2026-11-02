@@ -18,6 +18,7 @@ import 'content/studio_content_repository.dart';
 final StudioProfile qfliStudioProfile = StudioProfile(
   id: StudioProductCatalog.qfliStudioKey,
   appTitle: StudioProductCatalog.qfliStudio,
+  clientVersion: '5.0.1',
   templates: ProjectTemplate.values,
   isOffline: false,
   productKey: StudioProductCatalog.qfliStudioKey,
