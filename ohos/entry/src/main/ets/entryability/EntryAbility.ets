@@ -13,6 +13,7 @@ import { window, display } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
 import { configureInteropChannels } from '../interop/StudioInterop';
+import { AgreementPlatformBridge } from '../interop/AgreementBridge';
 
 const CHANNEL_PLATFORM = 'qflistudio/platform';
 const CHANNEL_HUAWEI = 'qflistudio/huawei_account';
@@ -208,6 +209,29 @@ export default class EntryAbility extends FlutterAbility {
             .catch((err: BusinessError) => {
               result.error('SHARE_FAILED', `${err.code}: ${err.message}`, null);
             });
+        } else if (call.method === 'openAgreement') {
+          // 应用内协议阅读页（整改任务书 §3-W3）：只开 https 文档。
+          const title = call.argument('title') as string;
+          const url = call.argument('url') as string;
+          AgreementPlatformBridge.openAgreement(abilityContext, title, url)
+            .then((error: string | null) => {
+              if (error === null) {
+                result.success(true);
+              } else {
+                result.error('AGREEMENT_FAILED', error, null);
+              }
+            })
+            .catch((err: BusinessError) => {
+              result.error(
+                'AGREEMENT_FAILED',
+                `${err.code}: ${err.message}`,
+                null,
+              );
+            });
+        } else if (call.method === 'requestPrivacyWithdraw') {
+          // 宿主不托管隐私声明：由系统设置里的华为隐私授权撤回。
+          // Flutter 侧收到 false 就走本地退出 + 引导，不谎称已撤回。
+          result.success(false);
         } else {
           result.notImplemented();
         }
