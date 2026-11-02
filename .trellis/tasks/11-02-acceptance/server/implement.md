@@ -120,8 +120,8 @@ All commits used explicit paths and temporary message files. No push was run.
 - [x] Run the previous frozen 86-assertion script and retain its hash.
 - [x] Append sanitized evidence and limitations to server.md.
 - [x] Run the Chinese linter, evidence checks, and explicit-path diff checks.
-- [ ] Commit only the report and owned server task files.
-- [ ] Append the new Result and print the final terminal handoff.
+- [x] Commit only the report and owned server task files.
+- [x] Append the new Result and print the final terminal handoff.
 
 Execution evidence:
 
@@ -149,3 +149,44 @@ D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc8
 
 Complete server unit evidence:
 D:/AppData/Local/Temp/qfli-p7-unit-20261103-3atjey9n/
+
+## Result (2026-11-03 moderation identity retest)
+
+Commit: c1b8a13 test(compliance): verify moderation identity pseudonyms.
+
+Appended item 7 evidence to docs/compliance/acceptance/server.md. Earlier failure
+evidence remains intact. The committed independent harness starts unmodified
+QFLI and moderation entry points with disposable SQLite data and a local gateway.
+
+Commands and final results:
+
+- node .trellis/tasks/11-02-acceptance/server/moderation-pseudonym-retest.mjs:
+  69/69 assertions passed. Real HTTP login, publication, reports, text/IP blocks,
+  queued reviews, two erasures, production failClosed, and recovery all passed.
+- node <previous-evidence-root>/server-acceptance-retest-two.mjs:
+  the unchanged original 86-assertion script passed 86/86.
+- node --test --test-timeout=60000 "test/*.test.js" in azurekiln-qfli-server:
+  154 tests, 153 passed, 0 failed, 1 opt-in MySQL pool test skipped.
+- python -X utf8 scripts/ste-lint-zh.py on server.md, design.md, and implement.md:
+  zero findings.
+- node --check on the new harness and git diff --check on all owned paths passed.
+- Independent evidence verification checked script hashes, all snapshot scans,
+  exact preservation of moderation rows after erasure, the original report prefix,
+  69/69 and 86/86 summaries, unchanged business sources, and child termination.
+
+The moderation database, its audit API, and SQLite/WAL/SHM files contain none of
+the four fixture users' raw local IDs or gateway subjects before or after erasure.
+Missing and too-short keys return 503 for post, comment, nickname, and biography
+publication. Reports retain the existing locally queued contract. These checks
+do not establish removal of raw IDs from historic production data.
+
+Outstanding evidence: production rollout, historical production records, real
+gateway erasure and grant behavior, and MySQL still require separate verification.
+User action: inject an independent random QFLI_MODERATION_SUBJECT_SALT with at
+least 16 characters into production, and grant qfli_account_erase in gateway admin.
+
+Only server.md and this isolated server task directory changed. Business code,
+deployment configuration, shared task files, and other workers' output stayed
+read-only. All five service children stopped. No push or prohibited Git operation
+was run. The terminal handoff reports the work commit, bookkeeping commit, tests,
+remaining evidence, and required user actions.
