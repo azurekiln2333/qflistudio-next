@@ -253,3 +253,45 @@ node --test --test-timeout=60000 "test/*.test.js"
 
 ``test/acceptance-fixes.test.js`` 的注册用例改为"从未有本地 users 行的首次注册"，
 并新增"已有映射时复用不重复建用户"。
+
+## 审核侧标识去标识化（验收第 7 条补漏）
+
+验收观察到审核服务（举报中心与审核审计）里保存的 reporterId、userId 是本站原始用户ID。
+该侧留存 365 天，用户注销后仍可关联到个人，因此必须换成不可逆假名。
+
+| 短哈希 | 标题 |
+| --- | --- |
+| ``3463632`` | feat(server): send pseudonymous user ids to the moderation service |
+| ``715ed33`` | test(server): assert no raw user ids reach the moderation service |
+| ``59ab6af`` | docs(server): document the moderation subject salt |
+
+### 做法
+
+- 新增 ``src/moderation-subject.js``：HMAC-SHA256 假名，输出 ``psn_`` 加 64 位十六进制。
+  密钥取 ``QFLI_MODERATION_SUBJECT_SALT``，独立于 JWT 与其他密钥。
+- 适配层三个出口全部换成假名：文本审核与 IP 审核的 ``userId``、举报的 ``reporterId``、
+  以及 ``targetType=user`` 时的 ``targetId``。帖子与评论编号不是个人标识，按原样送。
+- 假名稳定：同一用户在审核侧仍可归并。换盐后旧假名无法与新数据关联。
+- 生产环境缺盐或短于 16 位时拒绝发布类请求，返回 503 ``moderation.unavailable``
+  并写一条 ``moderation.subject_salt_missing`` 告警，绝不回退成原始ID。
+  开发环境有默认盐，与服务端其他密钥的开发口径一致。
+- 本地 ``reports`` 行仍存真实上报人，管理员的举报处置以本地记录为准。
+
+### 测试
+
+```
+cd azurekiln-qfli-server
+node --test --test-timeout=60000 "test/*.test.js"
+→ tests 154, pass 153, fail 0, skipped 1
+```
+
+``test/moderation-subject.test.js`` 经过真实路由挂载（发帖、评论、昵称、举报），
+记录每一次到审核服务的调用载荷并整体扫描：任何原始用户ID出现即失败。
+另覆盖 ``targetType=user`` 的 targetId、缺盐 failClosed、换盐后不可关联。
+
+### 遗留
+
+本地举报处理结果同步到审核中心：SDK 0.1.0 的方法只有
+``checkText``、``checkImage``、``checkIp``、``submitReport``、``getReview``，
+没有举报处理接口（``POST /v1/admin/reports/:id/handle`` 只能直连 admin 接口）。
+本轮未接，等 W1 扩展 SDK 后再补。当前管理员在 QFLI 处理举报只更新本地记录。
