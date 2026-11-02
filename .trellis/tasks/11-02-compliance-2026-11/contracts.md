@@ -16,6 +16,7 @@ POST {AZK_OAUTH2_BASE_URL}/oauth2/account/erase
 - 请求头：X-Client-Platform: harmonyos-app/<版本号>（其他平台 android-app/、ios-app/、windows-app/、macos-app/、linux-app/、web/）。服务端据此记录 platform。
 - 错误体：{error, errorKey, message}。
   - 403 realname.required：无已验证手机号；客户端引导华为账号绑定手机号。
+  - 403 huawei.phone_required：华为账号没有已验证手机号（服务端本地判断 phoneAvailable===false，或网关返回 huawei_verified_phone_required 时统一转换），message 为“请使用已绑定手机号的华为账号”；客户端在华为登录/绑定流程中显示该 message。
   - 403 account.banned / account.muted：被封停 / 被禁言。
   - 429 rate.limited：带 retryAfter（秒）。
   - 422 moderation.blocked：文本命中，带 categories（不回显命中词原文）。
