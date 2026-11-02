@@ -20,6 +20,9 @@ final StudioProfile qfliStudioProfile = StudioProfile(
   appTitle: StudioProductCatalog.qfliStudio,
   templates: ProjectTemplate.values,
   isOffline: false,
+  // 云端项目与发布入口尚未随本版发布：隐藏云端 scope 与云端新建入口，
+  // 教程与示例一律读 assets 内置内容，不走服务端。
+  offlineOnly: true,
   productKey: StudioProductCatalog.qfliStudioKey,
   showHomeTabs: true,
   runtimeKind: 'multi-runtime',
