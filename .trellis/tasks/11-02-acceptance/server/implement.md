@@ -13,7 +13,7 @@
 - [x] Run the controlled-Chinese linter and verify evidence references.
 - [x] Verify the remaining three failures after the follow-up fix commit.
 - [x] Commit only server.md and these server planning files.
-- [ ] Append Result with commit, tests, gaps, and required user actions.
+- [x] Append Result with commit, tests, gaps, and required user actions.
 
 Local evidence and scripts stay in an isolated system temporary directory.
 The committed report contains response excerpts and reproduction steps.
@@ -56,3 +56,53 @@ Complete server tests: 145 total, 144 passed, 0 failed, 1 opt-in MySQL pool skip
 The server code remains read-only for this worker.
 Second retest evidence:
 D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793614305018/
+
+## Result
+
+Delivered docs/compliance/acceptance/server.md with original requirement text,
+individual HTTP methods, sanitized response excerpts, verdicts, evidence paths,
+and exact post-deployment retest commands. Initial and first-retest failures stay
+in the report. The opening and second-retest section give the latest local verdict.
+
+Acceptance commits:
+
+- e5c0ed2 test(compliance): record initial server acceptance evidence
+- 6357f19 test(compliance): record server fix verification gaps
+- 82ea73b test(compliance): record passing server acceptance retest
+
+Tests and checks:
+
+- Real QFLI and moderation HTTP processes used separate disposable SQLite files.
+- Initial run: 79/84 assertions passed, with five failures handed to w37:p3.
+- First fix retest: 81/84 passed. New registration and real admin auth still failed.
+- Final run at 390fad5: 86/86 passed, including all five original failures.
+- Two added checks cover administrator-deletion detail references on erasure.
+- Twelve original audit rows and timestamps survived with deidentified user refs.
+- The local report row survived erasure with a deidentified reporter ID.
+- node --test --test-timeout=60000 "test/*.test.js": 145 total, 144 pass, 0 fail,
+  1 opt-in MySQL terminal-pool skip.
+- python scripts/ste-lint-zh.py on the report and both server planning files:
+  zero findings.
+- verify-evidence.mjs checked three frozen script hashes and required sections.
+- git diff --check passed for the owned documentation paths.
+
+Evidence root:
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/
+
+Outstanding evidence:
+
+- Production deployment, runtime retention configuration, nginx source ports, and
+  the real AI upstream require the documented post-deployment retest.
+- Live Huawei login, first-registration profile lookup, gateway erasure, token
+  revocation, and long-term registration information retention remain unverified.
+- Real MySQL behavior was not exercised. The explicit MySQL test remains skipped.
+- Moderation-center report status synchronization and erasure of its reporter ID
+  belong to the moderation acceptance scope. The observed limits are in the report.
+- Client-only criteria belong to the client acceptance worker.
+
+User action: grant qfli_account_erase to the existing qfli client in gateway admin.
+Do not treat the local gateway fixture as proof that this live grant exists.
+
+Only the server acceptance report and isolated server planning files were edited.
+Business code, gateway code, shared task metadata, and other reports stayed read-only.
+All commits used explicit paths and temporary message files. No push was run.
