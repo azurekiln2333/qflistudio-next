@@ -15,12 +15,20 @@
   "branch": "main",
   "base_branch": "main",
   "worktree_path": null,
-  "commit": null,
+  "commit": "d58f72e8f035882b1f89fab320dcc417e7d3c2c1",
   "pr_url": null,
   "subtasks": [],
   "children": [],
   "parent": "11-02-compliance-2026-11",
-  "relatedFiles": [],
-  "notes": "",
-  "meta": {}
+  "relatedFiles": [
+    "pubspec.yaml",
+    "ohos/AppScope/app.json5",
+    "lib/main.dart",
+    "test/release_version_test.dart"
+  ],
+  "notes": "Version 5.0.1/5000001 and signed release-mode trial verified. Final HAP awaits the coordinator's test-green notice. Device smoke stopped at lockscreen preflight.",
+  "meta": {
+    "releaseState": "awaiting-test-green",
+    "lastCheckedAt": "2026-11-03T04:03:23+08:00"
+  }
 }
