@@ -1627,3 +1627,308 @@ D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc8
 审核中心的处理同步与去标识化不在本报告结论内。
 用户本人仍须授予 qfli_account_erase。
 前文已列出部署后复测命令。
+
+## 第 7 条补充复测：审核身份假名（2026-11-03）
+
+**条目原文**
+
+~~~text
+App 内可以永久注销账号；注销后无法再登录，个人数据被删除，日志已去标识化。
+~~~
+
+**本地结论：通过。**
+本轮新增 69 项断言全部通过。
+原先 86 项脚本也全部通过。
+前文保留 2026-11-02 的历史结果。
+本节更新审核侧新写入身份字段的结论。
+本轮未修改业务代码。
+
+**版本与环境**
+
+复测时间为 2026-11-03 03:42:31 至 03:42:34。
+时区为 UTC+08:00。
+QFLI 与审核服务分别启动全新进程。
+两项服务均使用全新的临时 SQLite。
+QFLI 直接启动 src/server.js。
+审核服务也直接启动 src/server.js。
+两项服务均采用 NODE_ENV=production。
+网关登录、资料和注销接口使用本地 HTTP 夹具。
+认证和审核传输未注入替身。
+测试账号均通过真实 QFLI 登录接口建号。
+本轮没有读取项目 .env。
+
+~~~json
+{
+  "qfliRevision": "cad26560e991ccc25e29d8aa942ef7ef9084c893",
+  "moderationRevision": "6d6754c907b1e3b6caf162a55a2292edc6469022",
+  "fixCommits": ["3463632", "715ed33", "59ab6af"],
+  "node": "v24.15.0",
+  "checks": 69,
+  "passed": 69,
+  "failed": [],
+  "sourceChanges": {"qfli": [], "moderation": []}
+}
+~~~
+
+**验证方法**
+
+脚本在内存中创建本轮随机密钥。
+脚本独立计算 HMAC-SHA256 预期值。
+脚本没有调用业务的假名函数。
+密钥和令牌未写入报告或证据 JSON。
+完整脚本位于验收任务的 server 子目录。
+
+~~~powershell
+cd D:/MyNewProjects/qflistudio
+node .trellis/tasks/11-02-acceptance/server/moderation-pseudonym-retest.mjs
+~~~
+
+脚本 SHA-256：
+
+~~~text
+ab8f13a2cea2c14424683d14534c8813d70f669b17a4f5a612555235b3c0eca4
+~~~
+
+脚本先检查数据库中的全部 4 个本地用户 ID。
+扫描范围也包含这 4 个账号的网关 sub。
+脚本提交以下请求。
+路径中的变量来自本轮 HTTP 响应。
+
+~~~text
+POST /api/auth/login
+{"username":"accept_p7_erase","password":"[REDACTED]"}
+POST /api/posts
+{"type":"discussion","zoneId":"<zoneId>","title":"Acceptance author discussion","content":"Acceptance ordinary technical discussion body","tags":["acceptance"]}
+POST /api/posts/<postId>/comments
+{"content":"Acceptance ordinary author comment"}
+PATCH /api/users/me
+{"nickname":"Acceptance profile","bio":"Acceptance ordinary profile text"}
+POST /api/reports
+{"targetType":"post","targetId":"<postId>","reason":"Acceptance report identity retention"}
+POST /api/reports
+{"targetType":"comment","targetId":"<commentId>","reason":"Acceptance report identity retention"}
+POST /api/reports
+{"targetType":"user","targetId":"<localUserId>","reason":"Acceptance report identity retention"}
+POST /v1/admin/keywords
+{"word":"acceptancebadwordpseven","category":"custom"}
+POST /api/posts
+{"type":"discussion","zoneId":"<zoneId>","title":"acceptancebadwordpseven","content":"Acceptance ordinary technical discussion body","tags":["acceptance"]}
+POST /api/posts/<postId>/comments
+{"content":"acceptancebadwordpseven"}
+PATCH /api/users/me
+{"nickname":"acceptancebadwordpseven"}
+POST /v1/admin/ip-rules
+{"type":"ip","value":"203.0.113.37","reason":"Acceptance blocked source"}
+POST /api/posts
+X-Real-IP: 203.0.113.37
+PUT /v1/admin/scenes/community.post.title
+{"preReview":true}
+PUT /v1/admin/scenes/community.comment
+{"preReview":true}
+GET /v1/admin/audit?limit=100&offset=0
+POST /api/users/me/deactivate
+{"confirm":"DEACTIVATE"}
+~~~
+
+本轮还提交正常帖子和评论以触发人工审核队列。
+作者举报帖子、评论和另一用户。
+另一举报人举报作者本人。
+脚本随后分别注销作者和该举报人。
+每次注销后均检查旧会话。
+
+**实际结果：身份字段**
+
+正常帖子、评论和资料修改均返回 200。
+4 条举报均返回 201 并转发成功。
+帖子和评论命中词库后均返回 422。
+昵称命中词库后也返回 422。
+IP 黑名单命中后返回 403。
+先审后发的帖子与评论均返回 pending。
+
+审核库中的文本与 IP 审计只保存预期假名。
+标题、正文、标签、评论、昵称和简介均已覆盖。
+同一用户在这些场景中使用相同假名。
+下列摘录保留原始字段和值。
+
+~~~json
+{
+  "action": "text.check",
+  "actor_id": "psn_c54a245ba7f522a2315048601d4a4f8bafb5583a641449ba464e4877b325d90d",
+  "decision": "block",
+  "data": "{\"scene\":\"community.post.title\",\"categories\":[\"custom\"],\"hits\":[{\"keywordId\":\"18f3a70e-3a78-44aa-a643-58676ea018e9\",\"category\":\"custom\"}]}"
+}
+~~~
+
+user 类举报的目标 ID 也等于预期假名。
+该条举报由另一个测试账号提交。
+
+~~~json
+{
+  "target_type": "user",
+  "target_id": "psn_c54a245ba7f522a2315048601d4a4f8bafb5583a641449ba464e4877b325d90d",
+  "reporter_id": "psn_5301bd8ea39525995dc30b1b7f150ea9a2392f3438e9850509a335c4d1d5d2c6",
+  "reason": "Acceptance report identity retention",
+  "status": "open"
+}
+~~~
+
+post 和 comment 类目标仍使用对应内容 ID。
+这两类举报的 reporter_id 同样使用预期假名。
+人工审核队列的 user_id 也使用预期假名。
+
+~~~json
+{
+  "scene": "community.comment",
+  "status": "pending",
+  "user_id": "psn_c54a245ba7f522a2315048601d4a4f8bafb5583a641449ba464e4877b325d90d",
+  "payload_json": "{\"text\":\"Acceptance queued comment\",\"metadata\":{}}"
+}
+~~~
+
+**实际结果：数据库与注销后扫描**
+
+脚本扫描审核库的全部 11 张表。
+扫描覆盖每一行的每一列。
+脚本另查管理员审计接口的全部分页。
+文件扫描覆盖数据库、WAL 和 SHM。
+文件扫描同时匹配 UTF-8 与 UTF-16LE。
+下表中的命中数合并本地 ID 与网关 sub。
+
+| 阶段 | 审计行 | 举报行 | 队列行 | 原始 ID 命中数 |
+|---|---:|---:|---:|---:|
+| 注销前 | 32 | 4 | 2 | 0 |
+| 作者注销后 | 32 | 4 | 2 | 0 |
+| 举报人注销后 | 32 | 4 | 2 | 0 |
+| 恢复密钥并再次发帖后 | 36 | 4 | 3 | 0 |
+
+两次注销均返回 200 deactivated。
+两个旧会话均返回 401。
+QFLI 的两条用户映射均已删除。
+两次注销前后的审核库快照完全相同。
+原 32 条审计、4 条举报和 2 条队列记录均保留。
+4 次举报详情查询均未检出原始 ID。
+保留记录中的假名与注销前相同。
+
+**实际结果：缺少密钥时 failClosed**
+
+脚本关闭已配置密钥的 QFLI 进程。
+脚本随后启动缺少密钥的新生产模式进程。
+另一轮新进程只配置 5 字符密钥。
+审核服务在这两轮中持续正常运行。
+其他配置和测试数据库保持一致。
+
+| 请求 | 缺少密钥 | 5 字符密钥 |
+|---|---:|---:|
+| POST /api/posts | 503 | 503 |
+| POST /api/posts/:id/comments | 503 | 503 |
+| PATCH /api/users/me：昵称 | 503 | 503 |
+| PATCH /api/users/me：简介 | 503 | 503 |
+
+缺少密钥时的原始发帖响应如下。
+
+~~~json
+{
+  "status": 503,
+  "body": {
+    "error": "审核服务暂不可用",
+    "errorKey": "moderation.unavailable",
+    "requestId": "6e0dc49c-f151-4f4b-9186-b3029f3ded54"
+  }
+}
+~~~
+
+两轮均未增加帖子或评论。
+两轮均未调用网关资料修改接口。
+审核库也没有新增或修改任何记录。
+进程日志均记录 moderation.subject_salt_missing。
+举报仍按既有契约在本地受理。
+其响应为 201 queued，forwarded 为 0。
+其 moderationReportId 为 null。
+这两条举报没有转发到审核服务。
+
+恢复有效密钥后，另一全新进程发帖返回 200。
+该帖子因先审后发开关而处于 pending。
+审核库新增记录仍只使用预期假名。
+本轮启动的 5 个服务子进程均已关闭。
+
+**原 86 项回归与完整服务端测试**
+
+原 86 项脚本未作改动。
+本次回归时间为 2026-11-03 03:34:08 至 03:34:10。
+脚本重新启动两项真实服务。
+脚本另建临时 SQLite。
+该旧脚本仍采用 NODE_ENV=test。
+新增脚本独立验证上述生产模式行为。
+
+~~~json
+{
+  "checks": 86,
+  "passed": 86,
+  "failed": [],
+  "sourceChanges": []
+}
+~~~
+
+旧脚本 SHA-256 保持不变。
+
+~~~text
+42aa73bb3eddea3b7aea229cfa0cd1b1eb3df7e72b761ca201fff3c7685e861a
+~~~
+
+完整服务端测试共有 154 项。
+其中 153 项通过，0 项失败，1 项跳过。
+跳过项仍须独立 MySQL 测试库。
+这些单元测试仅作为补充证据。
+
+~~~powershell
+cd D:/MyNewProjects/qflistudio/azurekiln-qfli-server
+node --test --test-timeout=60000 "test/*.test.js"
+~~~
+
+**证据路径**
+
+新增复测根目录记为 P。
+
+~~~text
+D:/AppData/Local/Temp/qfli-server-pseudonym-20261103-p7-nffJeH
+~~~
+
+| 文件 | 内容 |
+|---|---|
+| P/manifest.json | 版本、源码哈希与脚本哈希 |
+| P/http-and-db.json | 原始请求、响应及测试身份清单 |
+| P/checks.json | 全部 69 项断言 |
+| P/moderation-before-erase.json | 注销前的全表快照与文件扫描 |
+| P/moderation-after-erase.json | 作者注销后的相同检查 |
+| P/moderation-after-reporter.json | 举报人注销后的相同检查 |
+| P/moderation-final.json | 恢复密钥后的相同检查 |
+| P/qfli-final.json | QFLI 用户、举报与审计摘录 |
+| P/gateway.json | 本地网关资料和注销请求轨迹 |
+| P/processes.json | 子进程 PID、日志与退出记录 |
+| P/summary.json | 本轮汇总 |
+
+原 86 项回归证据目录如下。
+
+~~~text
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793648048450
+~~~
+
+完整测试证据目录如下。
+原始日志为 server-unit.log。
+汇总文件为 summary.json。
+
+~~~text
+D:/AppData/Local/Temp/qfli-p7-unit-20261103-3atjey9n
+~~~
+
+**范围与遗留项**
+
+本节只验证 QFLI 自动填入的身份字段。
+测试正文与举报理由均未主动包含原始 ID。
+本节证明新写入记录的原始身份字段已替换。
+本节未验证或清理既有生产记录。
+前文的旧 reporterId 观察仍属于历史证据。
+真实网关注销、线上部署和 MySQL 仍待补证。
+生产环境须配置 QFLI_MODERATION_SUBJECT_SALT。
+用户本人须注入至少 16 字符的独立随机密钥。
+用户本人仍须授予 qfli_account_erase。

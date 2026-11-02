@@ -106,3 +106,46 @@ Do not treat the local gateway fixture as proof that this live grant exists.
 Only the server acceptance report and isolated server planning files were edited.
 Business code, gateway code, shared task metadata, and other reports stayed read-only.
 All commits used explicit paths and temporary message files. No push was run.
+
+## Moderation identity retest plan (2026-11-03)
+
+- [x] Read the new fix commits and the current acceptance contracts.
+- [x] Define the retest boundary before writing the new harness.
+- [x] Add an independent HTTP/SQLite retest harness in this server subdirectory.
+- [x] Exercise real login, post, comment, report, review, and blocked requests.
+- [x] Scan moderation tables, audit results, and database files before erasure.
+- [x] Erase a user, verify sessions, and repeat the complete moderation scan.
+- [x] Restart production-mode QFLI without a key and check failClosed behavior.
+- [x] Check a too-short key and unchanged moderation records.
+- [x] Run the previous frozen 86-assertion script and retain its hash.
+- [x] Append sanitized evidence and limitations to server.md.
+- [x] Run the Chinese linter, evidence checks, and explicit-path diff checks.
+- [ ] Commit only the report and owned server task files.
+- [ ] Append the new Result and print the final terminal handoff.
+
+Execution evidence:
+
+- Baseline: cad26560e991ccc25e29d8aa942ef7ef9084c893.
+- Moderation: 6d6754c907b1e3b6caf162a55a2292edc6469022.
+- New independent harness: moderation-pseudonym-retest.mjs in this directory.
+- Final run: 69/69 assertions passed in fresh production-mode service processes.
+- Every QFLI user and gateway subject in this fixture was included in the scan.
+- All 11 moderation tables, audit API pages, SQLite/WAL/SHM files had zero raw IDs.
+- Author and reporter erasure retained identical moderation rows with pseudonyms.
+- Missing and five-character keys refused post/comment/nickname/bio requests with
+  503 moderation.unavailable. Content and moderation records stayed unchanged.
+- Reports retained the existing local queued behavior without upstream records.
+- Restoring the configured key allowed a post to enter the pending review queue.
+- All five service children stopped and both business source trees stayed unchanged.
+- Frozen original script: 86/86 passed. Its SHA-256 stayed
+  42aa73bb3eddea3b7aea229cfa0cd1b1eb3df7e72b761ca201fff3c7685e861a.
+- Full server suite: 154 total, 153 passed, 0 failed, 1 opt-in MySQL test skipped.
+
+New evidence:
+D:/AppData/Local/Temp/qfli-server-pseudonym-20261103-p7-nffJeH/
+
+Frozen-script regression evidence:
+D:/AppData/Local/Temp/qfli-server-acceptance-20261102-p7-099baf6f149948bd8f53bc88445de02a/run-1793648048450/
+
+Complete server unit evidence:
+D:/AppData/Local/Temp/qfli-p7-unit-20261103-3atjey9n/
