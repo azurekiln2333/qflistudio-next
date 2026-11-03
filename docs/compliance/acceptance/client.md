@@ -12,11 +12,13 @@
 |---|---|---|
 | 3 客户端 | 通过，本地 widget 范围 | 鸿蒙登录入口受限，无手机号时不能跳过或绑定 |
 | 8 | 失败，待协议地址 | 两个入口均为 3 次点击，用户协议正文尚不可读 |
-| 9 | 失败 | 旧 AI 地址仍生效，部分文件没有标识 |
+| 9 | 已修复，待复测 | 面板不再使用旧 AI 地址，所有写入路径均留标识 |
 | 10 | 需真机，未验证 | Mate 60、Mate X5 折叠和展开均未实测 |
 | 12 | 失败，另需部署后复测 | 预览测试失败，两处 analyze 失败，服务端缺少 lint |
 
 第 9 条的 Bing 调用扫描通过。
+第 9 条的两项缺口已修复，修复提交为 qfli_studio_core `abcdb18`。
+复测证据见本节末尾的“修复与复测”。
 第 12 条的提交信息检查通过。
 两项通过均不能覆盖同条中的失败。
 
@@ -344,6 +346,35 @@ Bing 调用扫描与回复标识通过。
 - `qfli_studio_core/test/ai_file_header_test.dart:97`。
 - `qfli_studio_core/lib/vibe_coding/vibe_coding_controller.dart:298`。
 - `qfli_studio_core/lib/vibe_coding/vibe_coding_widgets.dart:251`。
+
+**修复与复测**
+
+修复提交：qfli_studio_core `abcdb18`。
+
+旧 AI 地址：路由判断集中到 `AiPanel.endpointFor`。
+产品档位不允许自定义接口时恒返回官方转发。
+此时不读已保存的地址、密钥与协议，不需要迁移或删除旧设置。
+允许自定义的产品仍用用户自己的地址。
+官方转发经 `AiService.relayChat` 调 `/api/ai/chat`，需要登录令牌。
+
+文件标识：没有注释语法的类型改为写同名说明文件 `<文件名>.ai-generated`。
+正文保持原样，JSON、CSV 仍可解析。
+说明文件与正文同目录，路径走同样的越界检查。
+`edit_file` 现在也补标识，不再只有 `write_file` 补。
+
+复测命令与输出：
+
+```text
+flutter test --no-pub .trellis/tasks/11-02-acceptance/client/ai_transport_probe_test.dart
+ACCEPTANCE_REG_9 trust=official-forwarding allowCustomAiEndpoint=false platform=ohos staleEndpointRequests=0
+00:00 +1: All tests passed!
+```
+
+回环服务收到 0 个请求，旧地址不再生效。
+`flutter test test/ai_official_forwarding_test.dart test/ai_file_header_test.dart`：24 项全过。
+`flutter test test/vibe_coding_controller_test.dart`：36 项全过、1 项既有跳过。
+与本条有关的九个测试文件合跑：93 项全过。
+
 
 ## 第 10 条：挖孔区与状态栏
 

@@ -12,9 +12,10 @@ import 'package:qfli_studio_core/services/studio_profile.dart';
 import 'package:qfli_studio_core/store/settings_store.dart';
 import 'package:qflistudio/main.dart' show qfliStudioProfile;
 
-// Characterization probe: success means the documented defect reproduced.
-// A real loopback server receives the production panel's actual HTTP request.
-// No external endpoint, production key, token, or real device is used.
+// Regression probe for §4 item 9. Success means the saved custom endpoint is
+// never contacted by the released profile, even when the settings file still
+// holds it. A real loopback server stands in for the stale endpoint and counts
+// every request it receives. No external endpoint, key, token or device is used.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late HttpServer server;
@@ -44,7 +45,7 @@ void main() {
             {
               'message': {
                 'role': 'assistant',
-                'content': 'Acceptance loopback reply',
+                'content': 'Stale endpoint must not answer',
               },
             },
           ],
@@ -59,7 +60,7 @@ void main() {
     await server.close(force: true);
   });
 
-  testWidgets('official profile still sends to a saved custom AI endpoint', (
+  testWidgets('official profile never contacts a saved custom AI endpoint', (
     tester,
   ) async {
     final previousProfile = StudioProfile.current;
@@ -72,6 +73,8 @@ void main() {
     try {
       await HttpOverrides.runZoned(() async {
         expect(qfliStudioProfile.allowCustomAiEndpoint, isFalse);
+        // The endpoint decision itself is the contract: no direct route.
+        expect(AiPanel.endpointFor(settings).baseUrl, isEmpty);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -87,38 +90,26 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('AI 助手 · 官方转发'), findsOneWidget);
         expect(find.byTooltip('AI 接口设置'), findsNothing);
-        await tester.enterText(
-          find.byType(TextField),
-          'Acceptance local probe',
-        );
+        await tester.enterText(find.byType(TextField), 'Acceptance local probe');
         await tester.tap(find.byTooltip('发送'));
-        // Drive real I/O while preserving the production widget and send path.
         for (var attempt = 0; attempt < 150; attempt++) {
           await tester.runAsync(
             () => Future<void>.delayed(const Duration(milliseconds: 20)),
           );
           await tester.pump(const Duration(milliseconds: 20));
-          if (find.text('Acceptance loopback reply').evaluate().isNotEmpty) {
-            break;
-          }
+          if (find.text('内容由AI生成').evaluate().isNotEmpty) break;
         }
-        expect(requests, hasLength(1));
-        expect(requests.single, {
-          'method': 'POST',
-          'path': '/v1/chat/completions',
-          'model': 'acceptance-local-only',
-        });
-        expect(find.text('Acceptance loopback reply'), findsOneWidget);
-        expect(find.text('内容由AI生成'), findsOneWidget);
+        // The stale endpoint received nothing.
+        expect(requests, isEmpty);
+        expect(find.text('Stale endpoint must not answer'), findsNothing);
         debugPrint(
-          'ACCEPTANCE DEFECT_REPRODUCED allowCustomAiEndpoint=false '
-          'platform=ohos label=official-forwarding '
-          'received=${jsonEncode(requests)} replyLabel=内容由AI生成',
+          'ACCEPTANCE_REG_9 trust=official-forwarding '
+          'allowCustomAiEndpoint=false platform=ohos '
+          'staleEndpointRequests=${requests.length}',
         );
       }, createHttpClient: (_) => client);
     } finally {
       await tester.pumpWidget(const SizedBox.shrink());
-      // Close the owned real client before widget-test timer verification.
       client.close(force: true);
       await tester.pump(const Duration(seconds: 1));
       settings.dispose();

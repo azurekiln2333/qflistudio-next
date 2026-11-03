@@ -60,3 +60,35 @@ git -C azurekiln-qfli-server diff --quiet   # 业务代码零改动
 ### 需要用户本人办的事
 
 - 无。线上部署与 `MODERATION_APPS_JSON` 密钥由运维在部署时提供。
+
+## 2026-11-04 客户端第 9 条失败修复
+
+修复提交：qfli_studio_core `abcdb18`。
+
+### 缺口与改法
+
+1. 旧 AI 地址仍生效。鸿蒙正式版已隐藏自定义接口设置。生产面板仍读旧设置里的地址、密钥与协议。
+   改法：路由判断集中到 `AiPanel.endpointFor`。
+   产品档位 `allowCustomAiEndpoint` 为 false 时恒返回官方转发，不读旧字段。
+   因此不需要迁移，也不需要删除旧设置。
+   官方转发经 `AiService.relayChat` 调 `/api/ai/chat`，需要登录令牌。
+   允许自定义的产品仍走用户自己的地址。
+2. 部分文件没有标识。JSON、CSV、TXT 与未知扩展名原名原样写入，没有标识。
+   改法：这类文件写同名说明文件 `<文件名>.ai-generated`，正文保持原样。
+   正文不变，因此仍可解析。
+   `edit_file` 也会补标识，不再只有 `write_file` 补。
+
+### 验证
+
+| 命令 | 结果 |
+|---|---|
+| `flutter test --no-pub .trellis/tasks/11-02-acceptance/client/ai_transport_probe_test.dart` | 1 项通过，输出 `staleEndpointRequests=0` |
+| `flutter test test/ai_official_forwarding_test.dart test/ai_file_header_test.dart` | 24 项通过 |
+| `flutter test test/vibe_coding_controller_test.dart` | 36 项通过，1 项既有跳过 |
+| 与本条相关的九个测试文件合跑 | 93 项通过 |
+| `flutter analyze lib test` | No issues found |
+
+### 遗留
+
+- 验收探针改为回归断言：真实面板、真实网络栈，回环服务计数为 0。
+- 新增 `test/ai_official_forwarding_test.dart`。覆盖两种产品档位的路由、转发往返、说明文件与编辑路径。
