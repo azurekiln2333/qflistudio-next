@@ -59,6 +59,7 @@ main:
             cd azurekiln-qfli-server
             node --version
             npm ci
+            npm run lint
             node scripts/check-deployment.mjs
             node --test test/*.test.js
             bash -n deployment/sqlbox/bootstrap.sh
@@ -100,6 +101,7 @@ main:
             node scripts/check-root-ci.mjs
             (cd azurekiln-qfli-server
             npm ci
+            npm run lint
             node scripts/check-deployment.mjs
             node --test test/*.test.js)
             (cd azurekiln-qfli-terminal
@@ -166,6 +168,7 @@ main:
             set -euo pipefail
             cd azurekiln-qfli-server
             npm ci
+            npm run lint
             node scripts/check-deployment.mjs
             node --test test/*.test.js
             bash -n deployment/sqlbox/bootstrap.sh
@@ -222,6 +225,7 @@ main:
             node scripts/check-root-ci.mjs
             (cd azurekiln-qfli-server
             npm ci
+            npm run lint
             node scripts/check-deployment.mjs
             node --test test/*.test.js)
             (cd azurekiln-qfli-terminal
