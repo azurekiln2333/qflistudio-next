@@ -70,7 +70,7 @@ flutter test --no-pub
 | `editor_reload_from_disk_test` | 实现丢失 | 补回 `EditorController.reloadFromDisk`：干净缓冲区重读磁盘，脏缓冲区拒绝并返回说明，内容未变时不换 `codeLines` 以保留光标 | `0da69b4` |
 | `points_page_test` | 实现丢失 + 本轮引入的连带回归 | 补回 `client`/`clock`/`cacheDirectory` 注入点。分栏并发加载，各栏独立 loading。各栏保留滚动位置。账号切换后重载。兑换容忍本地写盘失败 | `2b111a9` |
 | `tasks_page_checkin_test` | 实现丢失 | 补回 `activity` 注入点。签到失败就地提示并可重试。本地写盘失败报「结果未知」并给刷新确认，不给重试。状态按账号加日期分组。令牌轮换后仍可确认 | `2b111a9` |
-| `vibe_e2e_harness_test` / `_local_executor_test` / `_runner_test` / `vibe_live_e2e_test` | 实现丢失（测试工具侧） | `InteropProbe` 已从 `available` 改为 `status`，改调用侧。报告写入前把环境变量名脱敏（报告自带泄漏校验）。控制台消息保留原名 | `ff3b0d5` |
+| `vibe_e2e_harness_test` / `_local_executor_test` / `_runner_test` / `vibe_live_e2e_test` | 实现丢失（测试工具侧） | `InteropProbe` 已从 `available` 改为 `status`，改调用侧。报告写入前把环境变量名脱敏（报告自带泄漏检查）。控制台消息保留原名 | `ff3b0d5` |
 | `studio_content_repository_test` | 实现丢失 | `_filter` 把主 App 的产品键视为「显示全部」。`_loadExamples` 去掉按产品 id 的二次过滤。本地内容页两个 AppBar 显式 `centerTitle: false` | `910b880` |
 | `studio_home_release_test`（Tab 计数与云端 scope） | 实现丢失 | 主 App profile 标为 `offlineOnly: true`。项目菜单标签加 `Flexible`，窄视口换行而不是溢出报错 | `910b880` + `34db1b8` |
 | `studio_home_release_test`（content factory stays lazy） | 测试夹具（未解） | 见下方阻塞项 | — |
@@ -130,3 +130,27 @@ dart analyze <改动文件>    -> No issues found
 cd D:/MyNewProjects/qflistudio
 flutter test --no-pub     -> 8 通过 / 0 失败
 ```
+
+### 验收第 12 条：静态检查与预览导出
+
+详情：
+
+1. `preview_test.dart` 编译不过。`CommunityUser.id` 已从 `int` 改成 `String`，导出脚本还传 `1`。同时它按 tooltip 找设置入口，而个人页早已改成列表行「设置」。改成传 `'1'`，并先滚动到该行再点。`9b02eb0`（qflistudio）。
+2. `tool/python_content/export_inventory.dart` 有 11 个 error。它读取的 `validation`、`output`、按用例的 `inputFixtures`、以及 topic 级的 `inputFixtures` 都不在现有模型里。该文件自加入起从未编译通过，也没有任何构建拉它。按现有模型改成只读 `PythonTask` 的题目、提示、参考答案，以及 `PythonTopic` 的 stdin。清单构建抽成 `buildInventory`，新增 3 个用例钉住单元数、答案字段与 stdin 夹具。`1c36277`、`a1d22de`。
+3. `flutter analyze` 全量 940 项来自第三方与构建产物：`vendor/re_editor`（vendored 编辑器）与 `build/checkpoints/*`、`build/preview-compat-review/*`（构建缓存里的副本）。在 `analysis_options.yaml` 里排除 `vendor/**` 与 `build/**`，第三方代码一行未改。`4b05bc0`。
+4. qflistudio 余下 2 个 info 都在自己的 tool 里，直接修掉：`validate_content.dart` 的 for 体缺花括号，`generate_content_catalog.dart` 的相邻字符串拼接。`9b02eb0`。
+
+最终：
+
+```
+cd D:/MyNewProjects/qfli_studio_core
+flutter analyze  -> No issues found
+flutter test     -> 1377 通过 / 9 跳过 / 0 失败
+
+cd D:/MyNewProjects/qflistudio
+flutter analyze  -> No issues found
+flutter test     -> 8 通过 / 0 失败
+flutter test --no-pub tool/preview_test.dart -> 1 通过 / 0 失败
+```
+
+剩余 info 数量：两个仓库均为 0。`vendor/` 下的第三方 lint 不计入统计，因为 analyzer 已排除它们，且按要求未做批量修改。
