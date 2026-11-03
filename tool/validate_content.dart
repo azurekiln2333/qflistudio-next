@@ -19,7 +19,9 @@ Future<void> main() async {
   final result = ContentCatalogValidator.validateForRelease(catalog);
   if (!result.isValid) {
     stderr.writeln('FAIL: content catalog has ${result.issues.length} issues.');
-    for (final issue in result.issues.take(100)) stderr.writeln('  - $issue');
+    for (final issue in result.issues.take(100)) {
+      stderr.writeln('  - $issue');
+    }
     exitCode = 1;
     return;
   }

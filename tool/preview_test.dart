@@ -42,7 +42,7 @@ void main() {
     await auth.signIn(
       'preview-only',
       const CommunityUser(
-        id: 1,
+        id: '1',
         username: 'qfli_dev',
         nickname: '清风',
         bio: '写一点代码，记录一点想法。',
@@ -84,7 +84,13 @@ void main() {
     await capture('profile-dark');
     await settings.setThemeMode('light');
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('设置'));
+    final settingsEntry = find.text('设置');
+    await tester.scrollUntilVisible(
+      settingsEntry,
+      300,
+      scrollable: find.byType(Scrollable).at(1),
+    );
+    await tester.tap(settingsEntry);
     await tester.pumpAndSettle();
     await capture('settings-light');
     await tester.pumpWidget(const SizedBox());

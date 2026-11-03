@@ -215,9 +215,9 @@ String _source(String type, int index) {
     'python' =>
       'values = [$a, $b, $c]\nweighted = sum(value * (position + 1) for position, value in enumerate(values))\nprint(f"weighted={weighted}")',
     'dart' =>
-      'void main() { final values = <int>[' +
-          '$a, $b, $c' +
-          ']; final weighted = values[0] + values[1] * 2 + values[2] * 3; print("weighted=" + weighted.toString()); }',
+      'void main() { final values = <int>[$a, $b, $c]; '
+          'final weighted = values[0] + values[1] * 2 + values[2] * 3; '
+          'print("weighted=" + weighted.toString()); }',
     'sql' =>
       'CREATE TABLE measurements (position INTEGER NOT NULL, value INTEGER NOT NULL);\nINSERT INTO measurements VALUES (1, $a), (2, $b), (3, $c);\nSELECT SUM(position * value) AS weighted FROM measurements;',
     'json' =>
