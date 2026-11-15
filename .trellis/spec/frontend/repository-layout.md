@@ -17,6 +17,11 @@ Apply this contract when changing an app's package dependencies, creating a lang
 - `qfli_c` additionally declares `qfli_c_runtime` at `packages/qfli_c_runtime` within its own Git root.
 - `qfli_studio_core` owns the patched `vendor/re_editor` and its own path override.
 - No package declares `resolution: workspace`; there is no root Dart pub workspace.
+- Before editing shared code, inspect local `pubspec_overrides.yaml` and
+  `.dart_tool/package_config.json`. An integration build may resolve
+  `qfli_studio_core` to a Git worktree rather than the sibling checkout. Edit
+  the resolved checkout and preserve local overrides unless the task changes
+  dependency wiring.
 
 ## 4. Validation & Error Matrix
 
