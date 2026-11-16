@@ -19,6 +19,7 @@ import 'package:qfli_studio_core/store/auth_store.dart';
 import 'package:qfli_studio_core/store/project_store.dart';
 import 'package:qfli_studio_core/store/settings_store.dart';
 import 'package:qfli_studio_core/theme/app_theme.dart';
+import 'package:qfli_studio_core/widgets/collapsed_search_field.dart';
 import 'package:qfli_studio_core/widgets/project_card.dart';
 import 'package:qfli_studio_core/workspace/saved_workspaces_tab.dart';
 import 'package:qflistudio/content/studio_content_repository.dart';
@@ -173,17 +174,15 @@ void main() {
         find.descendant(of: scopes, matching: find.byType(Tab)),
         findsNWidgets(5),
       );
-      await tester.tap(
-        find.descendant(
-          of: find.descendant(
-            of: find.byType(HomeTab),
-            matching: find.byType(AppBar),
-          ),
-          matching: find.byType(PopupMenuButton<String>),
-        ),
-      );
+      // The creation entry moved from the overflow menu to the FAB (R1): on
+      // the cloud scope the FAB opens the cloud dialog, and the menu no longer
+      // carries a cloud item.
+      await tester.ensureVisible(find.text(l10n.cloudProjects));
+      await tester.tap(find.descendant(of: scopes, matching: find.text(l10n.cloudProjects)));
       await _settle(tester);
-      expect(find.text(l10n.newCloudProject), findsOneWidget);
+      await tester.tap(find.byType(FloatingActionButton));
+      await _settle(tester);
+      expect(find.text(l10n.newCloudProject), findsWidgets);
       await tester.binding.handlePopRoute();
       await _settle(tester);
       expect(tester.takeException(), isNull);
@@ -238,7 +237,17 @@ void main() {
         find.descendant(of: tutorialSurface, matching: find.byType(AppBar)),
       );
       expect(header.centerTitle, isFalse);
-      expect(header.actions, isNull);
+      // R6 plus R5: the bar carries the collapsed search icon only. Publishing
+      // actions stay absent.
+      expect(header.actions, isNotNull);
+      expect(
+        find.descendant(
+          of: tutorialSurface,
+          matching: find.byType(CollapsedSearchButton),
+        ),
+        findsOneWidget,
+      );
+      expect(find.byType(FloatingActionButton), findsNothing);
       // The title stays the tutorial one (R6).
       final headerTitle = find.descendant(
         of: tutorialSurface,
