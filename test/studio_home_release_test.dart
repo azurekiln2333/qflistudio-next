@@ -197,13 +197,13 @@ void main() {
       await _selectPage(tester, 2);
       await _waitFor(
         tester,
-        () => _cppFilter(LocalTutorialsTab).evaluate().isNotEmpty,
+        () => _cppFilter(TutorialCenterPage).evaluate().isNotEmpty,
         'production main tutorial catalog',
       );
       expect(find.byType(TutorialsTab), findsNothing);
       expect(find.byType(PostListPage), findsNothing);
-      final tutorial = tester.widget<LocalTutorialsTab>(
-        find.byType(LocalTutorialsTab),
+      final tutorial = tester.widget<TutorialCenterPage>(
+        find.byType(TutorialCenterPage),
       );
       expect(tutorial.language, qfliStudioProfile.id);
       expect(tutorial.repository, isA<StudioContentRepository>());
@@ -222,7 +222,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('写教程'), findsNothing);
-      final tutorialSurface = find.byType(LocalTutorialsTab);
+      final tutorialSurface = find.byType(TutorialCenterPage);
       expect(
         find.descendant(
           of: tutorialSurface,
@@ -239,20 +239,37 @@ void main() {
       );
       expect(header.centerTitle, isFalse);
       expect(header.actions, isNull);
+      // The title stays the tutorial one (R6).
+      final headerTitle = find.descendant(
+        of: tutorialSurface,
+        matching: find.byType(AppBar),
+      );
+      expect(
+        find.descendant(
+          of: headerTitle,
+          matching: find.text(
+            StudioLocalizations.of(
+              tester.element(find.byType(TutorialCenterPage)),
+            ).tutorial,
+          ),
+        ),
+        findsWidgets,
+      );
 
-      await _selectPage(tester, 3);
+      // Example code is the second section of the same page.
+      await tester.tap(find.byKey(TutorialCenterPage.examplesSectionKey));
       await _waitFor(
         tester,
-        () => _cppFilter(ExampleCodeTab).evaluate().isNotEmpty,
+        () => _cppFilter(TutorialCenterPage).evaluate().isNotEmpty,
         'production main example catalog',
       );
-      final examples = tester.widget<ExampleCodeTab>(
-        find.byType(ExampleCodeTab),
+      final examples = tester.widget<TutorialCenterPage>(
+        find.byType(TutorialCenterPage),
       );
       expect(examples.repository, same(repository));
       expect(repository.load(), same(catalogFuture));
       final l10n = StudioLocalizations.of(
-        tester.element(find.byType(ExampleCodeTab)),
+        tester.element(find.byType(TutorialCenterPage)),
       );
       expect(find.text(l10n.localExamplesMissing), findsNothing);
       expect(
@@ -268,7 +285,7 @@ void main() {
   );
 
   testWidgets(
-    'main content factory stays lazy and runs once across retained tutorial and example routes',
+    'main content factory stays lazy and runs once on the merged content page',
     (tester) async {
       var factoryCalls = 0;
       // Real asset I/O stops arriving from the fake-async zone once earlier
@@ -302,32 +319,63 @@ void main() {
       await _selectPage(tester, 2);
       await _waitFor(
         tester,
-        () => _cppFilter(LocalTutorialsTab).evaluate().isNotEmpty,
+        () => _cppFilter(TutorialCenterPage).evaluate().isNotEmpty,
         'lazy tutorial route',
       );
       expect(factoryCalls, 1);
       final repository = tester
-          .widget<LocalTutorialsTab>(find.byType(LocalTutorialsTab))
+          .widget<TutorialCenterPage>(find.byType(TutorialCenterPage))
           .repository;
       expect(repository, isA<StudioContentRepository>());
-      await _selectPage(tester, 3);
+      await tester.tap(find.byKey(TutorialCenterPage.examplesSectionKey));
       await _waitFor(
         tester,
-        () => _cppFilter(ExampleCodeTab).evaluate().isNotEmpty,
-        'shared example route',
+        () => _cppFilter(TutorialCenterPage).evaluate().isNotEmpty,
+        'shared example section',
       );
       expect(
-        tester.widget<ExampleCodeTab>(find.byType(ExampleCodeTab)).repository,
+        tester
+            .widget<TutorialCenterPage>(find.byType(TutorialCenterPage))
+            .repository,
         same(repository),
       );
       await _selectPage(tester, 0);
       await _selectPage(tester, 2);
-      await _selectPage(tester, 3);
       expect(factoryCalls, 1);
       expect(
-        tester.widget<ExampleCodeTab>(find.byType(ExampleCodeTab)).repository,
+        tester
+            .widget<TutorialCenterPage>(find.byType(TutorialCenterPage))
+            .repository,
         same(repository),
       );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'the shell offers no separate example-code entry',
+    (tester) async {
+      await _mount(tester, root);
+      // Tutorials and example code share one page (R6): four destinations and
+      // no example-code icon anywhere in the navigation.
+      final destinations = find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.byWidgetPredicate((widget) => widget is InkResponse),
+      );
+      expect(destinations, findsNWidgets(4));
+      expect(find.byIcon(Icons.code_outlined), findsNothing);
+      expect(find.byIcon(Icons.code), findsNothing);
+      expect(find.byType(NavigationDestination), findsNWidgets(4));
+      await _selectPage(tester, 2);
+      await _waitFor(
+        tester,
+        () => _cppFilter(TutorialCenterPage).evaluate().isNotEmpty,
+        'merged content page',
+      );
+      expect(find.byType(TutorialCenterPage), findsOneWidget);
+      // The offline example page is unreachable from the shell now.
+      expect(find.byType(ExampleCodeTab), findsNothing);
+      expect(find.byType(LocalTutorialsTab), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
@@ -385,7 +433,7 @@ Future<void> _selectPage(WidgetTester tester, int index) async {
     of: find.byType(NavigationBar),
     matching: find.byWidgetPredicate((widget) => widget is InkResponse),
   );
-  expect(destinations, findsNWidgets(5));
+  expect(destinations, findsNWidgets(4));
   await tester.tap(destinations.at(index));
   await _settle(tester);
   expect(
