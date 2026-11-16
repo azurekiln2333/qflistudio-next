@@ -215,3 +215,9 @@ Flutter 产物由 hvigor 插件自动 `flutter assemble` 并拷贝，不用手�
 - [大陆社区上线清单](docs/community-launch.md)：企业/个体工商户的备案、实名、举报审核与安全评估准备。
 - [启动与性能验证](docs/startup-and-performance.md)：已经修改的内容、自动测试和真机验收步骤。
 - 个人页预览：[浅色](docs/previews/profile-light.png) / [深色](docs/previews/profile-dark.png)，[设置页](docs/previews/settings-light.png)。预览使用演示资料。
+
+## 许可证
+
+本仓库代码采用 GNU GPL v3.0 许可证。
+单独声明许可证的内容沿用原许可证。
+许可证全文见 [LICENSE](LICENSE)。
