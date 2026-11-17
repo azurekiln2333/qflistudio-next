@@ -187,7 +187,8 @@ jobs:
         working-directory: qflistudio
         run: |
           flutter build windows --release
-          if not exist "qflistudio.exe" (
+          if not exist "%RELEASE_DIR%\%APP_EXE%" (
+            echo Flutter build windows produced no %RELEASE_DIR%\%APP_EXE%
             exit /b 1
           )
 
