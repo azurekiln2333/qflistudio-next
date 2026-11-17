@@ -1,0 +1,1745 @@
+name: App installers
+
+# Builds installable packages for eleven targets on GitHub-hosted runners.
+# Every JavaScript action is pinned by commit and runs on Node 24, so no
+# "Node.js 20 is deprecated" warning appears. Nothing here signs with a real
+# key or publishes.
+
+on:
+  push:
+    branches:
+      - main
+      - "ci/**"
+    tags:
+      - "v*"
+    paths:
+      - "lib/**"
+      - "assets/**"
+      - "windows/**"
+      - "linux/**"
+      - "macos/**"
+      - "ios/**"
+      - "android/**"
+      - "ohos/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "tool/ci/**"
+      - ".github/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "assets/**"
+      - "windows/**"
+      - "linux/**"
+      - "macos/**"
+      - "ios/**"
+      - "android/**"
+      - "ohos/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "tool/ci/**"
+      - ".github/**"
+  workflow_dispatch:
+    inputs:
+      flutter_version:
+        description: Official Flutter stable version. Empty uses the newest stable.
+        required: false
+        default: ""
+      core_ref:
+        description: qflistudio-core branch, tag or commit.
+        required: false
+        default: "main"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-installers-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: qflistudio
+
+env:
+  # The app reads the core through path: ../qfli_studio_core, so both
+  # repositories are checked out as siblings inside the workspace.
+  OHOS_TOOLS_VERSION: "26.0.0.821"
+  OHOS_API_LEVEL: "26"
+  OHOS_FLUTTER_VERSION: "3.27.5-ohos-1.0.1"
+  OHOS_FLUTTER_COMMIT: "12587c79e88aacf3172a84e536f226457d037594"
+  OHOS_NODE_VERSION: "24.14.1"
+  # Bumped in the same commit as pubspec.yaml, so the OHOS artifact name and
+  # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
+  APP_VERSION: "5.0.1"
+  APP_ID: com.azurekiln.qfli.qflistudio
+  OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
+  ANDROID_NDK_VERSION: "27.0.12077973"
+  ANDROID_CMAKE_VERSION: "3.22.1"
+
+jobs:
+  # One Flutter version for all ten official packages, so a run is consistent.
+  resolve-flutter:
+    name: Resolve the Flutter stable version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      commit: ${{ steps.resolve.outputs.commit }}
+      # The OHOS job names its artifact after this value in env, so a guard
+      # keeps the two from drifting apart in silence.
+      app-version: ${{ steps.app.outputs.version }}
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Resolve the version and its framework commit
+        id: resolve
+        env:
+          REQUESTED: ${{ inputs.flutter_version }}
+        run: |
+          bash tool/ci/resolve_flutter.sh "$REQUESTED" | tee "$RUNNER_TEMP/resolved.txt"
+          cat "$RUNNER_TEMP/resolved.txt" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Flutter"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/resolved.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Resolve the app version
+        id: app
+        run: |
+          version="$(bash tool/ci/app_version.sh)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$version" != "$APP_VERSION" ]; then
+            echo "::error::pubspec.yaml says $version but the workflow env APP_VERSION is $APP_VERSION. Bump both in the same commit."
+            exit 1
+          fi
+          echo "PASS pubspec.yaml and the workflow agree on $version"
+
+  windows:
+    name: Windows ${{ matrix.arch }} installer
+    needs: resolve-flutter
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: windows-2022
+            # dumpbin prints the COFF machine of the PE image as hex.
+            machine: "8664"
+          - arch: arm64
+            runner: windows-11-arm
+            machine: "AA64"
+    env:
+      ARCH: ${{ matrix.arch }}
+      PE_MACHINE: ${{ matrix.machine }}
+      BUILD_DIR: build/windows/${{ matrix.arch }}
+      RELEASE_DIR: build/windows/${{ matrix.arch }}/runner/Release
+      APP_EXE: qflistudio.exe
+      SIGNING_STATE: "unsigned (Windows SmartScreen will warn)"
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || 'main' }}
+          cache-scope: windows-${{ matrix.arch }}
+          desktop-platforms: windows
+
+      # bin/flutter is the bash entry point. On a MINGW arm64 host its
+      # bin/internal/update_dart_sdk.sh takes the "MINGW* | MSYS* )" branch,
+      # which always names dart-sdk-windows-x64.zip (checked at tag 3.50.0,
+      # update_dart_sdk.sh lines 114-117). update_dart_sdk.ps1 asks for
+      # dart-sdk-windows-arm64.zip when PROCESSOR_ARCHITECTURE is ARM64 (lines
+      # 53-71). flutter.bat runs the .ps1, so arm64 calls it. The CMake target
+      # follows the host arch, so the release directory carries matrix.arch.
+      - name: Build Windows release
+        if: matrix.arch == 'x64'
+        run: |
+          bash tool/ci/run_logged.sh "flutter build windows" flutter build windows --release
+          if [ ! -s "$RELEASE_DIR/$APP_EXE" ]; then
+            echo "::error::flutter build windows produced no $RELEASE_DIR/$APP_EXE"
+            exit 1
+          fi
+
+      - name: Build Windows release with the batch entry point
+        if: matrix.arch == 'arm64'
+        # flutter.bat is the entry point that asks for the arm64 Dart SDK.
+        shell: cmd
+        working-directory: qflistudio
+        run: |
+          flutter build windows --release
+          if not exist "qflistudio.exe" (
+            exit /b 1
+          )
+
+      - name: Locate MSVC inspection tools and runtime
+        run: |
+          temp="$(cygpath -m "$RUNNER_TEMP")"
+          # vswhere has one fixed location on every Visual Studio 2017+ machine.
+          vswhere="/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+          if [ ! -f "$vswhere" ]; then
+            echo "::error::vswhere.exe is missing from the Visual Studio Installer directory"
+            exit 1
+          fi
+          if [ "$ARCH" = "arm64" ]; then
+            tools_component="Microsoft.VisualStudio.Component.VC.Tools.ARM64"
+          else
+            tools_component="Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+          fi
+          vs_property() {
+            "$vswhere" -latest -products '*' $2 \
+              -property "$1" 2> /dev/null | tr -d '\r' | sed -n '1p'
+          }
+          vs_install="$(vs_property installationPath "-requires $tools_component" || true)"
+          if [ -z "$vs_install" ]; then
+            # The component id is a preference. The toolset layout below decides.
+            echo "::warning::No Visual Studio reports $tools_component; falling back to the latest install"
+            vs_install="$(vs_property installationPath '' || true)"
+          fi
+          if [ -z "$vs_install" ]; then
+            echo "::error::vswhere found no Visual Studio installation"
+            exit 1
+          fi
+          vs_root="$(cygpath -m "$vs_install")"
+          defaults_dir="$vs_root/VC/Auxiliary/Build"
+
+          if [ ! -f "$defaults_dir/Microsoft.VCToolsVersion.default.txt" ]; then
+            echo "::error::Microsoft.VCToolsVersion.default.txt is missing from $defaults_dir"
+            exit 1
+          fi
+          tools_version="$(tr -d '\r\n ' < "$defaults_dir/Microsoft.VCToolsVersion.default.txt")"
+          # An arm64 host uses Hostarm64/arm64. A cross-toolchain may live one
+          # directory over, so both layouts are tried.
+          dumpbin=""
+          for host in "$ARCH" x64; do
+            candidate="$vs_root/VC/Tools/MSVC/$tools_version/bin/Host$host/$ARCH/dumpbin.exe"
+            if [ -f "$candidate" ]; then
+              dumpbin="$candidate"
+              break
+            fi
+          done
+          if [ -z "$dumpbin" ]; then
+            echo "::error::dumpbin.exe for $ARCH is missing from MSVC toolset $tools_version"
+            exit 1
+          fi
+
+          # Flutter does not bundle the MSVC runtime. Take it from the
+          # redistributable directory of this Visual Studio.
+          redist_default=""
+          if [ -f "$defaults_dir/Microsoft.VCRedistVersion.default.txt" ]; then
+            redist_default="$(tr -d '\r\n ' < "$defaults_dir/Microsoft.VCRedistVersion.default.txt")"
+          fi
+          crt_dir=""
+          for candidate in \
+            "$vs_root/VC/Redist/MSVC/$redist_default/$ARCH/Microsoft.VC*.CRT" \
+            "$vs_root"/VC/Redist/MSVC/*/"$ARCH"/Microsoft.VC*.CRT; do
+            if [ -f "$candidate/msvcp140.dll" ] && [ -f "$candidate/vcruntime140.dll" ]; then
+              crt_dir="$candidate"
+              break
+            fi
+          done
+          if [ -z "$crt_dir" ]; then
+            echo "::error::No $ARCH Microsoft.VC*.CRT directory with msvcp140.dll and vcruntime140.dll under $vs_root/VC/Redist/MSVC"
+            exit 1
+          fi
+          redist_version="$(basename "$(dirname "$(dirname "$crt_dir")")")"
+
+          # Read the compiler and CMake that the build really used.
+          generator=""
+          cmake_version=""
+          cache="$BUILD_DIR/CMakeCache.txt"
+          if [ -f "$cache" ]; then
+            cmake_command="$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$cache" | tr -d '\r' | sed -n '1p')"
+            generator="$(sed -n 's/^CMAKE_GENERATOR:INTERNAL=//p' "$cache" | tr -d '\r' | sed -n '1p')"
+            cmake_arch="$(sed -n 's/^CMAKE_GENERATOR_PLATFORM:INTERNAL=//p' "$cache" | tr -d '\r' | sed -n '1p')"
+            if [ -n "$cmake_command" ] && [ -f "$cmake_command" ]; then
+              cmake_version="$("$cmake_command" --version | tr -d '\r' | sed -n '1p')"
+            fi
+          else
+            echo "::warning::$cache is missing; BUILD_INFO.txt records unknown tool versions"
+            cmake_arch=""
+          fi
+          compiler_version="$(cat "$BUILD_DIR"/CMakeFiles/*/CMakeCXXCompiler.cmake 2>/dev/null \
+            | sed -n 's/^set(CMAKE_CXX_COMPILER_VERSION "\([^"]*\)").*/\1/p' | sed -n '1p' || true)"
+
+          {
+            echo "visual_studio=$(vs_property displayName '' || true) $(vs_property catalog_productDisplayVersion '' || true)"
+            echo "msvc_component=$tools_component"
+            echo "msvc_compiler=${compiler_version:-unknown}"
+            echo "msvc_default_toolset=$tools_version"
+            echo "cmake=${cmake_version:-unknown}"
+            echo "cmake_generator=${generator:-unknown}"
+            echo "cmake_generator_platform=${cmake_arch:-unknown}"
+          } > "$temp/windows-build-info.txt"
+          cat "$temp/windows-build-info.txt"
+          {
+            echo "DUMPBIN=$dumpbin"
+            echo "VC_CRT_DIR=$crt_dir"
+            echo "VC_REDIST_VERSION=$redist_version"
+          } >> "$GITHUB_ENV"
+
+      # The CMake target follows the host arch. A truncated or emulated build
+      # would still produce an exe, so the machine field decides.
+      - name: Inspect the release directory and the PE machine
+        run: |
+          temp="$(cygpath -m "$RUNNER_TEMP")"
+          failed=0
+          for item in "$APP_EXE" flutter_windows.dll data/app.so data/icudtl.dat \
+            data/flutter_assets/assets/app_icon.png; do
+            if [ -s "$RELEASE_DIR/$item" ]; then
+              echo "PASS $item"
+            else
+              echo "::error::Release directory is missing $item"
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            ls -la "$RELEASE_DIR" || true
+            exit 1
+          fi
+
+          # dumpbin accepts dash switches; Git Bash would rewrite slash switches.
+          for binary in "$APP_EXE" flutter_windows.dll data/app.so; do
+            report="$temp/pe-headers-$binary.txt"
+            "$DUMPBIN" -nologo -headers "$RELEASE_DIR/$binary" | tr -d '\r' > "$report"
+            actual="$(sed -n 's/^ *\([0-9A-Fa-f]\{4\}\) machine (\([^)]*\)).*/\1/p' "$report" | sed -n '1p')"
+            if [ -z "$actual" ]; then
+              sed -n '1,20p' "$report"
+              echo "::error::Cannot read the COFF machine of $binary"
+              failed=1
+            elif [ "$actual" != "$PE_MACHINE" ]; then
+              echo "::error::$binary has machine $actual, expected $PE_MACHINE for $ARCH"
+              failed=1
+            else
+              echo "PASS $binary is a $ARCH PE image (machine $actual)"
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "windows_inspection=release files and the $ARCH COFF machine ($PE_MACHINE) were checked" \
+            >> "$temp/windows-build-info.txt"
+
+      - name: Assemble the package directory with the MSVC runtime
+        run: |
+          temp="$(cygpath -m "$RUNNER_TEMP")"
+          version="$(bash tool/ci/app_version.sh)"
+          package_base="QFLIStudio-$version-windows-$ARCH"
+          work="$temp/package"
+          package_dir="$work/$package_base"
+          rm -rf "$work"
+          mkdir -p "$package_dir"
+          cp -R "$RELEASE_DIR/." "$package_dir/"
+
+          # The install step also copies static plugin archives next to the exe.
+          for leftover in "$package_dir"/*.lib "$package_dir"/*.exp "$package_dir"/*.pdb "$package_dir"/*.ilk; do
+            if [ -e "$leftover" ]; then
+              echo "Dropping link-time file $(basename "$leftover")"
+              rm -f "$leftover"
+            fi
+          done
+
+          # The zip and the installer both start on a PC without the VC++
+          # redistributable. arm64 has no vcruntime140_1.dll.
+          for runtime in msvcp140.dll vcruntime140.dll vcruntime140_1.dll; do
+            if [ -f "$VC_CRT_DIR/$runtime" ]; then
+              cp "$VC_CRT_DIR/$runtime" "$package_dir/$runtime"
+            elif [ "$runtime" = "vcruntime140_1.dll" ]; then
+              echo "Note: $VC_CRT_DIR holds no vcruntime140_1.dll for $ARCH"
+            else
+              echo "::error::$VC_CRT_DIR holds no $runtime"
+              exit 1
+            fi
+          done
+
+          # Every MSVC runtime DLL that a packaged binary imports must be here.
+          failed=0
+          for binary in "$package_dir"/*.exe "$package_dir"/*.dll; do
+            dependents="$temp/pe-dependents.txt"
+            "$DUMPBIN" -nologo -dependents "$binary" | tr -d '\r' > "$dependents"
+            while IFS= read -r dependency; do
+              case "${dependency,,}" in
+                msvcp*|vcruntime*|concrt*|vccorlib*|vcomp*)
+                  if [ -f "$package_dir/$dependency" ]; then
+                    echo "PASS $(basename "$binary") -> $dependency"
+                  else
+                    echo "::error::$(basename "$binary") imports $dependency, which is not in the package"
+                    failed=1
+                  fi
+                  ;;
+              esac
+            done < <(sed -n 's/^[[:space:]]*\([A-Za-z0-9_.-]*\.[Dd][Ll][Ll]\)[[:space:]]*$/\1/p' "$dependents")
+          done
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          ls -la "$package_dir"
+          echo "vc_runtime=bundled msvcp140.dll and vcruntime140.dll from redistributable $VC_REDIST_VERSION" \
+            >> "$temp/windows-build-info.txt"
+          {
+            echo "PACKAGE_BASE=$package_base"
+            echo "PACKAGE_WORK=$work"
+          } >> "$GITHUB_ENV"
+
+      - name: Create the portable zip
+        run: |
+          seven_zip="$(command -v 7z || true)"
+          if [ -z "$seven_zip" ] && [ -f "/c/Program Files/7-Zip/7z.exe" ]; then
+            seven_zip="/c/Program Files/7-Zip/7z.exe"
+          fi
+          if [ -z "$seven_zip" ]; then
+            echo "::error::7z is not available on this runner"
+            exit 1
+          fi
+          # Archive from the parent directory: the zip unpacks into one directory.
+          cd "$PACKAGE_WORK"
+          "$seven_zip" a -tzip -mx=9 "$PACKAGE_BASE-portable.zip" "$PACKAGE_BASE"
+          "$seven_zip" t "$PACKAGE_BASE-portable.zip"
+          "$seven_zip" l -slt "$PACKAGE_BASE-portable.zip" | tr -d '\r' \
+            | sed -n 's/^Path = //p' | tr '\\' '/' > zip-entries.txt
+          echo "seven_zip=$("$seven_zip" i | tr -d '\r' | sed -n '/^7-Zip/p' | sed -n '1p')" \
+            >> "$(cygpath -m "$RUNNER_TEMP")/windows-build-info.txt"
+
+      - name: Build the installer with Inno Setup
+        env:
+          # ISCC takes /D switches. Git Bash must not rewrite them as paths.
+          MSYS_NO_PATHCONV: "1"
+          MSYS2_ARG_CONV_EXCL: "*"
+        run: |
+          temp="$(cygpath -m "$RUNNER_TEMP")"
+          find_iscc() {
+            iscc="$(command -v iscc.exe || true)"
+            for candidate in "/c/Program Files (x86)/Inno Setup 6/ISCC.exe" "/c/Program Files/Inno Setup 6/ISCC.exe"; do
+              if [ -z "$iscc" ] && [ -f "$candidate" ]; then
+                iscc="$candidate"
+              fi
+            done
+          }
+          find_iscc
+          if [ -z "$iscc" ]; then
+            bash tool/ci/run_logged.sh "choco install innosetup" choco install innosetup --no-progress -y
+            find_iscc
+          fi
+          if [ -z "$iscc" ]; then
+            echo "::error::ISCC.exe is not available and Chocolatey did not install Inno Setup 6"
+            exit 1
+          fi
+          echo "Using $iscc"
+
+          version="$(bash tool/ci/app_version.sh)"
+          bash tool/ci/run_logged.sh "Inno Setup compile" "$iscc" \
+            "/DAppVersion=$version" \
+            "/DArch=$ARCH" \
+            "/DSourceDir=$(cygpath -w "$PACKAGE_WORK/$PACKAGE_BASE")" \
+            "/DOutputDir=$(cygpath -w "$PACKAGE_WORK")" \
+            "/DOutputBaseFilename=$PACKAGE_BASE-setup" \
+            "$(cygpath -aw windows/installer/qflistudio.iss)" | tee "$temp/iscc.log"
+          if [ ! -s "$PACKAGE_WORK/$PACKAGE_BASE-setup.exe" ]; then
+            echo "::error::Inno Setup produced no $PACKAGE_BASE-setup.exe"
+            exit 1
+          fi
+          inno_version="$(tr -d '\r' < "$temp/iscc.log" | sed -n 's/^Compiler engine version: //p' | sed -n '1p')"
+          if [ -z "$inno_version" ]; then
+            echo "::warning::ISCC printed no compiler engine version; BUILD_INFO.txt records unknown"
+          fi
+          echo "inno_setup=${inno_version:-unknown}" >> "$temp/windows-build-info.txt"
+
+      - name: Inspect the portable zip and the installer
+        run: |
+          failed=0
+          entries="$PACKAGE_WORK/zip-entries.txt"
+          for item in "$APP_EXE" flutter_windows.dll msvcp140.dll vcruntime140.dll \
+            data/app.so data/icudtl.dat data/flutter_assets/assets/app_icon.png; do
+            if grep -Fxq "$PACKAGE_BASE/$item" "$entries"; then
+              echo "PASS zip holds $PACKAGE_BASE/$item"
+            else
+              echo "::error::Portable zip is missing $PACKAGE_BASE/$item"
+              failed=1
+            fi
+          done
+
+          setup="$PACKAGE_WORK/$PACKAGE_BASE-setup.exe"
+          setup_bytes="$(wc -c < "$setup" | tr -d '[:space:]')"
+          if [ "$setup_bytes" -gt 5242880 ]; then
+            echo "PASS installer is $setup_bytes bytes"
+          else
+            echo "::error::Installer is only $setup_bytes bytes; expected more than 5 MiB"
+            failed=1
+          fi
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Install silently and inspect the installed files
+        # A dialog would block a silent install forever; bound the step instead.
+        timeout-minutes: 10
+        env:
+          # Setup takes /VERYSILENT style switches. Git Bash must not rewrite them.
+          MSYS_NO_PATHCONV: "1"
+          MSYS2_ARG_CONV_EXCL: "*"
+        run: |
+          temp="$(cygpath -m "$RUNNER_TEMP")"
+          install_dir="$temp/install-check"
+          install_log="$temp/setup-install.txt"
+          rm -rf "$install_dir"
+          # skipifsilent on the [Run] entry keeps the app from starting.
+          status=0
+          "$PACKAGE_WORK/$PACKAGE_BASE-setup.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART \
+            /CURRENTUSER /SP- "/DIR=$(cygpath -w "$install_dir")" \
+            "/LOG=$(cygpath -w "$install_log")" || status=$?
+          if [ "$status" -ne 0 ]; then
+            if [ -f "$install_log" ]; then
+              tail -n 40 "$install_log" | tr -d '\r'
+            fi
+            echo "::error::Silent install exited with status $status"
+            exit 1
+          fi
+
+          failed=0
+          for item in "$APP_EXE" flutter_windows.dll msvcp140.dll vcruntime140.dll \
+            data/app.so data/icudtl.dat unins000.exe; do
+            if [ -s "$install_dir/$item" ]; then
+              echo "PASS installed $item"
+            else
+              echo "::error::Silent install did not write $item"
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            ls -la "$install_dir" || true
+            exit 1
+          fi
+          echo "installer_inspection=silent per-user install wrote the app, the runtime DLLs and the uninstaller; the app was not started" \
+            >> "$temp/windows-build-info.txt"
+
+      - name: Stage the Windows packages
+        run: |
+          QFLI_SIGNING="$SIGNING_STATE" \
+            QFLI_BUILD_INFO_EXTRA="$(cygpath -m "$RUNNER_TEMP")/windows-build-info.txt" \
+            bash tool/ci/stage_artifact.sh "$ARTIFACT" \
+            "$PACKAGE_WORK/$PACKAGE_BASE-setup.exe" "$PACKAGE_WORK/$PACKAGE_BASE-portable.zip"
+        env:
+          ARTIFACT: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-windows-${{ matrix.arch }}
+
+      - name: Upload the Windows packages
+        id: artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-windows-${{ matrix.arch }}
+          # Upload paths are relative to the workspace, not the app checkout.
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-windows-${{ matrix.arch }}/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize the Windows package
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          FLUTTER_VERSION: ${{ needs.resolve-flutter.outputs.version }}
+          APP_VERSION: ${{ needs.resolve-flutter.outputs.app-version }}
+        run: |
+          {
+            echo "### Windows $ARCH installer and portable zip"
+            echo
+            echo "[Download app-windows-$ARCH]($ARTIFACT_URL)"
+            echo
+            echo "Contents: QFLIStudio-$APP_VERSION-windows-$ARCH-setup.exe, -portable.zip,"
+            echo 'BUILD_INFO.txt, SHA256SUMS and LICENSE.'
+            echo
+            echo "Signing: $SIGNING_STATE. The MSVC runtime is bundled from redistributable $VC_REDIST_VERSION."
+            echo 'Retention: 14 days. The installer is per-user by default and needs Windows 10 or later.'
+            echo "Validation: release files, the $ARCH COFF machine ($PE_MACHINE), MSVC runtime imports,"
+            echo 'zip listing and a silent install. The app was not launched or tested on Windows.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  linux:
+    name: Linux ${{ matrix.arch }} packages
+    needs: resolve-flutter
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-22.04
+            # file(1) prints the ELF class and machine of a Linux binary.
+            deb_arch: amd64
+          - arch: arm64
+            runner: ubuntu-22.04-arm
+            deb_arch: arm64
+    env:
+      ARCH: ${{ matrix.arch }}
+      BUNDLE_DIR: build/linux/${{ matrix.arch }}/release/bundle
+      PACKAGE_DIR: build/linux-packages
+      SIGNING_STATE: "unsigned"
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || 'main' }}
+          cache-scope: linux-${{ matrix.arch }}
+          desktop-platforms: linux
+
+      - name: Install Linux desktop build tools
+        run: |
+          sudo apt-get update
+          # file_selector_linux is the only plugin with native Linux code.
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
+            libstdc++-12-dev desktop-file-utils file
+
+      - name: Build the Linux release bundle
+        run: |
+          bash tool/ci/run_logged.sh "flutter build linux" flutter build linux --release
+
+      - name: Inspect the Linux bundle and its ELF machine
+        run: |
+          for path in qflistudio lib/libflutter_linux_gtk.so lib/libapp.so \
+            data/icudtl.dat data/flutter_assets; do
+            if [ ! -e "$BUNDLE_DIR/$path" ]; then
+              echo "::error::Linux bundle is missing $path"
+              exit 1
+            fi
+          done
+          if [ ! -x "$BUNDLE_DIR/qflistudio" ]; then
+            echo "::error::Linux bundle executable is not executable"
+            exit 1
+          fi
+
+          failed=0
+          report="$(file -b "$BUNDLE_DIR/qflistudio")"
+          if [ "$ARCH" = "arm64" ]; then
+            expected='aarch64'
+          else
+            expected='x86-64'
+          fi
+          if grep -q "$expected" <<<"$report"; then
+            echo "PASS qflistudio is $expected: $report"
+          else
+            echo "::error::qflistudio is not a $expected ELF binary: $report"
+            failed=1
+          fi
+          for library in "$BUNDLE_DIR"/lib/*.so; do
+            report="$(file -b "$library")"
+            if grep -q "$expected" <<<"$report"; then
+              echo "PASS $(basename "$library") is $expected"
+            else
+              echo "::error::$(basename "$library") is not a $expected ELF binary: $report"
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          # The executable must resolve its libraries through its own RPATH.
+          report="$(ldd "$BUNDLE_DIR/qflistudio" 2>&1 || true)"
+          echo "$report"
+          if grep -q "not found" <<<"$report"; then
+            echo "::error::qflistudio has unresolved shared libraries"
+            exit 1
+          fi
+          echo "PASS Linux bundle contents, the $expected ELF machine and shared libraries"
+
+      - name: Package the deb and the tar.gz
+        run: |
+          bash tool/ci/package_linux.sh "$ARCH" "$BUNDLE_DIR" "$PACKAGE_DIR"
+
+      - name: Inspect the Linux packages
+        run: |
+          version="$(bash tool/ci/app_version.sh)"
+          deb="$PACKAGE_DIR/qflistudio_${version}_${{ matrix.deb_arch }}.deb"
+          tarball="$PACKAGE_DIR/qflistudio-$version-linux-$ARCH.tar.gz"
+
+          dpkg-deb --info "$deb"
+          field="$(dpkg-deb -f "$deb" Architecture)"
+          if [ "$field" != "${{ matrix.deb_arch }}" ]; then
+            echo "::error::The deb declares Architecture '$field', expected ${{ matrix.deb_arch }}"
+            exit 1
+          fi
+          echo "PASS the deb declares Architecture $field"
+
+          dpkg-deb --contents "$deb" > "$RUNNER_TEMP/deb-contents.txt"
+          for path in ./opt/qflistudio/qflistudio \
+            ./usr/bin/qflistudio ./usr/share/applications/$APP_ID.desktop \
+            ./usr/share/pixmaps/$APP_ID.png; do
+            if ! awk -v path="$path" '$NF == path { found = 1 } END { exit !found }' \
+              "$RUNNER_TEMP/deb-contents.txt"; then
+              echo "::error::The deb does not contain $path"
+              exit 1
+            fi
+          done
+
+          tar -tzf "$tarball" > "$RUNNER_TEMP/tar-contents.txt"
+          for path in qflistudio lib/libapp.so; do
+            if ! grep -qx "qflistudio-$version-linux-$ARCH/$path" "$RUNNER_TEMP/tar-contents.txt"; then
+              echo "::error::The tar.gz does not contain $path"
+              exit 1
+            fi
+          done
+
+          # Install the deb on the runner. The app is not launched.
+          sudo dpkg -i "$deb"
+          test -x /usr/bin/qflistudio
+          desktop-file-validate /usr/share/applications/$APP_ID.desktop
+          report="$(ldd /opt/qflistudio/qflistudio 2>&1 || true)"
+          if grep -q "not found" <<<"$report"; then
+            echo "$report"
+            echo "::error::The installed executable has unresolved shared libraries"
+            exit 1
+          fi
+          echo "PASS deb and tar.gz contents; the deb installs on this $ARCH runner"
+
+      - name: Stage the Linux packages
+        env:
+          ARTIFACT: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-linux-${{ matrix.arch }}
+        run: |
+          version="$(bash tool/ci/app_version.sh)"
+          {
+            echo "clang=$(clang --version | sed -n '1p')"
+            echo "cmake=$(cmake --version | sed -n '1p')"
+            echo "ninja=$(ninja --version)"
+            echo "gtk=$(pkg-config --modversion gtk+-3.0)"
+            echo "glibc=$(ldd --version | sed -n '1p')"
+            echo "dpkg=$(dpkg-deb --version | sed -n '1p')"
+            echo "deb_architecture=${{ matrix.deb_arch }}"
+            echo "deb_install_prefix=/opt/qflistudio"
+          } > "$RUNNER_TEMP/linux-toolchain.txt"
+          QFLI_SIGNING="$SIGNING_STATE" QFLI_BUILD_INFO_EXTRA="$RUNNER_TEMP/linux-toolchain.txt" \
+            bash tool/ci/stage_artifact.sh "$ARTIFACT" \
+            "$PACKAGE_DIR/qflistudio_${version}_${{ matrix.deb_arch }}.deb" \
+            "$PACKAGE_DIR/qflistudio-$version-linux-$ARCH.tar.gz"
+
+      - name: Upload the Linux packages
+        id: artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-linux-${{ matrix.arch }}
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-linux-${{ matrix.arch }}/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize the Linux packages
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          APP_VERSION: ${{ needs.resolve-flutter.outputs.app-version }}
+        run: |
+          {
+            echo "### Linux $ARCH deb and tar.gz"
+            echo
+            echo "[Download app-linux-$ARCH]($ARTIFACT_URL)"
+            echo
+            echo "Contents: qflistudio_${APP_VERSION}_${{ matrix.deb_arch }}.deb,"
+            echo "qflistudio-${APP_VERSION}-linux-$ARCH.tar.gz, BUILD_INFO.txt, SHA256SUMS and LICENSE."
+            echo
+            echo 'Signing: unsigned. Built for glibc 2.35 or later.'
+            echo 'Retention: 14 days.'
+            echo 'Validation: bundle contents, the ELF machine of the app and every library, shared'
+            echo 'library resolution, the deb Architecture field and a real dpkg installation.'
+            echo 'The app was not launched or tested on a desktop.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  macos:
+    name: macOS ${{ matrix.arch }} DMG
+    needs: resolve-flutter
+    runs-on: macos-15
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both slices are built on Apple Silicon. Xcode cross-compiles x86_64,
+        # so no Intel runner is needed.
+        arch:
+          - x86_64
+          - arm64
+    env:
+      ARCH: ${{ matrix.arch }}
+      BUNDLE_ID: com.azurekiln.qfli.qflistudio
+      SIGNING_STATE: "ad-hoc signature, not notarized (Gatekeeper will block the first launch)"
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || 'main' }}
+          cache-scope: macos-${{ matrix.arch }}
+          desktop-platforms: macos
+
+      - name: Show the Apple toolchain
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          pod --version
+
+      # FLUTTER_XCODE_* variables become xcodebuild build settings
+      # (environmentVariablesAsXcodeBuildSettings in xcodeproj.dart). ARCHS
+      # narrows the build to one slice. If a prebuilt framework stays universal,
+      # the next step thins and re-signs it, so both paths end single-arch.
+      - name: Build the macOS release app for one architecture
+        env:
+          FLUTTER_XCODE_ARCHS: ${{ matrix.arch }}
+        run: |
+          bash tool/ci/run_logged.sh "flutter build macos" flutter build macos --release
+
+      - name: Thin and inspect the macOS app
+        run: |
+          products="build/macos/Build/Products/Release"
+          app=""
+          count=0
+          for candidate in "$products"/*.app; do
+            if [ -d "$candidate" ]; then
+              app="$candidate"
+              count=$((count + 1))
+            fi
+          done
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Expected exactly one .app in $products, found $count"
+            ls -la "$products" || true
+            exit 1
+          fi
+          app="$PWD/$app"
+          echo "App bundle: $app"
+
+          # Every Mach-O must carry only ARCH. Universal files left by Flutter
+          # or a prebuilt framework are thinned and the bundle re-signed.
+          bash tool/ci/thin_macos_app.sh "$ARCH" "$app"
+
+          executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+          binary="$app/Contents/MacOS/$executable"
+          if [ ! -x "$binary" ]; then
+            echo "::error::The app bundle has no executable at Contents/MacOS/$executable"
+            exit 1
+          fi
+
+          bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Contents/Info.plist")"
+          if [ "$bundle_id" != "$BUNDLE_ID" ]; then
+            echo "::error::Bundle ID is '$bundle_id', expected $BUNDLE_ID"
+            exit 1
+          fi
+          for framework in FlutterMacOS App; do
+            if [ ! -d "$app/Contents/Frameworks/$framework.framework" ]; then
+              echo "::error::The app bundle is missing Contents/Frameworks/$framework.framework"
+              exit 1
+            fi
+          done
+
+          codesign --verify --deep --strict --verbose=2 "$app"
+          signature="$(codesign -dv "$app" 2>&1)"
+          echo "$signature"
+          case "$signature" in
+            *"Signature=adhoc"*) ;;
+            *)
+              echo "::error::The app bundle is not ad-hoc signed"
+              exit 1
+              ;;
+          esac
+
+          {
+            echo "xcode=$(xcodebuild -version | tr '\n' ' ' | sed 's/ *$//')"
+            echo "macosx_sdk=$(xcrun --sdk macosx --show-sdk-version)"
+            echo "cocoapods=$(pod --version)"
+            echo "macos_deployment_target=$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")"
+            echo "architectures=$(lipo -archs "$binary")"
+            echo "bundle_id=$bundle_id"
+          } > "$RUNNER_TEMP/macos-toolchain.txt"
+          cat "$RUNNER_TEMP/macos-toolchain.txt"
+
+          echo "MAC_APP=$app" >> "$GITHUB_ENV"
+          echo "MAC_EXECUTABLE=$executable" >> "$GITHUB_ENV"
+          echo "PASS every Mach-O is $ARCH, the bundle ID is right and the ad-hoc signature verifies"
+
+      - name: Package and stage the DMG
+        env:
+          ARTIFACT: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-macos-${{ matrix.arch }}
+        run: |
+          version="$(bash tool/ci/app_version.sh)"
+          app_name="$(basename "$MAC_APP")"
+          work="$RUNNER_TEMP/dmg"
+          dmg="$work/QFLIStudio-$version-macos-$ARCH.dmg"
+          rm -rf "$work"
+          mkdir -p "$work/staging" "$work/mount"
+
+          # ditto keeps symlinks and extended attributes, so the signature stays valid.
+          ditto "$MAC_APP" "$work/staging/$app_name"
+          ln -s /Applications "$work/staging/Applications"
+
+          # hdiutil sometimes fails with "Resource busy" on hosted runners.
+          created=0
+          for attempt in 1 2 3; do
+            if hdiutil create -volname "QFLIStudio" -srcfolder "$work/staging" \
+              -ov -format UDZO "$dmg"; then
+              created=1
+              break
+            fi
+            echo "::warning::hdiutil create attempt $attempt failed"
+            sleep $((attempt * 10))
+          done
+          if [ "$created" -ne 1 ]; then
+            echo "::error::hdiutil could not create the DMG"
+            exit 1
+          fi
+          hdiutil verify "$dmg"
+
+          # Mount the image and check its contents. The app is not launched.
+          hdiutil attach -nobrowse -readonly -mountpoint "$work/mount" "$dmg"
+          mounted_ok=1
+          if [ ! -x "$work/mount/$app_name/Contents/MacOS/$MAC_EXECUTABLE" ]; then
+            echo "::error::The DMG does not contain $app_name with its executable"
+            mounted_ok=0
+          fi
+          if [ ! -L "$work/mount/Applications" ]; then
+            echo "::error::The DMG does not contain the Applications link"
+            mounted_ok=0
+          fi
+          if ! codesign --verify --deep --strict "$work/mount/$app_name"; then
+            echo "::error::The app inside the DMG fails signature verification"
+            mounted_ok=0
+          fi
+          mounted_archs="$(lipo -archs "$work/mount/$app_name/Contents/MacOS/$MAC_EXECUTABLE" || true)"
+          if [ "$mounted_archs" != "$ARCH" ]; then
+            echo "::error::The mounted executable carries '$mounted_archs', expected only $ARCH"
+            mounted_ok=0
+          fi
+          if ! hdiutil detach "$work/mount"; then
+            echo "::warning::hdiutil detach failed; forcing the detach"
+            hdiutil detach -force "$work/mount"
+          fi
+          if [ "$mounted_ok" -ne 1 ]; then
+            exit 1
+          fi
+          ls -l "$dmg"
+
+          QFLI_SIGNING="$SIGNING_STATE" QFLI_BUILD_INFO_EXTRA="$RUNNER_TEMP/macos-toolchain.txt" \
+            bash tool/ci/stage_artifact.sh "$ARTIFACT" "$dmg"
+
+      - name: Upload the macOS DMG
+        id: artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-macos-${{ matrix.arch }}
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-macos-${{ matrix.arch }}/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize the macOS DMG
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          APP_VERSION: ${{ needs.resolve-flutter.outputs.app-version }}
+        run: |
+          {
+            echo "### macOS $ARCH DMG"
+            echo
+            echo "[Download app-macos-$ARCH]($ARTIFACT_URL)"
+            echo
+            echo "Contents: QFLIStudio-$APP_VERSION-macos-$ARCH.dmg, BUILD_INFO.txt, SHA256SUMS and LICENSE."
+            echo
+            echo 'Signing: ad-hoc signature, not notarized. Gatekeeper blocks the first launch.'
+            echo 'Allow the app in System Settings > Privacy & Security, or run:'
+            echo 'xattr -dr com.apple.quarantine /Applications/qflistudio.app'
+            echo 'Retention: 14 days.'
+            echo "Validation: every Mach-O in the bundle is $ARCH only, the bundle ID, the embedded"
+            echo 'frameworks, the ad-hoc signature and the DMG contents.'
+            echo 'The app was not launched or tested.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  ios:
+    name: iOS unsigned IPA
+    needs: resolve-flutter
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      BUNDLE_ID: com.azurekiln.qfli.qflistudio
+      SIGNING_STATE: "unsigned (re-sign with your own Apple certificate and provisioning profile before installing)"
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || 'main' }}
+          cache-scope: ios
+
+      - name: Build the iOS release app
+        run: |
+          bash tool/ci/run_logged.sh "flutter build ios" \
+            flutter build ios --release --no-codesign
+
+      - name: Inspect the iOS app
+        run: |
+          app="build/ios/iphoneos/Runner.app"
+          if [ ! -f "$app/Runner" ] || [ ! -f "$app/Info.plist" ]; then
+            echo "::error::flutter build ios did not produce $app"
+            exit 1
+          fi
+
+          archs="$(lipo -archs "$app/Runner")"
+          echo "Runner architectures: $archs"
+          if [ "$archs" != "arm64" ]; then
+            echo "::error::Runner is '$archs', expected only arm64"
+            exit 1
+          fi
+          for candidate in "$app"/Frameworks/*.framework/*; do
+            if [ -f "$candidate" ]; then
+              framework_archs="$(lipo -archs "$candidate" 2>/dev/null || true)"
+              if [ -n "$framework_archs" ] && [ "$framework_archs" != "arm64" ]; then
+                echo "::error::$(basename "$candidate") is '$framework_archs', expected only arm64"
+                exit 1
+              fi
+            fi
+          done
+
+          bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")"
+          if [ "$bundle_id" != "$BUNDLE_ID" ]; then
+            echo "::error::Bundle ID is '$bundle_id', expected $BUNDLE_ID"
+            exit 1
+          fi
+          for framework in Flutter App; do
+            if [ ! -f "$app/Frameworks/$framework.framework/$framework" ]; then
+              echo "::error::Runner.app is missing Frameworks/$framework.framework"
+              exit 1
+            fi
+          done
+
+          {
+            echo "xcode=$(xcodebuild -version | tr '\n' ' ' | sed 's/ *$//')"
+            echo "iphoneos_sdk=$(xcrun --sdk iphoneos --show-sdk-version)"
+            echo "cocoapods=$(pod --version)"
+            echo "ios_deployment_target=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$app/Info.plist")"
+            echo "architectures=$archs"
+            echo "bundle_id=$bundle_id"
+          } > "$RUNNER_TEMP/ios-toolchain.txt"
+          cat "$RUNNER_TEMP/ios-toolchain.txt"
+          echo "PASS the iOS app is arm64 only, the bundle ID is right and the frameworks are embedded"
+
+      - name: Package and stage the unsigned IPA
+        env:
+          ARTIFACT: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-ios-arm64
+        run: |
+          version="$(bash tool/ci/app_version.sh)"
+          work="$RUNNER_TEMP/ipa"
+          ipa="$work/QFLIStudio-$version-ios-unsigned.ipa"
+          rm -rf "$work"
+          mkdir -p "$work/Payload"
+          ditto build/ios/iphoneos/Runner.app "$work/Payload/Runner.app"
+
+          # An IPA is a zip archive with the app under Payload/. -y keeps symlinks.
+          (cd "$work" && zip -qry "$(basename "$ipa")" Payload)
+          unzip -l "$ipa" > "$RUNNER_TEMP/ipa-contents.txt"
+          if ! grep -q 'Payload/Runner\.app/Info\.plist$' "$RUNNER_TEMP/ipa-contents.txt"; then
+            echo "::error::The IPA does not contain Payload/Runner.app/Info.plist"
+            exit 1
+          fi
+          ls -l "$ipa"
+
+          QFLI_SIGNING="$SIGNING_STATE" QFLI_BUILD_INFO_EXTRA="$RUNNER_TEMP/ios-toolchain.txt" \
+            bash tool/ci/stage_artifact.sh "$ARTIFACT" "$ipa"
+
+      - name: Upload the iOS IPA
+        id: artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-ios-arm64
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-ios-arm64/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize the iOS IPA
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          FLUTTER_VERSION: ${{ needs.resolve-flutter.outputs.version }}
+          APP_VERSION: ${{ needs.resolve-flutter.outputs.app-version }}
+        run: |
+          {
+            echo "### iOS unsigned IPA"
+            echo
+            echo "[Download app-ios-arm64]($ARTIFACT_URL)"
+            echo
+            echo "Contents: QFLIStudio-$APP_VERSION-ios-unsigned.ipa, BUILD_INFO.txt, SHA256SUMS and LICENSE."
+            echo
+            echo 'Signing: unsigned. The IPA does not install as it is. Re-sign it with your own'
+            echo 'Apple certificate and provisioning profile before installing.'
+            echo 'Retention: 14 days.'
+            echo 'Validation: the arm64 slice, the bundle ID and the embedded frameworks.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  android:
+    name: Android release APKs
+    needs: resolve-flutter
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      APK_DIR: build/app/outputs/flutter-apk
+      SIGNING_STATE: "debug key (installable; not a store release key)"
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || 'main' }}
+          cache-scope: android
+
+      - name: Select JDK 17 and install the pinned Android build tools
+        run: |
+          for candidate in JAVA_HOME_17_X64 JAVA_HOME_17_X86_64; do
+            if [ -n "${!candidate:-}" ] && [ -x "${!candidate}/bin/java" ]; then
+              export JAVA_HOME="${!candidate}"
+              break
+            fi
+          done
+          if [ -z "${JAVA_HOME:-}" ]; then
+            echo "::error::The runner image has no JDK 17 at JAVA_HOME_17_X64"
+            exit 1
+          fi
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          bash tool/ci/run_logged.sh "sdkmanager" \
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "ndk;$ANDROID_NDK_VERSION" "cmake;$ANDROID_CMAKE_VERSION"
+          # An installer-only NDK directory is not a usable NDK.
+          if [ ! -f "$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/source.properties" ]; then
+            echo "::error::NDK $ANDROID_NDK_VERSION has no source.properties after installation"
+            exit 1
+          fi
+
+      # build.gradle.kts fails a release build without a key store. CI has no
+      # release key, so a debug key is created here and passed through the
+      # ANDROID_* variables the build reads. It also lands in the default
+      # debug key store location, which the Android Gradle plugin falls back
+      # to, so either build variant signs with the same key.
+      - name: Create the debug key store
+        run: |
+          keystore="$HOME/.android/debug.keystore"
+          mkdir -p "$HOME/.android"
+          rm -f "$keystore"
+          keytool -genkeypair -v \
+            -keystore "$keystore" \
+            -storetype PKCS12 \
+            -storepass android \
+            -keypass android \
+            -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US" > /dev/null
+          {
+            echo "ANDROID_KEYSTORE_PATH=$keystore"
+            echo "ANDROID_KEYSTORE_PASSWORD=android"
+            echo "ANDROID_KEY_ALIAS=androiddebugkey"
+            echo "ANDROID_KEY_PASSWORD=android"
+          } >> "$GITHUB_ENV"
+          ls -l "$keystore"
+
+      - name: Build the split release APKs
+        run: |
+          bash tool/ci/run_logged.sh "flutter build apk" \
+            flutter build apk --release --split-per-abi \
+            --target-platform android-arm,android-arm64,android-x64
+          ls -l "$APK_DIR"
+
+      - name: Inspect each APK's ABI, signature and package ID
+        run: |
+          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          if [ -z "$build_tools" ] || [ ! -x "$build_tools/apksigner" ] || [ ! -x "$build_tools/aapt2" ]; then
+            echo "::error::No Android build-tools with apksigner and aapt2 under $ANDROID_HOME/build-tools"
+            exit 1
+          fi
+          echo "Inspecting with build-tools $(basename "$build_tools")"
+          failed=0
+
+          for pair in \
+            "x86_64:app-x86_64-release.apk" \
+            "armeabi-v7a:app-armeabi-v7a-release.apk" \
+            "arm64-v8a:app-arm64-v8a-release.apk"; do
+            abi="${pair%%:*}"
+            apk="$APK_DIR/${pair#*:}"
+            if [ ! -s "$apk" ]; then
+              echo "::error::flutter build apk produced no $apk"
+              failed=1
+              continue
+            fi
+
+            signature="$RUNNER_TEMP/apksigner-$abi.txt"
+            if ! "$build_tools/apksigner" verify --verbose --print-certs "$apk" > "$signature" 2>&1; then
+              cat "$signature"
+              echo "::error::apksigner verify rejected $apk"
+              failed=1
+              continue
+            fi
+            signer="$(sed -n 's/^Signer #1 certificate DN: //p' "$signature" | sed -n '1p')"
+            if grep -q 'CN=Android Debug' "$signature"; then
+              echo "PASS $abi is signed by the Android debug key ($signer)"
+            else
+              echo "::error::$abi signer is '$signer', expected the Android debug key"
+              failed=1
+            fi
+
+            badging="$RUNNER_TEMP/apk-badging-$abi.txt"
+            if ! "$build_tools/aapt2" dump badging "$apk" > "$badging"; then
+              echo "::error::aapt2 could not read the manifest of $apk"
+              failed=1
+              continue
+            fi
+            package_id="$(sed -n "s/^package: name='\([^']*\)'.*/\1/p" "$badging" | sed -n '1p')"
+            if [ "$package_id" = "$APP_ID" ]; then
+              echo "PASS $abi package ID is $APP_ID"
+            else
+              echo "::error::$abi package ID is '$package_id', expected $APP_ID"
+              failed=1
+            fi
+
+            # --split-per-abi gives one lib/<abi>/ per APK, and only that one.
+            entries="$RUNNER_TEMP/apk-entries-$abi.txt"
+            unzip -Z1 "$apk" > "$entries"
+            abis="$(sed -n 's#^lib/\([^/]*\)/.*#\1#p' "$entries" | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/ $//')"
+            if [ "$abis" = "$abi" ]; then
+              echo "PASS $abi APK holds only lib/$abi/"
+            else
+              echo "::error::$abi APK holds ABIs '$abis', expected only $abi"
+              failed=1
+            fi
+            for library in libflutter.so libapp.so; do
+              if grep -Fxq "lib/$abi/$library" "$entries"; then
+                echo "PASS lib/$abi/$library"
+              else
+                echo "::error::$abi APK is missing lib/$abi/$library"
+                failed=1
+              fi
+            done
+          done
+
+          apk_count="$(find "$APK_DIR" -maxdepth 1 -name '*-release.apk' | wc -l | tr -d ' ')"
+          if [ "$apk_count" -ne 3 ]; then
+            echo "::error::Expected three split APKs in $APK_DIR, found $apk_count"
+            ls -l "$APK_DIR" || true
+            failed=1
+          fi
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "apk_inspected_with=build-tools $(basename "$build_tools")" > "$RUNNER_TEMP/apk-inspection.txt"
+          echo "PASS three split APKs, one ABI each, debug-signed and with the right package ID"
+
+      - name: Inspect the ELF machine of the packaged runtime
+        run: |
+          # Every ABI slice must really be built for its ABI.
+          python3 - <<'PY'
+          import os
+          import pathlib
+          import re
+          import subprocess
+          import zipfile
+
+          ndk = pathlib.Path(os.environ['ANDROID_HOME']) / 'ndk' / os.environ['ANDROID_NDK_VERSION']
+          readelf = ndk / 'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
+          scratch = pathlib.Path(os.environ['RUNNER_TEMP']) / 'apk-elf'
+          scratch.mkdir(parents=True, exist_ok=True)
+          apk_dir = pathlib.Path(os.environ['APK_DIR'])
+          machines = {
+              'x86_64': ('X86-64', 'app-x86_64-release.apk'),
+              'armeabi-v7a': ('ARM', 'app-armeabi-v7a-release.apk'),
+              'arm64-v8a': ('AArch64', 'app-arm64-v8a-release.apk'),
+          }
+          failures = []
+          for abi, (machine, name) in machines.items():
+              apk = apk_dir / name
+              with zipfile.ZipFile(apk) as archive:
+                  library = scratch / f'{abi}-libapp.so'
+                  library.write_bytes(archive.read(f'lib/{abi}/libapp.so'))
+              report = subprocess.check_output([str(readelf), '-h', '-W', str(library)], text=True)
+              found = re.search(r'^\s*Machine:\s*(.+?)\s*$', report, re.MULTILINE)
+              actual = found.group(1) if found else ''
+              # 'ARM' must match whole; the other names are distinctive suffixes.
+              if not (actual == machine or (machine != 'ARM' and actual.endswith(machine))):
+                  failures.append(f'{abi}: ELF machine is {actual!r}, expected {machine}')
+              print(f'{abi}: machine={actual}')
+          for failure in failures:
+              print(f'::error::libapp.so {failure}')
+          if failures:
+              raise SystemExit(1)
+          print('PASS each libapp.so carries the ELF machine of its ABI')
+          PY
+          echo "apk_libapp_elf=ELF machine checked for 3 ABIs" >> "$RUNNER_TEMP/apk-inspection.txt"
+
+      - name: Stage the Android packages
+        run: |
+          version="$(bash tool/ci/app_version.sh)"
+          extra="$RUNNER_TEMP/android-build-info.txt"
+          {
+            echo "apk_package=$APP_ID"
+            echo "apk_signer=Android Debug key generated in the job"
+            echo "java=$(java -version 2>&1 | sed -n '1p')"
+            sed -n 's/^Pkg\.Revision *= *\(.*\)/ndk=\1/p' "$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/source.properties"
+            echo "cmake=$("$ANDROID_HOME/cmake/$ANDROID_CMAKE_VERSION/bin/cmake" --version | sed -n '1p')"
+            sed -n 's/^distributionUrl=.*gradle-\([0-9.]*\)-.*/gradle=\1/p' android/gradle/wrapper/gradle-wrapper.properties
+            sed -n 's/.*id("com\.android\.application") version "\([^"]*\)".*/android_gradle_plugin=\1/p' android/settings.gradle.kts
+            sed -n 's/.*id("org\.jetbrains\.kotlin\.android") version "\([^"]*\)".*/kotlin=\1/p' android/settings.gradle.kts
+            cat "$RUNNER_TEMP/apk-inspection.txt"
+          } > "$extra"
+          for pair in \
+            "x86_64:app-x86_64-release.apk" \
+            "armeabi-v7a:app-armeabi-v7a-release.apk" \
+            "arm64-v8a:app-arm64-v8a-release.apk"; do
+            abi="${pair%%:*}"
+            package_name="QFLIStudio-$version-android-$abi.apk"
+            mkdir -p "$RUNNER_TEMP/package"
+            cp "$APK_DIR/${pair#*:}" "$RUNNER_TEMP/package/$package_name"
+            {
+            echo "apk_abi=$abi"
+              cat "$extra"
+            } > "$RUNNER_TEMP/android-build-info-$abi.txt"
+            QFLI_SIGNING="$SIGNING_STATE" \
+              QFLI_BUILD_INFO_EXTRA="$RUNNER_TEMP/android-build-info-$abi.txt" \
+              bash tool/ci/stage_artifact.sh "qflistudio-$version-android-$abi" \
+              "$RUNNER_TEMP/package/$package_name"
+          done
+
+      - name: Upload the x86_64 APK
+        id: apk-x86_64
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-android-x86_64
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-android-x86_64/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload the armeabi-v7a APK
+        id: apk-armeabi-v7a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-android-armeabi-v7a
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-android-armeabi-v7a/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload the arm64-v8a APK
+        id: apk-arm64-v8a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-android-arm64-v8a
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-android-arm64-v8a/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize the Android packages
+        env:
+          URL_X86_64: ${{ steps.apk-x86_64.outputs.artifact-url }}
+          URL_ARMEABI_V7A: ${{ steps.apk-armeabi-v7a.outputs.artifact-url }}
+          URL_ARM64_V8A: ${{ steps.apk-arm64-v8a.outputs.artifact-url }}
+          APP_VERSION: ${{ needs.resolve-flutter.outputs.app-version }}
+        run: |
+          {
+            echo "### Android release APKs"
+            echo
+            echo "| ABI | Download |"
+            echo "| --- | --- |"
+            echo "| x86_64 | [app-android-x86_64]($URL_X86_64) |"
+            echo "| armeabi-v7a | [app-android-armeabi-v7a]($URL_ARMEABI_V7A) |"
+            echo "| arm64-v8a | [app-android-arm64-v8a]($URL_ARM64_V8A) |"
+            echo
+            echo "Contents: QFLIStudio-$APP_VERSION-android-<abi>.apk per artifact, plus BUILD_INFO.txt,"
+            echo 'SHA256SUMS and LICENSE.'
+            echo
+            echo "Signing: $SIGNING_STATE."
+            echo 'Retention: 14 days. These APKs are not an AAB or a store release.'
+            echo 'Validation: apksigner verification, the package ID, one lib/<abi>/ per APK and the'
+            echo 'ELF machine of the packaged runtime. Device runtime was not tested.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  ohos:
+    name: OHOS unsigned HAP
+    # The HarmonyOS fork predates the arm64 desktop targets and is built here only.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      HAP_PATH: build/ohos/hap/entry-default-unsigned.hap
+      SIGNING_STATE: "unsigned (sign with your own HarmonyOS certificate and profile before installing)"
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      # The Flutter OHOS tool resolves a HarmonyOS SDK during flutter pub get.
+      # The tools therefore go in before the shared setup, which runs pub get.
+      - name: Install the command-line tools prerequisite
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libgl1-mesa-dev
+
+      - name: Install the HarmonyOS command-line tools
+        id: ohos-tools
+        uses: ./qflistudio/.github/actions/setup-ohos
+        with:
+          version: ${{ env.OHOS_TOOLS_VERSION }}
+
+      - name: Verify the tools layout and the API level
+        env:
+          TOOLS_SDK_VERSION: ${{ steps.ohos-tools.outputs.sdk-version }}
+          TOOLS_API_VERSION: ${{ steps.ohos-tools.outputs.api-version }}
+        run: |
+          # The project targets SDK 26.0.0. Another API level is another toolchain.
+          if [ "$TOOLS_API_VERSION" != "$OHOS_API_LEVEL" ]; then
+            echo "::error::setup-ohos reported API level '$TOOLS_API_VERSION', expected $OHOS_API_LEVEL"
+            exit 1
+          fi
+          if [ -z "${HOS_SDK_HOME:-}" ] || [ ! -d "$HOS_SDK_HOME" ]; then
+            echo "::error::setup-ohos exported no usable HOS_SDK_HOME ('${HOS_SDK_HOME:-}')"
+            exit 1
+          fi
+          tools_home="$(dirname "$HOS_SDK_HOME")"
+          echo "HOS_SDK_HOME=$HOS_SDK_HOME"
+
+          # setup-ohos appends its bin directory to GITHUB_PATH, so a later
+          # prepend would win. The tools' own Node lives in that directory
+          # too, and hvigorw falls back to it. The RUNNER_TEMP copy of Flutter
+          # goes first so this job runs the resolved version, not the one the
+          # tools ship (it uses Flutter's node resolution order).
+          if [ -z "${QFLI_FLUTTER_ROOT:-}" ]; then
+            echo "QFLI_FLUTTER_ROOT=$RUNNER_TEMP/flutter" >> "$GITHUB_ENV"
+          fi
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+
+          # The Flutter OHOS tool accepts an SDK only when a child directory holds
+          # sdk-pkg.json with data.apiVersion as a numeric string.
+          sdk_pkg="$HOS_SDK_HOME/default/sdk-pkg.json"
+          if [ ! -f "$sdk_pkg" ]; then
+            echo "::error::Missing $sdk_pkg. The Flutter OHOS tool would find no HarmonyOS SDK."
+            exit 1
+          fi
+          python3 - "$sdk_pkg" "$OHOS_API_LEVEL" <<'PY'
+          import json
+          import sys
+
+          data = json.load(open(sys.argv[1], encoding='utf-8-sig')).get('data', {})
+          api = data.get('apiVersion')
+          if not isinstance(api, str) or api != sys.argv[2]:
+              print(f'::error::sdk-pkg.json data.apiVersion is {api!r}, expected the string {sys.argv[2]!r}', file=sys.stderr)
+              raise SystemExit(1)
+          print(f'PASS sdk-pkg.json apiVersion is {api}, version {data.get("version", "unknown")}')
+          PY
+
+          # ohos/ tracks no hvigor wrapper. The Flutter OHOS tool calls hvigorw
+          # from PATH, and hvigor installs packages with ohpm.
+          failed=0
+          if [ ! -d "$HOS_SDK_HOME/default/openharmony/toolchains" ]; then
+            echo "::error::Missing $HOS_SDK_HOME/default/openharmony/toolchains"
+            failed=1
+          fi
+          for tool in ohpm hvigorw; do
+            if location="$(command -v "$tool")"; then
+              echo "$tool -> $location"
+            else
+              echo "::error::$tool is not on PATH after setup-ohos"
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          # Hvigor reads the SDK location from DEVECO_SDK_HOME. The Flutter OHOS
+          # tool checks the same variable before HOS_SDK_HOME.
+          if [ -z "${DEVECO_SDK_HOME:-}" ]; then
+            echo "DEVECO_SDK_HOME=$HOS_SDK_HOME" >> "$GITHUB_ENV"
+          fi
+
+          # The tools must be able to compile what the project declares. The
+          # tracked profile names its target SDK, so it is the authority here.
+          project_api="$(python3 - ohos/build-profile.json5 <<'PY'
+          import re
+          import sys
+
+          text = open(sys.argv[1], encoding='utf-8-sig').read()
+          # A JSON5 file may hold comments; the field itself is a plain string.
+          found = re.search(r'"targetSdkVersion"\s*:\s*"([^"]+)"', text)
+          if not found:
+              print(f'::error::{sys.argv[1]} declares no targetSdkVersion', file=sys.stderr)
+              raise SystemExit(1)
+          value = found.group(1)
+          # "6.1.1(24)" names the API level in parentheses; "26.0.0" is itself one.
+          bracketed = re.search(r'\((\d+)\)', value)
+          print(bracketed.group(1) if bracketed else value.split('.')[0])
+          PY
+          )"
+          echo "OHOS_PROJECT_API=$project_api" >> "$GITHUB_ENV"
+          echo "project_target_sdk_api=$project_api"
+          if [ "$TOOLS_API_VERSION" -lt "$project_api" ]; then
+            echo "::error::The command-line tools provide API $TOOLS_API_VERSION, but the project targets API $project_api"
+            exit 1
+          fi
+          echo "PASS the command-line tools layout, API level $TOOLS_API_VERSION (project target API $project_api)"
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ env.OHOS_FLUTTER_VERSION }}
+          flutter-commit: ${{ env.OHOS_FLUTTER_COMMIT }}
+          flutter-mode: ohos
+          core-ref: ${{ inputs.core_ref || 'main' }}
+          cache-scope: ohos
+
+      # hvigorw resolves its interpreter in this order, read from the wrapper
+      # shipped in the command-line tools and from hvigorw.bat:
+      #   1. $NODE_HOME/bin/node, else $NODE_HOME/node.exe;
+      #   2. otherwise whatever "node" is first on PATH.
+      # The wrapper prepends NODE_HOME only when the variable is set, so PATH
+      # position alone would leave the tools' own Node in charge. setup-ohos
+      # adds its bin directory to GITHUB_PATH, and the tools ship a Node there,
+      # so the bare "node" case is covered by setup-node plus NODE_HOME.
+      # Flutter also copies NODE_HOME into ohos/local.properties as nodejs.dir
+      # (packages/flutter_tools/lib/src/ohos/hvigor_utils.dart:67-69,103-105).
+      - name: Select Node 24 for hvigor
+        id: node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.OHOS_NODE_VERSION }}
+
+      - name: Pin NODE_HOME and require Node 24.14.1
+        run: |
+          # setup-node prepends its directory to PATH but sets no NODE_HOME.
+          # The hvigorw wrapper needs the variable to stop falling back to the
+          # Node that ships inside the command-line tools.
+          if [ -z "${NODE_HOME:-}" ]; then
+            node_bin="$(command -v node)"
+            NODE_HOME="$(dirname "$(dirname "$node_bin")")"
+          fi
+          if [ ! -x "$NODE_HOME/bin/node" ]; then
+            echo "::error::NODE_HOME '$NODE_HOME' holds no bin/node"
+            exit 1
+          fi
+          echo "NODE_HOME=$NODE_HOME" >> "$GITHUB_ENV"
+          echo "node -> $(command -v node) $(node --version)"
+          echo "NODE_HOME -> $NODE_HOME/bin/node $("$NODE_HOME/bin/node" --version)"
+          node_version="$("$NODE_HOME/bin/node" --version)"
+          if [ "$node_version" != "v$OHOS_NODE_VERSION" ]; then
+            echo "::error::NODE_HOME/bin/node is '$node_version', expected v$OHOS_NODE_VERSION. hvigor would run on another Node."
+            exit 1
+          fi
+          echo "PASS NODE_HOME/bin/node is $node_version"
+
+      - name: Record the OHOS toolchain
+        run: |
+          probe() {
+            # A version probe is evidence, not a gate. Output goes to a file:
+            # a leftover daemon cannot hold a pipe open.
+            local output="$RUNNER_TEMP/ohos-probe.txt"
+            if (cd "$RUNNER_TEMP" && timeout -k 10 120 "$@") > "$output" 2>&1 < /dev/null; then
+              tr -d '\r' < "$output" | sed 's/\x1b\[[0-9;]*m//g' | sed -n '/[0-9]/p' | sed -n '1p'
+            else
+              echo "::warning::Version probe '$*' failed" >&2
+              echo unknown
+            fi
+          }
+          project_api="$(python3 - ohos/build-profile.json5 <<'PY'
+          import re
+          import sys
+
+          text = open(sys.argv[1], encoding='utf-8-sig').read()
+          found = re.search(r'"targetSdkVersion"\s*:\s*"([^"]+)"', text)
+          print(found.group(1) if found else 'unknown')
+          PY
+          )"
+          {
+            echo "ohos_tools_source=ErBWs/ohos-sdk release, a third-party redistribution of the HarmonyOS command-line tools"
+            echo "ohos_command_line_tools=$OHOS_TOOLS_VERSION"
+            echo "ohos_sdk_api_level=$OHOS_API_LEVEL"
+            echo "ohos_project_target_sdk=$project_api"
+            echo "node=$(node --version)"
+            echo "node_home=${NODE_HOME:-unset}"
+            echo "npm=$(probe npm --version)"
+            echo "ohpm=$(probe ohpm --version)"
+            echo "hvigor=$(probe hvigorw --version)"
+            echo "hvigor_node=$("${NODE_HOME:-}/bin/node" --version 2>/dev/null || echo unknown)"
+          } | tee "$RUNNER_TEMP/ohos-toolchain.txt"
+
+      - name: Remove local signing from the runner's build profile
+        run: |
+          # The tracked profile names a key store on the developer's machine.
+          # This edit stays on the runner. The tracked file keeps its entries.
+          python3 tool/ci/strip_ohos_signing.py ohos/build-profile.json5
+          git --no-pager diff --stat -- ohos/build-profile.json5
+
+      - name: Build the unsigned release HAP
+        run: |
+          bash tool/ci/run_logged.sh "flutter build hap" \
+            flutter build hap --release --target-platform ohos-arm64 --no-codesign
+          # Neither the fork nor hvigor agrees on one output directory, so the
+          # newest unsigned HAP is taken and pinned for the later steps.
+          hap=""
+          for candidate in "$HAP_PATH" \
+            ohos/entry/build/default/outputs/default/entry-default-unsigned.hap \
+            $(find build/ohos ohos/entry/build -name '*-unsigned.hap' 2> /dev/null | sort || true); do
+            if [ -s "$candidate" ]; then
+              hap="$candidate"
+              break
+            fi
+          done
+          if [ -z "$hap" ]; then
+            # find fails on a missing directory. That must not hide the error below.
+            found="$(find build/ohos ohos/entry/build -name '*.hap' 2> /dev/null | tr '\n' ' ' || true)"
+            echo "::error::flutter build hap produced no unsigned HAP. HAP files found: ${found:-none}"
+            exit 1
+          fi
+          echo "HAP_PATH=$hap" >> "$GITHUB_ENV"
+          ls -l "$hap"
+          # No signing material exists on the runner, so no signed HAP can exist.
+          signed="$(find build/ohos ohos/entry/build -name '*-signed.hap' 2> /dev/null | tr '\n' ' ' || true)"
+          if [ -n "$signed" ]; then
+            echo "::error::Unexpected signed HAP on a runner without signing material: $signed"
+            exit 1
+          fi
+
+      - name: Show the hvigor logs after a failed build
+        if: failure()
+        run: |
+          for log in ohos/.hvigor/outputs/build-logs/*.log; do
+            if [ -f "$log" ]; then
+              echo "::group::$log (last 200 lines)"
+              tail -n 200 "$log"
+              echo "::endgroup::"
+            fi
+          done
+
+      - name: Inspect the HAP entries, the bundle name and the libraries
+        run: |
+          python3 - "$HAP_PATH" "$OHOS_BUNDLE_NAME" "$RUNNER_TEMP/hap-inspection.txt" <<'PY'
+          import json
+          import pathlib
+          import sys
+          import zipfile
+
+          hap, expected_bundle, report = sys.argv[1:4]
+          abi = 'arm64-v8a'
+
+
+          def fail(message):
+              print(f'::error::{message}')
+              raise SystemExit(1)
+
+
+          if not zipfile.is_zipfile(hap):
+              fail(f'{hap} is not a ZIP archive')
+          with zipfile.ZipFile(hap) as archive:
+              damaged = archive.testzip()
+              if damaged:
+                  fail(f'HAP entry fails its CRC check: {damaged}')
+              names = set(archive.namelist())
+              libraries = [f'libs/{abi}/{name}' for name in ('libflutter.so', 'libapp.so')]
+              required = ['module.json'] + libraries
+              missing = [name for name in required if name not in names or archive.getinfo(name).file_size == 0]
+              if missing:
+                  fail(f'HAP lacks a non-empty {", ".join(missing)}')
+              for name in required:
+                  print(f'PASS {name} ({archive.getinfo(name).file_size} bytes)')
+
+              abis = sorted({name.split('/')[1] for name in names if name.startswith('libs/') and name.count('/') >= 2})
+              if abis != [abi]:
+                  fail(f'HAP ABI set is {abis}, expected only {abi}')
+              for name in libraries:
+                  header = archive.read(name)[:20]
+                  machine = int.from_bytes(header[18:20], 'little')
+                  if header[:4] != b'\x7fELF' or header[4] != 2 or machine != 183:
+                      fail(f'{name} is not a 64-bit AArch64 ELF library')
+
+              module = json.loads(archive.read('module.json'))
+              bundle = module.get('app', {}).get('bundleName')
+              if bundle != expected_bundle:
+                  fail(f'HAP bundle name is {bundle!r}, expected {expected_bundle}')
+
+          facts = [
+              f'hap_bundle={bundle}',
+              f'hap_abis={" ".join(abis)}',
+              f'hap_entries={len(names)}',
+          ]
+          pathlib.Path(report).write_text('\n'.join(facts) + '\n', encoding='utf-8')
+          print('\n'.join(facts))
+          print('PASS HAP entries, bundle name, ABI set and AArch64 libraries')
+          PY
+
+      - name: Stage the OHOS package
+        run: |
+          package_name="QFLIStudio-$APP_VERSION-ohos-arm64-unsigned.hap"
+          mkdir -p "$RUNNER_TEMP/package"
+          cp "$HAP_PATH" "$RUNNER_TEMP/package/$package_name"
+          extra="$RUNNER_TEMP/ohos-build-info.txt"
+          cat "$RUNNER_TEMP/ohos-toolchain.txt" "$RUNNER_TEMP/hap-inspection.txt" > "$extra"
+          QFLI_SIGNING="$SIGNING_STATE" QFLI_BUILD_INFO_EXTRA="$extra" \
+            bash tool/ci/stage_artifact.sh "qflistudio-$APP_VERSION-ohos-arm64" \
+            "$RUNNER_TEMP/package/$package_name"
+          echo "PACKAGE_NAME=$package_name" >> "$GITHUB_ENV"
+
+      - name: Upload the OHOS package
+        id: artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          # The HarmonyOS fork names no version in the output, so the artifact
+          # name reads the version pinned for this job.
+          name: qflistudio-${{ env.APP_VERSION }}-ohos-arm64
+          path: qflistudio/build/ci-artifacts/qflistudio-${{ env.APP_VERSION }}-ohos-arm64/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize the OHOS package
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          {
+            echo "### OHOS unsigned release HAP"
+            echo
+            echo "[Download app-ohos-arm64]($ARTIFACT_URL)"
+            echo
+            echo "Contents: $PACKAGE_NAME, BUILD_INFO.txt, SHA256SUMS and LICENSE."
+            echo
+            echo "Flutter: $OHOS_FLUTTER_VERSION. Tools: HarmonyOS command-line tools $OHOS_TOOLS_VERSION,"
+            echo 'a third-party redistribution from the ErBWs/ohos-sdk release, not an official Huawei channel.'
+            echo "Signing: $SIGNING_STATE. A device rejects this HAP until it is signed."
+            echo 'Retention: 14 days. This HAP is not an APP package or a store release.'
+            echo 'Validation: ZIP entries, the bundle name, the ABI set and the AArch64 libraries.'
+          } >> "$GITHUB_STEP_SUMMARY"
