@@ -75,11 +75,8 @@ runs:
       run: |
         flutter --version
         flutter config --no-analytics
-        # The OHOS fork prepares the ohos/ project on every pub get and build,
-        # and stops when no HarmonyOS SDK is installed. Only the OHOS job has one.
-        if [ "$FLUTTER_MODE" != "ohos" ]; then
-          flutter config --no-enable-ohos
-        fi
+        # The cache key separates upstream and OHOS SDKs. Upstream Flutter has
+        # no enable-ohos config flag, so do not pass an OHOS-only option here.
         for platform in ${DESKTOP_PLATFORMS//,/ }; do
           flutter config --enable-"${platform}"-desktop
         done
