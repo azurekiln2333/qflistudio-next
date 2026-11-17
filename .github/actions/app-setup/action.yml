@@ -1,0 +1,92 @@
+name: QFLIStudio app build setup
+description: >-
+  Check out the pinned shared core beside the app, install Flutter and resolve
+  Dart packages. The app must be checked out at qflistudio inside the workspace,
+  and the core at qfli_studio_core.
+
+inputs:
+  flutter-version:
+    description: Flutter version to install.
+    required: true
+  flutter-commit:
+    description: Framework commit the version must resolve to.
+    required: true
+  flutter-mode:
+    description: upstream or ohos. Selects the repository to clone.
+    required: false
+    default: upstream
+  cache-scope:
+    description: Build target name. Each target keeps its own Flutter SDK cache.
+    required: true
+  core-ref:
+    description: qflistudio-core commit, tag or branch.
+    required: false
+    default: main
+  desktop-platforms:
+    description: Comma separated desktop platforms to enable, for example windows,macos.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Check out shared core
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        repository: azurekiln2333/qflistudio-core
+        # The app resolves the core through path: ../qfli_studio_core.
+        ref: ${{ inputs.core-ref }}
+        path: qfli_studio_core
+        persist-credentials: false
+
+    - name: Restore Flutter SDK
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ runner.temp }}/flutter
+        key: flutter-${{ inputs.flutter-mode }}-${{ inputs.flutter-version }}-${{ runner.os }}-${{ runner.arch }}-${{ inputs.cache-scope }}
+
+    - name: Install Flutter SDK
+      shell: bash
+      working-directory: qflistudio
+      env:
+        FLUTTER_VERSION: ${{ inputs.flutter-version }}
+        FLUTTER_COMMIT: ${{ inputs.flutter-commit }}
+        FLUTTER_MODE: ${{ inputs.flutter-mode }}
+      run: |
+        arguments=("$RUNNER_TEMP/flutter" "$FLUTTER_VERSION" "$FLUTTER_COMMIT")
+        if [ "$FLUTTER_MODE" = "ohos" ]; then
+          arguments+=(--ohos)
+        fi
+        bash tool/ci/setup_flutter.sh "${arguments[@]}"
+        echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+        {
+          echo "QFLI_FLUTTER_ROOT=$RUNNER_TEMP/flutter"
+          echo "QFLI_FLUTTER_VERSION=$FLUTTER_VERSION"
+          echo "QFLI_FLUTTER_MODE=$FLUTTER_MODE"
+          echo "QFLI_CORE_COMMIT=$(git -C ../qfli_studio_core rev-parse HEAD)"
+        } >> "$GITHUB_ENV"
+
+    - name: Resolve Dart packages
+      shell: bash
+      working-directory: qflistudio
+      env:
+        FLUTTER_MODE: ${{ inputs.flutter-mode }}
+        DESKTOP_PLATFORMS: ${{ inputs.desktop-platforms }}
+      run: |
+        flutter --version
+        flutter config --no-analytics
+        # The OHOS fork prepares the ohos/ project on every pub get and build,
+        # and stops when no HarmonyOS SDK is installed. Only the OHOS job has one.
+        if [ "$FLUTTER_MODE" != "ohos" ]; then
+          flutter config --no-enable-ohos
+        fi
+        for platform in ${DESKTOP_PLATFORMS//,/ }; do
+          flutter config --enable-"${platform}"-desktop
+        done
+        # Flutter rewrites pubspec.lock for its own SDK. The runner copy is not
+        # committed back, but a large diff means the resolved versions changed.
+        bash tool/ci/run_logged.sh "flutter pub get" flutter pub get
+        if ! git diff --quiet -- pubspec.lock; then
+          echo "::warning::flutter pub get changed pubspec.lock on the runner"
+          git --no-pager diff --stat -- pubspec.lock
+        fi
