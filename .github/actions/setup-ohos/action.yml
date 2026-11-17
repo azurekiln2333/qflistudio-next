@@ -1,0 +1,29 @@
+name: 'Setup HarmonyOS command-line tools'
+description: 'Download and set up the HarmonyOS command-line tools. Vendored from ErBWs/setup-ohos (MIT) at 4dbb63025116eb6165ceac58a4bf47cbdc5ac721 without the cache step, because that step pulled in a Node 20 action.'
+
+inputs:
+  version:
+    description: 'CLI tools build version'
+    required: true
+
+outputs:
+  sdk-version:
+    description: 'HarmonyOS SDK version (for example 5.0.5.165)'
+    value: ${{ steps.setup-ohos.outputs.sdk-version }}
+  api-version:
+    description: 'API version (for example 17)'
+    value: ${{ steps.setup-ohos.outputs.api-version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Make the script executable
+      run: chmod +x "$GITHUB_ACTION_PATH/setup.sh"
+      shell: bash
+    - name: Run setup script
+      id: setup-ohos
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        "$GITHUB_ACTION_PATH/setup.sh" -v '${{ inputs.version }}'
+      shell: bash
