@@ -321,7 +321,7 @@ jobs:
 
           # dumpbin accepts dash switches; Git Bash would rewrite slash switches.
           for binary in "$APP_EXE" flutter_windows.dll data/app.so; do
-            report="$temp/pe-headers-$binary.txt"
+            report="$temp/pe-headers-$(basename "$binary").txt"
             "$DUMPBIN" -nologo -headers "$RELEASE_DIR/$binary" | tr -d '\r' > "$report"
             actual="$(sed -n 's/^ *\([0-9A-Fa-f]\{4\}\) machine (\([^)]*\)).*/\1/p' "$report" | sed -n '1p')"
             if [ -z "$actual" ]; then
