@@ -1,0 +1,4 @@
+{"file": ".trellis/tasks/11-18-app-installer-ci/research/app-build-facts.md", "reason": "qflistudio build facts: sibling core, Android signing, OHOS signing, app identity"}
+{"file": ".trellis/tasks/11-18-app-installer-ci/research/ci-patterns-and-node24.md", "reason": "qfli_python workflow template and node24 action audit with pinned SHAs"}
+{"file": ".trellis/tasks/11-18-app-installer-ci/research/arm64-toolchain-probe.md", "reason": "why OHOS fork cannot build arm64 desktop and upstream stable can"}
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "sibling Git roots and ../qfli_studio_core path contract"}

@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Quality gates for the check pass"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "UI conventions to check against"}
+{"file": ".trellis/tasks/11-16-home-tutorial-tools-ui/pi-rules.md", "reason": "Rules the diff must respect"}
+{"file": ".trellis/tasks/11-16-home-tutorial-tools-ui/research/dirty-files.txt", "reason": "Paths that must stay untouched"}

@@ -17,11 +17,20 @@ Research: `research/ohos-cross-app-20261101.md`.
 
 **Platform limit (R6).** OHOS gives no cross-bundle writable directory a third
 party can use without a file-provider grant, and the Studio project lives in the
-Studio sandbox. The request therefore crosses as **validated launch parameters
-plus a payload directory** that the caller writes into its own cache: the
-receiver reads only `manifest.json` and the names it lists. Limit: 64 files and
-256 KiB of decoded content. Projects above that are refused with
-`payload_too_large`, not truncated.
+Studio sandbox. Limit: 64 files and 256 KiB of decoded content. Projects above
+that are refused with `payload_too_large`, not truncated.
+
+Amendment 2026-11-05 (device evidence). The first implementation passed a
+plain cache path in the Want and the receiver read it directly. On a real
+device the receiver's mount namespace resolves that path inside its own
+sandbox, so every run was refused with `payload 目录不存在` before any compile.
+The payload now crosses as **one zip file shared through OHOS file-URI
+temporary authorization** — the platform's own cross-app permission mechanism:
+the Want carries `uri` plus `FLAG_AUTH_READ_URI_PERMISSION`, the receiver opens
+the granted URI, copies the zip into its own cache and decompresses it there.
+Every path, the file count and the byte cap are re-validated after the
+decompress. The caller and receiver apps hold different debug certificates, so
+certificate-based app-group sharing is not an option here; the URI grant is.
 
 The first draft put the whole payload in a `Want` string parameter. One string
 of 256 KiB exceeds the documented parameter budget, and a truncated parameter
@@ -69,13 +78,14 @@ Launch parameters on the `Want` to the receiver:
 | `bridgeAction` | string | Action to start on the caller's bridge |
 | `files` | string | JSON array `[{"path": ..., "content": <base64>}, ...]` |
 | `filesDigest` | string | Lowercase hex SHA-256 of the exact `files` string |
-| `payloadDirectory` | string | Absolute path the caller wrote the payload to; the receiver reads `manifest.json` from it |
+| `payloadUri` | string | `file://` URI of the payload zip in the caller's cache. The Want also carries that URI and `FLAG_AUTH_READ_URI_PERMISSION`; the receiver opens it, copies the zip and decompresses it into its own cache |
 
 Rules:
 
 - `files` is one JSON string because a `Want` parameter can hold an array only
   through `parameter` typing the receiver may not share. One string keeps the
-  digest verifiable.
+  digest verifiable. `files` crosses the MethodChannel between Dart and the
+  Studio ArkTS bridge; the Want to the receiver carries only the zip URI.
 - Total decoded payload ≤ 256 KiB, file count ≤ 64.
 - Path rule: relative, forward slashes only, no `\`, no leading `/`,
   no drive prefix, no empty segment, no `.` or `..` segment, no NUL,
@@ -119,6 +129,11 @@ Versioning: a receiver rejects `qfli-interop/2` with
 `unsupported_protocol`. A new minor field must be ignorable by an old receiver,
 so no field is ever repurposed.
 
+Client-local codes: `app_missing`, `transport_failure`, `sequence_gap` and the
+Studio-side refusals `busy`, `notification_disabled`, `notification_failed`,
+`cancel_failed` never appear in a receiver event. They reach Dart as a platform
+or transport error and are reported as 127. Do not read them as protocol codes.
+
 ### 3.4 Handshake
 
 Before it offers a run action, Studio sends a request with `action: analyze`,
@@ -153,7 +168,8 @@ Contracts:
   `parseRequest` then `copyPayload` in `InteropReceiver.ets`.
 - `InteropReceiver.ets` is a shared template: the Java and C copies differ only
   in the `LANGUAGE`, `ALLOWED_CALLER`, and launch section. It re-validates the
-  request, copies the manifest-listed files into its own cache, invokes the
+  request, copies the granted zip into its own cache, decompresses it,
+  re-validates every path the zip restored, invokes the
   app's existing native bridge, forwards events, and finally emits `done`.
 - Event emission follows the child's output tail: each poll reads the bytes the
   child appended since the last poll and sends them as one `stdout` or `stderr`
@@ -181,6 +197,11 @@ Contracts:
 - No file outside the session directory is ever read or written.
 - No payload byte is logged. The receiver logs the session id, the language and
   the exit code only.
+
+Review note (2026-11-09): `InteropAbility.handle()` still logs the caller's
+parameter key names, `want.uri` and `payloadUri`. That is outside this rule; the
+URI alone reveals the Studio sandbox path and the session id. Remove those three
+lines once the device evidence they were added for is recorded.
 
 ## 7. Interfaces that need another owner's agreement
 
@@ -212,6 +233,104 @@ existing `qfli_forge/native` channel the same way the Java receiver reuses
 
 Both are recorded here and not implemented in this task. Acceptance for this
 task covers the protocol, the Studio side, and Java on OHOS.
+
+## 8a. Background route platform review (2026-11-09)
+
+Read-only review of the background increment. Evidence and per-item disposition:
+`research/pi-D-20261109.md`.
+
+- **API floor is 20.** Both `UIAbility.onDidForeground` and the Promise form of
+  `commonEventManager.subscribeToEvent` are `@since 20`, while both apps build
+  with `compatibleSdkVersion 5.1.0(18)`. The background route therefore needs a
+  platform at API 20 or later. On an 18/19 platform the first subscribe throws a
+  `TypeError` that surfaces as `internal`/127. Record this floor here and refuse
+  with a named error instead of throwing.
+- **`CommonEventData.bundleName` is not the publisher identity.** The documented
+  filter is `publisherBundleName` in the subscribe info, which both sides
+  already set. SDK text for `CommonEventData.bundleName` is only "left empty by
+  default". A second comparison against it can drop every result frame without
+  a trace, so it must not carry authentication on its own.
+- **A visible transition was inherent to the UIAbility approach.** The receiver
+  loads `pages/InteropIdle` and minimizes only after the transient allowance.
+  The start window plus that page were visible for that window. §8b settles it:
+  the windowless appService extension returns `801` on this tablet, so `prd.md`
+  B6 is not reachable here. Record the 410 ms window as the actual shape.
+- **Installed artefacts must be newer than their sources.** In the 2026-11-09
+  round the Studio HAP was older than the sender sources, so the newest
+  diagnostics could not appear on the device. Compare HAP and source timestamps
+  before every acceptance round.
+- **Device capture must include ability-manager and common-event tags.** Without
+  them a refused start and a broken subscription both look like "no events".
+
+No permission is missing for this route. `requestSuspendDelay`,
+`commonEventManager.publish`/`subscribe`, `notificationManager.publish`,
+`wantAgent.getWantAgent`, `window.minimize` and the file-URI grant all carry no
+`@permission` in the API 23 declarations, and neither `module.json5` needs an
+addition.
+
+## 8b. Receiver visibility and result delivery (2026-11-09 proof, 2026-11-10 verdict)
+
+Evidence: `research/pi-D-20261109.md` §2, §3 and the fourth round.
+
+**The problem.** Starting a UIAbility receiver moves the foreground away from
+Studio. About three seconds later the suspend manager freezes Studio:
+
+```
+23:49:33.832 SUSPEND_MANAGER Freeze pid: 44761 success.
+             FROZEN_BY_START_WINDOW_AFTER_PULLED_FROZEN
+23:49:34.963 Pid 48108 publish ...EVENT to 100 end(1,0,0,1) freezePid[44761,]
+```
+
+Every later frame is refused, even though the publisher got a success receipt.
+A visible receiver therefore used to lose the terminal frame and the exit code.
+
+**The verdict.** The windowless routes do not exist on this tablet. Both
+implicit starts return `801` (capability not supported), and the receiver is
+declared and exported correctly, so the failure is platform gating and not
+configuration:
+
+```
+09:09:45.699 start_service_refused code=801
+09:09:45.703 start_hidden_refused code=801
+09:09:45.726 launched mode=visible
+```
+
+The transient allowance carried delivery instead. The freeze moved past the
+terminal frame by about 2.8 s:
+
+```
+09:09:45.696 allowance_ok delay=180000
+09:09:46.622 first_frame kind=accepted
+09:09:50.365 terminal kind=done exit=0
+09:09:52.373 Freeze pid: 32201 success.
+```
+
+So the design has one mandatory guard and one open gap:
+
+- Mandatory: Studio holds a transient allowance before the launch. This is now
+the only mechanism that keeps result delivery alive.
+- Open gap: the receiver is visible for about 410 ms (`onCreate` to
+  `minimizeDone`). No documented start option removes it on this device class.
+
+Treat `mode=visible` as the supported shape on tablets, not as a degraded
+fallback. On 2in1 hardware the extension branch may still win, so keep the
+branching and keep recording `mode=`.
+
+The receiver keeps retrying `9900002` when it takes its own allowance. That
+error means "foreground transition not yet settled", not "quota spent".
+
+Platform conditions for the extension route, none of them free:
+
+- `startAppServiceExtensionAbility` is `@since 20`. The project floor is 18.
+- The target extension must be declared and exported. An invisible target also
+  needs `ohos.permission.START_INVISIBLE_ABILITY`.
+- Error `16000200` points at `appIdentifierAllowList`, a real
+  `extensionAbilities` field (string array, each `<=128`, `[0-9a-zA-Z]+$`).
+  The receiver does not set it today.
+
+Record the branch actually taken (`mode=service|hidden|visible`, plus
+`start_service_refused code=`). On this tablet `visible` is the only reachable
+branch, so acceptance must be judged on the visible branch.
 
 ## 9. Validation plan
 

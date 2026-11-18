@@ -24,7 +24,12 @@
     "11-02-w2a-server-identity-logs",
     "11-02-w2b-server-moderation",
     "11-02-w3a-client-shell-login",
-    "11-02-w3b-client-settings-community-ai"
+    "11-02-w3b-client-settings-community-ai",
+    "11-02-fix-test-suites",
+    "11-02-w3-release",
+    "11-02-deploy-prep",
+    "11-02-acceptance",
+    "11-03-moderation-deploy-parity"
   ],
   "parent": null,
   "relatedFiles": [],

@@ -477,3 +477,63 @@ The most likely fix is to stop using a real start for the probe: either give the
 - New contract assertions: the bridge must not call `getBundleInfoSync` / `getBundleInfo` / `getBundleInfoForSelfSync`, must not import `bundleManager`, must name both `16000001` and `16000003`, and its probe must send `action: 'analyze'`. `module.json5` and `string.json` must not mention `GET_BUNDLE_INFO` or `bundle_info_reason`.
 - OHOS build: `hvigorw assembleHap` → `BUILD SUCCESSFUL`, installed with `hdc install -r` → `install bundle successfully`.
 
+## Background increment review (role D, 2026-11-09)
+
+只读审查结论见 `research/pi-D-20261109.md`，已落到 `design.md` §3.3 与 §8a。
+权限与 `module.json5` 没有缺项。以下是待处置项。
+
+### 已证实的根因（2026-11-10 00:10，证据在 `research/pi-D-20261109.md` 第二轮）
+
+1. **9900002 已解决**。23:49 那轮首次拿到额度：`attempt=0` 报 9900002、
+   `attempt=1 elapsed=257 delay=180000`。该 message 的含义是“前台过渡尚未生效”，
+   约 250 ms 后即恢复，不是额度耗尽，也不是后台停留过久。
+2. **结果帧丢失的根因是 Studio 被冻结**。`startAbility` 把前台交给 JVMX 后，
+   Studio 约 3 秒被 `SUSPEND_MANAGER` 冻结：
+   `23:49:33.832 Freeze pid: 44761 success. FROZEN_BY_START_WINDOW_AFTER_PULLED_FROZEN`。
+   此后 4 次 `publish ... EVENT` 全部带 `freezePid[44761,]`，事件服务拒绝投递。
+   Dart 收到的那 3 帧（30.999/31.047/31.079）都在冻结之前。
+3. 因此“接收端不可见”与“结果回传”在这条路由上是两个独立问题：
+   - 接收端可见 → 三条隐式路线（appService 扩展、`startupVisibility`、
+     `hideStartWindow`）在本平板均不可用，只能走可见启动，留下 410 ms 窗口。
+   - 结果回传 → 需要 Studio 自己不成为可冻结的后台进程。
+     落地做法：`start()` 在 `startAbility` 之前为 Studio 申请瞬态额度
+     （`backgroundTaskManager.requestSuspendDelay`），终态或 `dispose` 时
+     `cancelSuspendDelay`。顺序不能反，否则重演 9900002。
+4. **窗口无关路线在本平板上不可用**（2026-11-10 09:10 真机结论）：“801”。
+   原推断是 `startAppServiceExtensionAbility` 能同时解决可见与冻结。
+   实测两个隐式启动都返回 801：
+   - `start_service_refused code=801`
+   - `start_hidden_refused code=801`
+   - 然后是 `launched mode=visible`
+   排除项：`qfli_java` 的 `module.json5` 第 80-84 行确实声明了
+   `InteropBackgroundService`（`type: appService`、`exported: true`）。
+   声明齐备而仍报 801，说明是平台不支持该能力，不是配置缺失。
+   据此“回退分支不算可接受形态”这条作废：回退是本平板唯一可用形态。
+5. SDK 条件（审查项，已被上一条实测覆盖）：`startAppServiceExtensionAbility`
+   是 `@since 20`，而两个工程 `compatibleSdkVersion` 是 18。
+   `16000200` 对应真实的 `appIdentifierAllowList` 字段
+   （`extensionAbilities` 级，字符串数组）。目标扩展若不可见，还需
+   `ohos.permission.START_INVISIBLE_ABILITY`。
+6. **瞬态额度已在真机生效**（2026-11-10 09:10）。`reserveSenderAllowance`
+   把冻结推到了终态帧之后：
+   - `09:09:45.696 allowance_ok delay=180000`
+   - `09:09:46.622 first_frame kind=accepted`
+   - `09:09:50.365 terminal kind=done exit=0`
+   - `09:09:52.373 Freeze pid: 32201 success`（终态帧之后 2 秒）
+   退出码 0 与终端帧同时到达，结果回传、流式、不闪退三项成立。
+
+### 其余待处置项
+
+1. 抓取脚本缺能力管理与公共事件 tag，且需加 `SUSPEND_MANAGER`/`OpenSession`：
+   冻结证据只在 `SUSPEND_MANAGER` 与 `Unordered`（`freezePid[...]`）里。
+2. Studio 侧用 `CommonEventData.bundleName` 做第二道过滤，该字段没有发布方语义文档，
+   而 B 的报告与 `interop.md` 都写成只用 `publisherBundleName`。
+3. `pages/InteropIdle` 是带文案的整屏页，且只在拿到额度后才最小化。
+   B6 需按 `startupVisibility` 的实测结果重写，不能留 pending。
+4. `onDidForeground` 与 `subscribeToEvent` 都是 `@since 20`（后者三处调用），
+   两个工程 `compatibleSdkVersion` 是 18。
+5. `InteropAbility.handle()` 仍打 `payloadUri` 与参数键名，超出 `design.md` §6 的日志规则。
+
+宿主机侧仍全绿：Studio 桥 12 项、Java 接收端 23 项、Dart 聚焦 116 项。
+真机验收仍为 pending：00:06 设备锁屏，`aa start` 返回 10106102，未绕过。
+

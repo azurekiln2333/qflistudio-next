@@ -1,0 +1,73 @@
+# qflistudio main tree (do not modify or create these paths)
+ M .cnb.yml
+ M .trellis/spec/frontend/index.md
+ M .trellis/spec/frontend/interop.md
+ M android/.gitignore
+ M android/app/build.gradle.kts
+ M docs/previews/profile-dark.png
+ M docs/previews/profile-light.png
+ M docs/previews/settings-light.png
+ M lib/main.dart
+ M ohos/build-profile.json5
+ M ohos/entry/src/main/ets/components/HuaweiQuickLoginPlatformView.ets
+ M ohos/entry/src/main/ets/entryability/EntryAbility.ets
+ M ohos/entry/src/main/ets/interop/InteropBridgeAbility.ets
+ M ohos/entry/src/main/ets/interop/StudioInterop.ets
+ M pubspec.lock
+?? Roboto_Mono.zip
+?? android/gradle/wrapper/gradle-wrapper.jar
+?? android/gradlew
+?? android/gradlew.bat
+?? docs/compliance/2026-11-整改任务书.md
+?? ohos/entry/src/main/ets/interop/StudioBackgroundInterop.ets
+?? scripts/test-ohos-background-bridge.cjs
+?? scripts/test-ohos-huawei-login.cjs
+?? tool/agent_workbench_device.md
+
+# qfli_studio_core main tree (do not modify or create these paths)
+ M lib/editor/editor_page.dart
+ M lib/editor/terminal_pane.dart
+ M lib/interop/interop_protocol.dart
+ M lib/interop/interop_run_dialog.dart
+ M lib/interop/interop_runner.dart
+ M lib/interop/interop_transport.dart
+ M lib/services/ai_service.dart
+ M lib/services/api_client.dart
+ M lib/services/studio_profile.dart
+ M lib/vibe_coding/vibe_coding_controller.dart
+ M lib/vibe_coding/vibe_models.dart
+ M lib/vibe_coding/vibe_skills.dart
+ M lib/vibe_coding/vibe_tools.dart
+ M test/interop_arkts_contract_test.dart
+ M test/interop_protocol_test.dart
+ M test/interop_runner_test.dart
+ M test/vibe_coding_controller_test.dart
+ M test/vibe_coding_skills_test.dart
+ M test/vibe_coding_tools_test.dart
+ M tool/vibe_e2e_runner.dart
+?? lib/chat/
+?? lib/interop/interop_background_transport.dart
+?? lib/interop/interop_zip.dart
+?? lib/layout/
+?? lib/pages/project/
+?? lib/session/
+?? lib/shell/
+?? lib/sidebar/
+?? lib/vibe_coding/vibe_agent_facade.dart
+?? test/agent_session_test.dart
+?? test/ai_reasoning_effort_test.dart
+?? test/chat_attachment_picker_test.dart
+?? test/chat_composer_card_test.dart
+?? test/chat_transcript_test.dart
+?? test/composer_state_test.dart
+?? test/editor_background_run_test.dart
+?? test/editor_pad_layout_test.dart
+?? test/interop_background_transport_test.dart
+?? test/interop_zip_test.dart
+?? test/project_page_test.dart
+?? test/support/fake_agent.dart
+?? test/vibe_agent_facade_test.dart
+?? test/vibe_attachment_read_test.dart
+?? test/vibe_controller_agent_hooks_test.dart
+?? test/vibe_search_text_test.dart
+?? test/workbench_shell_test.dart

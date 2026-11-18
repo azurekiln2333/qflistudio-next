@@ -1,0 +1,25 @@
+ M .trellis/spec/frontend/index.md
+ M .trellis/spec/frontend/saved-workspaces.md
+ M lib/chat/chat_transcript.dart
+ M lib/chat/composer_card.dart
+ M lib/editor/agent/editor_sidebar_tabs.dart
+ M lib/editor/agent/session_list_view.dart
+ M lib/editor/editor_page.dart
+ M lib/editor/file_explorer.dart
+ M lib/session/agent_session.dart
+ M lib/shell/workbench_agent_pane.dart
+ M lib/vibe_coding/vibe_agent_facade.dart
+ M lib/workspace/workspace_store.dart
+ M test/agent_hub_test.dart
+ M test/agent_session_test.dart
+ M test/chat_composer_card_test.dart
+ M test/editor_agent_embed_test.dart
+ M test/vibe_agent_facade_test.dart
+ M test/workbench_agent_pane_test.dart
+ M test/workspace_project_switch_test.dart
+?? test/agent_message_view_metadata_test.dart
+?? test/chat_message_actions_test.dart
+?? test/chat_transcript_position_test.dart
+?? test/editor_project_browse_semantics_test.dart
+?? test/workspace_add_members_test.dart
+?? tool/preview_composer_card_test.dart

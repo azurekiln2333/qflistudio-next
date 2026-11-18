@@ -1,0 +1,31 @@
+{
+  "id": "home-tutorial-tools-ui",
+  "name": "home-tutorial-tools-ui",
+  "title": "Home tabs, tutorial merge, netrix tools port",
+  "description": "Parent: home FAB/tab reorder/search, tutorial+samples merge, port all netrix tools (main app only). Dispatched to 4 Pi workers.",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-16",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "11-16-home-fab-tabs-search",
+    "11-16-tutorial-samples-merge",
+    "11-16-tools-netrix-framework",
+    "11-16-tools-netrix-batch2"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

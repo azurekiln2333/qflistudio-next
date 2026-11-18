@@ -1,0 +1,49 @@
+ M .trellis/spec/frontend/index.md
+ M .trellis/spec/frontend/interop.md
+ M .trellis/tasks/11-01-ohos-app-interop/check.jsonl
+ M .trellis/tasks/11-01-ohos-app-interop/design.md
+ M .trellis/tasks/11-01-ohos-app-interop/implement.jsonl
+ M .trellis/tasks/11-01-ohos-app-interop/implement.md
+ M .trellis/tasks/11-01-ohos-app-interop/prd.md
+ M .trellis/tasks/11-01-ohos-app-interop/task.json
+ M .trellis/tasks/11-02-compliance-2026-11/task.json
+ M .trellis/tasks/11-02-fix-test-suites/task.json
+ M docs/previews/profile-dark.png
+ M docs/previews/profile-light.png
+ M docs/previews/settings-light.png
+ M lib/main.dart
+ M ohos/build-profile.json5
+ M ohos/entry/src/main/ets/components/HuaweiQuickLoginPlatformView.ets
+ M ohos/entry/src/main/ets/entryability/EntryAbility.ets
+ M ohos/entry/src/main/ets/interop/InteropBridgeAbility.ets
+ M ohos/entry/src/main/ets/interop/StudioInterop.ets
+?? .trellis/tasks/11-01-ohos-app-interop/research/background-9900002-official-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/background-baseline-20261105.json
+?? .trellis/tasks/11-01-ohos-app-interop/research/background-design-20261105.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/background-receiver-fix-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/device-debug-20261105.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/device-debug-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/harmony-cross-app-survey-20261110.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pad-interop-validation-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pi-C-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pi-D-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pi-a-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pi-a-20261110.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pi-b-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/pi-brief-20261109.md
+?? .trellis/tasks/11-01-ohos-app-interop/research/qfli_snap.jpeg
+?? .trellis/tasks/11-01-ohos-app-interop/research/studio-sender-20261109.md
+?? .trellis/tasks/11-12-agents-workbench/
+?? Roboto_Mono.zip
+?? azurekiln-qfli-server/bike.html
+?? azurekiln-qfli-terminal/
+?? "docs/compliance/2026-11-\346\225\264\346\224\271\344\273\273\345\212\241\344\271\246.md"
+?? ohos/entry/src/main/ets/interop/StudioBackgroundInterop.ets
+?? output/
+?? scripts/test-ohos-background-bridge.cjs
+?? scripts/test-ohos-huawei-login.cjs
+?? "\346\226\260UI.png"
+?? "\346\226\260\345\242\236APP - \345\205\250\345\233\275\344\272\222\350\201\224\347\275\221\345\256\211\345\205\250\347\256\241\347\220\206\346\234\215\345\212\241\345\271\263\345\217\260.html"
+?? "\346\226\260\345\242\236APP - \345\205\250\345\233\275\344\272\222\350\201\224\347\275\221\345\256\211\345\205\250\347\256\241\347\220\206\346\234\215\345\212\241\345\271\263\345\217\260_files/"
+?? "\346\227\247UI.png"
+?? "\346\227\247icon.png"

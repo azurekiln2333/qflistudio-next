@@ -1,0 +1,10 @@
+{"file": ".trellis/tasks/11-12-agents-workbench/research/A-ui-inventory.md", "reason": "UI 现状、割裂点、模块所有权"}
+{"file": ".trellis/tasks/11-12-agents-workbench/research/B-harness.md", "reason": "现有 harness 能力与接口草案"}
+{"file": ".trellis/tasks/11-12-agents-workbench/research/C-platform-permissions.md", "reason": "各平台权限与工具可用矩阵"}
+{"file": ".trellis/tasks/11-12-agents-workbench/research/D-cicd.md", "reason": "跨仓库 CI/CD、签名、remote 现状"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/RULES-impl.md", "reason": "实现阶段通用规则"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "前端编码规范索引"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/RULES-rework.md", "reason": "返工阶段通用工作区、git 与测试规则"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/rework-round4.md", "reason": "第四轮错误详情诊断与真机自适应需求简报"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/round4-resume.md", "reason": "第四轮续跑防 OOM 与各 Pi 交付口径"}
+{"file": ".trellis/tasks/11-12-agents-workbench/research/E-session-storage.md", "reason": "会话存储 JSONL 索引与性能预算设计"}

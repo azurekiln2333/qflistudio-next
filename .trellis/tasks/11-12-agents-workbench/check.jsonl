@@ -1,0 +1,9 @@
+{"file": ".trellis/tasks/11-12-agents-workbench/research/A-ui-inventory.md", "reason": "割裂点清单，检查是否消除"}
+{"file": ".trellis/tasks/11-12-agents-workbench/research/D-cicd.md", "reason": "发布阻塞项，检查是否解决"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/RULES-impl.md", "reason": "实现阶段通用规则"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "前端编码规范索引"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/RULES-rework.md", "reason": "返工检查与隔离红线规则"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/CHECKLIST.md", "reason": "A-J 项交叉检查与真机全流程验收清单"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/phase3-final.md", "reason": "最终截图与真机全流程检查规范"}
+{"file": ".trellis/tasks/11-12-agents-workbench/briefs/rework-round4.md", "reason": "第四轮错误详情与真机自适应验收标准"}
+{"file": ".trellis/tasks/11-12-agents-workbench/research/F-rework-audit.md", "reason": "返工根因对照与回归检查重点"}
