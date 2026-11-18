@@ -15,9 +15,9 @@
  * A rule that exists on only one side is a hole, so change both together.
  */
 
-import { common, Want } from '@kit.AbilityKit';
+import { common, Want, wantConstant } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { fileIo as fs } from '@kit.CoreFileKit';
+import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import {
   FlutterAbility,
   FlutterEngine,
@@ -58,8 +58,8 @@ const ALLOWED_RECEIVERS: string[] = [
 const CHANNEL_METHODS = 'qfli_interop/bridge';
 const CHANNEL_EVENTS = 'qfli_interop/bridge/events';
 
-/** Sessions Studio started. An event for any other session is dropped. */
-const activeSessions: Set<string> = new Set<string>();
+/** Sessions Studio started, with the token each response event must echo. */
+const activeSessions: Map<string, string> = new Map<string, string>();
 
 /** Sessions the user asked to stop. */
 const cancelledSessions: Set<string> = new Set<string>();
@@ -81,6 +81,15 @@ let hostContext: common.UIAbilityContext | null = null;
  */
 let probeHostContext: common.UIAbilityContext | null = null;
 let eventSink: EventSink | null = null;
+/**
+ * Events that arrived before Dart started listening on the event channel.
+ *
+ * A receiver can refuse a run within a few hundred milliseconds, while Dart
+ * is still between the start call resolving and its stream subscription. An
+ * unbuffered sink drop there would swallow the only terminal event and leave
+ * the run dialog waiting forever, so events park here and flush on listen.
+ */
+const pendingEvents: Map<string, string>[] = [];
 
 /** One refusal, with a code the Dart side already understands. */
 export class InteropRefusal extends Error {
@@ -159,13 +168,17 @@ function readString(raw: Map<string, string>, key: string): string {
  * Validates the launch parameters Dart produced, in the order protocol, caller,
  * size, paths. A refused request must not have touched another app.
  */
-function validateRequest(raw: Map<string, string>): PayloadEntry[] {
+export function validateRequest(raw: Map<string, string>): PayloadEntry[] {
   if (readString(raw, 'protocol') !== PROTOCOL) {
     throw new InteropRefusal('unsupported_protocol', '不支持的协议版本');
   }
   const sessionId = readString(raw, 'sessionId');
   if (!/^[A-Za-z0-9_-]{8,64}$/.test(sessionId)) {
     throw new InteropRefusal('bad_request', '会话标识不合法');
+  }
+  const sessionToken = readString(raw, 'sessionToken');
+  if (!/^[A-Za-z0-9]{16,64}$/.test(sessionToken)) {
+    throw new InteropRefusal('bad_request', '会话令牌不合法');
   }
   if (readString(raw, 'callerBundle') !== STUDIO_BUNDLE) {
     throw new InteropRefusal('caller_not_allowed', '调用方包名不匹配');
@@ -233,12 +246,10 @@ export function isAllowedReceiver(bundleName: string): boolean {
 }
 
 /** Records a started session so stray events from earlier runs are dropped. */
-export function registerSession(sessionId: string): void {
-  activeSessions.add(sessionId);
-  cancelledSessions.delete(sessionId);
+export function registerSession(sessionId: string, sessionToken: string): void {
+  activeSessions.set(sessionId, sessionToken);
   if (activeSessions.size > 8) {
-    const iterator = activeSessions.values();
-    const first = iterator.next();
+    const first = activeSessions.keys().next();
     if (!first.done) {
       activeSessions.delete(first.value);
     }
@@ -258,65 +269,68 @@ export function closeSession(sessionId: string): void {
 
 /** Forwards one validated event to the Flutter EventChannel. */
 export function publishEvent(event: Map<string, string>): void {
-  if (eventSink === null) {
-    return;
-  }
   const payload = new Map<string, string>();
   event.forEach((value: string, key: string) => {
     payload.set(key, value);
   });
-  eventSink.success(payload);
+  if (eventSink === null) {
+    pendingEvents.push(payload);
+    if (pendingEvents.length > 64) {
+      pendingEvents.shift();
+    }
+    console.error(`QFLI_INTEROP_PARKED size=${pendingEvents.length}`);
+    return;
+  }
+  console.error('QFLI_INTEROP_SENT');
+  try {
+    eventSink.success(payload);
+  } catch (error) {
+    console.error(`QFLI_INTEROP_SINK_THREW ${(error as BusinessError).code}`);
+  }
 }
 
 /**
- * Writes the payload under the studio cache and returns a manifest path.
+ * Returns the payload zip Dart wrote into this shared sandbox cache, after
+ * checking it names the interop output directory and exists on disk.
  *
- * The manifest exists because a Want cannot carry the files reliably: the
- * documented parameter budget is far below our 256 KiB cap, and a truncated
- * parameter would arrive as a corrupt project. The file path is start-only,
- * short and validated; the receiver reads it back only if the producing app is
- * still the one we started.
+ * The prefix cannot be compared against context.cacheDir: Dart's
+ * path_provider resolves the application-level cache while this ability
+ * context exposes the module-level one, and both are real directories. The
+ * zipPath arrives over an in-process channel, not from outside the app, and
+ * the receiver re-validates every file the zip restores.
  */
-function writePayload(context: common.UIAbilityContext, sessionId: string,
-    entries: PayloadEntry[]): string {
-  const directory = `${context.cacheDir}/qfli_interop/out/${sessionId}`;
-  fs.mkdirSync(directory, true);
-  const manifest: string[] = [];
-  for (const entry of entries) {
-    const target = `${directory}/${entry.path}`;
-    const parent = target.substring(0, target.lastIndexOf('/'));
-    fs.mkdirSync(parent, true);
-    const file = fs.openSync(target, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY | fs.OpenMode.TRUNC);
-    try {
-      fs.writeSync(file.fd, entry.content);
-    } finally {
-      fs.closeSync(file);
-    }
+export function payloadZipPath(raw: Map<string, string>): string {
+  const zipPath = readString(raw, 'zipPath');
+  if (zipPath.indexOf('qfli_interop/out/') < 0 || !zipPath.endsWith('.zip')) {
+    throw new InteropRefusal('bad_request', 'payload 路径无效');
   }
-  // The receiver reads `files` from here; the Want only carries the directory.
-  const manifestPath = `${directory}/manifest.json`;
-  const file = fs.openSync(manifestPath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY | fs.OpenMode.TRUNC);
-  try {
-    fs.writeSync(file.fd, JSON.stringify(entries.map((entry: PayloadEntry) => entry.path)));
-  } finally {
-    fs.closeSync(file);
+  if (!fs.accessSync(zipPath)) {
+    throw new InteropRefusal('bad_request', 'payload 不存在');
   }
-  return directory;
+  return zipPath;
 }
 
 async function start(context: common.UIAbilityContext, raw: Map<string, string>): Promise<void> {
-  const entries = validateRequest(raw);
+  // Validation still runs over the files JSON: it is the security gate that
+  // keeps malformed requests from reaching another app, even though the zip
+  // is now the bytes the receiver actually reads.
+  validateRequest(raw);
   const sessionId = raw.get('sessionId') as string;
   const bundleName = raw.get('targetBundle') as string;
   if (!isAllowedReceiver(bundleName)) {
     throw new InteropRefusal('caller_not_allowed', '目标不是认可的配套应用');
   }
-  const directory = writePayload(context, sessionId, entries);
-  registerSession(sessionId);
+  const zipPath = payloadZipPath(raw);
+  registerSession(sessionId, raw.get('sessionToken') as string);
 
+  // The zip crosses under a file-URI read grant, the platform's cross-app
+  // permission mechanism. Without the flag the receiver's open fails, so the
+  // grant is the only thing that lets a foreign sandbox read the payload.
+  const uri = fileUri.getUriFromPath(zipPath);
   const payload: Record<string, Object> = {};
   payload['protocol'] = PROTOCOL;
   payload['sessionId'] = sessionId;
+  payload['sessionToken'] = raw.get('sessionToken') as string;
   payload['language'] = raw.get('language') as string;
   payload['entry'] = raw.get('entry') as string;
   payload['action'] = raw.get('action') as string;
@@ -324,17 +338,27 @@ async function start(context: common.UIAbilityContext, raw: Map<string, string>)
   payload['timeoutMs'] = Number(raw.get('timeoutMs'));
   payload['callerBundle'] = STUDIO_BUNDLE;
   payload['bridgeAction'] = raw.get('bridgeAction') as string;
-  payload['payloadDirectory'] = directory;
+  payload['payloadUri'] = uri;
   const want: Want = {
     bundleName: bundleName,
     abilityName: TARGET_ABILITY,
+    // The action is part of the receiver's exported skills; since API 26 an
+    // exported ability without a matching skills entry cannot be started by
+    // another application (AMS checkCallPermission, error 201).
+    action: 'action.system.qfli.interop.request',
+    uri: uri,
+    type: 'application/zip',
+    flags: wantConstant.Flags.FLAG_AUTH_READ_URI_PERMISSION,
     parameters: payload,
   };
+  console.error(`QFLI_INTEROP_SEND_URI ${uri}`);
   try {
     await context.startAbility(want);
+    console.error('QFLI_INTEROP_START_OK');
   } catch (error) {
-    closeSession(sessionId);
     const failure = error as BusinessError;
+    console.error(`QFLI_INTEROP_START_FAILED ${failure.code} ${failure.message}`);
+    closeSession(sessionId);
     // 16000001: the ability does not exist. 16000003: the bundle is not
     // installed. Both mean the sibling app has to be installed.
     if (failure.code === 16000001 || failure.code === 16000003) {
@@ -426,7 +450,8 @@ async function probeByStart(bundleName: string): Promise<ProbeAnswer> {
   parameters['timeoutMs'] = 5000;
   parameters['callerBundle'] = STUDIO_BUNDLE;
   parameters['bridgeAction'] = 'action.system.qfli.interop.event';
-  parameters['payloadDirectory'] = '';
+  parameters['sessionToken'] = 'probetoken0000000000000000000';
+  parameters['payloadUri'] = '';
   const want: Want = {
     bundleName: bundleName,
     abilityName: TARGET_ABILITY,
@@ -541,26 +566,43 @@ export function configureInteropChannels(engine: FlutterEngine,
   events.setStreamHandler({
     onListen(args: Object, sink: EventSink): void {
       eventSink = sink;
+      while (pendingEvents.length > 0) {
+        const buffered = pendingEvents.shift();
+        if (buffered !== undefined) {
+          sink.success(buffered);
+        }
+      }
     },
     onCancel(args: Object): void {
       eventSink = null;
     },
   });
+
+
 }
 
 /**
- * Called by InteropBridgeAbility when a sibling app starts it with an event.
+ * Accepts one response event delivered as a common event.
  *
- * Returns false when the event is not from an allowed app or not for a session
- * Studio started, so the ability can finish without changing any state.
+ * Response events are broadcasts any application could publish, so the
+ * publisher bundle in the parameters is not proof of origin on its own. The
+ * event must also echo the session token Studio generated for the run.
+ *
+ * Returns false when the sender is not an allowed receiver, the session is
+ * unknown, or the token does not match, so the caller ignores the event.
  */
 export function acceptBridgeEvent(callerBundle: string,
     parameters: Map<string, Object>): boolean {
+  console.error(`QFLI_INTEROP_RECV from=${callerBundle} event=${parameters.get('event')} session=${parameters.get('sessionId')}`);
   if (!isAllowedReceiver(callerBundle)) {
     return false;
   }
   const sessionId = `${parameters.get('sessionId') ?? ''}`;
-  if (!activeSessions.has(sessionId)) {
+  const expectedToken = activeSessions.get(sessionId);
+  if (expectedToken === undefined) {
+    return false;
+  }
+  if (`${parameters.get('sessionToken') ?? ''}` !== expectedToken) {
     return false;
   }
   const out = new Map<string, string>();
