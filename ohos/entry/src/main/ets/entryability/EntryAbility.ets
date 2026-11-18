@@ -13,6 +13,7 @@ import { window, display } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
 import { configureInteropChannels } from '../interop/StudioInterop';
+import { configureBackgroundInteropChannels, disposeBackgroundInterop } from '../interop/StudioBackgroundInterop';
 import { AgreementPlatformBridge } from '../interop/AgreementBridge';
 
 const CHANNEL_PLATFORM = 'qflistudio/platform';
@@ -82,6 +83,10 @@ export function readWindowSafeArea(win: window.Window): WindowSafeArea {
 }
 
 export default class EntryAbility extends FlutterAbility {
+  onDestroy(): void {
+    disposeBackgroundInterop();
+    super.onDestroy();
+  }
   private safeAreaWindow: window.Window | null = null;
   private safeArea: WindowSafeArea = new WindowSafeArea();
   private safeAreaChannel: MethodChannel | null = null;
@@ -147,6 +152,7 @@ export default class EntryAbility extends FlutterAbility {
     // Cross-app compile and run: Dart asks a sibling app to build and execute a
     // project, and the sibling app streams events back to this engine.
     configureInteropChannels(flutterEngine, this.context as common.UIAbilityContext);
+    configureBackgroundInteropChannels(flutterEngine, this.context as common.UIAbilityContext);
 
     const abilityContext = this.context as common.UIAbilityContext;
 
