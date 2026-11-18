@@ -188,6 +188,53 @@ main:
             python3 -m py_compile sandbox/init.py sandbox/cleanup.py \
               sandbox/ready.py sandbox/snapshot.py deployment/smoke-isolation.py
 
+    # Flutter workbench checks for the desktop harness in qfli_studio_core.
+    #
+    # The two Flutter repositories are siblings: `pubspec.yaml` declares
+    # `qfli_studio_core` at `../qfli_studio_core` and overrides `re_editor` at
+    # `../qfli_studio_core/vendor/re_editor`. The job therefore checks both
+    # repositories out as siblings inside the workspace and never edits
+    # `pubspec.yaml`.
+    #
+    # `allowFailure: true` is deliberate: no Flutter image with the OHOS fork
+    # (3.27.5-ohos-1.0.1) and the Android SDK is published for this repository
+    # yet. The job must never turn an unrelated pull request red while the
+    # image is still being built. Remove `allowFailure` only after the image
+    # below passes once with `flutter --version` reporting the OHOS fork.
+    - name: verify-flutter-workbench
+      allowFailure: true
+      env:
+        FLUTTER_BUILD_IMAGE: cnbcool/default-dev-env:latest
+        CORE_REPO_URL: https://cnb.cool/azurekiln/qflistudio-core.git
+      image: ${FLUTTER_BUILD_IMAGE}
+      stages:
+        - name: checkout-siblings
+          script: |
+            set -euo pipefail
+            command -v flutter >/dev/null || {
+              echo "image ${FLUTTER_BUILD_IMAGE} has no flutter on PATH" >&2
+              echo "install the OHOS fork 3.27.5-ohos-1.0.1 in the image" >&2
+              exit 1
+            }
+            if [ ! -d ../qfli_studio_core ]; then
+              git clone --depth 1 \
+                "https://${CNB_TOKEN_USER_NAME}:${CNB_TOKEN}@${CORE_REPO_URL#https://}" \
+                ../qfli_studio_core
+            fi
+        - name: core-analyze-and-test
+          script: |
+            set -euo pipefail
+            cd ../qfli_studio_core
+            flutter pub get
+            flutter analyze
+            flutter test
+        - name: studio-analyze-and-test
+          script: |
+            set -euo pipefail
+            flutter pub get
+            flutter analyze
+            flutter test
+
 "v*":
   tag_push:
     - name: publish-release-images
@@ -264,3 +311,64 @@ main:
               docker push "$SANDBOX_IMAGE:$TAG-sandbox"
             fi
             printf 'published release images for %s (stable=%s)\n' "$TAG" "$STABLE"
+
+    # Signed Android APK for the tag. Kept separate from the image job above so
+    # a missing Flutter image or missing signing secret cannot block image
+    # publishing, and so image publishing cannot block the APK.
+    #
+    # Signing material comes from a CNB secret repository file imported through
+    # `imports`. The four values are consumed by android/app/build.gradle.kts
+    # through the ANDROID_* environment variables. Nothing here is committed:
+    # android/key.properties and android/*.jks stay git-ignored.
+    #
+    # Without the imported values the build fails on purpose instead of
+    # falling back to the debug certificate.
+    - name: release-apk
+      allowFailure: true
+      env:
+        FLUTTER_BUILD_IMAGE: cnbcool/default-dev-env:latest
+        CORE_REPO_URL: https://cnb.cool/azurekiln/qflistudio-core.git
+      image: ${FLUTTER_BUILD_IMAGE}
+      stages:
+        - name: checkout-siblings
+          script: |
+            set -euo pipefail
+            command -v flutter >/dev/null || {
+              echo "image ${FLUTTER_BUILD_IMAGE} has no flutter on PATH" >&2
+              exit 1
+            }
+            if [ ! -d ../qfli_studio_core ]; then
+              git clone --depth 1 \
+                "https://${CNB_TOKEN_USER_NAME}:${CNB_TOKEN}@${CORE_REPO_URL#https://}" \
+                ../qfli_studio_core
+            fi
+        - name: build-signed-apk
+          script: |
+            set -euo pipefail
+            cd ../qfli_studio_core && flutter pub get && cd "$CNB_WORKSPACE"
+            flutter pub get
+            : "${ANDROID_KEYSTORE_BASE64:?missing ANDROID_KEYSTORE_BASE64 secret}"
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/release.jks
+            export ANDROID_KEYSTORE_PATH=/tmp/release.jks
+            flutter build apk --release
+            ls -l build/app/outputs/flutter-apk/app-release.apk
+        - name: verify-certificate
+          script: |
+            set -euo pipefail
+            APK=build/app/outputs/flutter-apk/app-release.apk
+            APKSIGNER=$(find "${ANDROID_HOME:-/opt/android-sdk}/build-tools" \
+              -name apksigner -type f | sort | tail -1)
+            "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/certs.txt
+            if grep -q 'Android Debug' /tmp/certs.txt; then
+              echo 'release apk is debug-signed' >&2
+              exit 1
+            fi
+        - name: publish-release
+          type: git:release
+          options:
+            latest: "true"
+        - name: upload-apk
+          image: cnbcool/attachments:latest
+          settings:
+            attachments:
+              - build/app/outputs/flutter-apk/app-release.apk
