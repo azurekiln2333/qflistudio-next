@@ -907,7 +907,7 @@ jobs:
           # hdiutil sometimes fails with "Resource busy" on hosted runners.
           created=0
           for attempt in 1 2 3; do
-            if hdiutil create -volname "QFLIStudio" -srcfolder "$work/staging" \
+            if hdiutil create -volname "QFLIStudio+" -srcfolder "$work/staging" \
               -ov -format UDZO "$dmg"; then
               created=1
               break
