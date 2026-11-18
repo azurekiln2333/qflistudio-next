@@ -48,9 +48,11 @@ export default class InteropBridgeAbility extends UIAbility {
     const engine: FlutterEngine | null = ability === undefined
       ? null
       : bridgeHostEngine(ability);
-    // The caller bundle is the only identity the platform gives us here. The
-    // parameter map is untrusted, so nothing from it decides authorisation.
-    const caller = want.bundleName ?? '';
+    // The system injects the real caller into the parameters; `want.bundleName`
+    // is the target bundle the sender filled in and forgeable, so a missing
+    // injection fails closed instead of falling back to it.
+    const injected = source['ohos.aafwk.param.callerBundleName'];
+    const caller = typeof injected === 'string' ? injected as string : '';
     forwardBridgeEvent(caller, source, engine, this.context);
   }
 }
