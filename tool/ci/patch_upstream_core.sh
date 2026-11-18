@@ -42,6 +42,12 @@ replace(core / "vendor/re_editor/lib/src/_consts.dart",
 replace(core / "lib/pages/auth/login_page.dart",
         "    final isOhos = defaultTargetPlatform == TargetPlatform.ohos;",
         "    final isOhos = false;")
+replace(core / "lib/interop/interop_background_transport.dart",
+        "  bool get isSupported => defaultTargetPlatform == TargetPlatform.ohos;",
+        "  bool get isSupported => false;")
+replace(core / "lib/editor/editor_page.dart",
+        "    if (defaultTargetPlatform != TargetPlatform.ohos ||\n",
+        "    if (true ||\n")
 replace(core / "lib/pages/auth/agreement_page.dart",
         "    if (kIsWeb || defaultTargetPlatform != TargetPlatform.ohos) {",
         "    if (true) {")
