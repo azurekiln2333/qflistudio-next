@@ -15,6 +15,10 @@ import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant'
 import { configureInteropChannels } from '../interop/StudioInterop';
 import { configureBackgroundInteropChannels, disposeBackgroundInterop } from '../interop/StudioBackgroundInterop';
 import { AgreementPlatformBridge } from '../interop/AgreementBridge';
+import {
+  HUAWEI_QUICK_LOGIN_VIEW_TYPE,
+  HuaweiQuickLoginViewFactory,
+} from '../components/HuaweiQuickLoginPlatformView';
 
 const CHANNEL_PLATFORM = 'qflistudio/platform';
 const CHANNEL_HUAWEI = 'qflistudio/huawei_account';
@@ -149,6 +153,11 @@ export default class EntryAbility extends FlutterAbility {
     super.configureFlutterEngine(flutterEngine)
     GeneratedPluginRegistrant.registerWith(flutterEngine)
 
+    flutterEngine.getPlatformViewsController()?.getRegistry().registerViewFactory(
+      HUAWEI_QUICK_LOGIN_VIEW_TYPE,
+      new HuaweiQuickLoginViewFactory(flutterEngine.dartExecutor.getBinaryMessenger()),
+    );
+
     // Cross-app compile and run: Dart asks a sibling app to build and execute a
     // project, and the sibling app streams events back to this engine.
     configureInteropChannels(flutterEngine, this.context as common.UIAbilityContext);
@@ -253,13 +262,17 @@ export default class EntryAbility extends FlutterAbility {
     );
     huaweiChannel.setMethodCallHandler({
       onMethodCall(call: MethodCall, result: MethodResult): void {
-        if (call.method === 'login') {
+        if (call.method === 'login' || call.method === 'getAnonymousPhone') {
+          const anonymousPhone = call.method === 'getAnonymousPhone';
           try {
             const provider = new authentication.HuaweiIDProvider();
             const request: authentication.AuthorizationWithHuaweiIDRequest =
               provider.createAuthorizationWithHuaweiIDRequest();
-            request.scopes = ['openid'];
+            request.scopes = anonymousPhone ? ['quickLoginAnonymousPhone'] : ['openid'];
             request.permissions = [];
+            if (anonymousPhone) {
+              request.forceAuthorization = false;
+            }
 
             const controller =
               new authentication.AuthenticationController(abilityContext);
@@ -267,6 +280,11 @@ export default class EntryAbility extends FlutterAbility {
               .then((response: authentication.AuthenticationResponse) => {
                 const authResponse =
                   response as authentication.AuthorizationWithHuaweiIDResponse;
+                if (anonymousPhone) {
+                  const phone = authResponse.data?.extraInfo?.['quickLoginAnonymousPhone'];
+                  result.success(typeof phone === 'string' ? phone : '');
+                  return;
+                }
                 const code: string =
                   authResponse.data?.authorizationCode ?? '';
                 if (code.length > 0) {

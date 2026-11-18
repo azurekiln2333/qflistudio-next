@@ -8,23 +8,9 @@ import { BinaryMessenger } from '@ohos/flutter_ohos/src/main/ets/plugin/common/B
 import PlatformView, { Params } from '@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformView';
 import PlatformViewFactory from '@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformViewFactory';
 import common from '@ohos.app.ability.common';
-import { window, display } from '@kit.ArkUI';
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
 
 export const HUAWEI_QUICK_LOGIN_VIEW_TYPE = 'qflistudio/huawei_quick_login';
-
-/** Screen density of the default display; 1 when it cannot be read. */
-function screenDensity(): number {
-  try {
-    const density = display.getDefaultDisplaySync().densityPixels;
-    if (density > 0) {
-      return density;
-    }
-  } catch (e) {
-    // Assume 1:1 when display information is unavailable.
-  }
-  return 1;
-}
 
 @Observed
 class HuaweiButtonTheme {
@@ -63,27 +49,10 @@ export class HuaweiQuickLoginPlatformView extends PlatformView {
   private channel: MethodChannel;
   private controller: loginComponentManager.LoginWithHuaweiIDButtonController;
   private theme: HuaweiButtonTheme = new HuaweiButtonTheme();
-  private topAvoidPx: number = 0;
-  private avoidAreaVersion: number = 0;
 
   constructor(messenger: BinaryMessenger, viewId: number, colors: Map<string, number>) {
     super();
     this.theme.update(colors);
-    this.topAvoidPx = 0;
-    window.getLastWindow(getContext(this) as common.UIAbilityContext)
-      .then((win: window.Window) => {
-        const cutout = win.getWindowAvoidArea(
-          window.AvoidAreaType.TYPE_CUTOUT,
-        ).topRect.height;
-        const status = win.getWindowAvoidArea(
-          window.AvoidAreaType.TYPE_SYSTEM,
-        ).topRect.height;
-        this.topAvoidPx = Math.max(cutout, status) / screenDensity();
-        this.avoidAreaVersion++;
-      })
-      .catch(() => {
-        this.topAvoidPx = 0;
-      });
     this.channel = new MethodChannel(messenger, `${HUAWEI_QUICK_LOGIN_VIEW_TYPE}${viewId}`);
     this.controller = new loginComponentManager.LoginWithHuaweiIDButtonController();
     this.controller
@@ -139,16 +108,6 @@ export class HuaweiQuickLoginPlatformView extends PlatformView {
     return new WrappedBuilder(HuaweiQuickLoginBuilder);
   }
 
-  /** Top inset (px) of the window avoid areas, fetched once at creation. */
-  getTopAvoidPx(): number {
-    return this.topAvoidPx;
-  }
-
-  /** Incremented when the avoid area value becomes available. */
-  getAvoidAreaVersion(): number {
-    return this.avoidAreaVersion;
-  }
-
   dispose(): void {
     this.controller.setEnabled(false);
     this.channel.setMethodCallHandler(null);
@@ -160,9 +119,6 @@ function HuaweiQuickLoginBuilder(params: Params) {
   HuaweiQuickLoginButton({
     theme: (params.platformView as HuaweiQuickLoginPlatformView).getTheme(),
     controller: (params.platformView as HuaweiQuickLoginPlatformView).getController(),
-    topAvoidPx: (params.platformView as HuaweiQuickLoginPlatformView).getTopAvoidPx(),
-    avoidAreaVersion:
-      (params.platformView as HuaweiQuickLoginPlatformView).getAvoidAreaVersion(),
   })
     .width('100%')
     .height('100%')
@@ -173,10 +129,6 @@ struct HuaweiQuickLoginButton {
   @ObjectLink theme: HuaweiButtonTheme;
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController();
-  /** Top inset of the status bar and cutout; 0 until the window reports it. */
-  @Prop topAvoidPx: number = 0;
-  /** Forces a rebuild when a later avoid area report arrives. */
-  @Prop avoidAreaVersion: number = 0;
 
   build() {
     LoginWithHuaweiIDButton({
@@ -201,9 +153,6 @@ struct HuaweiQuickLoginButton {
     })
       .width('100%')
       .height('100%')
-      // Flutter centres the button in a fixed-height box, so the button needs
-      // its own top margin to stay clear of the status bar and the cutout in
-      // every posture, including the unfolded foldable screen.
-      .padding({ top: this.topAvoidPx })
+      // Flutter owns the page safe area; fill its 52vp button slot.
   }
 }
