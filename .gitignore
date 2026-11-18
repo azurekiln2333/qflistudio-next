@@ -89,7 +89,6 @@ app.*.map.json
 /.trellis/agents/
 /.trellis/config.yaml
 /.trellis/scripts/
-/.trellis/spec/
 /.trellis/tasks/00-bootstrap-guidelines/
 /.trellis/workflow.md
 /.trellis/workspace/

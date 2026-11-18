@@ -33,7 +33,7 @@ This directory contains guidelines for frontend development. Fill in each file w
 | [Repository Layout](./repository-layout.md) | Sibling Git roots, shared package paths, build commands | Active |
 | [Vibe Skills](./vibe-skills.md) | Skill discovery order, prompt index, body caps | Draft |
 | [AI Protocols](./ai-protocols.md) | Three endpoint protocols, one tool-call shape, endpoint joining | Draft |
-| [Interop](./interop.md) | Studio to `qfli_*` open, compile and run on OHOS | Draft |
+| [Interop](./interop.md) | Separate foreground and experimental background Java routes on OHOS | Draft |
 | [Vibe E2E](./vibe-e2e.md) | Headless acceptance harness, report schema, credential redaction | Draft |
 
 ---

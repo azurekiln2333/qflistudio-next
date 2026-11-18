@@ -49,3 +49,17 @@ Apply this contract when changing an app's package dependencies, creating a lang
 Wrong: `qfli_studio_core: {path: ../../packages/qfli_studio_core}` in a language App.
 
 Correct: `qfli_studio_core: {path: ../qfli_studio_core}` and a matching sibling `re_editor` override.
+## 8. CI Installer Layout
+
+The installer workflow checks out the app as `qflistudio/` and the shared core as sibling `qfli_studio_core/`. This layout is required by both path dependencies in `pubspec.yaml`.
+
+Windows, Linux, macOS, iOS and Android consume one upstream stable version resolved at the start of the run. OHOS uses the pinned OHOS Flutter fork and its own cache. Keep these SDKs separate.
+
+External JavaScript actions use only SHA-pinned Node 24 actions:
+
+- `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1`
+- `actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9`
+- `actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1`
+- `actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9`
+
+Local composite actions may wrap these actions. Do not add a Flutter action that brings a Node 20 cache action transitively.
