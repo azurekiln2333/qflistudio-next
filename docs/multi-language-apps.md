@@ -130,7 +130,7 @@ tool/new_language_app.dart    App 生成器
 ```dart
 const StudioProfile pythonProfile = StudioProfile(
   id: 'python',
-  appTitle: 'QFLIStudio+ Python 版',
+  appTitle: 'QFLIStudioN Python 版',
   templates: [ProjectTemplate.empty, ProjectTemplate.python],
   runner: PythonProgramRunner(),
   entryFileNames: ['main.py', 'src/main.py'],
@@ -344,7 +344,7 @@ JavaScript / TypeScript / Kotlin / Go / Rust / C# / PHP / Ruby / 空项目），
      entryFileNames: ['main.go', 'src/main.go'],
      runnerClass: 'GoProgramRunner',
      sourceExtensions: ['.go'],
-     description: 'QFLIStudio+ Go 版：手机上的 Go IDE，本地解释执行。',
+     description: 'QFLIStudioN Go 版：手机上的 Go IDE，本地解释执行。',
      htmlDescription: '手机上的 Go IDE，本地解释执行。',
      pendingRunner: true,
    ),

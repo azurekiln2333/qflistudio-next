@@ -388,7 +388,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.azurekiln.qflistudio.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QFLIStudio+.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QFLIStudio+";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QFLIStudioN.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QFLIStudioN";
 			};
 			name = Debug;
 		};
@@ -402,7 +402,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.azurekiln.qflistudio.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QFLIStudio+.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QFLIStudio+";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QFLIStudioN.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QFLIStudioN";
 			};
 			name = Release;
 		};
@@ -416,7 +416,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.azurekiln.qflistudio.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QFLIStudio+.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QFLIStudio+";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QFLIStudioN.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/QFLIStudioN";
 			};
 			name = Profile;
 		};

@@ -4,7 +4,7 @@ import 'package:qfli_studio_core/content/asset_content_repository.dart'
     show ContentAssetException;
 import 'package:qfli_studio_core/content/content_repository.dart';
 
-/// Offline content source for the QFLIStudio+ main app.
+/// Offline content source for the QFLIStudioN main app.
 ///
 /// The main product ships one composed catalog under its own `assets/content/`
 /// directory. [tool/generate_studio_content.dart] copies every sibling

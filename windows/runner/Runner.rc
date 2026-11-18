@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "AzureKiln" "\0"
-            VALUE "FileDescription", "QFLIStudio+" "\0"
+            VALUE "FileDescription", "QFLIStudioN" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "qflistudio" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 AzureKiln. All rights reserved." "\0"
             VALUE "OriginalFilename", "qflistudio.exe" "\0"
-            VALUE "ProductName", "QFLIStudio+" "\0"
+            VALUE "ProductName", "QFLIStudioN" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

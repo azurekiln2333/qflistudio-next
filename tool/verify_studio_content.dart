@@ -1,4 +1,4 @@
-// Verifies the QFLIStudio+ composed content assets against their authoritative
+// Verifies the QFLIStudioN composed content assets against their authoritative
 // product sources.
 //
 // Unlike `tool/validate_content.dart` (which releases the shared aggregate and

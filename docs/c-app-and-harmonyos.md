@@ -146,7 +146,7 @@ tool/new_language_app.dart   从 apps/qfli_c 生成新的语言 App
 ```dart
 StudioProfile.current = const StudioProfile(
   id: 'c',
-  appTitle: 'QFLIStudio+ C 版',
+  appTitle: 'QFLIStudioN C 版',
   templates: [ProjectTemplate.empty, ProjectTemplate.c],  // 新建项目只出这两个
   runner: CProgramRunner(),                                // 运行按钮交给 C 运行时
   entryFileNames: ['main.c', 'src/main.c'],                // 优先命中 C 入口

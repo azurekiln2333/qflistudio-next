@@ -250,7 +250,7 @@ router.get('/oauth2/callback', async (req, res) => {
   const claims = await gateway.userinfo(tokens.access_token);
   const loginCode = crypto.randomBytes(16).toString('hex');
   loginCodes.set(loginCode, { tokens, claims, createdAt: Date.now() });
-  res.type('html').send(`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>登录成功</title><body><h2>登录成功</h2><p>请回到 QFLIStudio+ 输入登录码：</p><code>${loginCode}</code><p>5 分钟内有效</p></body></html>`);
+  res.type('html').send(`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>登录成功</title><body><h2>登录成功</h2><p>请回到 QFLIStudioN 输入登录码：</p><code>${loginCode}</code><p>5 分钟内有效</p></body></html>`);
 });
 
 router.post('/oauth2/complete', async (req, res) => {

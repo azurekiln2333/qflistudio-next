@@ -1,4 +1,4 @@
-name: QFLIStudio app build setup
+name: QFLIStudioN app build setup
 description: >-
   Check out the pinned shared core beside the app, install Flutter and resolve
   Dart packages. The app must be checked out at qflistudio inside the workspace,

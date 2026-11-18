@@ -88,7 +88,7 @@ EOF
 cat > "$deb_root/usr/share/applications/$application_id.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=QFLIStudio+
+Name=QFLIStudioN
 Comment=IDE for many languages, built with Flutter
 Exec=$package_name
 Icon=$application_id
@@ -100,7 +100,7 @@ EOF
 cp "$icon" "$deb_root/usr/share/pixmaps/$application_id.png"
 
 {
-  echo "QFLIStudio is distributed under the GNU General Public License version 3."
+  echo "QFLIStudioN is distributed under the GNU General Public License version 3."
   echo
   echo "=== LICENSE ==="
   cat "$root/LICENSE"
@@ -121,8 +121,8 @@ Depends: libc6 (>= 2.35), libstdc++6, libgtk-3-0, libglib2.0-0
 Section: devel
 Priority: optional
 Homepage: https://github.com/azurekiln2333/qflistudio-next
-Description: QFLIStudio, an IDE for many languages built with Flutter
- QFLIStudio edits and runs code for many languages on the device.
+Description: QFLIStudioN, an IDE for many languages built with Flutter
+ QFLIStudioN edits and runs code for many languages on the device.
  The package is built in CI and is not signed.
 EOF
 

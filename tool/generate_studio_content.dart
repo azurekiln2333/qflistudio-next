@@ -1,4 +1,4 @@
-// Generates the QFLIStudio+ bundled local content catalog.
+// Generates the QFLIStudioN bundled local content catalog.
 //
 // The main app is a thin shell: every language product ships (or, for Java and
 // Python, relies on the shared core for) its own offline curriculum. This tool

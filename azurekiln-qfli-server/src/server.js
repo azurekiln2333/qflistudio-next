@@ -1,4 +1,4 @@
-// QFLIStudio+ 社区与在线终端服务。
+// QFLIStudioN 社区与在线终端服务。
 const express = require('express');
 const cors = require('cors');
 const path = require('node:path');

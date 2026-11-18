@@ -11,7 +11,7 @@ import 'package:qfli_studio_core/theme/app_theme.dart';
 
 import 'package:qflistudio/content/studio_content_repository.dart';
 
-/// Pins the QFLIStudio+ main app to the composed local curriculum.
+/// Pins the QFLIStudioN main app to the composed local curriculum.
 ///
 /// The main product has no language filter of its own: its tutorials and
 /// examples must show every sibling product's shipped content, with C and C++

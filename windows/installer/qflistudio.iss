@@ -1,4 +1,4 @@
-; Inno Setup script for the QFLIStudio Windows installer.
+; Inno Setup script for the QFLIStudioN Windows installer.
 ;
 ; CI passes AppVersion, SourceDir, OutputDir, OutputBaseFilename and Arch with
 ; /D. SourceDir is then a staged copy of the release directory that also holds
@@ -7,7 +7,7 @@
 ;
 ; Paths resolve from this file, not from the working directory. ASCII only.
 
-#define AppName "QFLIStudio+"
+#define AppName "QFLIStudioN"
 #define AppPublisher "azurekiln2333"
 #define AppURL "https://github.com/azurekiln2333/qflistudio-next"
 #define AppExeName "qflistudio.exe"

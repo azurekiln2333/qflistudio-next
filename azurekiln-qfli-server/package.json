@@ -1,7 +1,7 @@
 {
   "name": "azurekiln-qfli-server",
   "version": "1.0.0",
-  "description": "QFLIStudio+ community & online terminal server",
+  "description": "QFLIStudioN community & online terminal server",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {

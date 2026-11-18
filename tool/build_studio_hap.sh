@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 在命令行里打包 QFLIStudio+ 的鸿蒙 HAP（不用 DevEco Studio 图形界面）。
+# 在命令行里打包 QFLIStudioN 的鸿蒙 HAP（不用 DevEco Studio 图形界面）。
 #
 # 用法：
 #   tool/build_studio_hap.sh                 # debug 包（默认，装真机用这一份）

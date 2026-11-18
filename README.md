@@ -1,4 +1,4 @@
-# QFLIStudio+
+# QFLIStudioN
 
 基于 Flutter / Material 3 的轻量级代码编辑器 + 开发者社区。
 

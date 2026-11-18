@@ -1,6 +1,6 @@
 # azurekiln-qfli-server
 
-QFLIStudio+ 社区、云项目、在线终端后端。Node.js >= 22.9，默认 MySQL，可显式选择 SQLite。
+QFLIStudioN 社区、云项目、在线终端后端。Node.js >= 22.9，默认 MySQL，可显式选择 SQLite。
 
 ## 身份和业务数据
 

@@ -106,8 +106,8 @@ class _Spec {
   final String? productTitle;
   final String? packageKey;
 
-  /// `QFLIStudio+ C 版` 里的 `C` 换成这个。
-  String get title => productTitle ?? 'QFLIStudio+ $displayName 版';
+  /// `QFLIStudioN C 版` 里的 `C` 换成这个。
+  String get title => productTitle ?? 'QFLIStudioN $displayName 版';
 
   /// macOS 的 PRODUCT_NAME 不带「版」。
   String get macName => title;
@@ -203,7 +203,7 @@ const List<_Spec> _specs = <_Spec>[
     entryFileNames: ['main.cpp', 'src/main.cpp'],
     runnerClass: 'CppProgramRunner',
     sourceExtensions: ['.cpp', '.cc', '.cxx', '.hpp', '.hh'],
-    description: 'QFLIStudio+ C++ 版：手机上的 C++ IDE，本地解释执行。',
+    description: 'QFLIStudioN C++ 版：手机上的 C++ IDE，本地解释执行。',
     htmlDescription: '手机上的 C++ IDE，本地解释执行。',
     pendingRunner: true,
   ),
@@ -214,7 +214,7 @@ const List<_Spec> _specs = <_Spec>[
     entryFileNames: ['main.lua', 'src/main.lua'],
     runnerClass: 'LuaProgramRunner',
     sourceExtensions: ['.lua'],
-    description: 'QFLIStudio+ Lua 版：手机上的 Lua IDE，本地解释执行。',
+    description: 'QFLIStudioN Lua 版：手机上的 Lua IDE，本地解释执行。',
     htmlDescription: '手机上的 Lua IDE，本地解释执行。',
     pendingRunner: true,
   ),
@@ -228,7 +228,7 @@ const List<_Spec> _specs = <_Spec>[
     // 起一个本地静态服务器并注入调试桥，这里不接管反而是对的。
     runnerClass: null,
     sourceExtensions: ['.html', '.htm'],
-    description: 'QFLIStudio+ Web 版：手机上的网页 IDE，本地静态服务器预览，console 输出回传到编辑器。',
+    description: 'QFLIStudioN Web 版：手机上的网页 IDE，本地静态服务器预览，console 输出回传到编辑器。',
     htmlDescription: '手机上的网页 IDE：本地静态服务器预览，console 输出回传到编辑器。',
     pendingRunner: false,
   ),
@@ -239,7 +239,7 @@ const List<_Spec> _specs = <_Spec>[
     entryFileNames: ['main.py', 'src/main.py'],
     runnerClass: 'PythonProgramRunner',
     sourceExtensions: ['.py'],
-    description: 'QFLIStudio+ Python 版：手机上的 Python IDE，本地解释执行。',
+    description: 'QFLIStudioN Python 版：手机上的 Python IDE，本地解释执行。',
     htmlDescription: '手机上的 Python IDE，本地解释执行。',
     pendingRunner: true,
   ),
@@ -250,7 +250,7 @@ const List<_Spec> _specs = <_Spec>[
     entryFileNames: ['Main.java', 'src/Main.java'],
     runnerClass: 'JavaProgramRunner',
     sourceExtensions: ['.java'],
-    description: 'QFLIStudio+ Java 版：手机上的 Java IDE，本地解释执行。',
+    description: 'QFLIStudioN Java 版：手机上的 Java IDE，本地解释执行。',
     htmlDescription: '手机上的 Java IDE，本地解释执行。',
     pendingRunner: true,
   ),
@@ -261,7 +261,7 @@ const List<_Spec> _specs = <_Spec>[
     entryFileNames: ['main.dart', 'src/main.dart'],
     runnerClass: 'DartProgramRunner',
     sourceExtensions: ['.dart'],
-    description: 'QFLIStudio+ Dart 版：手机上的 Dart IDE，本地解释执行。',
+    description: 'QFLIStudioN Dart 版：手机上的 Dart IDE，本地解释执行。',
     htmlDescription: '手机上的 Dart IDE，本地解释执行。',
     pendingRunner: true,
   ),
@@ -482,8 +482,8 @@ int _copyTree(Directory from, Directory to) {
 ///
 /// 用「全局文本替换 + 长串优先」而不是逐文件逐字段改：平台工程里有太多地方
 /// 顺手写死了包名和产品名（包括注释），逐个列举必然漏。长串优先是为了让
-/// `qfli_c_runtime` 先于 `qfli_c` 被替换、`QFLIStudio+ C 版` 先于
-/// `QFLIStudio+ C`。
+/// `qfli_c_runtime` 先于 `qfli_c` 被替换、`QFLIStudioN C 版` 先于
+/// `QFLIStudioN C`。
 void _brand(_Spec spec, Directory dest) {
   final replacements = <String, String>{
     // 越长的键越先替换。
@@ -491,9 +491,9 @@ void _brand(_Spec spec, Directory dest) {
     'com.example.qflistudio.c': spec.androidAppId,
     'com.azurekiln.qfli.c': spec.ohosBundleName,
     'QFLIForge': spec.title,
-    r'QFLIStudio+ C \u7248': spec.cppEscapedTitle,
-    'QFLIStudio+ C 版': spec.title,
-    'QFLIStudio+ C': spec.macName,
+    r'QFLIStudioN C \u7248': spec.cppEscapedTitle,
+    'QFLIStudioN C 版': spec.title,
+    'QFLIStudioN C': spec.macName,
     'qfli_c_runtime': spec.runtimePackage,
     'qfli_c': 'qfli_${spec.id}',
     // web/index.html 里的描述句子带语言名，单独换掉（只换后缀句，

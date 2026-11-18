@@ -347,7 +347,7 @@ jobs:
         run: |
           temp="$(cygpath -m "$RUNNER_TEMP")"
           version="$(bash tool/ci/app_version.sh)"
-          package_base="QFLIStudio-$version-windows-$ARCH"
+          package_base="QFLIStudioN-$version-windows-$ARCH"
           work="$temp/package"
           package_dir="$work/$package_base"
           rm -rf "$work"
@@ -566,7 +566,7 @@ jobs:
             echo
             echo "[Download app-windows-$ARCH]($ARTIFACT_URL)"
             echo
-            echo "Contents: QFLIStudio-$APP_VERSION-windows-$ARCH-setup.exe, -portable.zip,"
+            echo "Contents: QFLIStudioN-$APP_VERSION-windows-$ARCH-setup.exe, -portable.zip,"
             echo 'BUILD_INFO.txt, SHA256SUMS and LICENSE.'
             echo
             echo "Signing: $SIGNING_STATE. The MSVC runtime is bundled from redistributable $VC_REDIST_VERSION."
@@ -896,7 +896,7 @@ jobs:
           version="$(bash tool/ci/app_version.sh)"
           app_name="$(basename "$MAC_APP")"
           work="$RUNNER_TEMP/dmg"
-          dmg="$work/QFLIStudio-$version-macos-$ARCH.dmg"
+          dmg="$work/QFLIStudioN-$version-macos-$ARCH.dmg"
           rm -rf "$work"
           mkdir -p "$work/staging" "$work/mount"
 
@@ -907,7 +907,7 @@ jobs:
           # hdiutil sometimes fails with "Resource busy" on hosted runners.
           created=0
           for attempt in 1 2 3; do
-            if hdiutil create -volname "QFLIStudio+" -srcfolder "$work/staging" \
+            if hdiutil create -volname "QFLIStudioN" -srcfolder "$work/staging" \
               -ov -format UDZO "$dmg"; then
               created=1
               break
@@ -972,11 +972,11 @@ jobs:
             echo
             echo "[Download app-macos-$ARCH]($ARTIFACT_URL)"
             echo
-            echo "Contents: QFLIStudio-$APP_VERSION-macos-$ARCH.dmg, BUILD_INFO.txt, SHA256SUMS and LICENSE."
+            echo "Contents: QFLIStudioN-$APP_VERSION-macos-$ARCH.dmg, BUILD_INFO.txt, SHA256SUMS and LICENSE."
             echo
             echo 'Signing: ad-hoc signature, not notarized. Gatekeeper blocks the first launch.'
             echo 'Allow the app in System Settings > Privacy & Security, or run:'
-            echo 'xattr -dr com.apple.quarantine /Applications/QFLIStudio+.app'
+            echo 'xattr -dr com.apple.quarantine /Applications/QFLIStudioN.app'
             echo 'Retention: 14 days.'
             echo "Validation: every Mach-O in the bundle is $ARCH only, the bundle ID, the embedded"
             echo 'frameworks, the ad-hoc signature and the DMG contents.'
@@ -1066,7 +1066,7 @@ jobs:
         run: |
           version="$(bash tool/ci/app_version.sh)"
           work="$RUNNER_TEMP/ipa"
-          ipa="$work/QFLIStudio-$version-ios-unsigned.ipa"
+          ipa="$work/QFLIStudioN-$version-ios-unsigned.ipa"
           rm -rf "$work"
           mkdir -p "$work/Payload"
           ditto build/ios/iphoneos/Runner.app "$work/Payload/Runner.app"
@@ -1103,7 +1103,7 @@ jobs:
             echo
             echo "[Download app-ios-arm64]($ARTIFACT_URL)"
             echo
-            echo "Contents: QFLIStudio-$APP_VERSION-ios-unsigned.ipa, BUILD_INFO.txt, SHA256SUMS and LICENSE."
+            echo "Contents: QFLIStudioN-$APP_VERSION-ios-unsigned.ipa, BUILD_INFO.txt, SHA256SUMS and LICENSE."
             echo
             echo 'Signing: unsigned. The IPA does not install as it is. Re-sign it with your own'
             echo 'Apple certificate and provisioning profile before installing.'
@@ -1335,7 +1335,7 @@ jobs:
             "armeabi-v7a:app-armeabi-v7a-release.apk" \
             "arm64-v8a:app-arm64-v8a-release.apk"; do
             abi="${pair%%:*}"
-            package_name="QFLIStudio-$version-android-$abi.apk"
+            package_name="QFLIStudioN-$version-android-$abi.apk"
             mkdir -p "$RUNNER_TEMP/package"
             cp "$APK_DIR/${pair#*:}" "$RUNNER_TEMP/package/$package_name"
             {
@@ -1391,7 +1391,7 @@ jobs:
             echo "| armeabi-v7a | [app-android-armeabi-v7a]($URL_ARMEABI_V7A) |"
             echo "| arm64-v8a | [app-android-arm64-v8a]($URL_ARM64_V8A) |"
             echo
-            echo "Contents: QFLIStudio-$APP_VERSION-android-<abi>.apk per artifact, plus BUILD_INFO.txt,"
+            echo "Contents: QFLIStudioN-$APP_VERSION-android-<abi>.apk per artifact, plus BUILD_INFO.txt,"
             echo 'SHA256SUMS and LICENSE.'
             echo
             echo "Signing: $SIGNING_STATE."
@@ -1715,7 +1715,7 @@ jobs:
 
       - name: Stage the OHOS package
         run: |
-          package_name="QFLIStudio-$APP_VERSION-ohos-arm64-unsigned.hap"
+          package_name="QFLIStudioN-$APP_VERSION-ohos-arm64-unsigned.hap"
           mkdir -p "$RUNNER_TEMP/package"
           cp "$HAP_PATH" "$RUNNER_TEMP/package/$package_name"
           extra="$RUNNER_TEMP/ohos-build-info.txt"
