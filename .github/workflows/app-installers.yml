@@ -976,7 +976,7 @@ jobs:
             echo
             echo 'Signing: ad-hoc signature, not notarized. Gatekeeper blocks the first launch.'
             echo 'Allow the app in System Settings > Privacy & Security, or run:'
-            echo 'xattr -dr com.apple.quarantine /Applications/qflistudio.app'
+            echo 'xattr -dr com.apple.quarantine /Applications/QFLIStudio+.app'
             echo 'Retention: 14 days.'
             echo "Validation: every Mach-O in the bundle is $ARCH only, the bundle ID, the embedded"
             echo 'frameworks, the ad-hoc signature and the DMG contents.'

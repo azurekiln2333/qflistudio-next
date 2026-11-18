@@ -88,7 +88,7 @@ EOF
 cat > "$deb_root/usr/share/applications/$application_id.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=QFLIStudio
+Name=QFLIStudio+
 Comment=IDE for many languages, built with Flutter
 Exec=$package_name
 Icon=$application_id

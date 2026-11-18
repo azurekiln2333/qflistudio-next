@@ -7,7 +7,7 @@
 ;
 ; Paths resolve from this file, not from the working directory. ASCII only.
 
-#define AppName "QFLIStudio"
+#define AppName "QFLIStudio+"
 #define AppPublisher "azurekiln2333"
 #define AppURL "https://github.com/azurekiln2333/qflistudio-next"
 #define AppExeName "qflistudio.exe"
