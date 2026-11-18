@@ -38,7 +38,9 @@ void main() {
       debugDefaultTargetPlatformOverride = previousPlatform;
     });
     StudioProfile.current = qfliStudioProfile;
-    debugDefaultTargetPlatformOverride = TargetPlatform.ohos;
+    // Resolved by name: `TargetPlatform.ohos` exists only on the OHOS Flutter
+    // fork, and this test file must also compile on official Flutter.
+    debugDefaultTargetPlatformOverride = TargetPlatform.values.byName('ohos');
     expect(ClientPlatform.header, 'harmonyos-app/$versionName');
   });
 }

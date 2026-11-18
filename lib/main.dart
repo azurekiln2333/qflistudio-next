@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:qfli_studio_core/app.dart';
+import 'package:qfli_studio_core/config/ohos_platform.dart';
 import 'package:qfli_studio_core/services/project_templates.dart';
 import 'package:qfli_studio_core/interop/interop_runner.dart';
 import 'package:qfli_studio_core/interop/interop_background_transport.dart';
@@ -62,7 +63,7 @@ final StudioProfile qfliStudioProfile = StudioProfile(
 
 Future<void> main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
-  final nativeStartup = !kIsWeb && defaultTargetPlatform == TargetPlatform.ohos;
+  final nativeStartup = isOhosPlatform;
   if (nativeStartup) binding.deferFirstFrame();
   StudioProfile.current = qfliStudioProfile;
   final store = ProjectStore();
