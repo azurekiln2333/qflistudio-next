@@ -74,7 +74,7 @@ env:
   OHOS_NODE_VERSION: "24.14.1"
   # Bumped in the same commit as pubspec.yaml, so the OHOS artifact name and
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
-  APP_VERSION: "5.0.3"
+  APP_VERSION: "5.0.4"
   APP_ID: com.azurekiln.qflistudio
   OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
   ANDROID_NDK_VERSION: "27.0.12077973"
