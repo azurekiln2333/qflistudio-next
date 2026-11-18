@@ -69,8 +69,8 @@ env:
   # repositories are checked out as siblings inside the workspace.
   OHOS_TOOLS_VERSION: "26.0.0.821"
   OHOS_API_LEVEL: "26"
-  OHOS_FLUTTER_VERSION: "3.27.5-ohos-1.0.1"
-  OHOS_FLUTTER_COMMIT: "12587c79e88aacf3172a84e536f226457d037594"
+  OHOS_FLUTTER_VERSION: "3.41.10-ohos-1.0.1"
+  OHOS_FLUTTER_COMMIT: "adaf911c35c9136a7d18fc424d714c9ec7724e60"
   OHOS_NODE_VERSION: "24.14.1"
   # Bumped in the same commit as pubspec.yaml, so the OHOS artifact name and
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
@@ -163,6 +163,7 @@ jobs:
           core-ref: ${{ inputs.core_ref || 'main' }}
           cache-scope: windows-${{ matrix.arch }}
           desktop-platforms: windows
+          patch-upstream-core: "true"
 
       # bin/flutter is the bash entry point. On a MINGW arm64 host its
       # bin/internal/update_dart_sdk.sh takes the "MINGW* | MSYS* )" branch,
@@ -608,6 +609,7 @@ jobs:
           core-ref: ${{ inputs.core_ref || 'main' }}
           cache-scope: linux-${{ matrix.arch }}
           desktop-platforms: linux
+          patch-upstream-core: "true"
 
       - name: Install Linux desktop build tools
         run: |
@@ -800,6 +802,7 @@ jobs:
           core-ref: ${{ inputs.core_ref || 'main' }}
           cache-scope: macos-${{ matrix.arch }}
           desktop-platforms: macos
+          patch-upstream-core: "true"
 
       - name: Show the Apple toolchain
         run: |
@@ -1000,11 +1003,13 @@ jobs:
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
           core-ref: ${{ inputs.core_ref || 'main' }}
           cache-scope: ios
+          patch-upstream-core: "true"
 
       - name: Build the iOS release app
         run: |
-          bash tool/ci/run_logged.sh "flutter build ios" \
-            flutter build ios --release --no-codesign
+          CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            bash tool/ci/run_logged.sh "flutter build ios" \
+              flutter build ios --release --no-codesign
 
       - name: Inspect the iOS app
         run: |
@@ -1126,6 +1131,7 @@ jobs:
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
           core-ref: ${{ inputs.core_ref || 'main' }}
           cache-scope: android
+          patch-upstream-core: "true"
 
       - name: Select JDK 17 and install the pinned Android build tools
         run: |
@@ -1179,7 +1185,7 @@ jobs:
       - name: Build the split release APKs
         run: |
           bash tool/ci/run_logged.sh "flutter build apk" \
-            flutter build apk --release --split-per-abi \
+            flutter build apk --release --android-skip-build-dependency-validation --split-per-abi \
             --target-platform android-arm,android-arm64,android-x64
           ls -l "$APK_DIR"
 
@@ -1525,6 +1531,7 @@ jobs:
           flutter-mode: ohos
           core-ref: ${{ inputs.core_ref || 'main' }}
           cache-scope: ohos
+          patch-upstream-core: "false"
 
       # hvigorw resolves its interpreter in this order, read from the wrapper
       # shipped in the command-line tools and from hvigorw.bat:

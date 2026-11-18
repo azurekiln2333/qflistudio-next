@@ -26,6 +26,10 @@ inputs:
     description: Comma separated desktop platforms to enable, for example windows,macos.
     required: false
     default: ""
+  patch-upstream-core:
+    description: Remove OHOS-only Dart APIs from the shared core for upstream Flutter jobs.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -65,6 +69,12 @@ runs:
           echo "QFLI_FLUTTER_MODE=$FLUTTER_MODE"
           echo "QFLI_CORE_COMMIT=$(git -C ../qfli_studio_core rev-parse HEAD)"
         } >> "$GITHUB_ENV"
+
+    - name: Patch shared core for upstream Flutter
+      if: inputs.patch-upstream-core == 'true'
+      shell: bash
+      working-directory: qflistudio
+      run: bash tool/ci/patch_upstream_core.sh "$PWD" ../qfli_studio_core
 
     - name: Resolve Dart packages
       shell: bash
