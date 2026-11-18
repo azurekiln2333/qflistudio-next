@@ -1,4 +1,4 @@
-package com.azurekiln.qfli.qflistudio
+package com.azurekiln.qflistudio
 
 import io.flutter.embedding.android.FlutterActivity
 

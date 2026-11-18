@@ -11,7 +11,7 @@ plugins {
 }
 
 extensions.configure<ApplicationExtension> {
-    namespace = "com.azurekiln.qfli.qflistudio"
+    namespace = "com.azurekiln.qflistudio"
     compileSdk = flutter.compileSdkVersion
     // flutter_ohos 默认 NDK 28.2 在本机下载解压失败；钉到已完整安装的 27.0。
     ndkVersion = "28.2.13676358"
@@ -30,8 +30,7 @@ extensions.configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.azurekiln.qfli.qflistudio"
+        applicationId = "com.azurekiln.qflistudio"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
