@@ -1,3 +1,8 @@
+import com.android.build.api.dsl.ApplicationExtension
+import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,7 +10,7 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-android {
+extensions.configure<ApplicationExtension> {
     namespace = "com.azurekiln.qfli.qflistudio"
     compileSdk = flutter.compileSdkVersion
     // flutter_ohos 默认 NDK 28.2 在本机下载解压失败；钉到已完整安装的 27.0。
@@ -14,10 +19,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
@@ -37,6 +38,12 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+}
+
+extensions.configure<KotlinAndroidProjectExtension> {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 

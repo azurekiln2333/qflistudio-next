@@ -320,7 +320,9 @@ jobs:
           fi
 
           # dumpbin accepts dash switches; Git Bash would rewrite slash switches.
-          for binary in "$APP_EXE" flutter_windows.dll data/app.so; do
+          # data/app.so is an ELF AOT snapshot, not a PE image. The executable
+          # and Windows Flutter DLL carry the Windows COFF machine field.
+          for binary in "$APP_EXE" flutter_windows.dll; do
             report="$temp/pe-headers-$(basename "$binary").txt"
             "$DUMPBIN" -nologo -headers "$RELEASE_DIR/$binary" | tr -d '\r' > "$report"
             actual="$(sed -n 's/^ *\([0-9A-Fa-f]\{4\}\) machine (\([^)]*\)).*/\1/p' "$report" | sed -n '1p')"
