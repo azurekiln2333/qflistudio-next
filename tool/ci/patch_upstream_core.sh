@@ -1,56 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# The shared core also contains the HarmonyOS build. The OHOS Flutter fork
-# adds TargetPlatform.ohos and OhosView, but upstream Flutter does not.
-# Keep the OHOS implementation for the OHOS job and remove only those
-# references from the copies used by the upstream jobs.
+# The shared core is compiled twice: by the OHOS Flutter fork for the HarmonyOS
+# job, and by official Flutter for every other job. Official Flutter has no
+# `TargetPlatform.ohos` and no `OhosView`, so the two must not appear in the
+# Dart sources of the official copy.
+#
+# They no longer do, except in one file: the Huawei one-tap login view embeds a
+# native ArkTS platform view and cannot avoid `OhosView`. This script replaces
+# that single widget with an inert stub and then proves the rest of the tree is
+# free of fork-only API, so a new reference fails the build here instead of
+# surfacing as a compile error halfway through the job.
 
 app_dir=${1:?usage: patch_upstream_core.sh APP_DIR CORE_DIR}
 core_dir=${2:?usage: patch_upstream_core.sh APP_DIR CORE_DIR}
 
-python3 - "$app_dir" "$core_dir" <<'PY'
+# Windows runners expose `python`, Linux and macOS runners `python3`, and a
+# Windows logon can shadow `python3` with a non-functional App Execution Alias.
+# Probe each candidate instead of trusting `command -v`.
+python_bin=${PYTHON:-}
+if [ -z "$python_bin" ]; then
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1 &&
+      "$candidate" -c 'import sys; sys.exit(0 if sys.version_info[0] == 3 else 1)' \
+        >/dev/null 2>&1; then
+      python_bin=$candidate
+      break
+    fi
+  done
+fi
+if [ -z "$python_bin" ]; then
+  echo "::error::python 3 was not found on this runner." >&2
+  exit 1
+fi
+
+"$python_bin" - "$app_dir" "$core_dir" <<'PY'
 from pathlib import Path
 import sys
 
 app = Path(sys.argv[1])
 core = Path(sys.argv[2])
-
-def replace(path: Path, old: str, new: str) -> None:
-    text = path.read_text(encoding="utf-8")
-    if old not in text:
-        raise SystemExit(f"expected compatibility text is missing: {path}")
-    path.write_text(text.replace(old, new), encoding="utf-8")
-
-replace(app / "lib/main.dart",
-        "  final nativeStartup = !kIsWeb && defaultTargetPlatform == TargetPlatform.ohos;",
-        "  final nativeStartup = false;")
-replace(core / "lib/config/client_platform.dart",
-        "    TargetPlatform.ohos => 'harmonyos',\n", "")
-replace(core / "lib/interop/interop_transport.dart",
-        "    TargetPlatform.ohos,\n", "")
-replace(core / "lib/terminal/shell/local_shell_io.dart",
-        "    case TargetPlatform.ohos:\n", "")
-replace(core / "lib/services/app_private_roots.dart",
-        "      TargetPlatform.ohos ||\n", "")
-replace(core / "lib/terminal/widgets/terminal_input.dart",
-        "      !kIsWeb && defaultTargetPlatform == TargetPlatform.ohos;",
-        "      false;")
-replace(core / "vendor/re_editor/lib/src/_consts.dart",
-        "    !kIsWeb && defaultTargetPlatform == TargetPlatform.ohos;",
-        "    false;")
-replace(core / "lib/pages/auth/login_page.dart",
-        "    final isOhos = defaultTargetPlatform == TargetPlatform.ohos;",
-        "    final isOhos = false;")
-replace(core / "lib/interop/interop_background_transport.dart",
-        "  bool get isSupported => defaultTargetPlatform == TargetPlatform.ohos;",
-        "  bool get isSupported => false;")
-replace(core / "lib/editor/editor_page.dart",
-        "    if (defaultTargetPlatform != TargetPlatform.ohos ||\n",
-        "    if (true ||\n")
-replace(core / "lib/pages/auth/agreement_page.dart",
-        "    if (kIsWeb || defaultTargetPlatform != TargetPlatform.ohos) {",
-        "    if (true) {")
 
 # Keep the public widget API while replacing the OHOS-only platform view.
 huawei = core / "lib/pages/auth/huawei_quick_login_view.dart"
@@ -72,6 +61,31 @@ class HuaweiQuickLoginView extends StatelessWidget {
   Widget build(BuildContext context) => const SizedBox.shrink();
 }
 """, encoding="utf-8")
+
+# Names that exist only on the OHOS Flutter fork.
+FORBIDDEN = ("TargetPlatform.ohos", "OhosView")
+roots = [app / "lib", core / "lib", core / "vendor/re_editor/lib"]
+allowlist = {(core / "lib/pages/auth/huawei_quick_login_view.dart").resolve()}
+
+offenders = []
+for root in roots:
+    if not root.is_dir():
+        raise SystemExit(f"::error::source directory is missing: {root}")
+    for path in sorted(root.rglob("*.dart")):
+        if path.resolve() in allowlist:
+            continue
+        for number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            for name in FORBIDDEN:
+                if name in line:
+                    offenders.append(f"{path}:{number}: {name}: {line.strip()}")
+
+if offenders:
+    print("::error::OHOS-only API is left in a copy built by official Flutter.")
+    for offender in offenders:
+        print(f"::error::{offender}")
+    raise SystemExit(1)
 
 print("Patched upstream Flutter copy to exclude OHOS-only Dart APIs.")
 PY
