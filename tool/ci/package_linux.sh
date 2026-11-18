@@ -33,7 +33,7 @@ case "$arch" in
 esac
 
 binary_name="qflistudio"
-application_id="com.azurekiln.qfli.qflistudio"
+application_id="com.azurekiln.qflistudio"
 package_name="qflistudio"
 install_dir="/opt/$package_name"
 version="$(bash "$root/tool/ci/app_version.sh")"
