@@ -88,7 +88,7 @@ function notification(session: BackgroundSession, text: string, terminal: boolea
       wantAgent: agent,
       content: {
         contentType: notificationTypes.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
-        normal: { title: 'QFLIStudio · Java 后台运行', text: text },
+        normal: { title: 'QFLIStudio+ · Java 后台运行', text: text },
       },
     });
   });
@@ -113,7 +113,7 @@ function notification(session: BackgroundSession, text: string, terminal: boolea
  */
 function reserveSenderAllowance(session: BackgroundSession): void {
   try {
-    const allowance = backgroundTaskManager.requestSuspendDelay('QFLIStudio 等待跨应用运行结果', () => {
+    const allowance = backgroundTaskManager.requestSuspendDelay('QFLIStudio+ 等待跨应用运行结果', () => {
       // An expiring allowance is not a run outcome. The terminal frame decides.
       trace('allowance_expired');
     });
