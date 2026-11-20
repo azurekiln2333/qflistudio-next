@@ -14,6 +14,7 @@ import 'package:qfli_studio_core/store/project_store.dart';
 import 'package:qfli_studio_core/store/settings_store.dart';
 
 import 'content/studio_content_repository.dart';
+import 'studio_tools_tab.dart';
 
 final StudioProfile qfliStudioProfile = StudioProfile(
   id: StudioProductCatalog.qfliStudioKey,
@@ -31,6 +32,9 @@ final StudioProfile qfliStudioProfile = StudioProfile(
   // 主 App 的本地教程/示例读取 assets/content/ 下由
   // tool/generate_studio_content.dart 组合的各产品权威课程。
   contentRepositoryFactory: () => StudioContentRepository(),
+  // 主 App 的功能页在共享内核的默认内容上增加一个「远程电脑」入口。
+  // 离线语言产品不设置这个构建器，因此看不到该在线入口。
+  toolsTabBuilder: buildStudioToolsTab,
   supportedFileExtensions: [
     '.c',
     '.h',
