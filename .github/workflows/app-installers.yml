@@ -2199,7 +2199,7 @@ jobs:
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
             printf '%s\n' 'The packaged sidecar passed fresh configuration, a LAN-address pairing link and phone request/reply checks over loopback.'
             printf '%s\n' 'Includes the remote computer module, the integrated thinking-stream UI and the Studio Git plugin UI.'
-            printf '%s\n' 'Every installer carries the same pinned qfli_git revision and API 2 native libraries; the plugin commit is recorded in each BUILD_INFO.txt.'
+            printf '%s\n' 'Every installer records the same pinned qfli_git revision in BUILD_INFO.txt. Android, iOS and OHOS packages are checked for API 2 exports and the CA bundle. Desktop Git uses the installed Git CLI.'
             printf '%s\n' 'Cloud-built preview. No physical-device validation.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'
