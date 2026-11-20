@@ -90,6 +90,11 @@ the Windows assistant build and every main app installer target. It checks
 each artifact's version, source revisions, SDK and checksums before publishing.
 Never substitute old artifacts for a failed job in the tagged run.
 
+Download the single assistant artifact with an exact `name` and a full named
+destination path. The pinned download action extracts a single pattern match
+directly into `path`, even when `merge-multiple` is false. Do not assume the
+artifact-name subdirectory used for multiple matches also exists for one match.
+
 The portable Windows assistant carries Node, MSVC DLLs and locked production
 agent dependencies. `Start-QFLI-Remote.cmd` sets `CLOUDTERMINAL_NODE` and
 `CLOUDTERMINAL_AGENT_DIR`. Packaging runs both the scripted protocol E2E and

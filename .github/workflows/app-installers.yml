@@ -2000,9 +2000,8 @@ jobs:
       - name: Download this run's portable Windows assistant
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          pattern: qfli-remote-assistant-${{ env.APP_VERSION }}-windows-x64
-          path: companions
-          merge-multiple: false
+          name: qfli-remote-assistant-${{ env.APP_VERSION }}-windows-x64
+          path: companions/qfli-remote-assistant-${{ env.APP_VERSION }}-windows-x64
 
       - name: Check all eleven artifacts and package release assets
         env:
@@ -2105,12 +2104,13 @@ jobs:
             printf 'Java receiver commit (contract checks): %s\n\n' "$JAVA_REF"
             printf '%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
-            printf '%s\n' 'The packaged sidecar also passed fresh configuration, LAN pairing and phone request/reply checks.'
+            printf '%s\n' 'The packaged sidecar passed fresh configuration, a LAN-address pairing link and phone request/reply checks over loopback.'
             printf '%s\n' 'Includes the remote computer module and integrated thinking-stream UI. The Studio Git plugin UI is not integrated.'
             printf '%s\n' 'Cloud-built preview. No physical-device validation.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'
             printf '%s\n' 'The Windows x64 remote assistant includes Node.js and agent dependencies. Extract its ZIP and open Start-QFLI-Remote.cmd.'
+            printf '%s\n' 'On the assistant Pairing page, read the relay address and short code. In Studio, open Tools > Remote Computer > Enter short code, enter both values, and connect. Camera scanning is not implemented.'
             printf '\nWorkflow: %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
           } > release-notes.md
           gh release create "$RELEASE_TAG" release-assets/* \
