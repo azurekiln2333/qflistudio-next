@@ -38,6 +38,15 @@ inputs:
 runs:
   using: composite
   steps:
+    # plugin_provenance.py and the plugin's Python checks need hashlib.file_digest
+    # (Python 3.11 or newer). The Ubuntu 22.04 OHOS and Linux runners ship
+    # python3 3.10, so the toolchain is pinned here for every job that uses this
+    # composite instead of relying on the system interpreter.
+    - name: Set up the pinned Python toolchain
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version: '3.13'
+
     - name: Check out shared core
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
@@ -109,3 +118,24 @@ runs:
           echo "::warning::flutter pub get changed pubspec.lock on the runner"
           git --no-pager diff --stat -- pubspec.lock
         fi
+
+    # The app reaches qfli_git through the shared core. Record the resolved
+    # commit and native lock in every build job. Package jobs and publication
+    # require complete facts; this step stays tolerant so a temporary pin still
+    # produces an analysable build instead of hiding the real compile error.
+    - name: Record the pinned qfli_git revision
+      shell: bash
+      working-directory: qflistudio
+      run: |
+        python_bin="$(command -v python3)"
+        if [ -z "$python_bin" ]; then
+          echo "::error::python 3 was not found on this runner."
+          exit 1
+        fi
+        "$python_bin" -c 'import sys; print("python " + sys.version.split()[0])'
+        if ! "$python_bin" -c 'import hashlib; hashlib.file_digest'; then
+          echo "::error::$python_bin is older than 3.11; setup-python did not take effect."
+          exit 1
+        fi
+        "$python_bin" tool/ci/plugin_provenance.py --write-env "$GITHUB_ENV"
+        "$python_bin" tool/ci/plugin_provenance.py

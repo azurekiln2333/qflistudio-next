@@ -84,7 +84,7 @@ The complete app/core suites use the OHOS Flutter fork, with
 enables OHOS generation after installing platform tools. Keep infos visible
 across the different SDK exports; warnings and errors remain fatal.
 
-Only a `v5.0.5-remote.*` tag publishes this preview. Publication waits for the
+A `v5.0.5-remote.*` or `v5.0.5-git.*` tag publishes this preview. Publication waits for the
 app/core suites, Node suites on Windows/Linux, the Java receiver host tests,
 the Windows assistant build and every main app installer target. It checks
 each artifact's version, source revisions, SDK and checksums before publishing.
@@ -105,3 +105,63 @@ Android preview APKs use a debug certificate. Windows is unsigned, macOS uses
 ad-hoc signing, and iOS/OHOS require signing before installation. Cloud host
 tests do not establish device or live-provider acceptance. Do not include
 developer identities or local signing material in any preview artifact.
+
+## 10. Git plugin release contract
+
+### Scope / Trigger
+
+Apply this contract when changing `qfli_git`, its Core dependency pin, native
+payloads, or installer provenance. The App consumes the plugin through Core.
+
+### Signatures
+
+- `plugin_provenance.py --write-env <file>` records the resolved plugin facts.
+- `plugin_provenance.py --require-release-ready` rejects incomplete imports.
+- `check_git_payload.py --platform <android|ios|ohos> --archive <package>`
+  accepts `--abi`, `--contract`, `--lock`, `--plugin-root`, and `--nm`.
+
+### Contracts
+
+The plugin lock uses schema 2 and API 2. All three platform source commits must
+match its full `source.commit`. Import all three native artifacts in one command.
+Core pins the artifact commit, and the App workflow pins the resulting Core
+commit. A source commit with old checked-in binaries is an interim pin only.
+
+The shared setup installs Python 3.13 before provenance checks; system Python
+3.10 lacks `hashlib.file_digest`. Each installer records `plugin_commit`,
+`plugin_native_source`, `plugin_native_release`, `plugin_native_api_version`,
+`plugin_cacert_sha256`, and `plugin_pending=0` in `BUILD_INFO.txt`.
+
+The plugin checkout verifies native bytes against its lock. APK/HAP/IPA checks
+verify ABI, exported symbols, and the exact packaged CA digest. Packaging can
+strip Android libraries or codesign iOS frameworks, so a packed binary hash
+is recorded but is not required to equal the imported binary hash.
+
+### Validation & Error Matrix
+
+| Condition | Required result |
+| --- | --- |
+| Missing native files, wrong API, divergent source, or changed hash | Stop staging. |
+| Packed library, required export, or CA missing | Fail the package job. |
+| Unresolved plugin facts or different installer pins | Refuse publication. |
+| Windows CRLF conversion affects a fingerprinted file | Keep LF via plugin attributes. |
+
+### Good / Base / Bad Cases
+
+- Good: import matching cloud binaries, validate the lock, then pin artifact/Core commits.
+- Base: a source-only run may exercise host FFI while mobile binaries are rebuilt.
+- Bad: tag the App with an interim plugin pin or substitute an earlier installer.
+
+### Tests Required
+
+Cloud runs execute both Python regression files, real plugin FFI tests, the
+complete Core/App suites, platform examples, and the installer matrix. Assert
+unborn history, per-file staging, dirty-buffer refusal, owning-project routing,
+clone cleanup, missing payload/export/CA rejection, and matching provenance.
+User-directed cloud-only validation forbids local test/build execution.
+
+### Wrong vs Correct
+
+Wrong: add project repositories globally to fix Flutter plugin resolution.
+The SDK settings use `FAIL_ON_PROJECT_REPOS`. Correct: add Maven Central only
+to `settings.pluginManagement.repositories` from the CI init script.

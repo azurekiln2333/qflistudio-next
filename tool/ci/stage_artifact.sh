@@ -25,6 +25,35 @@ shift
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 out="$root/build/ci-artifacts/$target"
 
+# A release package may never carry an unknown or pending plugin fact. The
+# facts come from tool/ci/plugin_provenance.py, which fails the job before this
+# script runs when the pinned plugin is incomplete; this guard catches a caller
+# that forgets to export them.
+require_fact() {
+  local name="$1" value="${2:-}"
+  if [ -z "$value" ] || [ "$value" = "unknown" ] || [ "$value" = "pending" ]; then
+    echo "::error::$name is '${value:-empty}'; a release package needs a pinned qfli_git"
+    exit 1
+  fi
+}
+# The collector writes 0 for a complete import and 1 for an interim pin.
+# Default omitted legacy callers to 0; the required facts below still gate them.
+QFLI_PLUGIN_PENDING="${QFLI_PLUGIN_PENDING:-0}"
+require_fact QFLI_PLUGIN_VERSION "${QFLI_PLUGIN_VERSION:-}"
+require_fact QFLI_PLUGIN_COMMIT "${QFLI_PLUGIN_COMMIT:-}"
+require_fact QFLI_PLUGIN_API_VERSION "${QFLI_PLUGIN_API_VERSION:-}"
+require_fact QFLI_PLUGIN_NATIVE_SOURCE "${QFLI_PLUGIN_NATIVE_SOURCE:-}"
+require_fact QFLI_PLUGIN_NATIVE_RELEASE "${QFLI_PLUGIN_NATIVE_RELEASE:-}"
+require_fact QFLI_PLUGIN_CACERT_SHA256 "${QFLI_PLUGIN_CACERT_SHA256:-}"
+if [ "$QFLI_PLUGIN_PENDING" != "0" ]; then
+  echo "::error::QFLI_PLUGIN_PENDING=$QFLI_PLUGIN_PENDING; a release package needs imported native artifacts"
+  exit 1
+fi
+if [ "${QFLI_PLUGIN_API_VERSION}" != "2" ]; then
+  echo "::error::QFLI_PLUGIN_API_VERSION=${QFLI_PLUGIN_API_VERSION}; the app requires API 2"
+  exit 1
+fi
+
 rm -rf "$out"
 mkdir -p "$out"
 
@@ -52,6 +81,14 @@ fi
   echo "flutter_commit=$flutter_commit"
   echo "flutter_mode=${QFLI_FLUTTER_MODE:-unknown}"
   echo "build_mode=release"
+  echo "plugin=qfli_git"
+  echo "plugin_version=$QFLI_PLUGIN_VERSION"
+  echo "plugin_commit=$QFLI_PLUGIN_COMMIT"
+  echo "plugin_native_api_version=$QFLI_PLUGIN_API_VERSION"
+  echo "plugin_native_source=$QFLI_PLUGIN_NATIVE_SOURCE"
+  echo "plugin_native_release=$QFLI_PLUGIN_NATIVE_RELEASE"
+  echo "plugin_cacert_sha256=$QFLI_PLUGIN_CACERT_SHA256"
+  echo "plugin_pending=$QFLI_PLUGIN_PENDING"
   echo "runner=${RUNNER_OS:-$(uname -s)} ${RUNNER_ARCH:-$(uname -m)} ${ImageOS:-}"
   echo "signing=$QFLI_SIGNING"
   echo "device_validation=none"

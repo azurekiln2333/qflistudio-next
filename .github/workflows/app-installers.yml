@@ -82,9 +82,12 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "72c0b0955e4ddd5215dc818327fa5a67a4be22f7"
+  CORE_REF: "a5a2410d56c723a9af8468bfb2eda1f0f8c4f5fe"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
+  # qfli_git C ABI version and Dart binding version. Package jobs reject a
+  # package whose embedded Git payload reports another version.
+  QFLI_GIT_API_VERSION: "2"
   APP_ID: com.azurekiln.qflistudio
   OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
   ANDROID_NDK_VERSION: "27.0.12077973"
@@ -192,6 +195,18 @@ jobs:
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         working-directory: ${{ matrix.directory }}
         run: flutter test --no-pub --reporter json 2>&1 | tee "$RUNNER_TEMP/flutter-test.json"
+
+      # The release helpers must be exercised on a cloud runner: they read a
+      # real pubspec.lock and a real native lock, which cannot be built locally.
+      - name: Test the CI helper scripts
+        if: ${{ !cancelled() && matrix.package == 'app' && steps.dependencies.outcome == 'success' }}
+        working-directory: ${{ matrix.directory }}
+        run: |
+          python3 --version
+          python3 -m unittest discover -s tool/ci -t tool/ci \
+            -p 'test_plugin_provenance.py' -v
+          python3 -m unittest discover -s tool/ci -t tool/ci \
+            -p 'test_check_git_payload.py' -v
 
       - name: Upload verification logs
         if: always()
@@ -1292,6 +1307,16 @@ jobs:
           fi
           ls -l "$ipa"
 
+          # The app graph, the plugin lock and the IPA payload must agree.
+          python3 tool/ci/plugin_provenance.py --require-release-ready
+          python3 tool/ci/check_git_payload.py \
+            --platform ios --archive "$ipa" \
+            --contract "$QFLI_PLUGIN_ROOT/tool/ci/native_contract.json" \
+            --cacert-sha256 "$QFLI_PLUGIN_CACERT_SHA256" \
+            --lock "$QFLI_PLUGIN_ROOT/native_libs.lock.json" \
+            --plugin-root "$QFLI_PLUGIN_ROOT" \
+            --nm /usr/bin/nm
+
           QFLI_SIGNING="$SIGNING_STATE" QFLI_BUILD_INFO_EXTRA="$RUNNER_TEMP/ios-toolchain.txt" \
             bash tool/ci/stage_artifact.sh "$ARTIFACT" "$ipa"
 
@@ -1526,6 +1551,27 @@ jobs:
           print('PASS each libapp.so carries the ELF machine of its ABI')
           PY
           echo "apk_libapp_elf=ELF machine checked for 3 ABIs" >> "$RUNNER_TEMP/apk-inspection.txt"
+
+      - name: Verify qfli_git native payload and provenance
+        run: |
+          # Fail before staging when the pinned plugin, its lock and the Dart
+          # bindings do not describe the same native API revision.
+          python3 tool/ci/plugin_provenance.py --require-release-ready
+          toolchain="$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          for pair in \
+            "x86_64:app-x86_64-release.apk" \
+            "armeabi-v7a:app-armeabi-v7a-release.apk" \
+            "arm64-v8a:app-arm64-v8a-release.apk"; do
+            abi="${pair%%:*}"
+            apk="$APK_DIR/${pair#*:}"
+            python3 tool/ci/check_git_payload.py \
+              --platform android --archive "$apk" --abi "$abi" \
+              --contract "$QFLI_PLUGIN_ROOT/tool/ci/native_contract.json" \
+              --cacert-sha256 "$QFLI_PLUGIN_CACERT_SHA256" \
+              --lock "$QFLI_PLUGIN_ROOT/native_libs.lock.json" \
+              --plugin-root "$QFLI_PLUGIN_ROOT" \
+              --nm "$toolchain/llvm-nm"
+          done
 
       - name: Stage the Android packages
         run: |
@@ -1925,6 +1971,17 @@ jobs:
           print('PASS HAP entries, bundle name, ABI set and AArch64 libraries')
           PY
 
+      - name: Verify qfli_git native payload and provenance
+        run: |
+          python3 tool/ci/plugin_provenance.py --require-release-ready
+          python3 tool/ci/check_git_payload.py \
+            --platform ohos --archive "$HAP_PATH" --abi arm64-v8a \
+            --contract "$QFLI_PLUGIN_ROOT/tool/ci/native_contract.json" \
+            --cacert-sha256 "$QFLI_PLUGIN_CACERT_SHA256" \
+            --lock "$QFLI_PLUGIN_ROOT/native_libs.lock.json" \
+            --plugin-root "$QFLI_PLUGIN_ROOT" \
+            --nm "$HOS_SDK_HOME/native/llvm/bin/llvm-nm"
+
       - name: Stage the OHOS package
         run: |
           package_name="QFLIStudioN-$APP_VERSION-ohos-arm64-unsigned.hap"
@@ -1968,7 +2025,7 @@ jobs:
 
   publish-preview:
     name: Publish verified preview installers
-    if: startsWith(github.ref, 'refs/tags/v5.0.5-remote.')
+    if: startsWith(github.ref, 'refs/tags/v5.0.5-remote.') || startsWith(github.ref, 'refs/tags/v5.0.5-git.')
     needs:
       - resolve-flutter
       - verify-flutter
@@ -2022,6 +2079,7 @@ jobs:
           directories = {path.name: path for path in Path('packages').iterdir()}
           if set(directories) != expected:
               raise SystemExit(f'Artifact set mismatch: {sorted(set(directories) ^ expected)}')
+          plugin_facts: dict[str, str] = {}
           for name, directory in sorted(directories.items()):
               report = directory / 'BUILD_INFO.txt'
               facts = dict(line.split('=', 1) for line in report.read_text().splitlines() if '=' in line)
@@ -2043,7 +2101,42 @@ jobs:
                       raise SystemExit(f'{name}: {key} is {facts.get(key)!r}, expected {value!r}')
               if not facts.get('signing'):
                   raise SystemExit(f'{name}: missing signing state')
+              # Every package must carry a resolved qfli_git: no unknown or
+              # pending facts, API 2 native artifacts, and the same plugin
+              # revision in all eleven targets.
+              plugin = {
+                  'plugin': 'qfli_git',
+                  'plugin_native_api_version': '2',
+                  'plugin_pending': '0',
+              }
+              for key, value in plugin.items():
+                  if facts.get(key) != value:
+                      raise SystemExit(
+                          f'{name}: {key} is {facts.get(key)!r}, expected {value!r}'
+                      )
+              for key in (
+                  'plugin_version', 'plugin_commit', 'plugin_native_source',
+                  'plugin_native_release', 'plugin_cacert_sha256',
+              ):
+                  value = facts.get(key)
+                  if not value or value == 'unknown' or value == 'pending':
+                      raise SystemExit(f'{name}: {key} is unresolved ({value!r})')
+                  if not plugin_facts.setdefault(key, value) == value:
+                      raise SystemExit(
+                          f'{name}: {key} is {value!r}, other packages have '
+                          f'{plugin_facts[key]!r}'
+                      )
               print(f'Provenance verified: {name}')
+          if len(plugin_facts.get('plugin_native_source', '')) != 40:
+              raise SystemExit('plugin_native_source is not a full commit')
+          if len(plugin_facts.get('plugin_commit', '')) != 40:
+              raise SystemExit('plugin_commit is not a full commit')
+          print(
+              'qfli_git ' + plugin_facts['plugin_version']
+              + ' at ' + plugin_facts['plugin_commit'][:12]
+              + ', native ' + plugin_facts['plugin_native_source'][:12]
+              + ', API 2 in all packages'
+          )
           PY
           mkdir -p release-assets
           for dir in packages/*; do
@@ -2105,7 +2198,8 @@ jobs:
             printf '%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
             printf '%s\n' 'The packaged sidecar passed fresh configuration, a LAN-address pairing link and phone request/reply checks over loopback.'
-            printf '%s\n' 'Includes the remote computer module and integrated thinking-stream UI. The Studio Git plugin UI is not integrated.'
+            printf '%s\n' 'Includes the remote computer module, the integrated thinking-stream UI and the Studio Git plugin UI.'
+            printf '%s\n' 'Every installer carries the same pinned qfli_git revision and API 2 native libraries; the plugin commit is recorded in each BUILD_INFO.txt.'
             printf '%s\n' 'Cloud-built preview. No physical-device validation.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'
