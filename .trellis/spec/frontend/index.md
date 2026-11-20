@@ -30,6 +30,7 @@ This directory contains guidelines for frontend development. Fill in each file w
 | [Editor Paging](./editor-paging.md) | Pager retention, update boundaries, font settings | Active |
 | [Authentication](./authentication.md) | MFA-first forms, native agreement reader and request diagnostics | Active |
 | [Project Storage](./project-storage.md) | Language directories, duplicate display names and config metadata | Active |
+| [Local Git UI](./git-ui.md) | Read-only branch cards, retained refresh and keyboard handling | Active |
 | [Repository Layout](./repository-layout.md) | Sibling Git roots, shared package paths, build commands | Active |
 | [Vibe Skills](./vibe-skills.md) | Skill discovery order, prompt index, body caps | Draft |
 | [AI Protocols](./ai-protocols.md) | Three endpoint protocols, one tool-call shape, endpoint joining | Draft |
