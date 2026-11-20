@@ -1348,6 +1348,180 @@ jobs:
             echo 'Validation: the arm64 slice, the bundle ID and the embedded frameworks.'
           } >> "$GITHUB_STEP_SUMMARY"
 
+  # Validate committed plugin payloads with production Flutter: the plugin's
+  # integration test runs here on the same Flutter version and the same plugin
+  # commit that the app release carries.
+  git-ios-integration:
+    name: Studio Git iOS integration test
+    needs: resolve-flutter
+    runs-on: macos-15
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      # Upstream Flutter and the same core ref as the iOS release job, so the
+      # test runs on the production SDK of the tagged release.
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
+          cache-scope: git-ios-integration
+          patch-upstream-core: 'true'
+
+      # app-setup records the qfli_git revision that pubspec.lock resolves.
+      - name: Assert the fixture ref is the released plugin commit
+        env:
+          PLUGIN_COMMIT: ${{ env.QFLI_PLUGIN_COMMIT }}
+          EXPECTED_FLUTTER: ${{ needs.resolve-flutter.outputs.version }}
+        run: |
+          if ! printf '%s' "$PLUGIN_COMMIT" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::QFLI_PLUGIN_COMMIT is '$PLUGIN_COMMIT', expected the pinned plugin commit"
+            exit 1
+          fi
+          if [ "$QFLI_FLUTTER_VERSION" != "$EXPECTED_FLUTTER" ]; then
+            echo "::error::Flutter is '$QFLI_FLUTTER_VERSION', expected $EXPECTED_FLUTTER"
+            exit 1
+          fi
+          echo "qfli_git $QFLI_PLUGIN_VERSION at $PLUGIN_COMMIT on Flutter $QFLI_FLUTTER_VERSION"
+
+      # A workspace clone of exactly that commit: the pub cache is untouched and
+      # the example resolves the plugin through its path dependency.
+      - name: Check out the released plugin commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: azurekiln2333/qflistudio-git
+          ref: ${{ env.QFLI_PLUGIN_COMMIT }}
+          path: qfli_git_fixture
+          persist-credentials: false
+
+      - name: Verify the fixture is that exact commit
+        env:
+          PLUGIN_COMMIT: ${{ env.QFLI_PLUGIN_COMMIT }}
+        working-directory: qfli_git_fixture
+        run: |
+          head_commit="$(git rev-parse HEAD)"
+          if [ "$head_commit" != "$PLUGIN_COMMIT" ]; then
+            echo "::error::fixture HEAD is $head_commit, expected $PLUGIN_COMMIT"
+            exit 1
+          fi
+          echo "PASS fixture HEAD $head_commit"
+
+      - name: Check the fixture native lock
+        working-directory: qfli_git_fixture
+        run: |
+          python3 tool/ci/check_native_install.py \
+            --repo-root . \
+            --contract tool/ci/native_contract.json
+
+      - name: Resolve the example packages
+        working-directory: qfli_git_fixture/example
+        run: bash ../tool/ci/run_annotated.sh example-pub-get flutter pub get
+
+      - name: Boot an iPhone simulator
+        run: |
+          xcrun simctl list devices available -j > "$RUNNER_TEMP/simulators.json"
+          python3 - "$RUNNER_TEMP/simulators.json" "$RUNNER_TEMP/simulator-choice.txt" <<'PY'
+          import json
+          import sys
+
+          devices = json.load(open(sys.argv[1], encoding='utf-8'))['devices']
+          chosen = None
+          for runtime in sorted(devices, reverse=True):
+              if 'iOS' not in runtime:
+                  continue
+              for item in devices[runtime]:
+                  if item.get('isAvailable') and item['name'].startswith('iPhone'):
+                      chosen = (runtime, item['name'], item['udid'])
+                      break
+              if chosen:
+                  break
+          if chosen is None:
+              raise SystemExit('no available iPhone simulator runtime')
+          runtime, name, udid = chosen
+          print(f'ios_runtime={runtime}')
+          print(f'ios_simulator={name}')
+          print(f'ios_udid={udid}')
+          with open(sys.argv[2], 'w', encoding='utf-8') as stream:
+              # The trailing newline matters: `read` returns non-zero at EOF
+              # without it, and the step runs under bash -e.
+              stream.write('\t'.join(chosen) + '\n')
+          PY
+          IFS=$'\t' read -r runtime name udid < "$RUNNER_TEMP/simulator-choice.txt"
+          xcrun simctl boot "$udid" || true
+          xcrun simctl bootstatus "$udid" -b
+          {
+            echo "SIMULATOR_UDID=$udid"
+            echo "SIMULATOR_NAME=$name"
+            echo "SIMULATOR_RUNTIME=$runtime"
+          } >> "$GITHUB_ENV"
+
+      # The test step keeps its own log and must fail the job when the test
+      # fails: pipefail plus no continue-on-error, and no skip path.
+      - name: Run the plugin integration test on the simulator
+        timeout-minutes: 12
+        working-directory: qfli_git_fixture/example
+        run: |
+          set -o pipefail
+          flutter test integration_test/flow_test.dart \
+            -d "$SIMULATOR_UDID" --verbose --reporter expanded \
+            2>&1 | tee "$RUNNER_TEMP/git-ios-flow-test.log"
+
+      - name: Collect the Runner system log
+        if: always()
+        run: |
+          report="$RUNNER_TEMP/git-ios-runner-system.log"
+          : > "$report"
+          if [ -z "${SIMULATOR_UDID:-}" ]; then
+            echo 'no simulator was started' >> "$report"
+          else
+            echo '== simulator identity ==' >> "$report"
+            echo "name=${SIMULATOR_NAME:-} runtime=${SIMULATOR_RUNTIME:-} udid=$SIMULATOR_UDID" >> "$report"
+            echo '== available devices ==' >> "$report"
+            xcrun simctl list devices available >> "$report" 2>&1 || true
+            echo '== Runner process log ==' >> "$report"
+            xcrun simctl spawn "$SIMULATOR_UDID" log show --last 20m --style compact \
+              --predicate 'process == "Runner" OR processImagePath CONTAINS "Runner"' \
+              >> "$report" 2>&1 || true
+            echo '== crash reports ==' >> "$report"
+            ls -1 "$HOME/Library/Logs/DiagnosticReports" >> "$report" 2>&1 || true
+          fi
+          tail -n 200 "$report" || true
+
+      - name: Upload the integration diagnostics
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: git-ios-integration-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/git-ios-flow-test.log
+            ${{ runner.temp }}/git-ios-runner-system.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarize the plugin integration run
+        if: always()
+        run: |
+          {
+            echo "### Studio Git iOS integration test"
+            echo
+            echo "Plugin commit: ${QFLI_PLUGIN_COMMIT:-unknown}"
+            echo
+            echo "Flutter: ${QFLI_FLUTTER_VERSION:-unknown}"
+            echo
+            echo "Simulator: ${SIMULATOR_NAME:-none} (${SIMULATOR_RUNTIME:-none})"
+            echo
+            echo 'Runs the example integration test against the released plugin commit on the production Flutter SDK.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   android:
     name: Android release APKs
     needs: resolve-flutter
@@ -2044,6 +2218,7 @@ jobs:
       - linux
       - macos
       - ios
+      - git-ios-integration
       - android
       - ohos
     runs-on: ubuntu-24.04

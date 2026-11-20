@@ -166,6 +166,13 @@ unborn history, per-file staging, dirty-buffer refusal, owning-project routing,
 clone cleanup, missing payload/export/CA rejection, and matching provenance.
 User-directed cloud-only validation forbids local test/build execution.
 
+The App's `git-ios-integration` job checks out the exact resolved plugin
+artifact commit outside the pub cache. It verifies the native lock and runs the
+unchanged example clone/branch/conflict/merge/push integration test on the same
+upstream Flutter SDK as the App's IPA job. Keep the bounded test step, verbose
+launch logs, and diagnostic upload. Preview publication depends on this job;
+an IPA build or a native symbol check alone is not a runtime integration test.
+
 ### Wrong vs Correct
 
 Wrong: add project repositories globally to fix Flutter plugin resolution.
