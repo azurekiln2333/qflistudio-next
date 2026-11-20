@@ -82,7 +82,7 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "3a1866ba9d32ce6f2061fb9091ab9c5815fcc5a9"
+  CORE_REF: "72c0b0955e4ddd5215dc818327fa5a67a4be22f7"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   APP_ID: com.azurekiln.qflistudio
@@ -502,14 +502,23 @@ jobs:
             redist_default="$(tr -d '\r\n ' < "$defaults_dir/Microsoft.VCRedistVersion.default.txt")"
           fi
           crt_dir=""
-          for candidate in \
-            "$vs_root/VC/Redist/MSVC/$redist_default/$ARCH/Microsoft.VC*.CRT" \
-            "$vs_root"/VC/Redist/MSVC/*/"$ARCH"/Microsoft.VC*.CRT; do
+          # Keep the CRT wildcard outside quotes so the default can match.
+          for candidate in "$vs_root/VC/Redist/MSVC/$redist_default/$ARCH"/Microsoft.VC*.CRT; do
             if [ -f "$candidate/msvcp140.dll" ] && [ -f "$candidate/vcruntime140.dll" ]; then
               crt_dir="$candidate"
               break
             fi
           done
+          if [ -z "$crt_dir" ]; then
+            # Older toolsets remain installed side by side. The fallback must
+            # choose the newest usable redistributable, not the first glob.
+            while IFS= read -r candidate; do
+              if [ -f "$candidate/msvcp140.dll" ] && [ -f "$candidate/vcruntime140.dll" ]; then
+                crt_dir="$candidate"
+                break
+              fi
+            done < <(printf '%s\n' "$vs_root"/VC/Redist/MSVC/*/"$ARCH"/Microsoft.VC*.CRT | sort -Vr)
+          fi
           if [ -z "$crt_dir" ]; then
             echo "::error::No $ARCH Microsoft.VC*.CRT directory with msvcp140.dll and vcruntime140.dll under $vs_root/VC/Redist/MSVC"
             exit 1
@@ -595,66 +604,18 @@ jobs:
             >> "$temp/windows-build-info.txt"
 
       - name: Assemble the package directory with the MSVC runtime
+        # The ARM64 Git Bash staging step terminated during the dependency
+        # loop. Use the native shell and log every tool invocation; a dumpbin
+        # failure still fails the package immediately.
+        shell: pwsh
         run: |
-          temp="$(cygpath -m "$RUNNER_TEMP")"
-          version="$(bash tool/ci/app_version.sh)"
-          package_base="QFLIStudioN-$version-windows-$ARCH"
-          work="$temp/package"
-          package_dir="$work/$package_base"
-          rm -rf "$work"
-          mkdir -p "$package_dir"
-          cp -R "$RELEASE_DIR/." "$package_dir/"
-
-          # The install step also copies static plugin archives next to the exe.
-          for leftover in "$package_dir"/*.lib "$package_dir"/*.exp "$package_dir"/*.pdb "$package_dir"/*.ilk; do
-            if [ -e "$leftover" ]; then
-              echo "Dropping link-time file $(basename "$leftover")"
-              rm -f "$leftover"
-            fi
-          done
-
-          # The zip and the installer both start on a PC without the VC++
-          # redistributable. arm64 has no vcruntime140_1.dll.
-          for runtime in msvcp140.dll vcruntime140.dll vcruntime140_1.dll; do
-            if [ -f "$VC_CRT_DIR/$runtime" ]; then
-              cp "$VC_CRT_DIR/$runtime" "$package_dir/$runtime"
-            elif [ "$runtime" = "vcruntime140_1.dll" ]; then
-              echo "Note: $VC_CRT_DIR holds no vcruntime140_1.dll for $ARCH"
-            else
-              echo "::error::$VC_CRT_DIR holds no $runtime"
-              exit 1
-            fi
-          done
-
-          # Every MSVC runtime DLL that a packaged binary imports must be here.
-          failed=0
-          for binary in "$package_dir"/*.exe "$package_dir"/*.dll; do
-            dependents="$temp/pe-dependents.txt"
-            "$DUMPBIN" -nologo -dependents "$binary" | tr -d '\r' > "$dependents"
-            while IFS= read -r dependency; do
-              case "${dependency,,}" in
-                msvcp*|vcruntime*|concrt*|vccorlib*|vcomp*)
-                  if [ -f "$package_dir/$dependency" ]; then
-                    echo "PASS $(basename "$binary") -> $dependency"
-                  else
-                    echo "::error::$(basename "$binary") imports $dependency, which is not in the package"
-                    failed=1
-                  fi
-                  ;;
-              esac
-            done < <(sed -n 's/^[[:space:]]*\([A-Za-z0-9_.-]*\.[Dd][Ll][Ll]\)[[:space:]]*$/\1/p' "$dependents")
-          done
-          if [ "$failed" -ne 0 ]; then
-            exit 1
-          fi
-
-          ls -la "$package_dir"
-          echo "vc_runtime=bundled msvcp140.dll and vcruntime140.dll from redistributable $VC_REDIST_VERSION" \
-            >> "$temp/windows-build-info.txt"
-          {
-            echo "PACKAGE_BASE=$package_base"
-            echo "PACKAGE_WORK=$work"
-          } >> "$GITHUB_ENV"
+          ./tool/ci/stage_windows_bundle.ps1 `
+            -ReleaseDirectory $env:RELEASE_DIR `
+            -CrtDirectory $env:VC_CRT_DIR `
+            -Dumpbin $env:DUMPBIN `
+            -Architecture $env:ARCH `
+            -Version $env:APP_VERSION `
+            -RedistVersion $env:VC_REDIST_VERSION
 
       - name: Create the portable zip
         run: |

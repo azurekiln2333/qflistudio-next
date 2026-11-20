@@ -64,6 +64,18 @@ External JavaScript actions use only SHA-pinned Node 24 actions:
 
 Local composite actions may wrap these actions. Do not add a Flutter action that brings a Node 20 cache action transitively.
 
+Windows packaging first uses Visual Studio's declared default redistributable.
+Keep `Microsoft.VC*.CRT` outside shell quotes so the wildcard expands. If the
+default is unavailable, select the newest usable version with version sorting;
+never take the first ascending glob from side-by-side toolsets. Match the target
+architecture and require `msvcp140.dll` and `vcruntime140.dll`.
+
+`stage_windows_bundle.ps1` copies the release and checks every executable/DLL's
+MSVC imports with the selected `dumpbin`. Run this staging step with `pwsh` on
+both architectures. Log the inspected binary, tool path and native exit code.
+A nonzero tool exit or missing imported runtime must stop packaging. Do not
+turn a runner/native-tool crash into a skipped dependency check.
+
 ## 9. Preview release verification
 
 `app-installers.yml` pins `CORE_REF` and `JAVA_REF` to full GitHub commit IDs.
