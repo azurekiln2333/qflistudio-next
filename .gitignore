@@ -69,6 +69,14 @@ app.*.map.json
 # Native language runtime build output
 **/native/build/
 
+# 电脑侧组件（companion/）：Node agent 依赖、分发配置与本机身份都来自本机，
+# 不进版本库。分发用的 bootstrap.json 若需随包发布，请显式用 ! 规则加回。
+/companion/**/node_modules/
+/companion/remote_agent/bootstrap.json
+/companion/remote_agent/cloudterminal.bootstrap.json
+/companion/remote_agent/*.log
+/companion/windows_assistant/.flutter-plugins-dependencies
+
 # Local AI/editor tool state; project instructions remain tracked in .agents/.trellis.
 /.agent/
 /.claude/
