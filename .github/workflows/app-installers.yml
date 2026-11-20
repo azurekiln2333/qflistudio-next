@@ -82,9 +82,9 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "bb7d0cf351358b75af7a7b9d0d7907cfe9638b45"
+  CORE_REF: "3a1866ba9d32ce6f2061fb9091ab9c5815fcc5a9"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
-  JAVA_REF: "18b8c661c3681756a85bce8666fbcc280d033117"
+  JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   APP_ID: com.azurekiln.qflistudio
   OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
   ANDROID_NDK_VERSION: "27.0.12077973"
@@ -184,7 +184,9 @@ jobs:
 
       - name: Analyze the complete package
         working-directory: ${{ matrix.directory }}
-        run: flutter analyze --no-pub 2>&1 | tee "$RUNNER_TEMP/flutter-analyze.log"
+        # The OHOS fork and upstream SDK export different material symbols.
+        # Keep compatibility infos visible; warnings and errors remain fatal.
+        run: flutter analyze --no-pub --no-fatal-infos 2>&1 | tee "$RUNNER_TEMP/flutter-analyze.log"
 
       - name: Run the complete package test suite
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
@@ -199,6 +201,42 @@ jobs:
           path: |
             ${{ runner.temp }}/flutter-analyze.log
             ${{ runner.temp }}/flutter-test.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  verify-java-interop:
+    name: Verify pinned Java foreground receiver
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: qfli_java
+    steps:
+      - name: Check out the Java receiver
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: azurekiln2333/qflistudio-java
+          ref: ${{ env.JAVA_REF }}
+          path: qfli_java
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: ${{ env.COMPANION_NODE_VERSION }}
+      - name: Install the pinned ArkTS host test transpiler
+        run: npm install --prefix "$RUNNER_TEMP/java-interop-tools" --no-save --ignore-scripts --package-lock=false typescript@4.9.5
+      - name: Exercise the native entry and receiver with platform stubs
+        run: |
+          QFLI_TYPESCRIPT="$RUNNER_TEMP/java-interop-tools/node_modules/typescript" \
+            node --test test/native_entry_ability_test.cjs test/interop_receiver_test.cjs \
+            2>&1 | tee "$RUNNER_TEMP/java-interop-tests.log"
+      - name: Upload Java verification logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: verification-java-interop
+          path: ${{ runner.temp }}/java-interop-tests.log
           if-no-files-found: warn
           retention-days: 14
 
@@ -1973,6 +2011,7 @@ jobs:
     needs:
       - resolve-flutter
       - verify-flutter
+      - verify-java-interop
       - verify-companion
       - verify-assistant
       - windows
@@ -2081,6 +2120,7 @@ jobs:
               'build_mode': 'release',
               'signing': 'unsigned',
               'packaged_protocol_e2e': 'passed',
+              'packaged_first_run_pairing': 'passed',
               'device_validation': 'none',
               'run': f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
           }
@@ -2101,8 +2141,11 @@ jobs:
         run: |
           {
             printf 'App version: %s\nApp commit: %s\nCore commit: %s\n\n' "$APP_VERSION" "$GITHUB_SHA" "$CORE_REF"
+            printf 'Java receiver commit (contract checks): %s\n\n' "$JAVA_REF"
             printf '%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
+            printf '%s\n' 'The packaged sidecar also passed fresh configuration, LAN pairing and phone request/reply checks.'
+            printf '%s\n' 'Includes the remote computer module and integrated thinking-stream UI. The Studio Git plugin UI is not integrated.'
             printf '%s\n' 'Cloud-built preview. No physical-device validation.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'

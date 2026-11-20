@@ -18,7 +18,7 @@ import { parseArgs } from 'node:util';
 import { createRelay } from '../relay/relay.ts';
 import { randomToken } from '../shared/crypto.ts';
 import { consoleLogger, type Logger } from '../shared/log.ts';
-import { type AgentMessage, type ClientMessage } from '../shared/protocol.ts';
+import { type ClientMessage } from '../shared/protocol.ts';
 import { loadConfig, saveConfig, configPath } from './config.ts';
 import { loadBootstrap } from './bootstrap.ts';
 import { relayAddress } from './setup.ts';
@@ -26,6 +26,7 @@ import { AgentCore } from './core.ts';
 import { CodexBridge } from './codex.ts';
 import { HerdrBridge } from './herdr.ts';
 import { RelayLink } from './link.ts';
+import { lanAddress } from './lan-address.ts';
 import { sdkHistory, sdkQueryFn } from './sdk.ts';
 import { nativePty } from './pty.ts';
 import { probeTools, type ToolProbeResult } from './tool-probe.ts';
@@ -53,7 +54,11 @@ const log: Logger = consoleLogger('sidecar');
 
 let config = await loadConfig(configPath(), { reset: values['reset-pairing'] });
 const preferences = { ...config };
-if (values.relay !== undefined) preferences.relayUrl = relayAddress(values.relay);
+if (values.relay !== undefined) {
+  preferences.relayUrl = relayAddress(values.relay);
+  preferences.connectionMode = 'remote';
+}
+if (values['local-relay']) preferences.connectionMode = 'local';
 if (values['relay-key'] !== undefined) preferences.relayKey = values['relay-key'];
 if (values.root?.length) preferences.roots = values.root.map((r) => path.resolve(r));
 if (values.cwd) preferences.defaultCwd = path.resolve(values.cwd);
@@ -63,17 +68,25 @@ if (values['no-herdr']) preferences.herdrPath = undefined;
 if (JSON.stringify(preferences) !== JSON.stringify(config)) await saveConfig(preferences);
 config = preferences;
 
-const useLocalRelay = values['local-relay'] || (values.relay === undefined && process.env.CLOUDTERMINAL_RELAY === undefined && config.connectionMode === 'local');
-
 // Lowest-priority relay source: the shipped bootstrap config. It never
 // overrides an explicit flag, env var or saved agent.json.
 const bootstrap = await loadBootstrap(process.cwd());
+const envRelay = process.env.CLOUDTERMINAL_RELAY?.trim() || undefined;
+const explicitRelay = values.relay ?? envRelay;
+const configuredRelay = config.relayUrl ?? bootstrap.value.relayUrl;
+// A fresh portable installation has no bootstrap or saved mode. Its first
+// connection is local; an explicitly configured remote address takes priority.
+const useLocalRelay = values['local-relay'] === true ||
+  (explicitRelay === undefined && (config.connectionMode === 'local' || configuredRelay === undefined));
 let relayUrl = useLocalRelay
   ? undefined
-  : values.relay ?? process.env.CLOUDTERMINAL_RELAY ?? config.relayUrl ?? bootstrap.value.relayUrl;
+  : explicitRelay ?? configuredRelay;
 if (relayUrl !== undefined) relayUrl = relayAddress(relayUrl);
-const relayRegistrationKey =
-  values['relay-key'] ?? process.env.CLOUDTERMINAL_RELAY_KEY ?? config.relayKey ?? bootstrap.value.relayKey;
+const savedRelayKey = relayUrl && config.relayUrl && relayUrl === relayAddress(config.relayUrl)
+  ? config.relayKey : undefined;
+const bootstrapRelayKey = relayUrl && bootstrap.value.relayUrl && relayUrl === bootstrap.value.relayUrl
+  ? bootstrap.value.relayKey : undefined;
+const relayRegistrationKey = values['relay-key'] || process.env.CLOUDTERMINAL_RELAY_KEY || savedRelayKey || bootstrapRelayKey;
 let publicUrl = values['public-url'];
 let localRelay: ReturnType<typeof createRelay> | undefined;
 const localRelayKey = randomToken(24);
@@ -83,7 +96,8 @@ if (useLocalRelay) {
   localRelay = createRelay({ logger: log, relayKey: localRelayKey });
   await localRelay.listen(relayPort, '0.0.0.0');
   relayUrl = `ws://127.0.0.1:${relayPort}/ws`;
-  publicUrl ??= relayUrl;
+  const address = lanAddress();
+  publicUrl ??= address ? `ws://${address}:${relayPort}/ws` : undefined;
 }
 
 const roots = (config.roots?.length ? config.roots : [process.cwd()]).map((r) => path.resolve(r));
@@ -131,7 +145,8 @@ function snapshot(): Record<string, unknown> {
     type: 'snapshot',
     seq: ++seq,
     relayOnline: link.isOnline,
-    relayUrl: publicUrl ?? relayUrl,
+    connectionMode: useLocalRelay ? 'local' : 'remote',
+    relayUrl: useLocalRelay ? publicUrl : publicUrl ?? relayUrl,
     retries,
     lastError,
     pairedClients: 0,
@@ -154,6 +169,11 @@ async function refreshTools(): Promise<void> {
 
 async function refreshPairCode(): Promise<void> {
   if (!link.isOnline) return;
+  if (useLocalRelay && !publicUrl) {
+    lastError = '未找到局域网地址。请连接局域网后重启助手。';
+    broadcast(snapshot());
+    return;
+  }
   const code = await link.requestPairCode().catch((err: unknown) => {
     lastError = err instanceof Error ? err.message : String(err);
     return undefined;
@@ -237,7 +257,7 @@ async function dispatchSidecar(message: Record<string, unknown>, client: Client)
         await core.closeAll();
         link.stop();
         await saveConfig({ ...config, agentId: `a_${randomToken(12)}`, secret: randomToken(32) });
-        reply({ type: 'error', message: '已重置身份，请重启助手以使用新身份。' });
+        reply({ type: 'notice', message: '身份已重置。请关闭并重新打开助手。' });
         break;
       case 'tool_probe':
         await refreshTools();
@@ -275,15 +295,16 @@ async function dispatchSidecar(message: Record<string, unknown>, client: Client)
         const url = typeof message.url === 'string' ? message.url.trim() : '';
         const key = typeof message.key === 'string' ? message.key.trim() : undefined;
         if (clear) {
-          await saveConfig({ ...config, relayUrl: undefined, relayKey: undefined, connectionMode: undefined });
-          reply({ type: 'error', message: '已清除中继地址，请重启助手以切换为局域网模式。' });
+          config = { ...config, relayUrl: undefined, relayKey: undefined, connectionMode: 'local' };
+          await saveConfig(config);
+          reply({ type: 'notice', message: '局域网模式已保存。请关闭并重新打开助手。' });
           break;
         }
         try {
           const resolved = relayAddress(url);
-          config = { ...config, relayUrl: resolved, relayKey: key || (url ? undefined : config.relayKey) };
+          config = { ...config, relayUrl: resolved, relayKey: key || undefined, connectionMode: 'remote' };
           await saveConfig(config);
-          reply({ type: 'error', message: '中继地址已保存，请重启助手以连接新的中继。' });
+          reply({ type: 'notice', message: '远端中继已保存。请关闭并重新打开助手。' });
         } catch (err) {
           reply({ type: 'error', message: err instanceof Error ? err.message : '中继地址无效' });
         }
@@ -303,10 +324,6 @@ const port = typeof address === 'object' && address ? address.port : 0;
 process.stdout.write(`${JSON.stringify({ type: 'listening', port })}\n`);
 if (relayUrl) log.info('sidecar listening', { port, relay: publicUrl ?? relayUrl });
 else log.warn('sidecar started without a relay; set one in the app');
-
-// The agent still reads its own messages; ignore inbound core messages the
-// sidecar does not surface yet.
-core.setEmitter((_msg: AgentMessage, _to?: string) => {});
 
 let stopping = false;
 async function shutdown(): Promise<void> {

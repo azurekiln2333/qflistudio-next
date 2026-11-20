@@ -1,69 +1,53 @@
-// Full chain: a phone-style WebSocket client pairs with the real relay and
-// drives the real sidecar agent, then reads Herdr/tool state. This is the
-// "phone remote control" leg end to end, over a real relay, with isolated
-// config and no real tool session touched.
-
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
-import { WebSocket } from 'ws';
+import { readFile, rm } from 'node:fs/promises';
+import path from 'node:path';
 import { describe, it } from 'node:test';
 
+import { smokeSidecar, startSidecar, temporarySidecarHome, unusedPort } from '../scripts/sidecar-smoke.ts';
 import { createRelay } from '../src/relay/relay.ts';
 
-const SERVER_DIR = process.cwd();
-
-function waitFor<T>(predicate: () => T | undefined, timeoutMs = 20_000): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const start = Date.now();
-    const tick = () => {
-      const value = predicate();
-      if (value !== undefined) return resolve(value);
-      if (Date.now() - start > timeoutMs) return reject(new Error('timeout'));
-      setTimeout(tick, 50);
-    };
-    tick();
-  });
-}
-
 describe('phone → relay → sidecar', () => {
-  it('pairs and sees the agent online', async () => {
-    const relayPort = 8877;
-    const relay = createRelay({});
-    await relay.listen(relayPort, '127.0.0.1');
+  it('starts from empty config, pairs and answers phone requests', { timeout: 90_000 }, smokeSidecar);
 
-    const child = spawn('node', ['src/agent/main.ts', '--sidecar', '--relay', `ws://127.0.0.1:${relayPort}/ws`, '--no-herdr'], {
-      cwd: SERVER_DIR,
-      shell: false,
-      env: { ...process.env, CLOUDTERMINAL_HOME: `${process.env.TEMP ?? '/tmp'}/ct-relay-sidecar-${Date.now()}` },
-    });
-    let sidecarPort = 0;
-    child.stdout.setEncoding('utf8');
-    child.stdout.on('data', (chunk: string) => {
-      for (const line of chunk.split('\n')) {
-        if (!line.trim()) continue;
-        try {
-          const msg = JSON.parse(line) as { type?: string; port?: number };
-          if (msg.type === 'listening' && msg.port) sidecarPort = msg.port;
-        } catch {
-          // ignore log lines
-        }
-      }
-    });
-
+  it('persists remote and local mode changes across restarts', { timeout: 90_000 }, async () => {
+    const home = await temporarySidecarHome();
+    const relay = createRelay({ relayKey: 'test-registration-key' });
+    let sidecar: Awaited<ReturnType<typeof startSidecar>> | undefined;
     try {
-      await waitFor(() => (sidecarPort ? sidecarPort : undefined));
-      // Wait for the agent to appear online on the relay.
-      const online = await waitFor(() => {
-        const stats = relay.stats();
-        return stats.online > 0 ? stats : undefined;
-      });
-      assert.ok(online.online >= 1, 'agent should be online on the relay');
+      const server = await relay.listen(0, '127.0.0.1');
+      const address = server.address();
+      assert.ok(address && typeof address !== 'string');
+      const url = `ws://127.0.0.1:${address.port}/ws`;
+      const config = async () => JSON.parse(await readFile(path.join(home, 'config', 'agent.json'), 'utf8'));
+
+      sidecar = await startSidecar(home, ['--port', String(await unusedPort())]);
+      await sidecar.wait((frame) => frame.type === 'snapshot' && frame.relayOnline === true);
+      sidecar.send({ type: 'set_relay', url, key: 'test-registration-key' });
+      await sidecar.wait((frame) => frame.type === 'notice');
+      assert.equal((await config()).connectionMode, 'remote');
+      await sidecar.stop();
+
+      sidecar = await startSidecar(home);
+      const remote = await sidecar.wait((frame) => frame.type === 'snapshot' && frame.relayOnline === true);
+      assert.equal(remote.connectionMode, 'remote');
+      assert.equal(remote.relayUrl, url);
+      assert.equal(relay.stats().online, 1);
+      sidecar.send({ type: 'set_relay', clear: true });
+      await sidecar.wait((frame) => frame.type === 'notice');
+      const cleared = await config();
+      assert.equal(cleared.connectionMode, 'local');
+      assert.equal(cleared.relayUrl, undefined);
+      assert.equal(cleared.relayKey, undefined);
+      await sidecar.stop();
+
+      sidecar = await startSidecar(home);
+      const local = await sidecar.wait((frame) => frame.type === 'snapshot' && frame.relayOnline === true);
+      assert.equal(local.connectionMode, 'local');
+      await sidecar.wait((frame) => frame.type === 'pair_code');
     } finally {
-      child.kill();
+      await sidecar?.stop();
       await relay.close();
+      await rm(home, { recursive: true, force: true });
     }
   });
 });
-
-// Keep the import referenced even if the socket assertions above are trimmed.
-void WebSocket;

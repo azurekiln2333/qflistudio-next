@@ -56,25 +56,27 @@ class SidecarClient {
     _process = process;
     process.stderr
         .transform(utf8.decoder)
-        .listen((chunk) => _messages.add(<String, dynamic>{
-              'type': '_stderr',
-              'text': chunk,
-            }));
+        .listen(
+          (chunk) => _messages.add(<String, dynamic>{
+            'type': '_stderr',
+            'text': chunk,
+          }),
+        );
 
     final portCompleter = Completer<int>();
     process.stdout
         .transform(utf8.decoder)
         .transform(const LineSplitter())
         .listen((line) {
-      if (!portCompleter.isCompleted) {
-        final decoded = _tryDecode(line);
-        final port = decoded?['port'];
-        if (decoded?['type'] == 'listening' && port is num) {
-          portCompleter.complete(port.toInt());
-          return;
-        }
-      }
-    });
+          if (!portCompleter.isCompleted) {
+            final decoded = _tryDecode(line);
+            final port = decoded?['port'];
+            if (decoded?['type'] == 'listening' && port is num) {
+              portCompleter.complete(port.toInt());
+              return;
+            }
+          }
+        });
 
     final port = await portCompleter.future.timeout(
       const Duration(seconds: 20),
@@ -98,10 +100,8 @@ class SidecarClient {
         .transform(const LineSplitter())
         .listen(
           _onLine,
-          onError: (Object e) => _messages.add(<String, dynamic>{
-            'type': '_error',
-            'text': '$e',
-          }),
+          onError: (Object e) =>
+              _messages.add(<String, dynamic>{'type': '_error', 'text': '$e'}),
         );
   }
 
@@ -148,8 +148,8 @@ class SidecarClient {
   /// Ask the sidecar to re-probe installed tools.
   void probeTools() => send('tool_probe');
 
-  /// Set or clear the relay address (and optional registration key) and
-  /// reconnect. Clearing the address switches to local-relay mode.
+  /// Save the relay address (and optional registration key) for the next start.
+  /// Clearing the address selects local-relay mode after restarting the app.
   void setRelay({String? url, String? key, bool clear = false}) => send(
     'set_relay',
     <String, dynamic>{'url': url, 'key': key, 'clear': clear},

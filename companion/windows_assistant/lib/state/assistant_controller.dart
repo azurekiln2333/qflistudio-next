@@ -19,6 +19,7 @@ class AssistantController extends ChangeNotifier {
   bool _starting = false;
   bool _running = false;
   String? _fatalError;
+  String? _commandMessage;
   AssistantSnapshot _snapshot = const AssistantSnapshot(relayOnline: false);
   PairCodeInfo? _pairCode;
   final Map<String, List<ToolEvent>> _streams = <String, List<ToolEvent>>{};
@@ -28,6 +29,7 @@ class AssistantController extends ChangeNotifier {
   bool get starting => _starting;
   bool get running => _running;
   String? get fatalError => _fatalError;
+  String? get commandMessage => _commandMessage;
   AssistantSnapshot get snapshot => _snapshot;
   PairCodeInfo? get pairCode => _pairCode;
 
@@ -60,7 +62,9 @@ class AssistantController extends ChangeNotifier {
     switch (message['type']) {
       case 'snapshot':
         _snapshot = AssistantSnapshot.fromJson(message);
-        _lastSeq = message['seq'] is num ? (message['seq'] as num).toInt() : _lastSeq;
+        _lastSeq = message['seq'] is num
+            ? (message['seq'] as num).toInt()
+            : _lastSeq;
         notifyListeners();
       case 'pair_code':
         _pairCode = PairCodeInfo.fromJson(message);
@@ -73,6 +77,10 @@ class AssistantController extends ChangeNotifier {
         break;
       case '_error':
         _fatalError = message['text'] as String?;
+        notifyListeners();
+      case 'error':
+      case 'notice':
+        _commandMessage = message['message'] as String?;
         notifyListeners();
       default:
         break;
@@ -110,10 +118,13 @@ class AssistantController extends ChangeNotifier {
 
   void refreshTools() => sidecar.probeTools();
 
-  /// Configure the relay from the UI. After this the sidecar reconnects, so the
-  /// next snapshot reflects the new state.
-  void setRelay({String? url, String? key, bool clear = false}) =>
-      sidecar.setRelay(url: url, key: key, clear: clear);
+  /// Save the relay mode for the next app start. The sidecar returns a notice
+  /// that tells the user to close and reopen the assistant.
+  void setRelay({String? url, String? key, bool clear = false}) {
+    _commandMessage = null;
+    notifyListeners();
+    sidecar.setRelay(url: url, key: key, clear: clear);
+  }
 
   void bind(SessionBinding binding) {
     _activeSession.add(binding.id);
@@ -139,7 +150,8 @@ class AssistantController extends ChangeNotifier {
 
   String _friendly(Object error) {
     final text = error.toString();
-    if (text.contains('ProcessException') || text.contains('system cannot find')) {
+    if (text.contains('ProcessException') ||
+        text.contains('system cannot find')) {
       return '找不到后台服务或 Node.js。请确认已安装 Node.js 24 LTS，'
           '并且 companion/remote_agent 依赖已安装（npm ci）。';
     }

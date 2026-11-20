@@ -2,8 +2,8 @@
 // sidecar over the loopback socket. This proves the IPC contract end to end
 // without a Windows toolchain, and is skipped when agent deps are missing.
 //
-// It starts the sidecar with --local-relay and an isolated config dir, so no
-// real relay, tool session or user credential is touched.
+// It starts the sidecar from empty config and cwd, without --local-relay or a
+// bootstrap file, matching the first launch of the portable package.
 
 import 'dart:async';
 import 'dart:io';
@@ -12,7 +12,9 @@ import 'package:cloudterminal_windows/engine/sidecar_client.dart';
 import 'package:cloudterminal_windows/models/tool.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final bool _serverReady = Directory('../remote_agent/node_modules').existsSync();
+final bool _serverReady = Directory(
+  '../remote_agent/node_modules',
+).existsSync();
 
 Future<T> _waitFor<T>(
   Stream<Map<String, dynamic>> messages,
@@ -30,7 +32,7 @@ Future<T> _waitFor<T>(
       unawaited(sub.cancel());
     }
   });
-  return completer.future.timeout(timeout);
+  return completer.future.timeout(timeout).whenComplete(sub.cancel);
 }
 
 void main() {
@@ -42,18 +44,29 @@ void main() {
         if (home.existsSync()) home.deleteSync(recursive: true);
       });
 
+      final portProbe = await ServerSocket.bind(
+        InternetAddress.loopbackIPv4,
+        0,
+      );
+      final relayPort = portProbe.port;
+      await portProbe.close();
+      final entry = File('../remote_agent/src/agent/main.ts').absolute.path;
       final client = SidecarClient(
         executable: Platform.isWindows ? 'node.exe' : 'node',
-        arguments: const <String>[
-          'src/agent/main.ts',
+        arguments: <String>[
+          entry,
           '--sidecar',
-          '--local-relay',
           '--port',
-          '8833',
+          '$relayPort',
           '--no-herdr',
         ],
-        workingDirectory: '../remote_agent',
-        environment: <String, String>{'CLOUDTERMINAL_HOME': home.path},
+        workingDirectory: home.path,
+        environment: <String, String>{
+          'CLOUDTERMINAL_HOME': home.path,
+          'CLOUDTERMINAL_RELAY': '',
+          'CLOUDTERMINAL_RELAY_KEY': '',
+          'CLOUDTERMINAL_BOOTSTRAP': '${home.path}/absent-bootstrap.json',
+        },
       );
       addTearDown(client.dispose);
 
@@ -78,6 +91,7 @@ void main() {
         () => snapshots.any((s) => s.relayOnline) ? true : null,
       );
       expect(online, isTrue);
+      expect(snapshots.lastWhere((s) => s.relayOnline).connectionMode, 'local');
 
       final withTools = await _waitFor(
         client.messages,
@@ -94,8 +108,18 @@ void main() {
         client.messages,
         () => codes.isNotEmpty ? codes.last : null,
       );
-      expect(PairCodeInfo(display: code.display, uri: code.uri, expiresAt: code.expiresAt).display, isNotEmpty);
+      expect(
+        PairCodeInfo(
+          display: code.display,
+          uri: code.uri,
+          expiresAt: code.expiresAt,
+        ).display,
+        isNotEmpty,
+      );
       expect(code.uri, startsWith('cloudterminal://pair?'));
+      final relay = Uri.parse(Uri.parse(code.uri).queryParameters['relay']!);
+      expect(relay.host, isNot(anyOf('localhost', '127.0.0.1', '0.0.0.0')));
+      expect(relay.port, relayPort);
     },
     skip: _serverReady ? false : 'run `npm ci` in ../remote_agent first',
   );

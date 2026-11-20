@@ -5,7 +5,7 @@
 //
 // Run `node src/agent/main.ts --help` for all options.
 
-import { networkInterfaces, hostname, homedir } from 'node:os';
+import { hostname, homedir } from 'node:os';
 import path from 'node:path';
 import { createInterface } from 'node:readline';
 import { parseArgs } from 'node:util';
@@ -21,6 +21,7 @@ import { HerdrBridge } from './herdr.ts';
 import { HerdrSocketClient, HERDR_LIVE_SUBSCRIPTIONS } from './herdr-socket.ts';
 import { HerdrLivePush } from './herdr-live.ts';
 import { RelayLink } from './link.ts';
+import { lanAddress } from './lan-address.ts';
 import { sdkHistory, sdkQueryFn } from './sdk.ts';
 
 import { nativePty } from './pty.ts';
@@ -343,15 +344,6 @@ function defaultCwdAllowed(): boolean {
     const rel = path.relative(r, defaultCwd);
     return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
   });
-}
-
-function lanAddress(): string | undefined {
-  for (const list of Object.values(networkInterfaces())) {
-    for (const a of list ?? []) {
-      if (a.family === 'IPv4' && !a.internal) return a.address;
-    }
-  }
-  return undefined;
 }
 
 let localSession: TerminalSession | undefined;

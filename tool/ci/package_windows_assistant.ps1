@@ -67,6 +67,8 @@ try {
   # is scripted and does not contact Claude or load any user credentials.
   & $node scripts/e2e.ts --demo --timeout 60
   if ($LASTEXITCODE -ne 0) { throw 'Packaged companion protocol E2E failed.' }
+  & $node scripts/sidecar-smoke.ts
+  if ($LASTEXITCODE -ne 0) { throw 'Packaged assistant first-run pairing failed.' }
 } finally {
   Pop-Location
 }
@@ -114,6 +116,7 @@ $facts = @(
   'build_mode=release',
   'signing=unsigned',
   'packaged_protocol_e2e=passed',
+  'packaged_first_run_pairing=passed',
   'device_validation=none',
   "run=$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
 )

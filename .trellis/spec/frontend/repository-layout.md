@@ -63,3 +63,28 @@ External JavaScript actions use only SHA-pinned Node 24 actions:
 - `actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9`
 
 Local composite actions may wrap these actions. Do not add a Flutter action that brings a Node 20 cache action transitively.
+
+## 9. Preview release verification
+
+`app-installers.yml` pins `CORE_REF` and `JAVA_REF` to full GitHub commit IDs.
+The complete app/core suites use the OHOS Flutter fork, with
+`ohos-platform-tooling: "false"` for SDK-less analysis and tests. The HAP job
+enables OHOS generation after installing platform tools. Keep infos visible
+across the different SDK exports; warnings and errors remain fatal.
+
+Only a `v5.0.5-remote.*` tag publishes this preview. Publication waits for the
+app/core suites, Node suites on Windows/Linux, the Java receiver host tests,
+the Windows assistant build and every main app installer target. It checks
+each artifact's version, source revisions, SDK and checksums before publishing.
+Never substitute old artifacts for a failed job in the tagged run.
+
+The portable Windows assistant carries Node, MSVC DLLs and locked production
+agent dependencies. `Start-QFLI-Remote.cmd` sets `CLOUDTERMINAL_NODE` and
+`CLOUDTERMINAL_AGENT_DIR`. Packaging runs both the scripted protocol E2E and
+the actual sidecar first-run pairing smoke with isolated configuration.
+Missing optional Herdr yields an unavailable status; it must not crash startup.
+
+Android preview APKs use a debug certificate. Windows is unsigned, macOS uses
+ad-hoc signing, and iOS/OHOS require signing before installation. Cloud host
+tests do not establish device or live-provider acceptance. Do not include
+developer identities or local signing material in any preview artifact.

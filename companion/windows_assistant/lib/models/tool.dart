@@ -170,6 +170,7 @@ class ToolEvent {
 class AssistantSnapshot {
   const AssistantSnapshot({
     required this.relayOnline,
+    this.connectionMode,
     this.relayUrl,
     this.retries = 0,
     this.lastError,
@@ -182,6 +183,11 @@ class AssistantSnapshot {
   factory AssistantSnapshot.fromJson(Map<String, dynamic> json) =>
       AssistantSnapshot(
         relayOnline: json['relayOnline'] == true,
+        connectionMode: switch (json['connectionMode']) {
+          'local' => 'local',
+          'remote' => 'remote',
+          _ => null,
+        },
         relayUrl: _str(json['relayUrl']),
         retries: json['retries'] is num ? (json['retries'] as num).toInt() : 0,
         lastError: _str(json['lastError']),
@@ -190,8 +196,10 @@ class AssistantSnapshot {
             : 0,
         tools: <ToolProbe>[
           for (final raw in (json['tools'] as List<dynamic>? ?? <dynamic>[]))
-            if (raw is Map<String, dynamic>) ToolProbe.fromJson(raw)
-            else if (raw is Map) ToolProbe.fromJson(raw.cast<String, dynamic>()),
+            if (raw is Map<String, dynamic>)
+              ToolProbe.fromJson(raw)
+            else if (raw is Map)
+              ToolProbe.fromJson(raw.cast<String, dynamic>()),
         ],
         bindings: <SessionBinding>[
           for (final raw in (json['bindings'] as List<dynamic>? ?? <dynamic>[]))
@@ -206,6 +214,12 @@ class AssistantSnapshot {
       );
 
   final bool relayOnline;
+  final String? connectionMode;
+  String get connectionModeLabel => switch (connectionMode) {
+    'local' => '局域网',
+    'remote' => '远端中继',
+    _ => '等待连接状态',
+  };
   final String? relayUrl;
   final int retries;
   final String? lastError;
@@ -247,7 +261,8 @@ class PairCodeInfo {
   Duration get remaining => expiresAt.difference(DateTime.now());
 }
 
-String? _str(Object? value) => value is String && value.isNotEmpty ? value : null;
+String? _str(Object? value) =>
+    value is String && value.isNotEmpty ? value : null;
 
 /// Lenient JSON object decode used by the IPC layer.
 Map<String, dynamic>? decodeJsonObject(String text) {

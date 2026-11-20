@@ -54,6 +54,7 @@ class OverviewPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                _row(context, '连接模式', snapshot.connectionModeLabel),
                 _row(context, '中继地址', snapshot.relayUrl ?? '未设置'),
                 _row(
                   context,
@@ -114,10 +115,7 @@ class OverviewPage extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: SelectableText(
-            value,
-            style: const TextStyle(fontSize: 13),
-          ),
+          child: SelectableText(value, style: const TextStyle(fontSize: 13)),
         ),
       ],
     ),
