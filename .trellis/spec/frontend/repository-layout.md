@@ -137,6 +137,12 @@ verify ABI, exported symbols, and the exact packaged CA digest. Packaging can
 strip Android libraries or codesign iOS frameworks, so a packed binary hash
 is recorded but is not required to equal the imported binary hash.
 
+OHOS release builds exclude `**/x86_64/**` through the entry module's
+`buildOptionSet[name=release].nativeLib.filter.excludes`. The plugin HAR ships
+both device and simulator libraries; a target-platform flag alone does not
+filter prebuilt HAR payloads. Keep debug simulator libraries and the strict
+ARM64-only release payload check.
+
 ### Validation & Error Matrix
 
 | Condition | Required result |

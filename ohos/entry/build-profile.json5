@@ -3,6 +3,23 @@
   "apiType": 'stageMode',
   "buildOption": {
   },
+  // The qfli_git HAR ships both its device (arm64-v8a) and emulator (x86_64)
+  // libraries, so a HAP built for the default target packages both ABI folders.
+  // Release builds are device-only, so exclude the x86_64 folder there; debug
+  // keeps it so the simulator still runs. hvigor matches these glob patterns
+  // against each native library's relative path while packaging.
+  "buildOptionSet": [
+    {
+      "name": "release",
+      "nativeLib": {
+        "filter": {
+          "excludes": [
+            "**/x86_64/**"
+          ]
+        }
+      }
+    }
+  ],
   "targets": [
     {
       "name": "default",
