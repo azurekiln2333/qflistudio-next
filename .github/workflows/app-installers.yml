@@ -82,7 +82,7 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "a8973c97c8ce89f3d6edff0ad51a9f853a3552f9"
+  CORE_REF: "75bd34211b05e3d5dea88585b5bfbd3ea4a65e8a"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
@@ -1974,13 +1974,21 @@ jobs:
       - name: Verify qfli_git native payload and provenance
         run: |
           python3 tool/ci/plugin_provenance.py --require-release-ready
+          # The OpenHarmony LLVM tools live under the NDK root, not under the
+          # command-line-tools SDK root: OHOS_NDK_HOME is exported by the setup
+          # action as $HOS_SDK_HOME/default/openharmony.
+          llvm_nm="$OHOS_NDK_HOME/native/llvm/bin/llvm-nm"
+          if [ ! -x "$llvm_nm" ]; then
+            echo "::error::llvm-nm is missing or not executable: $llvm_nm"
+            exit 1
+          fi
           python3 tool/ci/check_git_payload.py \
             --platform ohos --archive "$HAP_PATH" --abi arm64-v8a \
             --contract "$QFLI_PLUGIN_ROOT/tool/ci/native_contract.json" \
             --cacert-sha256 "$QFLI_PLUGIN_CACERT_SHA256" \
             --lock "$QFLI_PLUGIN_ROOT/native_libs.lock.json" \
             --plugin-root "$QFLI_PLUGIN_ROOT" \
-            --nm "$HOS_SDK_HOME/native/llvm/bin/llvm-nm"
+            --nm "$llvm_nm"
 
       - name: Stage the OHOS package
         run: |
