@@ -188,6 +188,39 @@ describe('herdr availability', () => {
     assert.equal(calls.length, 0, 'must not spawn anything when the binary is missing');
   });
 
+  it('reports a missing PATH binary without rejecting startup discovery', async () => {
+    const { bridge } = bridgeWith(() => ({
+      code: -1, stdout: '', stderr: 'spawn herdr ENOENT', timedOut: false, spawnError: 'ENOENT',
+    }));
+    const [availability, socketPath] = await Promise.all([bridge.availability(), bridge.socketPath()]);
+    assert.equal(availability.available, false);
+    assert.equal(availability.installed, false);
+    assert.equal(availability.canControl, false);
+    assert.equal(socketPath, undefined);
+    assert.match(availability.reason ?? '', /没有安装 Herdr/);
+  });
+
+  for (const stage of ['--version', 'status']) {
+    it(`reports ${stage} timeout without rejecting availability`, async () => {
+      const { bridge } = bridgeWith((argv) => argv[0] === stage
+        ? { code: -1, stdout: '', stderr: '', timedOut: true }
+        : raw('herdr 0.9.3\n'));
+      const availability = await bridge.availability();
+      assert.equal(availability.available, false);
+      assert.equal(availability.installed, true);
+      assert.equal(availability.canControl, false);
+      assert.match(availability.reason ?? '', /超时/);
+    });
+  }
+
+  it('retains command failures after discovery reports an unavailable binary', async () => {
+    const { bridge } = bridgeWith(() => ({
+      code: 1, stdout: '', stderr: 'permission denied', timedOut: false,
+    }));
+    assert.equal((await bridge.availability()).available, false);
+    await assert.rejects(() => bridge.workspaces(), HerdrError);
+  });
+
   it('reports a stopped server separately from a missing install', async () => {
     const { bridge } = bridgeWith((argv) => {
       if (argv[0] === '--version') return raw('herdr 0.9.3\n');

@@ -30,6 +30,10 @@ inputs:
     description: Remove OHOS-only Dart APIs from the shared core for upstream Flutter jobs.
     required: false
     default: "true"
+  ohos-platform-tooling:
+    description: Enable OHOS platform generation. Disable for Dart-only verification without a HarmonyOS SDK.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -82,9 +86,17 @@ runs:
       env:
         FLUTTER_MODE: ${{ inputs.flutter-mode }}
         DESKTOP_PLATFORMS: ${{ inputs.desktop-platforms }}
+        OHOS_PLATFORM_TOOLING: ${{ inputs.ohos-platform-tooling }}
       run: |
         flutter --version
         flutter config --no-analytics
+        if [ "$FLUTTER_MODE" = "ohos" ]; then
+          if [ "$OHOS_PLATFORM_TOOLING" = "true" ]; then
+            flutter config --enable-ohos
+          else
+            flutter config --no-enable-ohos
+          fi
+        fi
         # The cache key separates upstream and OHOS SDKs. Upstream Flutter has
         # no enable-ohos config flag, so do not pass an OHOS-only option here.
         for platform in ${DESKTOP_PLATFORMS//,/ }; do

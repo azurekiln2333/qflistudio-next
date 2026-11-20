@@ -82,7 +82,7 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "db4dadd84d2ed5dcafb9b85594d3166763035cf0"
+  CORE_REF: "bb7d0cf351358b75af7a7b9d0d7907cfe9638b45"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "18b8c661c3681756a85bce8666fbcc280d033117"
   APP_ID: com.azurekiln.qflistudio
@@ -174,6 +174,7 @@ jobs:
           core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: verify-${{ matrix.package }}
           patch-upstream-core: "false"
+          ohos-platform-tooling: "false"
 
       - name: Resolve all Dart packages read by the analyzer
         id: dependencies
@@ -254,10 +255,10 @@ jobs:
           retention-days: 14
 
   verify-assistant:
-    name: Verify Windows assistant and real sidecar IPC
+    name: Verify and package Windows assistant
     needs: resolve-flutter
     runs-on: windows-2022
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out app
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -272,6 +273,7 @@ jobs:
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
           core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: verify-assistant
+          desktop-platforms: windows
           patch-upstream-core: "true"
 
       - name: Set up Node for sidecar integration tests
@@ -294,12 +296,35 @@ jobs:
 
       - name: Analyze Windows assistant
         working-directory: qflistudio/companion/windows_assistant
-        run: flutter analyze --no-pub 2>&1 | tee "$RUNNER_TEMP/assistant-analyze.log"
+        # Flutter 3.50 reports material.dart migration notices as infos. Keep
+        # those visible; warnings and errors still fail this verification job.
+        run: flutter analyze --no-pub --no-fatal-infos 2>&1 | tee "$RUNNER_TEMP/assistant-analyze.log"
 
       - name: Run all assistant tests, including sidecar IPC
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         working-directory: qflistudio/companion/windows_assistant
         run: flutter test --no-pub --reporter json 2>&1 | tee "$RUNNER_TEMP/assistant-test.json"
+
+      - name: Build Windows assistant release
+        working-directory: qflistudio/companion/windows_assistant
+        run: flutter build windows --release --no-pub 2>&1 | tee "$RUNNER_TEMP/assistant-build.log"
+
+      - name: Bundle assistant, production agent and Node runtime
+        shell: pwsh
+        run: |
+          ./tool/ci/package_windows_assistant.ps1 `
+            -ReleaseDirectory companion/windows_assistant/build/windows/x64/runner/Release `
+            -OutputDirectory "build/ci-artifacts/qfli-remote-assistant-$env:APP_VERSION-windows-x64" `
+            -NodeVersion $env:COMPANION_NODE_VERSION
+
+      - name: Upload portable Windows assistant
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qfli-remote-assistant-${{ env.APP_VERSION }}-windows-x64
+          path: qflistudio/build/ci-artifacts/qfli-remote-assistant-${{ env.APP_VERSION }}-windows-x64/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
 
       - name: Upload assistant verification logs
         if: always()
@@ -309,6 +334,7 @@ jobs:
           path: |
             ${{ runner.temp }}/assistant-analyze.log
             ${{ runner.temp }}/assistant-test.json
+            ${{ runner.temp }}/assistant-build.log
           if-no-files-found: warn
           retention-days: 14
 
@@ -1971,6 +1997,13 @@ jobs:
           path: packages
           merge-multiple: false
 
+      - name: Download this run's portable Windows assistant
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: qfli-remote-assistant-${{ env.APP_VERSION }}-windows-x64
+          path: companions
+          merge-multiple: false
+
       - name: Check all eleven artifacts and package release assets
         env:
           OFFICIAL_FLUTTER_VERSION: ${{ needs.resolve-flutter.outputs.version }}
@@ -2021,6 +2054,45 @@ jobs:
           done
           (cd release-assets && sha256sum ./*.zip > SHA256SUMS)
 
+      - name: Check Windows assistant provenance and checksums
+        env:
+          OFFICIAL_FLUTTER_VERSION: ${{ needs.resolve-flutter.outputs.version }}
+          OFFICIAL_FLUTTER_COMMIT: ${{ needs.resolve-flutter.outputs.commit }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          name = f"qfli-remote-assistant-{os.environ['APP_VERSION']}-windows-x64"
+          directories = list(Path('companions').iterdir())
+          if len(directories) != 1 or directories[0].name != name:
+              raise SystemExit('Expected exactly the portable Windows assistant artifact')
+          report = directories[0] / 'BUILD_INFO.txt'
+          facts = dict(line.split('=', 1) for line in report.read_text().splitlines() if '=' in line)
+          required = {
+              'component': 'windows-assistant',
+              'app_version': os.environ['APP_VERSION'],
+              'app_commit': os.environ['GITHUB_SHA'],
+              'core_commit': os.environ['CORE_REF'],
+              'flutter_version': os.environ['OFFICIAL_FLUTTER_VERSION'],
+              'flutter_commit': os.environ['OFFICIAL_FLUTTER_COMMIT'],
+              'node_version': os.environ['COMPANION_NODE_VERSION'],
+              'architecture': 'x64',
+              'build_mode': 'release',
+              'signing': 'unsigned',
+              'packaged_protocol_e2e': 'passed',
+              'device_validation': 'none',
+              'run': f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+          }
+          for key, value in required.items():
+              if facts.get(key) != value:
+                  raise SystemExit(f'Assistant {key} is {facts.get(key)!r}, expected {value!r}')
+          PY
+          name="qfli-remote-assistant-$APP_VERSION-windows-x64"
+          (cd "companions/$name" && sha256sum --strict --check SHA256SUMS)
+          (cd "companions/$name" && zip -qr "$GITHUB_WORKSPACE/release-assets/$name.zip" .)
+          (cd release-assets && sha256sum ./*.zip > SHA256SUMS)
+
       - name: Publish the prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -2034,6 +2106,7 @@ jobs:
             printf '%s\n' 'Cloud-built preview. No physical-device validation.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'
+            printf '%s\n' 'The Windows x64 remote assistant includes Node.js and agent dependencies. Extract its ZIP and open Start-QFLI-Remote.cmd.'
             printf '\nWorkflow: %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
           } > release-notes.md
           gh release create "$RELEASE_TAG" release-assets/* \

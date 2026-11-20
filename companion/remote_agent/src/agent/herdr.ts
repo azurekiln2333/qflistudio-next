@@ -41,6 +41,8 @@ export type HerdrResult = {
   stdout: string;
   stderr: string;
   timedOut: boolean;
+  /** OS spawn failure, distinct from a Herdr command exit code. */
+  spawnError?: string;
 };
 
 export type HerdrRunOptions = {
@@ -65,7 +67,7 @@ export function nativeHerdrRunner(binary: string): HerdrRunner {
           stdio: ['ignore', 'pipe', 'pipe'],
         });
       } catch (err) {
-        resolve({ code: -1, stdout: '', stderr: err instanceof Error ? err.message : String(err), timedOut: false });
+        resolve({ code: -1, stdout: '', stderr: err instanceof Error ? err.message : String(err), timedOut: false, spawnError: (err as NodeJS.ErrnoException).code });
         return;
       }
 
@@ -74,12 +76,13 @@ export function nativeHerdrRunner(binary: string): HerdrRunner {
       let bytes = 0;
       let timedOut = false;
       let settled = false;
+      let spawnError: string | undefined;
 
       const finish = (code: number): void => {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        resolve({ code, stdout: out.join(''), stderr: err.join(''), timedOut });
+        resolve({ code, stdout: out.join(''), stderr: err.join(''), timedOut, spawnError });
       };
 
       const cap = MAX_STDOUT_BYTES;
@@ -99,6 +102,7 @@ export function nativeHerdrRunner(binary: string): HerdrRunner {
       child.stdout?.on('data', collect(out));
       child.stderr?.on('data', collect(err));
       child.on('error', (e) => {
+        spawnError = (e as NodeJS.ErrnoException).code;
         err.push(e.message);
         finish(-1);
       });
@@ -527,7 +531,13 @@ export class HerdrBridge {
     // A burst of terminal keys shares discovery instead of spawning two CLI
     // processes for every event before the first probe completes.
     if (this.availabilityProbe) return this.availabilityProbe;
-    const pending = this.probe().then((value) => {
+    const pending = this.probe().catch((error: unknown): HerdrAvailability => ({
+      available: false,
+      installed: !(error instanceof HerdrError && error.code === 'herdr_unavailable'),
+      serverRunning: false,
+      canControl: false,
+      reason: error instanceof Error ? error.message : 'Herdr 状态检查失败',
+    })).then((value) => {
       this.availabilityCache = { at: Date.now(), value };
       return value;
     });
@@ -550,20 +560,33 @@ export class HerdrBridge {
         reason: '这台电脑没有安装 Herdr。安装后重启 agent 即可用手机管理 Herdr 工作区。',
       };
     }
-    const version = await this.text(['--version'], 10_000);
-    if (version.code !== 0) {
+    // Discovery must describe an optional missing/broken installation. The
+    // mutation path's invoke() deliberately throws on these same failures.
+    const version = await this.runnerFor({ argv: ['--version'], timeoutMs: 10_000 });
+    if (version.code !== 0 || version.timedOut) {
+      const missing = version.spawnError === 'ENOENT';
       return {
         available: false,
-        installed: true,
+        installed: !missing,
         serverRunning: false,
         canControl: false,
-        reason: `找到了 Herdr 但无法运行：${firstLine(version.stderr) || `退出码 ${version.code}`}`,
+        reason: missing ? '这台电脑没有安装 Herdr。' : `找到了 Herdr 但无法运行：${version.timedOut ? '检查超时' : firstLine(version.stderr) || `退出码 ${version.code}`}`,
       };
     }
     const versionMatch = /^herdr\s+(\S+)\s*$/im.exec(version.stdout);
     const parsed = versionMatch ? versionMatch[1]! : undefined;
 
-    const status = await this.text(['status'], 10_000);
+    const status = await this.runnerFor({ argv: ['status'], timeoutMs: 10_000 });
+    if (status.code !== 0 || status.timedOut) {
+      return {
+        available: false,
+        installed: true,
+        version: parsed,
+        serverRunning: false,
+        canControl: false,
+        reason: `Herdr 服务不可用：${status.timedOut ? '检查超时' : firstLine(status.stderr) || `退出码 ${status.code}`}`,
+      };
+    }
     const info = parseHerdrStatus(status.stdout);
     const running = (info.serverStatus ?? '').toLowerCase() === 'running';
 

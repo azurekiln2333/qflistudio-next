@@ -29,7 +29,7 @@ test('real first-run wizard hides key and saved configuration starts again witho
   const pty = nativePty({ cwd: process.cwd(), cols: 160, rows: 40 });
   if (old === undefined) delete process.env.CLOUDTERMINAL_HOME; else process.env.CLOUDTERMINAL_HOME = old;
   let output = '';
-  const launch = process.platform === 'win32' ? '..\\start.cmd' : `"${process.execPath}" src/agent/main.ts`;
+  const launch = process.platform === 'win32' ? '.\\start.cmd' : `"${process.execPath}" src/agent/main.ts`;
   pty.onData((chunk) => { output += chunk; });
   const waitFor = async (text: string) => {
     const deadline = Date.now() + 8000;
