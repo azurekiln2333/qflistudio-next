@@ -2,14 +2,15 @@ name: App installers
 
 # Builds installable packages for eleven targets on GitHub-hosted runners.
 # Every JavaScript action is pinned by commit and runs on Node 24, so no
-# "Node.js 20 is deprecated" warning appears. Nothing here signs with a real
-# key or publishes.
+# "Node.js 20 is deprecated" warning appears. Preview publication requires
+# every verification job and installer target. No production signing key is used.
 
 on:
   push:
     branches:
       - main
       - "ci/**"
+      - "release/**"
     tags:
       - "v*"
     paths:
@@ -24,6 +25,8 @@ on:
       - "pubspec.yaml"
       - "pubspec.lock"
       - "tool/ci/**"
+      - "companion/**"
+      - "test/**"
       - ".github/**"
   pull_request:
     branches:
@@ -40,17 +43,19 @@ on:
       - "pubspec.yaml"
       - "pubspec.lock"
       - "tool/ci/**"
+      - "companion/**"
+      - "test/**"
       - ".github/**"
   workflow_dispatch:
     inputs:
       flutter_version:
-        description: Official Flutter stable version. Empty uses the newest stable.
+        description: Official Flutter stable version. Empty uses the pinned release version.
         required: false
         default: ""
       core_ref:
-        description: qflistudio-core branch, tag or commit.
+        description: qflistudio-core branch, tag or commit. Empty uses the pinned release commit.
         required: false
-        default: "main"
+        default: ""
 
 permissions:
   contents: read
@@ -72,9 +77,14 @@ env:
   OHOS_FLUTTER_VERSION: "3.41.10-ohos-1.0.1"
   OHOS_FLUTTER_COMMIT: "adaf911c35c9136a7d18fc424d714c9ec7724e60"
   OHOS_NODE_VERSION: "24.14.1"
+  COMPANION_NODE_VERSION: "24.14.1"
   # Bumped in the same commit as pubspec.yaml, so the OHOS artifact name and
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
-  APP_VERSION: "5.0.4"
+  APP_VERSION: "5.0.5"
+  FLUTTER_VERSION: "3.50.0"
+  CORE_REF: "db4dadd84d2ed5dcafb9b85594d3166763035cf0"
+  # The complete core suite reads the Java receiver's committed ArkTS contract.
+  JAVA_REF: "18b8c661c3681756a85bce8666fbcc280d033117"
   APP_ID: com.azurekiln.qflistudio
   OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
   ANDROID_NDK_VERSION: "27.0.12077973"
@@ -102,7 +112,7 @@ jobs:
       - name: Resolve the version and its framework commit
         id: resolve
         env:
-          REQUESTED: ${{ inputs.flutter_version }}
+          REQUESTED: ${{ inputs.flutter_version || env.FLUTTER_VERSION }}
         run: |
           bash tool/ci/resolve_flutter.sh "$REQUESTED" | tee "$RUNNER_TEMP/resolved.txt"
           cat "$RUNNER_TEMP/resolved.txt" >> "$GITHUB_OUTPUT"
@@ -124,6 +134,183 @@ jobs:
             exit 1
           fi
           echo "PASS pubspec.yaml and the workflow agree on $version"
+
+  verify-flutter:
+    name: Verify ${{ matrix.package }} with OHOS Flutter
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: core
+            directory: qfli_studio_core
+          - package: app
+            directory: qflistudio
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Check out the Java interop contract
+        if: matrix.package == 'core'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: azurekiln2333/qflistudio-java
+          ref: ${{ env.JAVA_REF }}
+          path: qfli_java
+          persist-credentials: false
+
+      # The full suites exercise TargetPlatform.ohos and real Huawei view types.
+      # Keep the core source intact and use the same pinned SDK as the HAP job.
+      - name: Set up OHOS Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ env.OHOS_FLUTTER_VERSION }}
+          flutter-commit: ${{ env.OHOS_FLUTTER_COMMIT }}
+          flutter-mode: ohos
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
+          cache-scope: verify-${{ matrix.package }}
+          patch-upstream-core: "false"
+
+      - name: Resolve all Dart packages read by the analyzer
+        id: dependencies
+        run: |
+          (cd ../qfli_studio_core && flutter pub get)
+          (cd companion/windows_assistant && flutter pub get)
+
+      - name: Analyze the complete package
+        working-directory: ${{ matrix.directory }}
+        run: flutter analyze --no-pub 2>&1 | tee "$RUNNER_TEMP/flutter-analyze.log"
+
+      - name: Run the complete package test suite
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        working-directory: ${{ matrix.directory }}
+        run: flutter test --no-pub --reporter json 2>&1 | tee "$RUNNER_TEMP/flutter-test.json"
+
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verification-flutter-${{ matrix.package }}
+          path: |
+            ${{ runner.temp }}/flutter-analyze.log
+            ${{ runner.temp }}/flutter-test.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  verify-companion:
+    name: Verify Node companion on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    defaults:
+      run:
+        shell: bash
+        working-directory: qflistudio/companion/remote_agent
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.COMPANION_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: qflistudio/companion/remote_agent/package-lock.json
+
+      - name: Install companion dependencies
+        id: dependencies
+        run: npm ci
+
+      - name: Check companion types
+        run: npm run check 2>&1 | tee "$RUNNER_TEMP/companion-check.log"
+
+      - name: Run companion tests
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: npm test 2>&1 | tee "$RUNNER_TEMP/companion-test.log"
+
+      - name: Verify pairing, streaming, permissions and questions
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        # The demo uses a scripted provider over the real relay and AgentCore.
+        # This requires no Claude account and cannot consume paid API usage.
+        run: npm run e2e -- --demo --timeout 60 2>&1 | tee "$RUNNER_TEMP/companion-e2e.log"
+
+      - name: Upload companion verification logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verification-companion-${{ matrix.os }}
+          path: ${{ runner.temp }}/companion-*.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  verify-assistant:
+    name: Verify Windows assistant and real sidecar IPC
+    needs: resolve-flutter
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - name: Check out app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: qflistudio
+          persist-credentials: false
+
+      - name: Set up Flutter and shared core
+        uses: ./qflistudio/.github/actions/app-setup
+        with:
+          flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+          flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
+          cache-scope: verify-assistant
+          patch-upstream-core: "true"
+
+      - name: Set up Node for sidecar integration tests
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.COMPANION_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: qflistudio/companion/remote_agent/package-lock.json
+
+      - name: Install the real sidecar dependencies
+        working-directory: qflistudio/companion/remote_agent
+        run: npm ci
+
+      - name: Resolve assistant dependencies and require sidecar fixtures
+        id: dependencies
+        working-directory: qflistudio/companion/windows_assistant
+        run: |
+          test -d ../remote_agent/node_modules
+          flutter pub get
+
+      - name: Analyze Windows assistant
+        working-directory: qflistudio/companion/windows_assistant
+        run: flutter analyze --no-pub 2>&1 | tee "$RUNNER_TEMP/assistant-analyze.log"
+
+      - name: Run all assistant tests, including sidecar IPC
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        working-directory: qflistudio/companion/windows_assistant
+        run: flutter test --no-pub --reporter json 2>&1 | tee "$RUNNER_TEMP/assistant-test.json"
+
+      - name: Upload assistant verification logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verification-windows-assistant
+          path: |
+            ${{ runner.temp }}/assistant-analyze.log
+            ${{ runner.temp }}/assistant-test.json
+          if-no-files-found: warn
+          retention-days: 14
 
   windows:
     name: Windows ${{ matrix.arch }} installer
@@ -160,7 +347,7 @@ jobs:
         with:
           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
-          core-ref: ${{ inputs.core_ref || 'main' }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: windows-${{ matrix.arch }}
           desktop-platforms: windows
           patch-upstream-core: "true"
@@ -608,7 +795,7 @@ jobs:
         with:
           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
-          core-ref: ${{ inputs.core_ref || 'main' }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: linux-${{ matrix.arch }}
           desktop-platforms: linux
           patch-upstream-core: "true"
@@ -801,7 +988,7 @@ jobs:
         with:
           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
-          core-ref: ${{ inputs.core_ref || 'main' }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: macos-${{ matrix.arch }}
           desktop-platforms: macos
           patch-upstream-core: "true"
@@ -1003,7 +1190,7 @@ jobs:
         with:
           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
-          core-ref: ${{ inputs.core_ref || 'main' }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: ios
           patch-upstream-core: "true"
 
@@ -1131,7 +1318,7 @@ jobs:
         with:
           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
-          core-ref: ${{ inputs.core_ref || 'main' }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: android
           patch-upstream-core: "true"
 
@@ -1531,7 +1718,7 @@ jobs:
           flutter-version: ${{ env.OHOS_FLUTTER_VERSION }}
           flutter-commit: ${{ env.OHOS_FLUTTER_COMMIT }}
           flutter-mode: ohos
-          core-ref: ${{ inputs.core_ref || 'main' }}
+          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: ohos
           patch-upstream-core: "false"
 
@@ -1753,3 +1940,102 @@ jobs:
             echo 'Retention: 14 days. This HAP is not an APP package or a store release.'
             echo 'Validation: ZIP entries, the bundle name, the ABI set and the AArch64 libraries.'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  publish-preview:
+    name: Publish verified preview installers
+    if: startsWith(github.ref, 'refs/tags/v5.0.5-remote.')
+    needs:
+      - resolve-flutter
+      - verify-flutter
+      - verify-companion
+      - verify-assistant
+      - windows
+      - linux
+      - macos
+      - ios
+      - android
+      - ohos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: Download this run's installer artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: qflistudio-${{ env.APP_VERSION }}-*
+          path: packages
+          merge-multiple: false
+
+      - name: Check all eleven artifacts and package release assets
+        env:
+          OFFICIAL_FLUTTER_VERSION: ${{ needs.resolve-flutter.outputs.version }}
+          OFFICIAL_FLUTTER_COMMIT: ${{ needs.resolve-flutter.outputs.commit }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          version = os.environ['APP_VERSION']
+          targets = {
+              'windows-x64', 'windows-arm64', 'linux-x64', 'linux-arm64',
+              'macos-x86_64', 'macos-arm64', 'ios-arm64', 'android-x86_64',
+              'android-armeabi-v7a', 'android-arm64-v8a', 'ohos-arm64',
+          }
+          expected = {f'qflistudio-{version}-{target}' for target in targets}
+          directories = {path.name: path for path in Path('packages').iterdir()}
+          if set(directories) != expected:
+              raise SystemExit(f'Artifact set mismatch: {sorted(set(directories) ^ expected)}')
+          for name, directory in sorted(directories.items()):
+              report = directory / 'BUILD_INFO.txt'
+              facts = dict(line.split('=', 1) for line in report.read_text().splitlines() if '=' in line)
+              ohos = name.endswith('-ohos-arm64')
+              required = {
+                  'target': name,
+                  'app_version': version,
+                  'app_commit': os.environ['GITHUB_SHA'],
+                  'core_commit': os.environ['CORE_REF'],
+                  'flutter_mode': 'ohos' if ohos else 'upstream',
+                  'flutter_version': os.environ['OHOS_FLUTTER_VERSION' if ohos else 'OFFICIAL_FLUTTER_VERSION'],
+                  'flutter_commit': os.environ['OHOS_FLUTTER_COMMIT' if ohos else 'OFFICIAL_FLUTTER_COMMIT'],
+                  'build_mode': 'release',
+                  'device_validation': 'none',
+                  'run': f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              }
+              for key, value in required.items():
+                  if facts.get(key) != value:
+                      raise SystemExit(f'{name}: {key} is {facts.get(key)!r}, expected {value!r}')
+              if not facts.get('signing'):
+                  raise SystemExit(f'{name}: missing signing state')
+              print(f'Provenance verified: {name}')
+          PY
+          mkdir -p release-assets
+          for dir in packages/*; do
+            (cd "$dir" && sha256sum --strict --check SHA256SUMS)
+            name="$(basename "$dir")"
+            (cd "$dir" && zip -qr "$GITHUB_WORKSPACE/release-assets/$name.zip" .)
+          done
+          (cd release-assets && sha256sum ./*.zip > SHA256SUMS)
+
+      - name: Publish the prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          {
+            printf 'App version: %s\nApp commit: %s\nCore commit: %s\n\n' "$APP_VERSION" "$GITHUB_SHA" "$CORE_REF"
+            printf '%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
+            printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
+            printf '%s\n' 'Cloud-built preview. No physical-device validation.'
+            printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
+            printf '%s\n' 'iOS and OHOS packages require signing before installation.'
+            printf '\nWorkflow: %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+          } > release-notes.md
+          gh release create "$RELEASE_TAG" release-assets/* \
+            --repo "$GH_REPO" --verify-tag --prerelease --latest=false \
+            --title "QFLIStudioN $RELEASE_TAG" --notes-file release-notes.md
