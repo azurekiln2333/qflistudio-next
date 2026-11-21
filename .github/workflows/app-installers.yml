@@ -82,7 +82,7 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "0f18c3692791e66aa8cb74e71f49ea52469b7295"
+  CORE_REF: "123602be34ab6fa9725bb93f0d3bc27a630c7b44"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
@@ -1267,6 +1267,16 @@ jobs:
           bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")"
           if [ "$bundle_id" != "$BUNDLE_ID" ]; then
             echo "::error::Bundle ID is '$bundle_id', expected $BUNDLE_ID"
+            exit 1
+          fi
+          file_sharing="$(/usr/libexec/PlistBuddy -c 'Print :UIFileSharingEnabled' "$app/Info.plist" 2>/dev/null || true)"
+          if [ "$file_sharing" != "true" ]; then
+            echo "::error::UIFileSharingEnabled is '$file_sharing', expected true"
+            exit 1
+          fi
+          documents_in_place="$(/usr/libexec/PlistBuddy -c 'Print :LSSupportsOpeningDocumentsInPlace' "$app/Info.plist" 2>/dev/null || true)"
+          if [ "$documents_in_place" != "true" ]; then
+            echo "::error::LSSupportsOpeningDocumentsInPlace is '$documents_in_place', expected true"
             exit 1
           fi
           for framework in Flutter App; do
