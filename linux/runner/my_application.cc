@@ -19,6 +19,21 @@ static void first_frame_cb(MyApplication* self, FlView* view) {
   gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
 }
 
+// Unsupported is explicit: do not pretend an open-folder or text operation
+// is a native file share.
+static void platform_method_call(FlMethodChannel* channel, FlMethodCall* call,
+                                 gpointer user_data) {
+  const gchar* method = fl_method_call_get_name(call);
+  g_autoptr(FlMethodResponse) response = nullptr;
+  if (g_strcmp0(method, "shareFile") == 0) {
+    g_autoptr(FlValue) supported = fl_value_new_bool(FALSE);
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(supported));
+  } else {
+    response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
+  }
+  fl_method_call_respond(call, response, nullptr);
+}
+
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
@@ -74,6 +89,11 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_realize(GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+  g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
+  g_autoptr(FlMethodChannel) platform = fl_method_channel_new(
+      fl_engine_get_binary_messenger(fl_view_get_engine(view)),
+      "qflistudio/platform", FL_METHOD_CODEC(codec));
+  fl_method_channel_set_method_call_handler(platform, platform_method_call, nullptr, nullptr);
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }

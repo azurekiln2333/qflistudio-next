@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
+#include <flutter/standard_method_codec.h>
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
@@ -25,6 +26,34 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+  archive_share_ = std::make_unique<WindowsArchiveShare>(GetHandle());
+  platform_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+      flutter_controller_->engine()->messenger(), "qflistudio/platform",
+      &flutter::StandardMethodCodec::GetInstance());
+  platform_channel_->SetMethodCallHandler(
+      [this](const flutter::MethodCall<flutter::EncodableValue>& call,
+         std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+        if (call.method_name() != "shareFile") {
+          result->NotImplemented();
+          return;
+        }
+        const auto* arguments = call.arguments()
+            ? std::get_if<flutter::EncodableMap>(call.arguments()) : nullptr;
+        const auto text = [arguments](const char* key) -> const std::string* {
+          if (!arguments) return nullptr;
+          const auto found = arguments->find(flutter::EncodableValue(key));
+          return found == arguments->end()
+              ? nullptr : std::get_if<std::string>(&found->second);
+        };
+        const auto* path = text("path");
+        const auto* title = text("title");
+        const auto* mime = text("mimeType");
+        if (!path || !mime || *mime != "application/zip") {
+          result->Error("INVALID_ARGUMENT", "A prepared ZIP is required.");
+          return;
+        }
+        archive_share_->Share(*path, title ? *title : "ZIP archive", std::move(result));
+      });
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -40,6 +69,10 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  // Complete/cancel native replies before destroying the Flutter messenger.
+  if (archive_share_) archive_share_->Dispose();
+  archive_share_ = nullptr;
+  platform_channel_ = nullptr;
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }

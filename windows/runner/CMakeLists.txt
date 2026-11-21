@@ -8,6 +8,7 @@ project(runner LANGUAGES CXX)
 # Any new source files that you add to the application should be added here.
 add_executable(${BINARY_NAME} WIN32
   "flutter_window.cpp"
+  "archive_share.cpp"
   "main.cpp"
   "utils.cpp"
   "win32_window.cpp"
@@ -33,7 +34,12 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app)
-target_link_libraries(${BINARY_NAME} PRIVATE "dwmapi.lib")
+target_link_libraries(${BINARY_NAME} PRIVATE
+  "dwmapi.lib" "windowsapp.lib" "runtimeobject.lib" "shell32.lib" "version.lib")
+
+# The HWND share adapter uses C++/WinRT coroutines; keep the rest of the runner's
+# standard settings unchanged. Windows SDK 10.0.19041+ provides these headers.
+target_compile_features(${BINARY_NAME} PRIVATE cxx_std_20)
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
 
 # Run the Flutter tool portions of the build. This must not be removed.

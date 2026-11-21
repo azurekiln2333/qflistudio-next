@@ -8,6 +8,7 @@ import {
 } from '@ohos/flutter_ohos';
 import { authentication } from '@kit.AccountKit';
 import { systemShare } from '@kit.ShareKit';
+import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { common, Want, ConfigurationConstant } from '@kit.AbilityKit';
 import { window, display } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -205,6 +206,46 @@ export default class EntryAbility extends FlutterAbility {
             .catch((err: BusinessError) => {
               result.error(`${err.code}`, `${err.message}`, null);
             });
+        } else if (call.method === 'shareFile') {
+          const path = call.argument('path') as string;
+          const title = call.argument('title') as string;
+          const mime = call.argument('mimeType') as string;
+          // Only the dedicated retained ZIP subtree is eligible. Never expose
+          // the parent files directory, source projects or cloud manifests.
+          const root = abilityContext.filesDir + '/archive_shares/';
+          const relative = typeof path === 'string' ? path.substring(root.length) : '';
+          const parts = relative.split('/');
+          if (typeof path !== 'string' || mime !== 'application/zip' || !path.startsWith(root) ||
+            parts.length !== 2 || !parts[0].startsWith('share-') ||
+            parts.some((part: string) => part === '' || part === '.' || part === '..') ||
+            !parts[1].endsWith('.zip')) {
+            result.error('INVALID_ARGUMENT', 'Only prepared ZIP archives may be shared.', null);
+            return;
+          }
+          try {
+            if (fileIo.lstatSync(root.slice(0, -1)).isSymbolicLink() ||
+              fileIo.lstatSync(root + parts[0]).isSymbolicLink() ||
+              fileIo.lstatSync(path).isSymbolicLink() ||
+              !fileIo.statSync(path).isFile()) {
+              result.error('SHARE_FAILED', 'Share ZIP is unavailable.', null);
+              return;
+            }
+            const data = new systemShare.SharedData({
+              utd: 'general.zip-archive',
+              uri: fileUri.getUriFromPath(path),
+              title: title,
+            });
+            const controller = new systemShare.ShareController(data);
+            const options: systemShare.ShareControllerOptions = {};
+            controller.show(abilityContext, options)
+              .then(() => result.success(true))
+              .catch((_err: BusinessError) => {
+                result.error('SHARE_FAILED', 'The ZIP could not be shared.', null);
+              });
+          } catch (_err) {
+            result.error('SHARE_FAILED', 'The ZIP could not be shared.', null);
+          }
+          // Do not unlink on dismissal: the receiver may read the URI later.
         } else if (call.method === 'shareText') {
           // 系统分享面板（Share Kit）：纯文本分享。
           const title = call.argument('title') as string;
