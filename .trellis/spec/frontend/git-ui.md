@@ -4,6 +4,8 @@
 
 Apply when changing project-card repository metadata or keyboard handling in Git dialogs and the editor symbols bar. Product sources live in the resolved Core checkout.
 
+For clone tasks and native progress, read [Parallel Git Clone](./git-clone-progress.md).
+
 ## 2. Signatures
 
 - `readProjectGitBranch(String projectRoot) -> Future<String?>` reads local HEAD metadata.

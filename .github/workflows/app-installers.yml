@@ -82,12 +82,12 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.5"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "123602be34ab6fa9725bb93f0d3bc27a630c7b44"
+  CORE_REF: "c619f9ff0e83341f4efb548ea58eb7af42a9f51f"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
   # package whose embedded Git payload reports another version.
-  QFLI_GIT_API_VERSION: "2"
+  QFLI_GIT_API_VERSION: "3"
   APP_ID: com.azurekiln.qflistudio
   OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
   ANDROID_NDK_VERSION: "27.0.12077973"
@@ -2295,11 +2295,11 @@ jobs:
               if not facts.get('signing'):
                   raise SystemExit(f'{name}: missing signing state')
               # Every package must carry a resolved qfli_git: no unknown or
-              # pending facts, API 2 native artifacts, and the same plugin
+              # pending facts, API 3 native artifacts, and the same plugin
               # revision in all eleven targets.
               plugin = {
                   'plugin': 'qfli_git',
-                  'plugin_native_api_version': '2',
+                  'plugin_native_api_version': '3',
                   'plugin_pending': '0',
               }
               for key, value in plugin.items():
@@ -2328,7 +2328,7 @@ jobs:
               'qfli_git ' + plugin_facts['plugin_version']
               + ' at ' + plugin_facts['plugin_commit'][:12]
               + ', native ' + plugin_facts['plugin_native_source'][:12]
-              + ', API 2 in all packages'
+              + ', API 3 in all packages'
           )
           PY
           mkdir -p release-assets
@@ -2392,7 +2392,7 @@ jobs:
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
             printf '%s\n' 'The packaged sidecar passed fresh configuration, a LAN-address pairing link and phone request/reply checks over loopback.'
             printf '%s\n' 'Includes the remote computer module, the integrated thinking-stream UI and the Studio Git plugin UI.'
-            printf '%s\n' 'Every installer records the same pinned qfli_git revision in BUILD_INFO.txt. Android, iOS and OHOS packages are checked for API 2 exports and the CA bundle. Desktop Git uses the installed Git CLI.'
+            printf '%s\n' 'Every installer records the same pinned qfli_git revision in BUILD_INFO.txt. Android, iOS and OHOS packages are checked for API 3 exports and the CA bundle. Desktop Git uses the installed Git CLI.'
             printf '%s\n' 'Cloud-built preview. No physical-device validation.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'

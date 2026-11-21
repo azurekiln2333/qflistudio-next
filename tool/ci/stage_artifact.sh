@@ -49,8 +49,8 @@ if [ "$QFLI_PLUGIN_PENDING" != "0" ]; then
   echo "::error::QFLI_PLUGIN_PENDING=$QFLI_PLUGIN_PENDING; a release package needs imported native artifacts"
   exit 1
 fi
-if [ "${QFLI_PLUGIN_API_VERSION}" != "2" ]; then
-  echo "::error::QFLI_PLUGIN_API_VERSION=${QFLI_PLUGIN_API_VERSION}; the app requires API 2"
+if [ "${QFLI_PLUGIN_API_VERSION}" != "3" ]; then
+  echo "::error::QFLI_PLUGIN_API_VERSION=${QFLI_PLUGIN_API_VERSION}; the app requires API 3"
   exit 1
 fi
 
