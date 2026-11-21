@@ -2,8 +2,8 @@ name: App installers
 
 # Builds installable packages for eleven targets on GitHub-hosted runners.
 # Every JavaScript action is pinned by commit and runs on Node 24, so no
-# "Node.js 20 is deprecated" warning appears. Preview publication requires
-# every verification job and installer target. No production signing key is used.
+# "Node.js 20 is deprecated" warning appears. Stable and preview publication
+# require every verification job and installer target. No production signing key is used.
 
 on:
   push:
@@ -80,7 +80,7 @@ env:
   COMPANION_NODE_VERSION: "24.14.1"
   # Bumped in the same commit as pubspec.yaml, so the OHOS artifact name and
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
-  APP_VERSION: "5.0.5"
+  APP_VERSION: "5.0.6"
   FLUTTER_VERSION: "3.50.0"
   CORE_REF: "c619f9ff0e83341f4efb548ea58eb7af42a9f51f"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
@@ -2215,9 +2215,9 @@ jobs:
             echo 'Validation: ZIP entries, the bundle name, the ABI set and the AArch64 libraries.'
           } >> "$GITHUB_STEP_SUMMARY"
 
-  publish-preview:
-    name: Publish verified preview installers
-    if: startsWith(github.ref, 'refs/tags/v5.0.5-remote.') || startsWith(github.ref, 'refs/tags/v5.0.5-git.')
+  publish-release:
+    name: Publish verified release or preview
+    if: github.ref == 'refs/tags/v5.0.6' || startsWith(github.ref, 'refs/tags/v5.0.6-remote.') || startsWith(github.ref, 'refs/tags/v5.0.6-git.')
     needs:
       - resolve-flutter
       - verify-flutter
@@ -2379,27 +2379,38 @@ jobs:
           (cd "companions/$name" && zip -qr "$GITHUB_WORKSPACE/release-assets/$name.zip" .)
           (cd release-assets && sha256sum ./*.zip > SHA256SUMS)
 
-      - name: Publish the prerelease
+      - name: Publish the verified release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           {
-            printf 'App version: %s\nApp commit: %s\nCore commit: %s\n\n' "$APP_VERSION" "$GITHUB_SHA" "$CORE_REF"
+            printf 'QFLIStudioN %s\n\n' "$APP_VERSION"
+            printf 'App commit: %s\nCore commit: %s\n' "$GITHUB_SHA" "$CORE_REF"
             printf 'Java receiver commit (contract checks): %s\n\n' "$JAVA_REF"
-            printf '%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
+            if [[ "$RELEASE_TAG" == "v$APP_VERSION" ]]; then
+              printf '%s\n' 'Release channel: stable.'
+              printf '%s\n' 'QFLIStudioN 5.0.6 brings the integrated Studio Git workflow, live clone progress, remote computer support and streamed AI thinking.'
+            else
+              printf '%s\n' "Release channel: preview ($RELEASE_TAG)."
+              printf '%s\n' 'This preview contains the 5.0.6 release candidate for cloud verification.'
+            fi
+            printf '\n%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
             printf '%s\n' 'The packaged sidecar passed fresh configuration, a LAN-address pairing link and phone request/reply checks over loopback.'
-            printf '%s\n' 'Includes the remote computer module, the integrated thinking-stream UI and the Studio Git plugin UI.'
             printf '%s\n' 'Every installer records the same pinned qfli_git revision in BUILD_INFO.txt. Android, iOS and OHOS packages are checked for API 3 exports and the CA bundle. Desktop Git uses the installed Git CLI.'
-            printf '%s\n' 'Cloud-built preview. No physical-device validation.'
+            printf '%s\n' 'Cloud-built packages. No physical-device validation was performed.'
             printf '%s\n' 'Android uses a debug certificate. Windows is unsigned. macOS is ad-hoc signed and not notarized.'
             printf '%s\n' 'iOS and OHOS packages require signing before installation.'
             printf '%s\n' 'The Windows x64 remote assistant includes Node.js and agent dependencies. Extract its ZIP and open Start-QFLI-Remote.cmd.'
             printf '%s\n' 'On the assistant Pairing page, read the relay address and short code. In Studio, open Tools > Remote Computer > Enter short code, enter both values, and connect. Camera scanning is not implemented.'
             printf '\nWorkflow: %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
           } > release-notes.md
-          gh release create "$RELEASE_TAG" release-assets/* \
-            --repo "$GH_REPO" --verify-tag --prerelease --latest=false \
-            --title "QFLIStudioN $RELEASE_TAG" --notes-file release-notes.md
+          release_args=(--repo "$GH_REPO" --verify-tag --title "QFLIStudioN $APP_VERSION" --notes-file release-notes.md)
+          if [[ "$RELEASE_TAG" == "v$APP_VERSION" ]]; then
+            release_args+=(--latest)
+          else
+            release_args+=(--prerelease --latest=false)
+          fi
+          gh release create "$RELEASE_TAG" release-assets/* "${release_args[@]}"

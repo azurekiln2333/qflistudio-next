@@ -64,6 +64,20 @@ External JavaScript actions use only SHA-pinned Node 24 actions:
 
 Local composite actions may wrap these actions. Do not add a Flutter action that brings a Node 20 cache action transitively.
 
+## 9. GitHub Release Integration
+
+Keep the App version, `StudioProfile.clientVersion`, OHOS version name/code and
+installer workflow `APP_VERSION` consistent. Stable `v<APP_VERSION>` tags must
+publish a normal GitHub release only after every verification and installer gate
+passes. Preview tags remain prereleases. Preserve exact Core/plugin commit pins
+and native build provenance when promoting a verified build.
+
+Before reporting a release complete, verify that its App history is reachable
+from GitHub main. Promote the verified Core and plugin histories to their GitHub
+main branches too. Use normal fast-forward updates when possible. Delete a
+topic branch only after proving that its complete history is reachable from the
+corresponding main. Preserve local dirty checkouts and existing worktrees.
+
 Windows packaging first uses Visual Studio's declared default redistributable.
 Keep `Microsoft.VC*.CRT` outside shell quotes so the wildcard expands. If the
 default is unavailable, select the newest usable version with version sorting;
