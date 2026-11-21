@@ -117,7 +117,7 @@ Version: $version
 Architecture: $deb_arch
 Maintainer: azurekiln2333 <1665673737@qq.com>
 Installed-Size: $installed_kib
-Depends: libc6 (>= 2.35), libstdc++6, libgtk-3-0, libglib2.0-0
+Depends: libc6 (>= 2.35), libstdc++6, libgtk-3-0, libglib2.0-0, libsecret-1-0
 Section: devel
 Priority: optional
 Homepage: https://github.com/azurekiln2333/qflistudio-next

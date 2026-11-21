@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Do not restore GitHub ciphertext without the device Keystore key. -->
+        <exclude domain="sharedpref" path="com.azurekiln.qfli.github.xml" />
+        <exclude domain="sharedpref" path="FlutterSecureKeyStorage:com.azurekiln.qfli.github.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="com.azurekiln.qfli.github.xml" />
+        <exclude domain="sharedpref" path="FlutterSecureKeyStorage:com.azurekiln.qfli.github.xml" />
+    </device-transfer>
+</data-extraction-rules>

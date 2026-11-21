@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- flutter_secure_storage GitHub namespace + wrapped Android Keystore key -->
+    <exclude domain="sharedpref" path="com.azurekiln.qfli.github.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage:com.azurekiln.qfli.github.xml" />
+</full-backup-content>

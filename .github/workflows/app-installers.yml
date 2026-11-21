@@ -843,10 +843,10 @@ jobs:
       - name: Install Linux desktop build tools
         run: |
           sudo apt-get update
-          # file_selector_linux is the only plugin with native Linux code.
+          # file_selector_linux and flutter_secure_storage_linux need native dependencies.
           sudo apt-get install -y --no-install-recommends \
             clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
-            libstdc++-12-dev desktop-file-utils file
+            libsecret-1-dev libstdc++-12-dev desktop-file-utils file
 
       - name: Build the Linux release bundle
         run: |
