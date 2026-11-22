@@ -196,6 +196,69 @@ jobs:
         working-directory: ${{ matrix.directory }}
         run: flutter test --no-pub --reporter json 2>&1 | tee "$RUNNER_TEMP/flutter-test.json"
 
+      - name: Report failed tests
+        if: ${{ failure() && steps.dependencies.outcome == 'success' }}
+        working-directory: ${{ matrix.directory }}
+        run: |
+          python3 - "$RUNNER_TEMP/flutter-test.json" <<'PY'
+          import json, re, sys
+          suites, tests, errors, stacks, prints = {}, {}, {}, {}, {}
+          ROOT = re.compile(r'file:///\S*?/(qfli_studio_core|qflistudio)/')
+
+          def frames(text):
+              # Keep only frames from our own sources and tests.
+              out = []
+              for f in text.splitlines():
+                  f = ROOT.sub('', f.strip())
+                  if ('package:qfli' in f or re.search(r'(^|[ (/])(test|lib)/', f)) and f not in out:
+                      out.append(f)
+              return out[:8]
+
+          def detail(tid):
+              # The caught exception that flutter_test prints before "Test failed".
+              lines = errors.get(tid, '').strip().splitlines()[1:8]
+              for msg in prints.get(tid, []):
+                  if 'EXCEPTION CAUGHT' not in msg:
+                      continue
+                  kept = []
+                  for l in msg.splitlines():
+                      if l.startswith('When the exception was thrown') or l.startswith('The relevant error-causing'):
+                          break
+                      if l.strip() and not l.startswith('══'):
+                          kept.append(l.rstrip())
+                  lines += kept[:14] + frames(msg)
+              return lines + frames(stacks.get(tid, ''))
+
+          for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
+              line = line.strip()
+              if not line.startswith('{'):
+                  continue
+              try:
+                  e = json.loads(line)
+              except ValueError:
+                  continue
+              kind = e.get('type')
+              if kind == 'suite':
+                  suites[e['suite']['id']] = e['suite'].get('path') or ''
+              elif kind == 'testStart':
+                  t = e['test']
+                  tests[t['id']] = (suites.get(t.get('suiteID'), ''), t.get('name', '?'))
+              elif kind == 'error':
+                  errors.setdefault(e['testID'], e.get('error') or '')
+                  stacks.setdefault(e['testID'], e.get('stackTrace') or '')
+              elif kind == 'print':
+                  prints.setdefault(e.get('testID'), []).append(e.get('message') or '')
+              elif kind == 'testDone' and e.get('result') != 'success' and not e.get('hidden'):
+                  path, name = tests.get(e['testID'], ('', '?'))
+                  lines = errors.get(e['testID'], '').strip().splitlines()
+                  first = lines[0][:200] if lines else e.get('result', '')
+                  head = ' '.join(f'{path} :: {name} :: {first}'.split())
+                  body = ['    ' + l.strip()[:240] for l in detail(e['testID']) if l.strip()]
+                  text = '\n'.join([head] + body)[:4000]
+                  text = text.replace('%', '%25').replace('\r', '').replace('\n', '%0A')
+                  print(f'::error title=Failed test::{text}')
+          PY
+
       # The release helpers must be exercised on a cloud runner: they read a
       # real pubspec.lock and a real native lock, which cannot be built locally.
       - name: Test the CI helper scripts
