@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:qfli_studio_core/app.dart';
 import 'package:qfli_studio_core/config/ohos_platform.dart';
+import 'package:qfli_studio_core/harness/hub/default_harness_hosts.dart';
 import 'package:qfli_studio_core/services/project_templates.dart';
 import 'package:qfli_studio_core/interop/interop_runner.dart';
 import 'package:qfli_studio_core/interop/interop_background_transport.dart';
@@ -76,6 +77,9 @@ Future<void> main() async {
   // 工具页的 Agents 卡片需要账号与设置才能打开编辑器，签名的限制见
   // studio_tools_tab.dart 里的说明。
   studioAppServices = (auth: auth, settings: settings);
+  // 四类 harness 主机在启动时注册一次：编辑器页只负责建 hub，
+  // 具体装哪些主机由 core 的集成装配文件决定。
+  registerDefaultHarnessHosts();
   final ready = ValueNotifier<bool>(false);
   runApp(QfliApp(store: store, auth: auth, settings: settings, ready: ready));
 
