@@ -73,6 +73,9 @@ Future<void> main() async {
   final store = ProjectStore();
   final auth = AuthStore();
   final settings = SettingsStore();
+  // 工具页的 Agents 卡片需要账号与设置才能打开编辑器，签名的限制见
+  // studio_tools_tab.dart 里的说明。
+  studioAppServices = (auth: auth, settings: settings);
   final ready = ValueNotifier<bool>(false);
   runApp(QfliApp(store: store, auth: auth, settings: settings, ready: ready));
 
