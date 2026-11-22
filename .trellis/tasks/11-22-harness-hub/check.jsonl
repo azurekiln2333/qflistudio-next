@@ -1,0 +1,4 @@
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"质量检查清单"}
+{"file":".trellis/spec/frontend/process-lifecycle.md","reason":"进程清理与退出路径"}
+{"file":".trellis/spec/frontend/remote-companion.md","reason":"远程协议兼容"}
+{"file":".trellis/tasks/11-22-harness-hub/reports/brief.md","reason":"Pi 硬性规则"}

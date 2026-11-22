@@ -1,0 +1,9 @@
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"App 与共享 Core 的仓库边界"}
+{"file":".trellis/spec/frontend/editor-terminal.md","reason":"编辑器终端与 PTY 约束"}
+{"file":".trellis/spec/frontend/process-lifecycle.md","reason":"本机会话进程生命周期"}
+{"file":".trellis/spec/frontend/remote-companion.md","reason":"远程 companion 与会话协议"}
+{"file":".trellis/spec/frontend/vibe-skills.md","reason":"内置 Agent 技能机制"}
+{"file":".trellis/spec/frontend/interop.md","reason":"平台互操作边界"}
+{"file":".trellis/spec/frontend/state-management.md","reason":"HarnessHub 状态管理"}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Agents 界面组件规范"}
+{"file":".trellis/tasks/11-22-harness-hub/reports/brief.md","reason":"Pi 分工与硬性规则"}
