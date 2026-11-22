@@ -82,7 +82,7 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.8"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "90e6caf575761d2ed9f37b394fd2f74aced0920b"
+  CORE_REF: "8440dcc9183e64bcae449730dec62778bcaade3d"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
