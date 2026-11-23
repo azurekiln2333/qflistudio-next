@@ -64,6 +64,22 @@ External JavaScript actions use only SHA-pinned Node 24 actions:
 
 Local composite actions may wrap these actions. Do not add a Flutter action that brings a Node 20 cache action transitively.
 
+### Release version and verification contract
+
+Update all four version owners together: `pubspec.yaml`, the
+`qfliStudioProfile.clientVersion` in `lib/main.dart`, OHOS
+`AppScope/app.json5`, and workflow `APP_VERSION`. The workflow's
+`publish-release.if` tag allowlist and release-note text must also match.
+
+Pin `CORE_REF` to the full reviewed Core commit. `ci/**` pushes build installers
+without publishing. Only the allowed version tags can publish, and publication
+depends on every verification and installer job.
+
+Track CI by repository, workflow, exact SHA, and branch. A completion marker
+or a green run for an older SHA is insufficient. Preserve run IDs and actual
+results. Check both repositories' `main` runs after integration. Do not describe
+physical-device acceptance as complete based on CI.
+
 ## 9. GitHub Release Integration
 
 Keep the App version, `StudioProfile.clientVersion`, OHOS version name/code and
