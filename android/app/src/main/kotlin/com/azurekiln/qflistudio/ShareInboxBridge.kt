@@ -29,10 +29,12 @@ class ShareInboxBridge(
     private val mainHandler = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor()
 
-    private var pending: Map<String, Any?>? = null
-
     /** Dart 已经取过一次批次，说明它可以收 `incoming`。 */
-    private var dartListening = false
+    private var dartListening: Boolean
+        get() = listeningShared
+        set(value) {
+            listeningShared = value
+        }
 
     /** 解析一个进来或新建的 intent。不是分享用的 intent 直接忽略。 */
     fun offer(intent: Intent?) {
@@ -128,6 +130,19 @@ class ShareInboxBridge(
         result.success(batch)
     }
 
+    /**
+     * Activity 重建时补投上一任桥缓存的批次。
+     *
+     * Dart 只会在启动时调一次 `takePending`；新桥若把批次只放进缓存，
+     * 这一批就再也送不到界面，所以要主动推一次。
+     */
+    fun flushPending() {
+        if (!dartListening) return
+        val batch = pending ?: return
+        pending = null
+        channel.invokeMethod("incoming", batch)
+    }
+
     /** 删除一个批次目录。目录名校验与 Dart 侧一致。 */
     fun discard(id: String?, result: MethodChannel.Result) {
         if (id == null || !BATCH_ID.matches(id)) {
@@ -139,7 +154,8 @@ class ShareInboxBridge(
     }
 
     fun dispose() {
-        worker.shutdownNow()
+        // 不中断在跑的复制：半截文件比晚到的批次更糟。
+        worker.shutdown()
     }
 
     private fun shareUris(intent: Intent): List<Uri> {
@@ -253,6 +269,13 @@ class ShareInboxBridge(
         private const val MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
         private const val MAX_BATCH_BYTES = 512L * 1024L * 1024L
         private const val COPY_CHUNK = 1 shl 20
+
+        // 进程级状态：Activity 重建会换一个新桥，而 Dart 侧早已听过通道。
+        @Volatile
+        private var listeningShared = false
+
+        @Volatile
+        private var pending: Map<String, Any?>? = null
     }
 
     private val BATCH_ID = Regex("[A-Za-z0-9_-]{1,64}")

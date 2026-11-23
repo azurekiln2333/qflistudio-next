@@ -25,6 +25,8 @@ class MainActivity : FlutterActivity() {
         }
         // 冷启动：进程由分享 intent 拉起。
         bridge.offer(intent)
+        // Activity 重建：上一任桥可能留下了没送出去的批次。
+        bridge.flushPending()
     }
 
     override fun onNewIntent(intent: Intent) {
