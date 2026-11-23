@@ -26,8 +26,10 @@ final class ShareInboxBridge {
   private init() {}
 
   /// 由 AppDelegate 在 `didInitializeImplicitFlutterEngine` 里调用。
+  ///
+  /// 引擎重建会带来新的 messenger：旧 channel 已经失效，必须重新装配，
+  /// 否则之后的分享会静默丢掉。
   func configure(messenger: FlutterBinaryMessenger) {
-    guard channel == nil else { return }
     let channel = FlutterMethodChannel(name: Self.channelName, binaryMessenger: messenger)
     channel.setMethodCallHandler { [weak self] call, result in
       guard let self else {
