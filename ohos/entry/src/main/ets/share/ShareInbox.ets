@@ -35,13 +35,21 @@ export function configureShareInbox(
   context: common.UIAbilityContext,
 ): void {
   abilityContext = context;
-  if (channel !== null) {
-    return;
-  }
   const inboxChannel = new MethodChannel(
     engine.dartExecutor.getBinaryMessenger(),
     SHARE_INBOX_CHANNEL,
   );
+  const previous = channel;
+  if (previous !== null) {
+    // 旧引擎已经拆掉：先拆掉它的处理器，再重置监听标记。
+    // 否则新引擎的 Dart 还没调 takePending，批次就会推给一个没人接的通道。
+    try {
+      previous.setMethodCallHandler(null);
+    } catch (error) {
+      // 旧引擎已销毁时拆处理器会抛，忽略。
+    }
+    dartListening = false;
+  }
   inboxChannel.setMethodCallHandler({
     onMethodCall: (call: MethodCall, result: MethodResult): void => {
       if (call.method === 'takePending') {
@@ -59,11 +67,11 @@ export function configureShareInbox(
           result.error('INVALID_ARGUMENT', '批次 id 无效', null);
           return;
         }
-        const directory = `${inboxRoot()}/${id}`;
+        // 目录已不在时这里抛，捕获即幂等。
         try {
-          fileIo.rmdirSync(directory);
+          fileIo.rmdirSync(`${inboxRoot()}/${id}`);
         } catch (error) {
-          // 目录已不在：删除是幂等的。
+          // 已经删掉了。
         }
         result.success(null);
       } else {
@@ -95,6 +103,7 @@ export function offerShareWant(want: Want, context: common.UIAbilityContext): vo
 
 async function copyBatch(uris: string[], source: string): Promise<void> {
   const batchId = makeBatchId();
+  const batchDir = `${inboxRoot()}/${batchId}`;
   const files: SharedFile[] = [];
   let total = 0;
   let index = 0;
@@ -107,9 +116,9 @@ async function copyBatch(uris: string[], source: string): Promise<void> {
       continue;
     }
     const name = baseName(sourcePath);
-    const target = `${inboxRoot()}/${batchId}/${pad(index + 1)}-${safeName(name)}`;
+    const target = `${batchDir}/${pad(index + 1)}-${safeName(name)}`;
     try {
-      ensureDirectory(`${inboxRoot()}/${batchId}`);
+      ensureDirectory(batchDir);
       const declared = declaredSize(sourcePath);
       if (declared !== null) {
         if (declared > MAX_FILE_BYTES || total + declared > MAX_BATCH_BYTES) {
@@ -132,13 +141,18 @@ async function copyBatch(uris: string[], source: string): Promise<void> {
       files.push(file);
       index++;
     } catch (error) {
-      // 单个文件失败不影响整批。
+      // 单个文件失败不影响整批；半截文件不能计入批次。
+      try {
+        fileIo.unlinkSync(target);
+      } catch (cleanupError) {
+        // 没拷出来就没有半成品。
+      }
       continue;
     }
   }
   if (files.length === 0) {
     try {
-      fileIo.rmdirSync(`${inboxRoot()}/${batchId}`);
+      fileIo.rmdirSync(batchDir);
     } catch (error) {
       // 没建出来就不用删。
     }
@@ -173,25 +187,37 @@ function shareUris(want: Want): string[] {
     return [];
   }
   const collected: string[] = [];
+  // 同一批里同一个 uri 只收一次：流和 want.uri 可能指向同一个文件。
+  const seen: Set<string> = new Set<string>();
+  const push = (value: string): void => {
+    if (value.length === 0 || seen.has(value)) {
+      return;
+    }
+    seen.add(value);
+    collected.push(value);
+  };
   const parameters = want.parameters;
   if (parameters !== undefined) {
-    const stream = parameters['ability.params.stream'];
+    const stream: Object | undefined = parameters['ability.params.stream'];
+    // ArkTS 不收 `any`：先按数组取，再逐项确认是字符串。
     if (Array.isArray(stream)) {
-      const list = stream as string[];
+      const list = stream as Object[];
       for (const item of list) {
-        if (item.length > 0) {
-          collected.push(item);
+        if (typeof item === 'string') {
+          push(item);
         }
       }
-    } else if (typeof stream === 'string' && stream.length > 0) {
-      collected.push(stream);
+    } else if (typeof stream === 'string') {
+      push(stream);
     }
   }
   const uri = want.uri;
-  if (uri !== undefined && uri.length > 0) {
-    collected.push(uri);
+  if (uri !== undefined) {
+    push(uri);
   }
-  return collected;
+  // viewData 只带一个文件；sendData 一次最多 16 个。
+  const limit = action === 'ohos.want.action.viewData' ? 1 : MAX_FILES;
+  return collected.slice(0, limit);
 }
 
 function toPath(uri: string): string {
