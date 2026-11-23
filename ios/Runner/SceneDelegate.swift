@@ -1,6 +1,5 @@
 import Flutter
 import UIKit
-import UniformTypeIdentifiers
 
 /// 接收别的应用打开的文件。
 ///
@@ -99,7 +98,7 @@ final class ShareInboxBridge {
       defer { if scoped { url.stopAccessingSecurityScopedResource() } }
       let name = url.lastPathComponent.isEmpty ? "shared_\(index + 1)" : url.lastPathComponent
       let target = directory.appendingPathComponent(
-        String(format: "%04d-%@", index + 1, Self.safeName(name))
+        String(format: "%04d-%@", index + 1, Self.safeName(name) as NSString)
       )
       guard let copied = copyFile(from: url, to: target), copied > 0 else { continue }
       total += copied
@@ -167,11 +166,19 @@ final class ShareInboxBridge {
   }
 
   private static func mimeType(of url: URL) -> String? {
-    let extensionName = url.pathExtension.lowercased()
-    guard !extensionName.isEmpty, let type = UTType(filenameExtension: extensionName) else {
-      return nil
+    // 部署目标是 iOS 13，用扩展名查表，不引 UniformTypeIdentifiers。
+    switch url.pathExtension.lowercased() {
+    case "txt", "md", "log": return "text/plain"
+    case "json": return "application/json"
+    case "pdf": return "application/pdf"
+    case "png": return "image/png"
+    case "jpg", "jpeg": return "image/jpeg"
+    case "gif": return "image/gif"
+    case "zip": return "application/zip"
+    case "mp4": return "video/mp4"
+    case "mp3": return "audio/mpeg"
+    default: return nil
     }
-    return type.preferredMIMEType
   }
 }
 
