@@ -253,6 +253,10 @@ export type ClientRequest =
   | { type: 'list_sessions' }
   | { type: 'list_history'; cwd?: string }
   | { type: 'list_dir'; path?: string }
+  /** Directory manifest for the non-git sync path. */
+  | { type: 'fs_manifest'; path: string }
+  /** One slice of a project file, at most `FS_CHUNK_BYTES`. */
+  | { type: 'fs_read'; path: string; offset: number; length?: number }
   /**
    * Git metadata of a project directory, used to decide whether the phone can
    * fetch the code from its origin instead of transferring files.
@@ -293,6 +297,27 @@ export type DirEntry = { name: string; path: string };
  * is a size signal, not the exact download volume.
  */
 export const GIT_CONFIRM_BYTES = 200 * 1024 * 1024;
+
+/** Largest slice the agent sends in one `fs_chunk`. */
+export const FS_CHUNK_BYTES = 512 * 1024;
+
+/** Above this many entries the manifest is cut and flagged. */
+export const FS_MANIFEST_MAX_ENTRIES = 20000;
+
+/** Version of the ignore table. Bumping it invalidates stored manifests. */
+export const FS_IGNORE_VERSION = 1;
+
+export type FsEntryKind = 'file' | 'dir';
+
+export type FsEntry = {
+  /** Posix relative path, `/` separated, no leading slash. */
+  path: string;
+  kind: FsEntryKind;
+  /** Bytes for a file, 0 for a directory. */
+  size: number;
+  /** Lowercase hex sha256 of the file bytes, '' for a directory. */
+  hash: string;
+};
 
 export type HistoryItem = {
   sessionId: string;
@@ -401,6 +426,23 @@ export type AgentMessage =
        * endpoints, and v1 agents leave this empty.
        */
       lanUrls?: string[];
+    }
+  | {
+      kind: 'fs_manifest';
+      id?: string;
+      root: string;
+      ignoreVersion: number;
+      entries: FsEntry[];
+      /** True when the walk stopped at the entry cap. */
+      truncated: boolean;
+    }
+  | {
+      kind: 'fs_chunk';
+      id?: string;
+      path: string;
+      offset: number;
+      base64: string;
+      eof: boolean;
     }
   | {
       kind: 'project_git_info';
