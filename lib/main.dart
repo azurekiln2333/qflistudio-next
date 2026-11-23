@@ -117,7 +117,7 @@ Future<void> main() async {
       store: store,
       settings: settings,
     );
-    void showError(String message) {
+    void showSnack(String message) {
       final context = navigatorKey.currentContext;
       if (context == null) return;
       ScaffoldMessenger.maybeOf(
@@ -131,11 +131,17 @@ Future<void> main() async {
       projects: () => store.projects,
       sessionsOf: (projectId) => runtime.sessions.sessionsOf(projectId),
       ready: ready,
-      onCopy: (batch, project, subdirectory) => copyBatchIntoProject(
-        batch: batch,
-        project: project,
-        subdirectory: subdirectory,
-      ),
+      onCopy: (batch, project, subdirectory) async {
+        final result = await copyBatchIntoProject(
+          batch: batch,
+          project: project,
+          subdirectory: subdirectory,
+        );
+        if (result.relativePaths.isNotEmpty) {
+          showSnack('${result.relativePaths.length} 个文件已放进 ${project.name}');
+        }
+        return result;
+      },
       onAttach: (batch, project, sessionId) async {
         final result = await copyBatchIntoProject(
           batch: batch,
@@ -163,7 +169,7 @@ Future<void> main() async {
           ),
         );
       },
-      onError: showError,
+      onError: showSnack,
     );
     await host.start();
   }
