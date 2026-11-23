@@ -17,6 +17,7 @@ import {
   type HistoryItem,
   type PermissionModeName,
 } from '../shared/protocol.ts';import { type Logger, silentLogger } from '../shared/log.ts';
+import { collectDeviceInfo } from './device-info.ts';
 import { normalize } from './normalize.ts';
 import { Session, type QueryFn, type SessionListener, type ManagedSession } from './session.ts';
 
@@ -180,11 +181,15 @@ export class AgentCore {
       case 'info': {
         const codex = this.opts.codex ? await this.opts.codex.availability() : undefined;
         const herdr = this.opts.herdr ? await this.opts.herdr.availability() : undefined;
+        const device = await collectDeviceInfo();
         return {
           kind: 'info',
           id,
           host: hostname(),
           platform: process.platform,
+          hostName: device.hostName,
+          os: device.os,
+          osVersion: device.osVersion,
           defaultCwd: this.opts.defaultCwd,
           roots: this.roots,
           allowBypass: this.opts.allowBypass === true,

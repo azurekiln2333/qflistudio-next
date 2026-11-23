@@ -370,6 +370,17 @@ export type AgentMessage =
       capabilities?: string[];
       codex?: CodexAvailability;
       herdr?: HerdrAvailability;
+      /**
+       * Device information. Field names match the phone's `HarnessDeviceInfo`
+       * (`hostName`, `os`, `osVersion`), so a forwarding host never renames a
+       * field. All three are optional: an older agent sends none of them and
+       * the phone prints `unknown`.
+       */
+      hostName?: string;
+      /** `windows` | `macos` | `linux` | `other`. Never `win32`/`darwin`. */
+      os?: string;
+      /** Human-readable version, kept verbatim. */
+      osVersion?: string;
     }
   | { kind: 'sessions'; id?: string; sessions: SessionInfo[] }
   | { kind: 'history'; id?: string; items: HistoryItem[] }
