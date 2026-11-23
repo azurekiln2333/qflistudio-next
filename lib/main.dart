@@ -22,7 +22,7 @@ import 'studio_tools_tab.dart';
 final StudioProfile qfliStudioProfile = StudioProfile(
   id: StudioProductCatalog.qfliStudioKey,
   appTitle: StudioProductCatalog.qfliStudio,
-  clientVersion: '5.0.6',
+  clientVersion: '5.0.8',
   templates: ProjectTemplate.values,
   isOffline: false,
   productKey: StudioProductCatalog.qfliStudioKey,
