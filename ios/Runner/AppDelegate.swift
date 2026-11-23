@@ -15,6 +15,9 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // 接收分享文件：文档类型打开后由 SceneDelegate 转给这个桥。
+    ShareInboxBridge.shared.configure(
+      messenger: engineBridge.applicationRegistrar.messenger())
     let channel = FlutterMethodChannel(
       name: "qflistudio/platform", binaryMessenger: engineBridge.applicationRegistrar.messenger())
     platformChannel = channel
