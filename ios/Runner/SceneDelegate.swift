@@ -103,7 +103,8 @@ final class ShareInboxBridge {
         String(format: "%04d-%@", index + 1, Self.safeName(name) as NSString)
       )
       let budget = Self.maxBatchBytes - total
-      guard let copied = copyFile(from: url, to: target, budget: budget), copied >= 0 else {
+      // 负数表示超限（单文件或整批）；copyFile 已删掉半成品。
+      guard let copied = copyFile(from: url, to: target, budget: budget), copied > 0 else {
         continue
       }
       total += copied
