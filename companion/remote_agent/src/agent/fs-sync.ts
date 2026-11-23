@@ -48,7 +48,7 @@ export const FS_IGNORE_DIRS: readonly string[] = [
   // dependencies
   'node_modules',
   '.venv',
-  'Pods',
+  'pods',
   '.gradle',
   // build outputs
   'build',
@@ -56,7 +56,7 @@ export const FS_IGNORE_DIRS: readonly string[] = [
   'out',
   'target',
   '.dart_tool',
-  'DerivedData',
+  'deriveddata',
   '.next',
   // caches
   '__pycache__',
@@ -73,14 +73,21 @@ export const FS_IGNORE_DIRS: readonly string[] = [
 /** File suffixes skipped at any depth. */
 export const FS_IGNORE_SUFFIXES: readonly string[] = ['.pyc', '.log'];
 
-/** Whether a directory entry is skipped by version 1 of the table. */
+/**
+ * Whether a directory entry is skipped by version 1 of the table.
+ *
+ * Matching ignores case: Windows and macOS keep the ignore-table names with
+ * their own casing (`Pods`, `DerivedData`), and a phone that kept them while
+ * the computer dropped them would re-download those trees on every sync.
+ */
 export function isIgnoredDir(name: string): boolean {
-  return FS_IGNORE_DIRS.includes(name);
+  return FS_IGNORE_DIRS.includes(name.toLowerCase());
 }
 
 /** Whether a file entry is skipped by version 1 of the table. */
 export function isIgnoredFile(name: string): boolean {
-  return FS_IGNORE_SUFFIXES.some((suffix) => name.endsWith(suffix));
+  const lower = name.toLowerCase();
+  return FS_IGNORE_SUFFIXES.some((suffix) => lower.endsWith(suffix));
 }
 
 /**
