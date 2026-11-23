@@ -16,6 +16,7 @@ import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant'
 import { configureInteropChannels } from '../interop/StudioInterop';
 import { configureBackgroundInteropChannels, disposeBackgroundInterop } from '../interop/StudioBackgroundInterop';
 import { AgreementPlatformBridge } from '../interop/AgreementBridge';
+import { configureShareInbox, offerShareWant } from '../share/ShareInbox';
 import {
   HUAWEI_QUICK_LOGIN_VIEW_TYPE,
   HuaweiQuickLoginViewFactory,
@@ -88,6 +89,20 @@ export function readWindowSafeArea(win: window.Window): WindowSafeArea {
 }
 
 export default class EntryAbility extends FlutterAbility {
+  onCreate(want: Want): void {
+    // 冷启动：进程由分享或打开文件拉起。引擎还没建好，先记下批次。
+    if (this.context !== undefined) {
+      offerShareWant(want, this.context as common.UIAbilityContext);
+    }
+    super.onCreate(want);
+  }
+
+  onNewWant(want: Want): void {
+    // 热启动：Ability 已在运行。
+    offerShareWant(want, this.context as common.UIAbilityContext);
+    super.onNewWant(want);
+  }
+
   onDestroy(): void {
     disposeBackgroundInterop();
     super.onDestroy();
@@ -153,6 +168,8 @@ export default class EntryAbility extends FlutterAbility {
   configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     GeneratedPluginRegistrant.registerWith(flutterEngine)
+    // 分享文件收件箱：冷启动批次由 Dart 的 takePending 取走。
+    configureShareInbox(flutterEngine, this.context as common.UIAbilityContext);
 
     flutterEngine.getPlatformViewsController()?.getRegistry().registerViewFactory(
       HUAWEI_QUICK_LOGIN_VIEW_TYPE,
