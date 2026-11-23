@@ -2,7 +2,7 @@ name: qflistudio
 description: "A lightweight IDE built with Flutter Material 3."
 publish_to: 'none'
 
-version: 5.0.12+5000012
+version: 5.0.13+5000013
 
 environment:
   sdk: ^3.11.5

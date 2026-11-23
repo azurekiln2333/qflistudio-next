@@ -83,7 +83,8 @@ bool FlutterWindow::OnCreate() {
   drop_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
       flutter_controller_->engine()->messenger(), "qflistudio/folder_drop",
       &flutter::StandardMethodCodec::GetInstance());
-  drop_target_ = std::make_unique<FolderDrop>();
+  // Attach adopts the initial COM reference. OLE owns its own reference.
+  drop_target_.Attach(new FolderDrop());
   if (!drop_target_->Register(
           flutter_controller_->view()->GetNativeWindow())) {
     // Drops unavailable. Keep the target so takePending can report why rather
@@ -144,7 +145,7 @@ void FlutterWindow::OnDestroy() {
   // Revoke the OLE drop target before the child window goes away.
   if (drop_target_) {
     drop_target_->Unregister();
-    drop_target_ = nullptr;
+    drop_target_.Reset();
   }
   drop_registered_ = false;
   drop_channel_ = nullptr;
@@ -175,7 +176,9 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
 
   switch (message) {
     case WM_FONTCHANGE:
-      flutter_controller_->engine()->ReloadSystemFonts();
+      if (flutter_controller_) {
+        flutter_controller_->engine()->ReloadSystemFonts();
+      }
       break;
   }
 

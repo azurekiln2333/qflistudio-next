@@ -207,11 +207,11 @@ HRESULT STDMETHODCALLTYPE FolderDrop::DragEnter(IDataObject* data,
   (void)point;
   if (effect == nullptr) return E_INVALIDARG;
 
-  // Accept any CF_HDROP payload here so Drop still runs and can explain why a
-  // file-only drop is not usable.
-  std::vector<std::string> folders;
-  int files = 0;
-  accepts_drag_ = ReadPaths(data, &folders, &files);
+  // Only query the offered format during hover. Reading directory attributes
+  // here would block feedback on network paths and repeat the work in Drop.
+  // File-only payloads still reach Drop, which explains the rejection.
+  FORMATETC format = {CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+  accepts_drag_ = data != nullptr && data->QueryGetData(&format) == S_OK;
   // Never advertise an effect the source does not allow: AND with COPY and
   // leave NONE when the source offered nothing usable.
   *effect = accepts_drag_

@@ -5,6 +5,7 @@
 #include <flutter/flutter_view_controller.h>
 #include <flutter/method_channel.h>
 #include <flutter/encodable_value.h>
+#include <wrl/client.h>
 
 #include <memory>
 
@@ -36,7 +37,7 @@ class FlutterWindow : public Win32Window {
 
   // Sends queued directory drops to Dart and reports rejected input.
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> drop_channel_;
-  std::unique_ptr<class FolderDrop> drop_target_;
+  Microsoft::WRL::ComPtr<class FolderDrop> drop_target_;
   // False when RegisterDragDrop failed; takePending then reports UNAVAILABLE.
   bool drop_registered_ = false;
 };

@@ -80,9 +80,9 @@ env:
   COMPANION_NODE_VERSION: "24.14.1"
   # Bumped in the same commit as pubspec.yaml, so the OHOS artifact name and
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
-  APP_VERSION: "5.0.12"
+  APP_VERSION: "5.0.13"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "3ef32e6ec944d31ba9fc2f86ebbb9984f6fd37f1"
+  CORE_REF: "c5bebf40dd982a03ffb7b0185bb0a2d47c01ddc3"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
@@ -2280,7 +2280,7 @@ jobs:
 
   publish-release:
     name: Publish verified release or preview
-    if: github.ref == 'refs/tags/v5.0.12' || startsWith(github.ref, 'refs/tags/v5.0.12-remote.') || startsWith(github.ref, 'refs/tags/v5.0.12-git.')
+    if: github.ref == 'refs/tags/v5.0.13' || startsWith(github.ref, 'refs/tags/v5.0.13-remote.') || startsWith(github.ref, 'refs/tags/v5.0.13-git.')
     needs:
       - resolve-flutter
       - verify-flutter
@@ -2454,10 +2454,10 @@ jobs:
             printf 'Java receiver commit (contract checks): %s\n\n' "$JAVA_REF"
             if [[ "$RELEASE_TAG" == "v$APP_VERSION" ]]; then
               printf '%s\n' 'Release channel: stable.'
-              printf '%s\n' 'QFLIStudioN 5.0.12 fixes Home Agents navigation: Agents now shares the project tab pager, supports tap and swipe navigation, preserves session-list state, and participates in saved tab ordering.'
+              printf '%s\n' 'QFLIStudioN 5.0.13 adds a shared tablet/desktop workbench, inline GitHub repositories, Windows folder drops, and an OHOS guide for downloading language tools. Phone navigation and retained editor sessions are preserved.'
             else
               printf '%s\n' "Release channel: preview ($RELEASE_TAG)."
-              printf '%s\n' 'This preview contains the 5.0.12 release candidate for cloud verification.'
+              printf '%s\n' 'This preview contains the 5.0.13 release candidate for cloud verification.'
             fi
             printf '\n%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
