@@ -253,6 +253,11 @@ export type ClientRequest =
   | { type: 'list_sessions' }
   | { type: 'list_history'; cwd?: string }
   | { type: 'list_dir'; path?: string }
+  /**
+   * Git metadata of a project directory, used to decide whether the phone can
+   * fetch the code from its origin instead of transferring files.
+   */
+  | { type: 'project_git_info'; path: string }
   | {
       type: 'create_session';
       cwd: string;
@@ -280,6 +285,14 @@ export type ClientRequest =
 export type ClientMessage = ClientRequest & { id?: string };
 
 export type DirEntry = { name: string; path: string };
+
+/**
+ * A clone larger than this is confirmed by the user first.
+ *
+ * The number is measured against the `.git` directory on the computer, so it
+ * is a size signal, not the exact download volume.
+ */
+export const GIT_CONFIRM_BYTES = 200 * 1024 * 1024;
 
 export type HistoryItem = {
   sessionId: string;
@@ -381,6 +394,28 @@ export type AgentMessage =
       os?: string;
       /** Human-readable version, kept verbatim. */
       osVersion?: string;
+      /**
+       * Encrypted LAN endpoints, e.g. `wss://192.168.1.20:8787/ws`.
+       *
+       * Only present when `lan_tls` is advertised: the phone ignores plaintext
+       * endpoints, and v1 agents leave this empty.
+       */
+      lanUrls?: string[];
+    }
+  | {
+      kind: 'project_git_info';
+      id?: string;
+      root: string;
+      /** False when the directory is not a repository or `.git` is unreadable. */
+      supported: boolean;
+      /** Byte size of the `.git` directory on the computer. */
+      gitBytes?: number;
+      remote?: string;
+      branch?: string;
+      /** Current HEAD commit id, full lowercase hex. */
+      head?: string;
+      /** True when the working tree has uncommitted changes. */
+      dirty?: boolean;
     }
   | { kind: 'sessions'; id?: string; sessions: SessionInfo[] }
   | { kind: 'history'; id?: string; items: HistoryItem[] }

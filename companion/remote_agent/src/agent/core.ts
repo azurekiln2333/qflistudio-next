@@ -18,6 +18,7 @@ import {
   type PermissionModeName,
 } from '../shared/protocol.ts';import { type Logger, silentLogger } from '../shared/log.ts';
 import { collectDeviceInfo } from './device-info.ts';
+import { readGitInfo } from './git-info.ts';
 import { normalize } from './normalize.ts';
 import { Session, type QueryFn, type SessionListener, type ManagedSession } from './session.ts';
 
@@ -198,6 +199,7 @@ export class AgentCore {
             ...(this.opts.ptyFactory ? ['terminal'] : []),
             ...(codex?.available ? ['codex_history', ...(codex.canControl ? ['codex_control'] : [])] : []),
             ...(herdr?.available ? ['herdr', 'herdr_paste'] : []),
+            'project_git',
           ],
           codex,
           herdr,
@@ -283,6 +285,12 @@ export class AgentCore {
 
       case 'list_dir':
         return { kind: 'dir', id, ...(await this.listDir(msg.path)) };
+
+      case 'project_git_info': {
+        const root = this.checkPath(msg.path);
+        const info = await readGitInfo(root);
+        return { kind: 'project_git_info', id, ...info };
+      }
 
       case 'create_terminal': {
         const session = await this.createTerminal(msg.cwd, msg.cols, msg.rows);
