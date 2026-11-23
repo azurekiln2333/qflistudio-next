@@ -128,8 +128,11 @@ Future<void> main() async {
       projects: () => store.projects,
       sessionsOf: (projectId) => runtime.sessions.sessionsOf(projectId),
       ready: ready,
-      onCopy: (batch, project) =>
-          copyBatchIntoProject(batch: batch, project: project),
+      onCopy: (batch, project, subdirectory) => copyBatchIntoProject(
+        batch: batch,
+        project: project,
+        subdirectory: subdirectory,
+      ),
       onAttach: (batch, project, sessionId) async {
         final result = await copyBatchIntoProject(
           batch: batch,
