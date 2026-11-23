@@ -51,6 +51,9 @@ final StudioProfile qfliStudioProfile = StudioProfile(
   // 主 App 的功能页在共享内核的默认内容上增加一个「远程电脑」入口。
   // 离线语言产品不设置这个构建器，因此看不到该在线入口。
   toolsTabBuilder: buildStudioToolsTab,
+  // 主 App 有配对电脑，才谈得上从电脑拉项目。离线语言产品不设这个开关，
+  // 因此保留默认的关闭值，编辑器里不会出现同步入口。
+  deviceSyncEnabled: true,
   supportedFileExtensions: [
     '.c',
     '.h',
