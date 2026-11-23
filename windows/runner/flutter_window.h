@@ -33,6 +33,12 @@ class FlutterWindow : public Win32Window {
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> platform_channel_;
   std::unique_ptr<WindowsArchiveShare> archive_share_;
+
+  // Sends queued directory drops to Dart and reports rejected input.
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> drop_channel_;
+  std::unique_ptr<class FolderDrop> drop_target_;
+  // False when RegisterDragDrop failed; takePending then reports UNAVAILABLE.
+  bool drop_registered_ = false;
 };
 
 #endif  // RUNNER_FLUTTER_WINDOW_H_

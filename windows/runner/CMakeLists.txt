@@ -9,6 +9,7 @@ project(runner LANGUAGES CXX)
 add_executable(${BINARY_NAME} WIN32
   "flutter_window.cpp"
   "archive_share.cpp"
+  "folder_drop.cpp"
   "main.cpp"
   "utils.cpp"
   "win32_window.cpp"
@@ -35,7 +36,8 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
 # dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app)
 target_link_libraries(${BINARY_NAME} PRIVATE
-  "dwmapi.lib" "windowsapp.lib" "runtimeobject.lib" "shell32.lib" "version.lib")
+  "dwmapi.lib" "windowsapp.lib" "runtimeobject.lib" "shell32.lib" "version.lib"
+  "ole32.lib")
 
 # The HWND share adapter uses C++/WinRT coroutines; keep the rest of the runner's
 # standard settings unchanged. Windows SDK 10.0.19041+ provides these headers.

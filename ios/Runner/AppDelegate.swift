@@ -4,6 +4,7 @@ import UIKit
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var platformChannel: FlutterMethodChannel?
+  private var formFactorChannel: FlutterMethodChannel?
   private let externalFolders = ExternalFolderStore()
 
   override func application(
@@ -18,6 +19,15 @@ import UIKit
     // 接收分享文件：文档类型打开后由 SceneDelegate 转给这个桥。
     ShareInboxBridge.shared.configure(
       messenger: engineBridge.applicationRegistrar.messenger())
+    // 设备类别：只读系统设备族，不受窗口尺寸与鼠标连接影响。
+    // iPad 宽度可以小到与手机相近（分屏），所以这里不用尺寸判断。
+    let formFactor = FlutterMethodChannel(
+      name: "qflistudio/form_factor", binaryMessenger: engineBridge.applicationRegistrar.messenger())
+    formFactorChannel = formFactor
+    formFactor.setMethodCallHandler { call, reply in
+      guard call.method == "getFormFactor" else { reply(FlutterMethodNotImplemented); return }
+      reply(UIDevice.current.userInterfaceIdiom == .pad ? "tablet" : "phone")
+    }
     let channel = FlutterMethodChannel(
       name: "qflistudio/platform", binaryMessenger: engineBridge.applicationRegistrar.messenger())
     platformChannel = channel

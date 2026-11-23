@@ -11,7 +11,7 @@ import { systemShare } from '@kit.ShareKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { common, Want, ConfigurationConstant, AbilityConstant } from '@kit.AbilityKit';
 import { window, display } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { GeneratedPluginRegistrant } from '../plugins/GeneratedPluginRegistrant';
 import { configureInteropChannels } from '../interop/StudioInterop';
 import { configureBackgroundInteropChannels, disposeBackgroundInterop } from '../interop/StudioBackgroundInterop';
@@ -25,6 +25,34 @@ import {
 const CHANNEL_PLATFORM = 'qflistudio/platform';
 const CHANNEL_HUAWEI = 'qflistudio/huawei_account';
 const CHANNEL_SAFE_AREA = 'qflistudio/safe_area';
+const CHANNEL_FORM_FACTOR = 'qflistudio/form_factor';
+
+/**
+ * 设备类别：只读系统运行时的设备类型，不看窗口宽度与鼠标连接。
+ *
+ * `deviceInfo.deviceType` 读的是设备运行时上报的类型常量，
+ * 例如 `phone`、`tablet`、`2in1`、`default`、`wearable` 等，
+ * 并不来自本应用的 module.json5 配置。
+ * 只把明确的大屏类型归为 tablet；其余（含 `default`、未知值、空值）
+ * 回空串，由 Dart 侧按完整显示区域的短边回退。
+ */
+export function resolveDeviceFormFactor(): string {
+  try {
+    const type = deviceInfo.deviceType;
+    if (typeof type === 'string') {
+      const normalized = type.trim().toLowerCase();
+      if (normalized === 'tablet' || normalized === '2in1') {
+        return 'tablet';
+      }
+      if (normalized === 'phone') {
+        return 'phone';
+      }
+    }
+  } catch (e) {
+    // 读不到设备类型时交给 Dart 侧的回退。
+  }
+  return '';
+}
 
 /**
  * Snapshot of the window avoid areas that page content must not cover.
@@ -195,6 +223,22 @@ export default class EntryAbility extends FlutterAbility {
             this.safeArea = readWindowSafeArea(win);
           }
           result.success(this.safeArea.toMap());
+        } else {
+          result.notImplemented();
+        }
+      },
+    });
+
+    // 设备类别通道。原生读运行时上报的 deviceInfo.deviceType；
+    // 读不到或不属于平板时回空值，由 Dart 侧用完整显示区域的短边回退。
+    const formFactorChannel = new MethodChannel(
+      flutterEngine.dartExecutor.getBinaryMessenger(),
+      CHANNEL_FORM_FACTOR,
+    );
+    formFactorChannel.setMethodCallHandler({
+      onMethodCall: (call: MethodCall, result: MethodResult): void => {
+        if (call.method === 'getFormFactor') {
+          result.success(resolveDeviceFormFactor());
         } else {
           result.notImplemented();
         }
