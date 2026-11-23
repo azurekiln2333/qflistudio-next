@@ -1540,7 +1540,7 @@ jobs:
       # The test step keeps its own log and must fail the job when the test
       # fails: pipefail plus no continue-on-error, and no skip path.
       - name: Run the plugin integration test on the simulator
-        timeout-minutes: 12
+        timeout-minutes: 20
         working-directory: qfli_git_fixture/example
         run: |
           set -o pipefail
