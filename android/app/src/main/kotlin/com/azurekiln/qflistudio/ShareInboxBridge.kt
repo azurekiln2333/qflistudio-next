@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.OpenableColumns
+import android.util.Log
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.IOException
@@ -40,32 +41,52 @@ class ShareInboxBridge(
         if (uris.isEmpty()) return
         val source = sourceOf(intent)
         val batchId = batchId()
+        // 每个 intent 的 MIME 类型属于这个 intent，不能等到工作线程再问：
+        // 那时 intent 可能已被下一个分享覆盖。
+        val mimeType = intent.resolveType(context)
         worker.execute {
             val files = ArrayList<Map<String, Any?>>()
             var index = 0
-            var totalBytes = 0L
+            var batchBytes = 0L
+            var tooLarge = false
             for (uri in uris) {
                 if (files.size >= MAX_FILES) break
-                if (totalBytes >= MAX_BATCH_BYTES) break
+                // 一批总量上限：先看大小再复制，不把一个超限文件整份写盘。
+                if (batchBytes >= MAX_BATCH_BYTES) {
+                    tooLarge = true
+                    break
+                }
                 val name = displayName(uri) ?: "shared_${index + 1}"
+                val declaredSize = sizeOf(uri)
+                if (declaredSize != null) {
+                    if (declaredSize > MAX_FILE_BYTES) {
+                        tooLarge = true
+                        continue
+                    }
+                    if (batchBytes + declaredSize > MAX_BATCH_BYTES) {
+                        tooLarge = true
+                        break
+                    }
+                }
                 val target = File(
                     File(File(context.filesDir, INBOX_DIR), batchId),
                     "%04d-%s".format(index + 1, safeName(name)),
                 )
                 try {
                     target.parentFile?.mkdirs()
-                    val copied = copy(uri, target)
-                    if (copied <= 0L) {
+                    val copied = copy(uri, target, MAX_BATCH_BYTES - batchBytes)
+                    if (copied == null || copied < 0L) {
                         target.delete()
+                        if (copied != null) tooLarge = true
                         continue
                     }
-                    totalBytes += copied
+                    batchBytes += copied
                     files.add(
                         mapOf(
                             "path" to target.absolutePath,
                             "name" to name,
                             "bytes" to copied,
-                            "mimeType" to intent.resolveType(context),
+                            "mimeType" to mimeType,
                         ),
                     )
                     index++
@@ -77,6 +98,7 @@ class ShareInboxBridge(
             }
             if (files.isEmpty()) {
                 File(File(context.filesDir, INBOX_DIR), batchId).deleteRecursively()
+                if (tooLarge) Log.w(TAG, "Every shared file was over the size limit ($source).")
                 return@execute
             }
             val batch = mapOf<String, Any?>(
@@ -90,6 +112,9 @@ class ShareInboxBridge(
                     channel.invokeMethod("incoming", batch)
                 } else {
                     pending = batch
+                }
+                if (tooLarge) {
+                    Log.w(TAG, "Shared files exceeded the size limits; some were skipped.")
                 }
             }
         }
@@ -177,17 +202,20 @@ class ShareInboxBridge(
             .take(120)
     }
 
-    private fun copy(uri: Uri, target: File): Long {
-        val input = context.contentResolver.openInputStream(uri) ?: return -1L
+    private fun copy(uri: Uri, target: File, budget: Long): Long? {
+        // 拿不到流就是读失败（null），不是空文件（0）。
+        val input = context.contentResolver.openInputStream(uri) ?: return null
         input.use { source ->
             target.outputStream().use { sink ->
-                val buffer = ByteArray(1 shl 20)
+                val buffer = ByteArray(COPY_CHUNK)
                 var total = 0L
                 while (true) {
                     val read = source.read(buffer)
                     if (read <= 0) break
                     total += read
+                    // 负数表示超限：调用方据此删除半成品。
                     if (total > MAX_FILE_BYTES) return -1L
+                    if (total > budget) return -1L
                     sink.write(buffer, 0, read)
                 }
                 sink.flush()
@@ -196,12 +224,35 @@ class ShareInboxBridge(
         }
     }
 
+    /** 先用 OpenableColumns.SIZE 判断大小，拿不到返回 null。 */
+    private fun sizeOf(uri: Uri): Long? {
+        return try {
+            context.contentResolver.query(
+                uri,
+                arrayOf(OpenableColumns.SIZE),
+                null,
+                null,
+                null,
+            )?.use { cursor: Cursor ->
+                if (!cursor.moveToFirst()) return@use null
+                val index = cursor.getColumnIndex(OpenableColumns.SIZE)
+                if (index < 0 || cursor.isNull(index)) null else cursor.getLong(index)
+            }
+        } catch (error: SecurityException) {
+            null
+        } catch (error: RuntimeException) {
+            null
+        }
+    }
+
     companion object {
         const val CHANNEL = "qflistudio/share_inbox"
+        private const val TAG = "ShareInbox"
         private const val INBOX_DIR = "shared_inbox"
         private const val MAX_FILES = 16
         private const val MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
         private const val MAX_BATCH_BYTES = 512L * 1024L * 1024L
+        private const val COPY_CHUNK = 1 shl 20
     }
 
     private val BATCH_ID = Regex("[A-Za-z0-9_-]{1,64}")

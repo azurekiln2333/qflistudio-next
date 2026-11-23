@@ -100,7 +100,10 @@ final class ShareInboxBridge {
       let target = directory.appendingPathComponent(
         String(format: "%04d-%@", index + 1, Self.safeName(name) as NSString)
       )
-      guard let copied = copyFile(from: url, to: target), copied > 0 else { continue }
+      let budget = Self.maxBatchBytes - total
+      guard let copied = copyFile(from: url, to: target, budget: budget), copied >= 0 else {
+        continue
+      }
       total += copied
       files.append([
         "path": target.path,
@@ -112,7 +115,7 @@ final class ShareInboxBridge {
     return files
   }
 
-  private func copyFile(from url: URL, to target: URL) -> Int64? {
+  private func copyFile(from url: URL, to target: URL, budget: Int64) -> Int64? {
     guard let input = try? FileHandle(forReadingFrom: url) else { return nil }
     defer { try? input.close() }
     FileManager.default.createFile(atPath: target.path, contents: nil)
@@ -122,11 +125,18 @@ final class ShareInboxBridge {
     while true {
       guard let chunk = try? input.read(upToCount: Self.copyChunk), !chunk.isEmpty else { break }
       total += Int64(chunk.count)
-      if total > Self.maxFileBytes {
+      // 负数表示超限：调用方据此删掉半成品。
+      if total > Self.maxFileBytes || total > budget {
+        try? FileManager.default.removeItem(at: target)
+        return -1
+      }
+      do {
+        try output.write(contentsOf: chunk)
+      } catch {
+        // 写失败（如磁盘满）不能返回一个假的完整大小。
         try? FileManager.default.removeItem(at: target)
         return nil
       }
-      try? output.write(contentsOf: chunk)
     }
     return total
   }
