@@ -22,6 +22,7 @@ import 'package:qfli_studio_core/share/share_intake.dart';
 import 'package:qfli_studio_core/share/share_intake_host.dart';
 import 'package:qfli_studio_core/shell/agent_runtime_factory.dart';
 import 'package:qfli_studio_core/splash_screen.dart';
+import 'package:qfli_studio_core/sync/placeholder_project.dart';
 import 'package:qfli_studio_core/store/auth_store.dart';
 import 'package:qfli_studio_core/store/project_store.dart';
 import 'package:qfli_studio_core/store/settings_store.dart';
@@ -209,6 +210,21 @@ Future<void> main() async {
       unawaited(
         startShareInbox().catchError((Object error) {
           debugPrint('分享收件箱装配失败：$error');
+        }),
+      );
+      // 占位项目扫一遍：会话没了、又没拉过文件的项目只占手机空间。
+      // 磁盘要等运行时装配完才能问，所以不拦首帧。
+      unawaited(
+        PlaceholderProjects.sweepPlaceholders(
+          store: store,
+          sessions: (await studioAgentRuntime(
+            auth: auth,
+            store: store,
+            settings: settings,
+          )).sessions,
+        ).catchError((Object error) {
+          debugPrint('占位项目清理失败：$error');
+          return 0;
         }),
       );
       await Future.wait([
