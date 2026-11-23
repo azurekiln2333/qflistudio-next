@@ -48,7 +48,11 @@ export function configureShareInbox(
         dartListening = true;
         const batch = pending;
         pending = null;
-        result.success(batch);
+        if (batch === null) {
+          result.success(null);
+        } else {
+          result.success(batch);
+        }
       } else if (call.method === 'discard') {
         const id = call.argument('id') as string;
         if (!validBatchId(id)) {
@@ -101,7 +105,13 @@ export function offerShareWant(want: Want, context: common.UIAbilityContext): vo
         continue;
       }
       total += size;
-      files.push({ path: target, name: name, bytes: size, mimeType: null });
+      const file: SharedFile = {
+        path: target,
+        name: name,
+        bytes: size,
+        mimeType: null,
+      };
+      files.push(file);
       index++;
     } catch (error) {
       // 单个文件失败不影响整批。
@@ -130,22 +140,28 @@ export function offerShareWant(want: Want, context: common.UIAbilityContext): vo
 }
 
 function shareUris(want: Want): string[] {
-  if (want.action !== 'ohos.want.action.sendData' && want.action !== 'ohos.want.action.viewData') {
+  const action = want.action;
+  if (action !== 'ohos.want.action.sendData' && action !== 'ohos.want.action.viewData') {
     return [];
   }
   const collected: string[] = [];
-  const stream = want.parameters?.['ability.params.stream'];
-  if (Array.isArray(stream)) {
-    for (const item of stream) {
-      if (typeof item === 'string' && item.length > 0) {
-        collected.push(item);
+  const parameters = want.parameters;
+  if (parameters !== undefined) {
+    const stream = parameters['ability.params.stream'];
+    if (Array.isArray(stream)) {
+      const list = stream as string[];
+      for (const item of list) {
+        if (item.length > 0) {
+          collected.push(item);
+        }
       }
+    } else if (typeof stream === 'string' && stream.length > 0) {
+      collected.push(stream);
     }
-  } else if (typeof stream === 'string' && stream.length > 0) {
-    collected.push(stream);
   }
-  if (want.uri !== undefined && want.uri.length > 0) {
-    collected.push(want.uri);
+  const uri = want.uri;
+  if (uri !== undefined && uri.length > 0) {
+    collected.push(uri);
   }
   return collected;
 }
