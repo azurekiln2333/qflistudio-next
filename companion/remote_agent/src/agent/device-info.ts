@@ -48,8 +48,11 @@ export async function formatOsVersion(
   const versionValue = (deps.version ?? osVersionText)();
   switch (platform) {
     case 'win32': {
-      const build = versionValue.match(/^Microsoft Windows ([^ ]+)/)?.[1];
-      return build ? `Windows ${build} (${releaseText})` : releaseText;
+      // `os.version()` is `Microsoft Windows 11 Home` on a real host. Keep
+      // everything after the prefix: the edition (`Home`, `Pro`) is what a
+      // user recognises, so cutting at the first space loses it.
+      const product = versionValue.match(/^Microsoft Windows (.+)$/)?.[1];
+      return product ? `Windows ${product.trim()} (${releaseText})` : releaseText;
     }
     case 'darwin':
       return macOSName(releaseText) ?? releaseText;

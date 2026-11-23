@@ -50,8 +50,14 @@ export function parseHead(
 ): { branch?: string; head?: string } {
   const text = head.trim();
   const symbolic = text.match(/^ref:\s*(\S+)$/);
+  // A detached head always carries both keys, `undefined` included. The reply
+  // is sent as JSON, so `branch: undefined` drops out on the wire; the parsed
+  // shape stays predictable for callers that destructure or deep-compare it.
+  // Invalid input keeps the empty-object answer it always gave.
   if (!symbolic) {
-    return /^[0-9a-f]{40}$/i.test(text) ? { head: text.toLowerCase() } : {};
+    return /^[0-9a-f]{40}$/i.test(text)
+      ? { branch: undefined, head: text.toLowerCase() }
+      : {};
   }
   const ref = symbolic[1] ?? '';
   if (!ref) return {};
