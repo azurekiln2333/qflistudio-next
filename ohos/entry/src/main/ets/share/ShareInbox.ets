@@ -74,7 +74,12 @@ export function configureShareInbox(
   channel = inboxChannel;
 }
 
-/** 处理一个 want。没有文件时直接返回。 */
+/**
+ * 处理一个 want。没有文件时直接返回。
+ *
+ * 冷启动时 `onCreate` 就调到这里：复制走 async，不阻塞 Ability 启动。
+ * 引擎未就绪时批次先进 `pending`，由 Dart 的 `takePending` 取走。
+ */
 export function offerShareWant(want: Want, context: common.UIAbilityContext): void {
   abilityContext = context;
   const uris = shareUris(want);
@@ -82,6 +87,13 @@ export function offerShareWant(want: Want, context: common.UIAbilityContext): vo
     return;
   }
   const source = want.action === 'ohos.want.action.viewData' ? 'viewData' : 'sendData';
+  // 复制可能搬几百 MB：不能占着 UI 线程，否则 onCreate 会卡成 ANR。
+  copyBatch(uris, source).catch((error: Error) => {
+    console.error(`share inbox: ${error.message}`);
+  });
+}
+
+async function copyBatch(uris: string[], source: string): Promise<void> {
   const batchId = makeBatchId();
   const files: SharedFile[] = [];
   let total = 0;
@@ -98,9 +110,15 @@ export function offerShareWant(want: Want, context: common.UIAbilityContext): vo
     const target = `${inboxRoot()}/${batchId}/${pad(index + 1)}-${safeName(name)}`;
     try {
       ensureDirectory(`${inboxRoot()}/${batchId}`);
-      fileIo.copyFileSync(sourcePath, target);
+      const declared = declaredSize(sourcePath);
+      if (declared !== null) {
+        if (declared > MAX_FILE_BYTES || total + declared > MAX_BATCH_BYTES) {
+          continue;
+        }
+      }
+      await fileIo.copyFile(sourcePath, target);
       const size = fileIo.statSync(target).size;
-      if (size <= 0 || size > MAX_FILE_BYTES) {
+      if (size > MAX_FILE_BYTES || total + size > MAX_BATCH_BYTES) {
         fileIo.unlinkSync(target);
         continue;
       }
@@ -136,6 +154,16 @@ export function offerShareWant(want: Want, context: common.UIAbilityContext): vo
   } else {
     // 只保留最后一批：更早的批次由 Dart 侧的 sweep 清理。
     pending = batch;
+  }
+}
+
+/** 文件大小；拿不到时返回 null，交给复制后的实际大小判断。 */
+function declaredSize(path: string): number | null {
+  try {
+    const stat = fileIo.statSync(path);
+    return stat.size;
+  } catch (error) {
+    return null;
   }
 }
 
