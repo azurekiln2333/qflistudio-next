@@ -1,16 +1,26 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:qfli_studio_core/app.dart';
+import 'package:qfli_studio_core/chat/composer_draft.dart';
 import 'package:qfli_studio_core/config/ohos_platform.dart';
+import 'package:qfli_studio_core/editor/retained_editor_host.dart';
+import 'package:qfli_studio_core/harness/harness_session_target.dart';
 import 'package:qfli_studio_core/harness/hub/default_harness_hosts.dart';
+import 'package:qfli_studio_core/harness/studio/studio_agent_host.dart';
+import 'package:qfli_studio_core/services/app_paths.dart';
 import 'package:qfli_studio_core/services/project_templates.dart';
 import 'package:qfli_studio_core/interop/interop_runner.dart';
 import 'package:qfli_studio_core/interop/interop_background_transport.dart';
 import 'package:qfli_studio_core/services/studio_profile.dart';
+import 'package:qfli_studio_core/share/share_inbox.dart';
+import 'package:qfli_studio_core/share/share_inbox_store.dart';
+import 'package:qfli_studio_core/share/share_intake.dart';
+import 'package:qfli_studio_core/share/share_intake_host.dart';
+import 'package:qfli_studio_core/shell/agent_runtime_factory.dart';
 import 'package:qfli_studio_core/splash_screen.dart';
 import 'package:qfli_studio_core/store/auth_store.dart';
 import 'package:qfli_studio_core/store/project_store.dart';
@@ -81,7 +91,76 @@ Future<void> main() async {
   // 具体装哪些主机由 core 的集成装配文件决定。
   registerDefaultHarnessHosts();
   final ready = ValueNotifier<bool>(false);
-  runApp(QfliApp(store: store, auth: auth, settings: settings, ready: ready));
+  final navigatorKey = GlobalKey<NavigatorState>();
+  runApp(
+    QfliApp(
+      navigatorKey: navigatorKey,
+      store: store,
+      auth: auth,
+      settings: settings,
+      ready: ready,
+    ),
+  );
+
+  Future<void> startShareInbox() async {
+    final base = await AppPaths.storageDirectory();
+    if (base == null) return;
+    final inbox = PlatformShareInbox(
+      store: ShareInboxStore(root: Directory('$base/shared_inbox')),
+    );
+    // 会话列表是本地文件，读它不会碰网络。
+    final runtime = await studioAgentRuntime(
+      auth: auth,
+      store: store,
+      settings: settings,
+    );
+    void showError(String message) {
+      final context = navigatorKey.currentContext;
+      if (context == null) return;
+      ScaffoldMessenger.maybeOf(
+        context,
+      )?.showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    final host = ShareIntakeHost(
+      inbox: inbox,
+      navigatorKey: navigatorKey,
+      projects: () => store.projects,
+      sessionsOf: (projectId) => runtime.sessions.sessionsOf(projectId),
+      ready: ready,
+      onCopy: (batch, project) =>
+          copyBatchIntoProject(batch: batch, project: project),
+      onAttach: (batch, project, sessionId) async {
+        final result = await copyBatchIntoProject(
+          batch: batch,
+          project: project,
+        );
+        final id = sessionId ?? (await runtime.sessions.create(project.id)).id;
+        final context = navigatorKey.currentContext;
+        if (context == null || !context.mounted) {
+          throw StateError('界面尚未就绪');
+        }
+        await openEditorPage(
+          context,
+          project: project,
+          auth: auth,
+          store: store,
+          settings: settings,
+          revealAgentPane: true,
+          harnessSession: HarnessSessionTarget(
+            hostId: kStudioHostId,
+            sessionId: id,
+          ),
+          composerPrefill: ComposerDraft(
+            attachments: result.relativePaths,
+            autoSend: false,
+          ),
+        );
+      },
+      onError: showError,
+    );
+    await host.start();
+  }
 
   const platformChannel = MethodChannel('qflistudio/platform');
   Future<void> reportProgress(double progress) async {
@@ -113,6 +192,8 @@ Future<void> main() async {
             ? (progress) => unawaited(reportProgress(progress))
             : null,
       );
+      // 分享收件箱不拦首帧：启动完再装通道，冷启动批次由 takePending 取。
+      unawaited(startShareInbox());
       await Future.wait([
         minimumDisplay,
         if (nativeStartup)
