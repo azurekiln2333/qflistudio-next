@@ -96,6 +96,15 @@ final class ExternalFolderStore: NSObject, UIDocumentPickerDelegate {
     case "releaseFolder":
       releaseFolder(args["id"] as? String, reply)
       return true
+    case "folderList":
+      listFolder(args["path"] as? String, reply)
+      return true
+    case "coordinatedRead":
+      coordinatedRead(args["path"] as? String, reply)
+      return true
+    case "coordinatedWrite":
+      coordinatedWrite(args["path"] as? String, args["bytes"], reply)
+      return true
     default:
       return false
     }
@@ -237,6 +246,164 @@ final class ExternalFolderStore: NSObject, UIDocumentPickerDelegate {
   private func makeBookmark(_ url: URL) throws -> Data {
     return try url.bookmarkData(
       options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+  }
+
+  // MARK: - 协调读写
+
+  /// 已授权的根。路径不在根内时拒绝，避免绕过选择器访问其它目录。
+  private func scopedRoot(for path: String) -> URL? {
+    let target = URL(fileURLWithPath: path).standardizedFileURL.path
+    for url in scopes.values {
+      let root = url.standardizedFileURL.path
+      if target == root || target.hasPrefix(root + "/") { return url }
+    }
+    return nil
+  }
+
+  private func listFolder(_ path: String?, _ reply: @escaping FlutterResult) {
+    guard let path = path, !path.isEmpty, scopedRoot(for: path) != nil else {
+      reply(
+        FlutterError(
+          code: "NO_SCOPE", message: "The folder is outside the granted roots.", details: nil))
+      return
+    }
+    queue.async {
+      let manager = FileManager.default
+      let url = URL(fileURLWithPath: path)
+      let keys: [URLResourceKey] = [
+        .isDirectoryKey, .fileSizeKey, .isUbiquitousItemKey,
+        .ubiquitousItemDownloadingStatusKey,
+      ]
+      var payload: [[String: Any]] = []
+      let items = (try? manager.contentsOfDirectory(
+        at: url, includingPropertiesForKeys: keys, options: [])) ?? []
+      for item in items {
+        let values = try? item.resourceValues(forKeys: Set(keys))
+        var name = item.lastPathComponent
+        var resolved = item
+        var downloaded = true
+        // 占位文件以 `.名字.icloud` 出现；真实路径供下载与读取使用。
+        if name.hasPrefix(".") && name.hasSuffix(".icloud") {
+          name = String(name.dropFirst().dropLast(".icloud".count))
+          resolved = item.deletingLastPathComponent().appendingPathComponent(name)
+          downloaded = false
+        }
+        if values?.isUbiquitousItem == true {
+          let status = values?.ubiquitousItemDownloadingStatus
+          if status != URLUbiquitousItemDownloadingStatus.current { downloaded = false }
+        }
+        payload.append([
+          "name": name,
+          "path": resolved.path,
+          "isDirectory": values?.isDirectory ?? false,
+          "size": values?.fileSize ?? 0,
+          "downloaded": downloaded,
+        ])
+      }
+      DispatchQueue.main.async { reply(payload) }
+    }
+  }
+
+  private func coordinatedRead(_ path: String?, _ reply: @escaping FlutterResult) {
+    guard let path = path, !path.isEmpty, scopedRoot(for: path) != nil else {
+      reply(
+        FlutterError(
+          code: "NO_SCOPE", message: "The file is outside the granted roots.", details: nil))
+      return
+    }
+    queue.async {
+      let url = URL(fileURLWithPath: path)
+      do {
+        try self.materialize(url)
+      } catch {
+        DispatchQueue.main.async {
+          reply(
+            FlutterError(
+              code: "DOWNLOAD_FAILED", message: error.localizedDescription, details: nil))
+        }
+        return
+      }
+      let coordinator = NSFileCoordinator()
+      var coordinationError: NSError?
+      var payload: Data?
+      var readError: Error?
+      coordinator.coordinate(readingItemAt: url, options: [], error: &coordinationError) {
+        readURL in
+        do { payload = try Data(contentsOf: readURL) } catch { readError = error }
+      }
+      DispatchQueue.main.async {
+        if let payload = payload {
+          reply(FlutterStandardTypedData(bytes: payload))
+          return
+        }
+        let failure = readError ?? coordinationError
+        reply(
+          FlutterError(
+            code: "READ_FAILED", message: failure?.localizedDescription ?? "Read failed.",
+            details: nil))
+      }
+    }
+  }
+
+  private func coordinatedWrite(
+    _ path: String?, _ bytes: Any?, _ reply: @escaping FlutterResult
+  ) {
+    guard let path = path, !path.isEmpty, scopedRoot(for: path) != nil else {
+      reply(
+        FlutterError(
+          code: "NO_SCOPE", message: "The file is outside the granted roots.", details: nil))
+      return
+    }
+    guard let data = bytes as? FlutterStandardTypedData else {
+      reply(
+        FlutterError(code: "INVALID_ARGUMENT", message: "bytes must be binary.", details: nil))
+      return
+    }
+    let payload = data.data
+    queue.async {
+      let url = URL(fileURLWithPath: path)
+      try? FileManager.default.createDirectory(
+        at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+      let coordinator = NSFileCoordinator()
+      var coordinationError: NSError?
+      var writeError: Error?
+      let exists = FileManager.default.fileExists(atPath: url.path)
+      coordinator.coordinate(
+        writingItemAt: url, options: exists ? .forReplacing : [], error: &coordinationError
+      ) { writeURL in
+        do { try payload.write(to: writeURL, options: .atomic) } catch { writeError = error }
+      }
+      DispatchQueue.main.async {
+        if let error = writeError ?? coordinationError {
+          reply(
+            FlutterError(
+              code: "WRITE_FAILED", message: error.localizedDescription, details: nil))
+          return
+        }
+        reply(nil)
+      }
+    }
+  }
+
+  /// iCloud 占位文件先下载。超时抛错，避免无限等待。
+  private func materialize(_ url: URL) throws {
+    let keys: Set<URLResourceKey> = [.isUbiquitousItemKey, .ubiquitousItemDownloadingStatusKey]
+    guard let values = try? url.resourceValues(forKeys: keys),
+      values.isUbiquitousItem == true
+    else { return }
+    if values.ubiquitousItemDownloadingStatus == URLUbiquitousItemDownloadingStatus.current {
+      return
+    }
+    try FileManager.default.startDownloadingUbiquitousItem(at: url)
+    let deadline = Date().addingTimeInterval(10)
+    while Date() < deadline {
+      let status = try? url.resourceValues(forKeys: keys).ubiquitousItemDownloadingStatus
+      if status == URLUbiquitousItemDownloadingStatus.current { return }
+      Thread.sleep(forTimeInterval: 0.1)
+    }
+    throw NSError(
+      domain: "qfli.external", code: 1,
+      userInfo: [NSLocalizedDescriptionKey: "The iCloud file is still downloading."])
   }
 
   // MARK: - 呈现
