@@ -17,6 +17,9 @@ import {
   type HistoryItem,
   type PermissionModeName,
 } from '../shared/protocol.ts';import { type Logger, silentLogger } from '../shared/log.ts';
+import { collectDeviceInfo } from './device-info.ts';
+import { buildManifest, readChunk } from './fs-sync.ts';
+import { readGitInfo } from './git-info.ts';
 import { normalize } from './normalize.ts';
 import { Session, type QueryFn, type SessionListener, type ManagedSession } from './session.ts';
 
@@ -180,11 +183,15 @@ export class AgentCore {
       case 'info': {
         const codex = this.opts.codex ? await this.opts.codex.availability() : undefined;
         const herdr = this.opts.herdr ? await this.opts.herdr.availability() : undefined;
+        const device = await collectDeviceInfo();
         return {
           kind: 'info',
           id,
           host: hostname(),
           platform: process.platform,
+          hostName: device.hostName,
+          os: device.os,
+          osVersion: device.osVersion,
           defaultCwd: this.opts.defaultCwd,
           roots: this.roots,
           allowBypass: this.opts.allowBypass === true,
@@ -193,6 +200,8 @@ export class AgentCore {
             ...(this.opts.ptyFactory ? ['terminal'] : []),
             ...(codex?.available ? ['codex_history', ...(codex.canControl ? ['codex_control'] : [])] : []),
             ...(herdr?.available ? ['herdr', 'herdr_paste'] : []),
+            'project_git',
+            'fs_sync',
           ],
           codex,
           herdr,
@@ -278,6 +287,23 @@ export class AgentCore {
 
       case 'list_dir':
         return { kind: 'dir', id, ...(await this.listDir(msg.path)) };
+
+      case 'project_git_info': {
+        const root = this.checkPath(msg.path);
+        const info = await readGitInfo(root);
+        return { kind: 'project_git_info', id, ...info };
+      }
+
+      case 'fs_manifest': {
+        const root = this.checkPath(msg.path);
+        return { kind: 'fs_manifest', id, ...(await buildManifest(root)) };
+      }
+      case 'fs_read': {
+        const root = this.roots.find((r) => isWithin(path.resolve(msg.path), r));
+        if (!root) throw new Error(`路径不在允许的目录内：${msg.path}`);
+        const chunk = await readChunk(root, path.relative(root, path.resolve(msg.path)), msg.offset, msg.length);
+        return { kind: 'fs_chunk', id, ...chunk };
+      }
 
       case 'create_terminal': {
         const session = await this.createTerminal(msg.cwd, msg.cols, msg.rows);
