@@ -199,7 +199,12 @@ Future<void> main() async {
             : null,
       );
       // 分享收件箱不拦首帧：启动完再装通道，冷启动批次由 takePending 取。
-      unawaited(startShareInbox());
+      // 失败只记日志：收不到分享不能连带启动失败。
+      unawaited(
+        startShareInbox().catchError((Object error) {
+          debugPrint('分享收件箱装配失败：$error');
+        }),
+      );
       await Future.wait([
         minimumDisplay,
         if (nativeStartup)
