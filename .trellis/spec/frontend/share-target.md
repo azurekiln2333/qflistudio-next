@@ -37,6 +37,16 @@ iCloud placeholders before reading their content. macOS requires user-selected
 read/write and app-scoped bookmark entitlements. Do not add a custom iCloud
 container: distributed iOS artifacts are unsigned and users re-sign them.
 
+Bookmark options differ by platform. iOS has no security-scope bookmark
+options. Create a bookmark with `.minimalBookmark` and resolve it with the
+empty/default options. Do not use `.withSecurityScope` or
+`.securityScopeAllowOnlyReadAccess` on iOS. Neither exists in the iOS SDK and
+the build fails. macOS keeps `.withSecurityScope` for both create and
+resolve. Scope grants come from `startAccessingSecurityScopedResource` and
+`stopAccessingSecurityScopedResource`, independent of the bookmark options.
+Basis: Apple "Providing access to directories" and Apple DTS forum thread
+772143.
+
 `UIFileSharingEnabled` and `LSSupportsOpeningDocumentsInPlace` expose app
 documents. They do not move those files out of the app's storage container.
 External project metadata stays in the app registry; external files remain
@@ -52,6 +62,8 @@ owned by their original folder provider.
 | User cancels directory picker | Return null. |
 | Bookmark unavailable | Report access failure without deleting user files. |
 | iCloud placeholder | Download, then coordinate the read. |
+| iOS bookmark create/resolve | Use `.minimalBookmark` and default resolve options. |
+| macOS bookmark create/resolve | Use `.withSecurityScope` for both. |
 
 ## 5. Good / Base / Bad Cases
 

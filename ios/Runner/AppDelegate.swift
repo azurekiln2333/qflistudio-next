@@ -186,7 +186,7 @@ final class ExternalFolderStore: NSObject, UIDocumentPickerDelegate {
       guard
         let url = try? URL(
           resolvingBookmarkData: data,
-          options: .withSecurityScope,
+          options: [],
           relativeTo: nil,
           bookmarkDataIsStale: &stale)
       else { continue }
@@ -247,8 +247,11 @@ final class ExternalFolderStore: NSObject, UIDocumentPickerDelegate {
   }
 
   private func makeBookmark(_ url: URL) throws -> Data {
+    // iOS 没有 `.withSecurityScope`（那是 macOS 专属）。
+    // Apple 的「Providing access to directories」要求用 `.minimalBookmark` 建书签，
+    // 解析时用默认选项。作用域授权仍由 startAccessingSecurityScopedResource 负责。
     return try url.bookmarkData(
-      options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+      options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
   }
 
   // MARK: - 协调读写
