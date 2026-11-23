@@ -113,7 +113,11 @@ void main() {
       }
       expect(
         find.descendant(of: scopes, matching: find.byType(Tab)),
-        findsNWidgets(4),
+        findsNWidgets(5),
+      );
+      expect(
+        find.descendant(of: scopes, matching: find.text(l10n.agentsTab)),
+        findsOneWidget,
       );
       expect(find.text(l10n.cloudProjects), findsNothing);
       expect(_visibleProjects(tester), ['Local release project']);
@@ -172,7 +176,11 @@ void main() {
       );
       expect(
         find.descendant(of: scopes, matching: find.byType(Tab)),
-        findsNWidgets(5),
+        findsNWidgets(6),
+      );
+      expect(
+        find.descendant(of: scopes, matching: find.text(l10n.agentsTab)),
+        findsOneWidget,
       );
       // The creation entry moved from the overflow menu to the FAB (R1): on
       // the cloud scope the FAB opens the cloud dialog, and the menu no longer
