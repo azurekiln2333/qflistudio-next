@@ -1,0 +1,5 @@
+{"file":".trellis/tasks/11-25-workbench-ui-cleanup/prd.md","reason":"Requirements and acceptance"}
+{"file":".trellis/tasks/11-25-workbench-ui-cleanup/design.md","reason":"File ownership, contracts and per-Pi design"}
+{"file":".trellis/spec/frontend/large-screen-workbench.md","reason":"Existing workbench contracts that remain in force"}
+{"file":".trellis/spec/frontend/editor-paging.md","reason":"Retained editor identity and drafts"}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Widget conventions"}
