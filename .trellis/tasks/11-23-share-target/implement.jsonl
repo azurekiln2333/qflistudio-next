@@ -1,0 +1,11 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "前端规范索引：确认哪些条目是 Active，哪些还是 Draft，避免按草案接口写代码。"}
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "app 与 core 是两个 Git 根，插件与依赖都按兄弟目录解析；改动前要先确认实际解析到哪个检出。"}
+{"file": ".trellis/spec/frontend/interop.md", "reason": "鸿蒙 Ability 与 Want 路由的既有做法，新增 sendData 与 viewData 时沿用同一套入口与参数校验口径。"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "收件箱宿主与选择面板要接进既有 store 注入风格，不新造全局单例。"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "通道消息跨原生与 Dart，字段要在边界处校验后再进模型。"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "选择面板是新的弹层界面，组件结构与回调命名要沿用既有约定。"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "提交前的质量要求：静态检查、禁止模式、注释口径。"}
+{"file": ".trellis/spec/frontend/cloud-project-cache.md", "reason": "缓存上限与清理策略的既有写法，收件箱的 512 MiB 上限与 sweep 参照同一套模式。"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "原生回调与异步复制要能取消、要能被页面销毁打断，避免留下未完成的写入。"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "本次改动横跨 Dart 与三端原生，需要按跨层契约检查错误码、重试与降级。"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "已有 PickerService、ShareService、FileService，先复用再新增，避免重复实现路径校验与复制。"}

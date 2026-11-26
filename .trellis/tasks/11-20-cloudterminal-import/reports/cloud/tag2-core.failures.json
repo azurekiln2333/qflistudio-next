@@ -1,0 +1,12 @@
+{
+  "counts": {
+    "success": 2579,
+    "skipped": 26
+  },
+  "done": {
+    "success": true,
+    "type": "done",
+    "time": 235138
+  },
+  "failures": []
+}

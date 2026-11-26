@@ -1,0 +1,32 @@
+{
+  "workspace": "w37",
+  "task": "11-21-github-repo-clone",
+  "status": "implementing",
+  "confirmed_working_at": "2026-11-21T14:07:41.617Z",
+  "workers": [
+    {
+      "role": "a",
+      "pane": "w37:pC",
+      "scope": "GitHub OAuth/PAT/API",
+      "observed_state": "working"
+    },
+    {
+      "role": "b",
+      "pane": "w37:pG",
+      "scope": "Home integration, GitHub picker, gitProjects, cache UI",
+      "observed_state": "working"
+    },
+    {
+      "role": "c",
+      "pane": "w37:pH",
+      "scope": "Cloud deletion, scoped cache and state",
+      "observed_state": "working"
+    },
+    {
+      "role": "d",
+      "pane": "w37:pJ",
+      "scope": "ZIP sharing and native platform integration",
+      "observed_state": "working"
+    }
+  ]
+}

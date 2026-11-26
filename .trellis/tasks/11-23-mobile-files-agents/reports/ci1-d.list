@@ -1,0 +1,27 @@
+- test/harness_remote_device_test.dart :: harnessDeviceOf finds the device host :: Expected: '工作台'
+    Actual: <null>
+    Which: not an <Instance of 'String'>
+    test/harness_remote_device_test.dart 293:5          main.<fn>
+- test/harness_remote_device_test.dart :: an old agent that sends no device fields falls back to platform :: Expected: HarnessDeviceOs:<HarnessDeviceOs.windows>
+    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>
+    platform 兜底
+    test/harness_remote_device_test.dart 250:7          main.<fn>
+- test/harness_remote_device_test.dart :: a missing os falls back to the platform value :: Expected: HarnessDeviceOs:<HarnessDeviceOs.macos>
+    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>
+    test/harness_remote_device_test.dart 229:5          main.<fn>
+- test/harness_remote_device_test.dart :: os other falls back to the platform value :: Expected: HarnessDeviceOs:<HarnessDeviceOs.windows>
+    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>
+    win32
+    test/harness_remote_device_test.dart 219:7          main.<fn>
+- test/harness_remote_device_test.dart :: os maps the three reported short names :: Expected: HarnessDeviceOs:<HarnessDeviceOs.windows>
+    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>
+    windows
+    test/harness_remote_device_test.dart 204:7          main.<fn>
+- test/harness_remote_device_test.dart :: a missing hostName falls back to host :: Expected: 'DESKTOP-7'
+    Actual: <null>
+    Which: not an <Instance of 'String'>
+    test/harness_remote_device_test.dart 193:5          main.<fn>
+- test/harness_remote_device_test.dart :: reported device fields reach the host unchanged :: Expected: '工作台'
+    Actual: <null>
+    Which: not an <Instance of 'String'>
+    test/harness_remote_device_test.dart 182:5          main.<fn>

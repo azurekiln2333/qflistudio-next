@@ -1,0 +1,178 @@
+{
+  "observed_at": "2026-11-24T10:55:10.577222+00:00",
+  "repo": "qflistudio-core",
+  "workflow": "core-check",
+  "branch": "feat/large-screen-workbench",
+  "sha": "ee83f1c0d72708547d0692e6cd05498d3539ce02",
+  "run_id": 45378163922,
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45378163922",
+  "jobs": [
+    {
+      "id": 138389869662,
+      "run_id": 45378163922,
+      "workflow_name": "core-check",
+      "head_branch": "feat/large-screen-workbench",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/runs/45378163922",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUxXzgM8AAAAgOK3UXg",
+      "head_sha": "ee83f1c0d72708547d0692e6cd05498d3539ce02",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/jobs/138389869662",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45378163922/job/138389869662",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-24T10:47:53Z",
+      "started_at": "2026-11-24T10:47:55Z",
+      "completed_at": "2026-11-24T10:53:53Z",
+      "name": "check",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-24T10:47:56Z",
+          "completed_at": "2026-11-24T10:47:59Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-24T10:47:59Z",
+          "completed_at": "2026-11-24T10:48:04Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-24T10:48:04Z",
+          "completed_at": "2026-11-24T10:48:05Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-24T10:48:05Z",
+          "completed_at": "2026-11-24T10:48:06Z"
+        },
+        {
+          "name": "Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-24T10:48:06Z",
+          "completed_at": "2026-11-24T10:48:10Z"
+        },
+        {
+          "name": "Install the pinned OHOS Flutter SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-24T10:48:10Z",
+          "completed_at": "2026-11-24T10:48:10Z"
+        },
+        {
+          "name": "Resolve packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-24T10:48:10Z",
+          "completed_at": "2026-11-24T10:48:12Z"
+        },
+        {
+          "name": "Check changed Dart formatting",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-24T10:48:12Z",
+          "completed_at": "2026-11-24T10:48:12Z"
+        },
+        {
+          "name": "Analyze",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-24T10:48:12Z",
+          "completed_at": "2026-11-24T10:48:37Z"
+        },
+        {
+          "name": "Run the complete test suite",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-24T10:48:37Z",
+          "completed_at": "2026-11-24T10:53:49Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-24T10:53:49Z",
+          "completed_at": "2026-11-24T10:53:49Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-24T10:53:49Z",
+          "completed_at": "2026-11-24T10:53:50Z"
+        },
+        {
+          "name": "Post Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-24T10:53:50Z",
+          "completed_at": "2026-11-24T10:53:50Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-24T10:53:50Z",
+          "completed_at": "2026-11-24T10:53:50Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-24T10:53:50Z",
+          "completed_at": "2026-11-24T10:53:51Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-24T10:53:51Z",
+          "completed_at": "2026-11-24T10:53:51Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-24T10:53:51Z",
+          "completed_at": "2026-11-24T10:53:51Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/check-runs/138389869662",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002609,
+      "runner_name": "GitHub Actions 1000002609",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

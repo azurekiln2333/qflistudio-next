@@ -14,7 +14,7 @@
 - Preserve and bundle the upstream OFL license, registering it once with `LicenseRegistry`. Chinese and unsupported glyphs use system fallback. Native `Typeface` objects cannot be passed to Flutter.
 - The vendored `CodeEditorStyle` forwards weight and slant into the text and paragraph strut styles.
 - Cache file modification time in `OpenFile`, updating it during asynchronous file reads/saves. Do not call `statSync` from a cursor or selection rebuild.
-- Use static analysis for routine checks; do not add or run tests unless requested. Device frame-time improvements require device profiling before claiming measured gains.
+- Run formatting, static analysis, tests and builds only in GitHub Actions. Do not run local checks or package resolution, including `--no-pub` variants. Retain the existing test contracts below; this policy changes where checks run, not what they cover. Device frame-time improvements require separately authorized device profiling before claiming measured gains.
 
 ## Embedded Agent Navigation
 
@@ -34,3 +34,13 @@
 - Existing checks: `editor_top_bar_title_test.dart` verifies toolbar placement,
   compact widths, text scaling, and badges. `editor_agent_embed_test.dart`
   verifies navigation, pane retention, lazy activation, and offline gating.
+
+## Workbench editor (task 11-25-workbench-ui-cleanup)
+
+#### Signatures and ownership
+- Keep one cached file view per OpenFile and one workbench selection toolbar controller per file. Workbench tree opt-in is `FileExplorer.largeScreen` (default false).
+- Workbench source selection uses ContextMenuController/TextSelectionToolbar. The mobile re_editor controller force-unwraps `renderRect`, but desktop right-click passes null; do not reuse that mobile implementation for desktop menus.
+- Editor tracks actual hub ownership separately from widget hints. An already-mounted workbench EditorPage must adopt a changed supplied hub before processing its session/reveal request. Cancel old waits, dispose only an owned previous hub, and ignore awaited results from a replaced hub. A repeated session target on a different hub is still a new request. Caller-owned hubs remain alive.
+
+#### Retention and validation
+Keep phone AppBar/tabs/selection/quick bar/symbols/outlined tree unchanged. TabBar adds implicit 2dp padding: a 38dp viewport preserves a 36dp tab child. Dirty dots become close controls on hover; preserve dirty-close guards and per-file state. Root selection overlays must close on tab switch, close, disposal, retained visibility loss, ancestor disabled tickers and medium Agent switching, without dropping cached documents. Test listener detach, original code-editor activators when Agent is absent, focused Ctrl/Cmd+S persistence, zero-width retained collapse, inclusive handle width and continuous constrained drags. Never query file stat synchronously during cursor updates.

@@ -1,0 +1,58 @@
+{
+  "provider": "pi",
+  "pid": 55768,
+  "started_at": "2026-11-20T13:04:06.322755+08:00",
+  "status": "needs_attention",
+  "phases": [
+    {
+      "name": "04a-tests",
+      "status": "artifacts_ready_unreviewed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "started_at": "2026-11-20T13:04:06.548461+08:00",
+          "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\04a-tests-1.jsonl",
+          "pid": 56076,
+          "exit_code": 0,
+          "ended_at": "2026-11-20T13:47:34.373060+08:00",
+          "missing_artifacts": []
+        }
+      ]
+    },
+    {
+      "name": "04b-ci",
+      "status": "incomplete",
+      "attempts": [
+        {
+          "attempt": 1,
+          "started_at": "2026-11-20T13:47:36.322703+08:00",
+          "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\04b-ci-1.jsonl",
+          "pid": 23408,
+          "exit_code": 0,
+          "ended_at": "2026-11-20T15:18:03.369025+08:00",
+          "missing_artifacts": [
+            "app/.github/workflows/remote-companion.yml",
+            "reports/phase-04b-ci.md",
+            "reports/pi-implementation.md",
+            "reports/pi-implementation.done"
+          ]
+        },
+        {
+          "attempt": 2,
+          "started_at": "2026-11-20T15:18:03.634381+08:00",
+          "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\04b-ci-2.jsonl",
+          "pid": 43344,
+          "exit_code": 0,
+          "ended_at": "2026-11-20T15:35:37.831410+08:00",
+          "missing_artifacts": [
+            "app/.github/workflows/remote-companion.yml",
+            "reports/pi-implementation.md",
+            "reports/pi-implementation.done"
+          ]
+        }
+      ]
+    }
+  ],
+  "error": "Phase ended without required artifacts: 04b-ci",
+  "ended_at": "2026-11-20T15:35:38.079191+08:00"
+}

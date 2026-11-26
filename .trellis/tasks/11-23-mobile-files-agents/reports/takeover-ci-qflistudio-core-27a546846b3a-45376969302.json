@@ -1,0 +1,228 @@
+{
+  "observed_at": "2026-11-24T10:46:34.084501+00:00",
+  "repo": "qflistudio-core",
+  "workflow": "core-check",
+  "branch": "feat/large-screen-workbench",
+  "sha": "27a546846b3a9f96dd564e8d339255b4ce3e3854",
+  "run_id": 45376969302,
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45376969302",
+  "jobs": [
+    {
+      "id": 138385728138,
+      "run_id": 45376969302,
+      "workflow_name": "core-check",
+      "head_branch": "feat/large-screen-workbench",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/runs/45376969302",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUxXzgM8AAAAgOG6iig",
+      "head_sha": "27a546846b3a9f96dd564e8d339255b4ce3e3854",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/jobs/138385728138",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45376969302/job/138385728138",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-24T10:40:14Z",
+      "started_at": "2026-11-24T10:40:16Z",
+      "completed_at": "2026-11-24T10:45:45Z",
+      "name": "check",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-24T10:40:17Z",
+          "completed_at": "2026-11-24T10:40:19Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-24T10:40:19Z",
+          "completed_at": "2026-11-24T10:40:25Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-24T10:40:25Z",
+          "completed_at": "2026-11-24T10:40:26Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-24T10:40:26Z",
+          "completed_at": "2026-11-24T10:40:27Z"
+        },
+        {
+          "name": "Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-24T10:40:27Z",
+          "completed_at": "2026-11-24T10:40:31Z"
+        },
+        {
+          "name": "Install the pinned OHOS Flutter SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-24T10:40:31Z",
+          "completed_at": "2026-11-24T10:40:31Z"
+        },
+        {
+          "name": "Resolve packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-24T10:40:31Z",
+          "completed_at": "2026-11-24T10:40:33Z"
+        },
+        {
+          "name": "Check changed Dart formatting",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 8,
+          "started_at": "2026-11-24T10:40:33Z",
+          "completed_at": "2026-11-24T10:40:33Z"
+        },
+        {
+          "name": "Analyze",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-24T10:40:33Z",
+          "completed_at": "2026-11-24T10:40:56Z"
+        },
+        {
+          "name": "Run the complete test suite",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 10,
+          "started_at": "2026-11-24T10:40:56Z",
+          "completed_at": "2026-11-24T10:45:41Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-24T10:45:41Z",
+          "completed_at": "2026-11-24T10:45:42Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-24T10:45:42Z",
+          "completed_at": "2026-11-24T10:45:42Z"
+        },
+        {
+          "name": "Post Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-11-24T10:45:42Z",
+          "completed_at": "2026-11-24T10:45:42Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-24T10:45:42Z",
+          "completed_at": "2026-11-24T10:45:42Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-24T10:45:42Z",
+          "completed_at": "2026-11-24T10:45:43Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-24T10:45:43Z",
+          "completed_at": "2026-11-24T10:45:43Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-24T10:45:43Z",
+          "completed_at": "2026-11-24T10:45:43Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/check-runs/138385728138",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002608,
+      "runner_name": "GitHub Actions 1000002608",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions",
+      "failure_annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/27a546846b3a9f96dd564e8d339255b4ce3e3854/.github",
+          "start_line": 67,
+          "start_column": null,
+          "end_line": 67,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/workspace_dialog_layout_test.dart :: loading /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/workspace_dialog_layout_test.dart :: Failed to load \"/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/workspace_dialog_layout_test.dart\":\n    Compilation failed for testPath=/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/workspace_dialog_layout_test.dart: test/workspace_dialog_layout_test.dart:223:2: Error: Expected ')' before this.\n    },\n    ^\n    .",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/27a546846b3a9f96dd564e8d339255b4ce3e3854/.github",
+          "start_line": 8798,
+          "start_column": null,
+          "end_line": 8798,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/27a546846b3a9f96dd564e8d339255b4ce3e3854/.github",
+          "start_line": 17,
+          "start_column": null,
+          "end_line": 17,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/27a546846b3a9f96dd564e8d339255b4ce3e3854/.github",
+          "start_line": 23,
+          "start_column": null,
+          "end_line": 23,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 65.",
+          "raw_details": ""
+        }
+      ]
+    }
+  ]
+}

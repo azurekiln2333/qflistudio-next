@@ -1,0 +1,208 @@
+[
+  {
+    "target": "windows-x64",
+    "artifact_sha256": "6b1936a1b83cb765217e060eeddc24bb54ada3c1c69c668d7ade78272e2200fd",
+    "provenance": "passed",
+    "checksummed_members": [
+      "BUILD_INFO.txt",
+      "LICENSE",
+      "QFLIStudioN-5.0.5-windows-x64-portable.zip",
+      "QFLIStudioN-5.0.5-windows-x64-setup.exe"
+    ],
+    "payload": {},
+    "facts": {
+      "target": "qflistudio-5.0.5-windows-x64",
+      "app_version": "5.0.5",
+      "app_commit": "6473c165b94367151655f7ebd5a9cf25ff219da5",
+      "core_commit": "79bfe0191878179caf370cfb154f23cc51918619",
+      "flutter_version": "3.50.0",
+      "flutter_commit": "ab2912035e160d9cad6306df307576da6128ebdb",
+      "flutter_mode": "upstream",
+      "build_mode": "release",
+      "plugin": "qfli_git",
+      "plugin_version": "0.1.0",
+      "plugin_commit": "53ad359159258706d4c242e70a2db0e1d075dabc",
+      "plugin_native_api_version": "2",
+      "plugin_native_source": "d002bd3e9febb478758b75b6670a24ba8a3c610c",
+      "plugin_native_release": "https://github.com/azurekiln2333/qflistudio-git/actions/runs/44802440226",
+      "plugin_cacert_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "plugin_pending": "0",
+      "runner": "Windows X64 win22",
+      "signing": "unsigned (Windows SmartScreen will warn)",
+      "device_validation": "none",
+      "run": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/44820763009",
+      "visual_studio": "Visual Studio Enterprise 2022 17.14.45",
+      "msvc_component": "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+      "msvc_compiler": "19.44.35230.0",
+      "msvc_default_toolset": "14.44.35207",
+      "cmake": "cmake version 3.31.6-msvc6",
+      "cmake_generator": "Visual Studio 17 2022",
+      "cmake_generator_platform": "x64",
+      "windows_inspection": "release files and the x64 COFF machine (8664) were checked",
+      "vc_runtime": "bundled msvcp140.dll and vcruntime140.dll from redistributable 14.44.35112",
+      "seven_zip": "7-Zip 26.06 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-11-06",
+      "inno_setup": "Inno Setup 6.7.1",
+      "installer_inspection": "silent per-user install wrote the app, the runtime DLLs and the uninstaller; the app was not started"
+    }
+  },
+  {
+    "target": "android-arm64-v8a",
+    "artifact_sha256": "32bc89c661e8925dc91747632d770a9a6eb829a872936e60b6e03468b0841c25",
+    "provenance": "passed",
+    "checksummed_members": [
+      "BUILD_INFO.txt",
+      "LICENSE",
+      "QFLIStudioN-5.0.5-android-arm64-v8a.apk"
+    ],
+    "payload": {
+      "git_members": [
+        "lib/arm64-v8a/libqfli_git.so",
+        "assets/flutter_assets/packages/qfli_git/assets/cacert.pem"
+      ],
+      "ca_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "native_members": [
+        "lib/arm64-v8a/libqfli_git.so"
+      ]
+    },
+    "facts": {
+      "target": "qflistudio-5.0.5-android-arm64-v8a",
+      "app_version": "5.0.5",
+      "app_commit": "6473c165b94367151655f7ebd5a9cf25ff219da5",
+      "core_commit": "79bfe0191878179caf370cfb154f23cc51918619",
+      "flutter_version": "3.50.0",
+      "flutter_commit": "ab2912035e160d9cad6306df307576da6128ebdb",
+      "flutter_mode": "upstream",
+      "build_mode": "release",
+      "plugin": "qfli_git",
+      "plugin_version": "0.1.0",
+      "plugin_commit": "53ad359159258706d4c242e70a2db0e1d075dabc",
+      "plugin_native_api_version": "2",
+      "plugin_native_source": "d002bd3e9febb478758b75b6670a24ba8a3c610c",
+      "plugin_native_release": "https://github.com/azurekiln2333/qflistudio-git/actions/runs/44802440226",
+      "plugin_cacert_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "plugin_pending": "0",
+      "runner": "Linux X64 ubuntu24",
+      "signing": "debug key (installable; not a store release key)",
+      "device_validation": "none",
+      "run": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/44820763009",
+      "apk_abi": "arm64-v8a",
+      "apk_package": "com.azurekiln.qflistudio",
+      "apk_signer": "Android Debug key generated in the job",
+      "java": "openjdk version \"17.0.21\" 2026-10-20",
+      "ndk": "27.0.12077973",
+      "cmake": "cmake version 3.22.1-g37088a8",
+      "gradle": "9.5.0",
+      "android_gradle_plugin": "9.3.1",
+      "kotlin": "2.4.10",
+      "apk_inspected_with": "build-tools 37.0.0",
+      "apk_libapp_elf": "ELF machine checked for 3 ABIs"
+    }
+  },
+  {
+    "target": "ohos-arm64",
+    "artifact_sha256": "246e46b13429af105f4ef6625e9959fecfb1c97c7b5552c37dc92a3b40d6726d",
+    "provenance": "passed",
+    "checksummed_members": [
+      "BUILD_INFO.txt",
+      "LICENSE",
+      "QFLIStudioN-5.0.5-ohos-arm64-unsigned.hap"
+    ],
+    "payload": {
+      "git_members": [
+        "libs/arm64-v8a/libqfli_git.so",
+        "resources/rawfile/flutter_assets/packages/qfli_git/assets/cacert.pem"
+      ],
+      "ca_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "native_members": [
+        "libs/arm64-v8a/libqfli_git.so"
+      ]
+    },
+    "facts": {
+      "target": "qflistudio-5.0.5-ohos-arm64",
+      "app_version": "5.0.5",
+      "app_commit": "6473c165b94367151655f7ebd5a9cf25ff219da5",
+      "core_commit": "79bfe0191878179caf370cfb154f23cc51918619",
+      "flutter_version": "3.41.10-ohos-1.0.1",
+      "flutter_commit": "adaf911c35c9136a7d18fc424d714c9ec7724e60",
+      "flutter_mode": "ohos",
+      "build_mode": "release",
+      "plugin": "qfli_git",
+      "plugin_version": "0.1.0",
+      "plugin_commit": "53ad359159258706d4c242e70a2db0e1d075dabc",
+      "plugin_native_api_version": "2",
+      "plugin_native_source": "d002bd3e9febb478758b75b6670a24ba8a3c610c",
+      "plugin_native_release": "https://github.com/azurekiln2333/qflistudio-git/actions/runs/44802440226",
+      "plugin_cacert_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "plugin_pending": "0",
+      "runner": "Linux X64 ubuntu22",
+      "signing": "unsigned (sign with your own HarmonyOS certificate and profile before installing)",
+      "device_validation": "none",
+      "run": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/44820763009",
+      "ohos_tools_source": "ErBWs/ohos-sdk release, a third-party redistribution of the HarmonyOS command-line tools",
+      "ohos_command_line_tools": "26.0.0.821",
+      "ohos_sdk_api_level": "26",
+      "ohos_project_target_sdk": "6.1.1(24)",
+      "node": "v24.14.1",
+      "node_home": "/opt/hostedtoolcache/node/24.14.1/x64",
+      "npm": "11.11.0",
+      "ohpm": "26.0.0.630",
+      "hvigor": "6.26.4",
+      "hvigor_node": "v24.14.1",
+      "hap_bundle": "com.azurekiln.qflistudio",
+      "hap_abis": "arm64-v8a",
+      "hap_entries": "38"
+    }
+  },
+  {
+    "target": "ios-arm64",
+    "artifact_sha256": "f13781c0db18a71edb478f80f775ce98edb6df594c4d4b80f2623ef496e8c1ad",
+    "provenance": "passed",
+    "checksummed_members": [
+      "BUILD_INFO.txt",
+      "LICENSE",
+      "QFLIStudioN-5.0.5-ios-unsigned.ipa"
+    ],
+    "payload": {
+      "git_members": [
+        "Payload/Runner.app/Frameworks/App.framework/flutter_assets/packages/qfli_git/",
+        "Payload/Runner.app/Frameworks/App.framework/flutter_assets/packages/qfli_git/assets/",
+        "Payload/Runner.app/Frameworks/App.framework/flutter_assets/packages/qfli_git/assets/cacert.pem",
+        "Payload/Runner.app/Frameworks/qfli_git.framework/",
+        "Payload/Runner.app/Frameworks/qfli_git.framework/qfli_git",
+        "Payload/Runner.app/Frameworks/qfli_git.framework/Info.plist"
+      ],
+      "ca_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "native_members": [
+        "Payload/Runner.app/Frameworks/qfli_git.framework/qfli_git"
+      ]
+    },
+    "facts": {
+      "target": "qflistudio-5.0.5-ios-arm64",
+      "app_version": "5.0.5",
+      "app_commit": "6473c165b94367151655f7ebd5a9cf25ff219da5",
+      "core_commit": "79bfe0191878179caf370cfb154f23cc51918619",
+      "flutter_version": "3.50.0",
+      "flutter_commit": "ab2912035e160d9cad6306df307576da6128ebdb",
+      "flutter_mode": "upstream",
+      "build_mode": "release",
+      "plugin": "qfli_git",
+      "plugin_version": "0.1.0",
+      "plugin_commit": "53ad359159258706d4c242e70a2db0e1d075dabc",
+      "plugin_native_api_version": "2",
+      "plugin_native_source": "d002bd3e9febb478758b75b6670a24ba8a3c610c",
+      "plugin_native_release": "https://github.com/azurekiln2333/qflistudio-git/actions/runs/44802440226",
+      "plugin_cacert_sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+      "plugin_pending": "0",
+      "runner": "macOS ARM64 macos15",
+      "signing": "unsigned (re-sign with your own Apple certificate and provisioning profile before installing)",
+      "device_validation": "none",
+      "run": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/44820763009",
+      "xcode": "Xcode 16.4 Build version 16F6",
+      "iphoneos_sdk": "18.5",
+      "cocoapods": "1.17.0",
+      "ios_deployment_target": "15.0",
+      "architectures": "arm64",
+      "bundle_id": "com.azurekiln.qflistudio"
+    }
+  }
+]

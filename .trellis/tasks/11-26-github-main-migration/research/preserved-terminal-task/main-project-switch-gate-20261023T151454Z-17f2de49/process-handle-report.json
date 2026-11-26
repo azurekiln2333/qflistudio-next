@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "minimal sanitized progress summary",
+  "source_relative_path": "main-project-switch-gate-20261023T151454Z-17f2de49/process-handle-report.json",
+  "schema": 1,
+  "status": "RELEASE",
+  "suite": "project-switch",
+  "grant": "User selector correction; actual-menu 3 cases with explicit history IO teardown; bounded serial focused verification",
+  "release_allowed": true,
+  "flutter_exit_code": 0,
+  "completed_utc": "2026-10-23T15:15:03.067806+00:00",
+  "within_110_second_plan": true,
+  "test_result": "PASS",
+  "tests_count": 1,
+  "errors_count": 0,
+  "processes_count": 9,
+  "omitted_fields": [
+    "artifacts",
+    "command",
+    "cwd",
+    "descendant_tracking",
+    "durable_message_file",
+    "processes",
+    "root_pid",
+    "source_after",
+    "source_before",
+    "stderr",
+    "stdout",
+    "taskkill"
+  ],
+  "policy": "Commands, working directories, process identifiers, stdout, stderr, session data and raw transcripts omitted."
+}

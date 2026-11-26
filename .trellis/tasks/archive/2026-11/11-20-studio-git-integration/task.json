@@ -1,0 +1,56 @@
+{
+  "id": "studio-git-integration",
+  "name": "studio-git-integration",
+  "title": "Studio Git 插件与界面接入",
+  "description": "将 qfli_git 接入共享内核和主应用，交付可用的项目 Git 操作与云端安装包。",
+  "status": "completed",
+  "dev_type": "fullstack",
+  "scope": "studio-git",
+  "package": "qflistudio,qfli_studio_core,qfli_git",
+  "priority": "P1",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-20",
+  "completedAt": "2026-11-21",
+  "branch": "release/studio-git-ui-20261120",
+  "base_branch": "release/v5.0.5-preview.1",
+  "worktree_path": "D:/MyNewProjects/_wt/studio-git-integration/qflistudio",
+  "commit": "6473c165b94367151655f7ebd5a9cf25ff219da5",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "prd.md",
+    "design.md",
+    "implement.md"
+  ],
+  "notes": "User authorized planning then immediate actual Pi dispatch. No local tests/builds.",
+  "meta": {
+    "planning_status": "complete",
+    "planning_review": "stream_fixtures: cloud scope, constructors, native CI sequence resolved",
+    "implementation_authorization": "Latest user: 赶紧计划做完下去给pi去做",
+    "workers": [
+      "pi-a",
+      "pi-b",
+      "pi-c",
+      "pi-d"
+    ],
+    "dispatch_state": ".trellis/tasks/11-20-studio-git-integration/reports/herdr-dispatch.json",
+    "herdr_workspace": "w37",
+    "herdr_panes": [
+      "w37:pC",
+      "w37:pH",
+      "w37:pG",
+      "w37:pJ"
+    ],
+    "validation_policy": "cloud-only tests and builds",
+    "app_base": "6d1b96d7118740f71e5dadf393cc8bd58238b6af",
+    "core_base": "72c0b0955e4ddd5215dc818327fa5a67a4be22f7",
+    "plugin_base": "89e656bd2c9f879c4fc7e6a0a343e17dc7d0f84a",
+    "release_tag": "v5.0.5-git.2",
+    "release_url": "https://github.com/azurekiln2333/qflistudio-next/releases/tag/v5.0.5-git.2",
+    "release_run": 44820763009,
+    "release_validation": "18/18 required jobs successful, 13 assets verified"
+  }
+}

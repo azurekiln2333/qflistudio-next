@@ -1,0 +1,9 @@
+{"file": ".trellis/spec/frontend/ai-protocols.md", "reason": "Protocol adapter contract: the agent loop never branches on protocol; adapters own the wire shape"}
+{"file": ".trellis/spec/backend/ai-terminal-pool.md", "reason": "Relay boundary and upstream message normalization rules for the new stream route and reasoning_content"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "ApiError status mapping for pre-header errors and in-band stream errors"}
+{"file": ".trellis/spec/backend/logging-guidelines.md", "reason": "Audit and dispatch logs must not record prompts, reasoning or credentials"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Controller/facade notify patterns for coalesced streaming updates"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "ThinkingBubble widget structure, styling and accessibility"}
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "Sibling checkout and integration worktree layout for core and app"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Server, transport, loop and UI must agree on one event contract"}
+{"file": ".trellis/tasks/11-12-agents-workbench/design.md", "reason": "Existing agent session, transcript and facade contracts this task extends"}

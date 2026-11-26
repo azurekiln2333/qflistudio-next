@@ -1,0 +1,11 @@
+# core-check failures, loop 2, run 45018665003, core d06125392571046c05b72047036e17dde5e568e1
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/studio_agent_host_test.dart :: open and view publishes a system entry when the run fails :: Bad state: No element
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/retained_editor_test.dart :: live editor survives Home, tools, content and restore :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: chat view rebinds when the handle changes :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: the composer stop button asks for confirmation too :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: agents surface keeps the studio pane until an external host is chosen :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: approval options reply with the request id :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: chat tab sends prompts through the handle :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: closing the view detaches and keeps the session running :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: stopping a session asks for confirmation first :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/experience_test.dart :: 云端目录合并保留收藏，不重复追加已有项目 :: Bad state: No element

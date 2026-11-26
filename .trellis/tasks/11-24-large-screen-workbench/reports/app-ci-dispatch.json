@@ -1,0 +1,12 @@
+{
+  "request": {
+    "ref": "feat/large-screen-workbench",
+    "inputs": {
+      "core_ref": "3ef32e6ec944d31ba9fc2f86ebbb9984f6fd37f1"
+    }
+  },
+  "response": {
+    "http_status": 204
+  },
+  "app_sha": "69656b4ab14e706e85907ef4c4205d8cd35a1338"
+}

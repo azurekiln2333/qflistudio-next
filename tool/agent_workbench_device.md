@@ -1,13 +1,25 @@
 # 鸿蒙真机：打包、安装、截图
 
-两份脚本：
+## 当前云端规则
+
+本文保留旧设备操作记录。
+构建、测试、分析和依赖安装只在 GitHub Actions 执行。
+本机不要运行下列历史命令。
+`--no-pub` 不构成本地验证例外。
+请关闭 IDE 自动构建、自动测试、依赖安装和 Sync。
+不要在本机启动 WSL 或下载构建产物。
+真机验收需要独立授权，不属于云端构建通过的结论。
+
+历史记录使用两份脚本：
 
 | 脚本 | 作用 |
 | --- | --- |
 | `tool/build_studio_hap.sh` | 命令行打 studio 本体的 HAP 包 |
 | `tool/device_ui.sh` | 封装 hdc：装包、启动、截图、点击、输入、返回、读日志 |
 
-## 打包
+## 历史打包记录
+
+以下前提和命令仅说明旧流程，不授权本地执行。
 
 ```bash
 tool/build_studio_hap.sh              # debug
@@ -21,31 +33,29 @@ tool/build_studio_hap.sh --release    # release，需要 build-profile.json5 里
 
 ## 依赖的内核仓库（集成时必看）
 
-`pubspec.yaml` 里 `qfli_studio_core` 指向 `../qfli_studio_core`。要打包**集成分支**的内核，
-在 studio 根目录放一个未跟踪的 `pubspec_overrides.yaml`：
+新电脑先按[根 README](../README.md#github-仓库与新电脑克隆)克隆两个 GitHub 仓库。
+标准克隆目录是并列的 `qflistudio-next/` 与 `qflistudio-core/`。
+应用通过 `../qflistudio-core` 引用内核。
+Dart 包名仍为 `qfli_studio_core`。
+这些名称不代表本机已有目录。
 
-```yaml
-dependency_overrides:
-  qfli_studio_core:
-    path: ../_wt/integration/qfli_studio_core
-```
+云端任务须记录两个仓库的完整提交、包名和版本。
+云端须核对锁文件路径、版本与实际内核检出。
+路径依赖的锁文件不记录 Git 提交。
+旧集成记录使用过未跟踪的 `pubspec_overrides.yaml`。
+其中的 `_wt/integration/` 是历史 worktree 路径。
+不要把它作为新电脑的依赖配置。
+不要提交机器专属覆盖文件。
 
-它**必须不被提交**。本仓库已把它写进 `.git/info/exclude`（本地忽略，不改 `.gitignore`）。
-确认一遍：
+## 真机操作历史
 
-```bash
-git check-ignore -v pubspec_overrides.yaml
-# .git/info/exclude:23:pubspec_overrides.yaml	pubspec_overrides.yaml
-git status --short            # 不应出现 pubspec_overrides.yaml
-```
-
-打包前脚本会打印实际使用的内核路径；看到 `_wt` 说明用的是 worktree 里的内核。
-集成完成后删掉这个文件，回到 `../qfli_studio_core`。
-
-## 真机操作
+以下命令仅作历史记录，不是当前操作指南。
+构建与产物校验使用获准的云端流程。
+设备操作与真机验收需要独立授权。
+地址 `192.0.2.10` 是文档示例，不是真实设备地址。
 
 ```bash
-export HDC_TARGET=$(hdc list targets | head -1)   # 例如 192.168.68.207:46551
+export HDC_TARGET=$(hdc list targets | head -1)   # 文档示例：192.0.2.10:46551
 export SHOT_DIR=./screenshots                     # 不设就用 ./screenshots
 
 tool/device_ui.sh targets            # 看设备
@@ -61,7 +71,7 @@ tool/device_ui.sh back               # 返回
 tool/device_ui.sh log 30             # 抓 30 秒 hilog，只显示 [agent-perf]
 ```
 
-## 两个坑
+## 历史排查中的两个坑
 
 1. **Git Bash 会改写参数**。MSYS 会把 `hdc file recv` 的设备路径
    `/data/local/tmp/x.png` 改写成 `D:/ProgramFiles/Git/data/local/tmp/x.png`，

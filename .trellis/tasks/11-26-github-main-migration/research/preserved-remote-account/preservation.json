@@ -1,0 +1,236 @@
+{
+  "created_at": "2026-11-26T20:20:19.353573+08:00",
+  "source_worktree": "D:\\MyNewProjects\\_wt\\remote-account-binding\\studio",
+  "source_head": "6d1b96d7118740f71e5dadf393cc8bd58238b6af",
+  "comparison_base": "c5f4bc3afe9c81ba488fd3f544d43c3dac061512",
+  "tracked_delta_files": [
+    {
+      "path": ".github/workflows/app-installers.yml",
+      "worktree_bytes": 99550,
+      "raw_sha256": "799570f89beb50f1e0fdd0abf4152efc8536313c2b57815f024975cbdd6293f1",
+      "crlf_lines": 2206,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/README.md",
+      "worktree_bytes": 6562,
+      "raw_sha256": "5668aaddf2fa58385ad7b00bed4159febfbe62b94dfadf38272df5924c58a723",
+      "crlf_lines": 131,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/relay-core.json",
+      "worktree_bytes": 760,
+      "raw_sha256": "4018424af3dfba8cdd0684310ce405fec355306c6b60688952b73d2e9c7bd86d",
+      "crlf_lines": 0,
+      "bare_lf_lines": 13
+    },
+    {
+      "path": "companion/remote_agent/scripts/sync-relay.ts",
+      "worktree_bytes": 9204,
+      "raw_sha256": "98196d2d75352cc9ae20cd777ee5aa2c14a6ec7af3f4e42ae9ea1658e45d47c5",
+      "crlf_lines": 205,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/src/agent/link.ts",
+      "worktree_bytes": 8843,
+      "raw_sha256": "9e99ae56353d0202e58d047df5436c40500ce9461d9d6db24afbb5e967ffe2a0",
+      "crlf_lines": 245,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/src/agent/main.ts",
+      "worktree_bytes": 21309,
+      "raw_sha256": "58a83d256b1576a1975874bf8c841ab52f86dc36b80162e3acff43b6207f5b19",
+      "crlf_lines": 466,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/src/agent/sdk.ts",
+      "worktree_bytes": 2151,
+      "raw_sha256": "97bc1391a80da1f4a502bb0ef15193befc4ef13f613f4974fe546c19b8b48f93",
+      "crlf_lines": 58,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/src/agent/sidecar.ts",
+      "worktree_bytes": 25632,
+      "raw_sha256": "1ea1b166ac4624b7e46fc4ffc562d8f095cf8ae271565585f74a6773cf5b66b5",
+      "crlf_lines": 627,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/src/agent/tool-streams.ts",
+      "worktree_bytes": 20062,
+      "raw_sha256": "44d8d256981486f7286b97d9356138537416ef405906795f75bfc70912951b77",
+      "crlf_lines": 514,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/src/relay/relay.ts",
+      "worktree_bytes": 30251,
+      "raw_sha256": "a5cca4ae489dacc276ae31bd2b7d35446ee5fd4a9e371601cf6fff579568fe30",
+      "crlf_lines": 0,
+      "bare_lf_lines": 768
+    },
+    {
+      "path": "companion/remote_agent/src/shared/relay-protocol.ts",
+      "worktree_bytes": 3352,
+      "raw_sha256": "187ece186696f506a63d825868c8fc3bcb2275530f577f612ede05a7b5f91323",
+      "crlf_lines": 0,
+      "bare_lf_lines": 91
+    },
+    {
+      "path": "companion/remote_agent/start.cmd",
+      "worktree_bytes": 1337,
+      "raw_sha256": "b08ddcc66bf3d78a5545cf83db2ea08f640940ee902ab60778155f7ab6e3aae7",
+      "crlf_lines": 38,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/start.sh",
+      "worktree_bytes": 642,
+      "raw_sha256": "5ce9322c35646e5b76867413b6d505c8914874c30fce2e00438ea2b8b74ec864",
+      "crlf_lines": 14,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "companion/remote_agent/test/relay-core-sync.test.ts",
+      "worktree_bytes": 4205,
+      "raw_sha256": "3e13312ff25537f602409d60224474b7636696a9bf0f50725f048dcf01c47183",
+      "crlf_lines": 90,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "lib/main.dart",
+      "worktree_bytes": 4363,
+      "raw_sha256": "3cc27c2e66321b5fc28d6af9c1c4fbdc9a299e800a63520a9b5448a385087105",
+      "crlf_lines": 130,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "lib/studio_tools_tab.dart",
+      "worktree_bytes": 4910,
+      "raw_sha256": "83c67f1bfb6f26a3b3984bee09c17345839fb146b85a95df251376ed2ed6d4d9",
+      "crlf_lines": 112,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "macos/Runner/DebugProfile.entitlements",
+      "worktree_bytes": 489,
+      "raw_sha256": "fd988deff226292ec13984551742a1ad3e2211a0d2d6bfa7ab539fae811b4a14",
+      "crlf_lines": 16,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "macos/Runner/Release.entitlements",
+      "worktree_bytes": 434,
+      "raw_sha256": "70c4ea1dea0991afa3208a21f35d7cd837c48f361f6a7f4c5d4d200904c856b5",
+      "crlf_lines": 14,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "pubspec.lock",
+      "worktree_bytes": 16845,
+      "raw_sha256": "5b9be71f7b919e3e9bcbcb44864c1f37ae7a086a11a62d30e8ec45207cf55b23",
+      "crlf_lines": 564,
+      "bare_lf_lines": 0
+    },
+    {
+      "path": "tool/ci/package_linux.sh",
+      "worktree_bytes": 4563,
+      "raw_sha256": "658275d80ea6295eb376ca8891c9bed0951cabb703c24f4073ad737838d8245c",
+      "crlf_lines": 141,
+      "bare_lf_lines": 0
+    }
+  ],
+  "tracked_delta_count": 20,
+  "untracked_source_files": [
+    {
+      "path": "companion/remote_agent/src/agent/desktop-discovery.ts",
+      "bytes": 7693,
+      "sha256": "4d7dea9c444067c662612fb061871013dcda0cc34f6aa50cc07c63f92288667a"
+    },
+    {
+      "path": "companion/remote_agent/src/agent/sidecar-port-file.ts",
+      "bytes": 4191,
+      "sha256": "d9e9c0f1a0eb5c41cc1c59e8c94ef9f00807e95c12316d8562779666ba78cbfe"
+    },
+    {
+      "path": "companion/remote_agent/test/desktop-discovery.test.ts",
+      "bytes": 19208,
+      "sha256": "7609a41f7853be56c1feaab5e740de0f6b329735c49ea42606040f261992158b"
+    },
+    {
+      "path": "companion/remote_agent/test/sidecar-port-file.test.ts",
+      "bytes": 4999,
+      "sha256": "a3f0bdf8d5e36497deb4cc9354bccf58d0e2d3d7b8e4b8b3047e3fd5edb3e888"
+    },
+    {
+      "path": "companion/tools/README.md",
+      "bytes": 3187,
+      "sha256": "7a0d95972ad01acc53854b21fc757e0d64d7afb86cac625e4c0cf8e4eecaeb73"
+    },
+    {
+      "path": "companion/tools/package_companion.ps1",
+      "bytes": 16427,
+      "sha256": "98b14e1809bb8f116c7168a5882342c4be918d7ab1e1308e43788faa32e6bbea"
+    },
+    {
+      "path": "companion/tools/verify_companion_bundle.mjs",
+      "bytes": 14759,
+      "sha256": "c27cf2f62619ef4621cfd722f85f1db07b5e408a042d6ec4aedc8d0232f25b11"
+    },
+    {
+      "path": "companion/tools/verify_companion_bundle.test.mjs",
+      "bytes": 9945,
+      "sha256": "1c21f1f09d7c44d957145b078b9361df7229604edbc44b6e95837a7f0249d927"
+    },
+    {
+      "path": "tool/ci/stage_desktop_companion.ps1",
+      "bytes": 3921,
+      "sha256": "13616de435acb09be70c504646c19ae53cc86d67bc8c421ab9f49f294e080bee"
+    }
+  ],
+  "untracked_source_count": 9,
+  "redundant_shared_files_excluded": [
+    {
+      "path": "companion/remote_agent/src/shared/crypto.ts",
+      "reason": "normalized bytes equal github/main; redundant"
+    },
+    {
+      "path": "companion/remote_agent/src/shared/log.ts",
+      "reason": "normalized bytes equal github/main; redundant"
+    },
+    {
+      "path": "companion/remote_agent/src/shared/protocol-account.ts",
+      "reason": "normalized bytes equal github/main; redundant"
+    }
+  ],
+  "patches": {
+    "exact": {
+      "path": "patches/remote-account-working-tree-exact.patch",
+      "bytes": 454970,
+      "sha256": "629c488397a518a6098b336366db27f29465fdc6cdc8c7bdfa1fe58230c166dd",
+      "description": "Exact Git binary diff of 20 non-equivalent tracked paths, including checkout CRLF."
+    },
+    "review": {
+      "path": "patches/remote-account-review.patch",
+      "bytes": 94535,
+      "sha256": "d3f216361f41f8d33348a8ad8a4982063b4f7fa3b27b4f27584de0c397a19327",
+      "description": "Same tracked changes with CR-at-EOL ignored; readable semantic review, not byte-exact."
+    }
+  },
+  "historical_checker": {
+    "source_worktree": "D:\\MyNewProjects\\_wt\\cloudterminal-import\\work\\qflistudio\\scripts\\check-remote-companion.mjs",
+    "preserved_path": "historical-only/cloudterminal-import/scripts/check-remote-companion.mjs",
+    "bytes": 11847,
+    "sha256": "1b28850c28782d67e3bfaa29b32ac0b8c9e694947e8c0d53a079489b916703ed",
+    "status": "historical-only; do not enable as current CI gate without adapting pins and criteria"
+  },
+  "preservation_only": true,
+  "no_runtime_application": true,
+  "no_git_mutation": true,
+  "no_build_test_install_or_wsl": true
+}

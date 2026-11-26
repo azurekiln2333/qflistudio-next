@@ -1,0 +1,48 @@
+{
+  "tag": "v5.0.5-git.5",
+  "run": 44833095726,
+  "run_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/44833095726",
+  "run_status": "completed",
+  "run_conclusion": "success",
+  "jobs_success": 18,
+  "release_id": 453270763,
+  "release_url": "https://github.com/azurekiln2333/qflistudio-next/releases/tag/v5.0.5-git.5",
+  "published_at": "2026-11-20T23:11:23Z",
+  "app_commit": "23b81a4abf33c9cec73490ba498bae5110acd587",
+  "core_commit": "0f18c3692791e66aa8cb74e71f49ea52469b7295",
+  "asset_count": 13,
+  "asset_names": [
+    "qfli-remote-assistant-5.0.5-windows-x64.zip",
+    "qflistudio-5.0.5-android-arm64-v8a.zip",
+    "qflistudio-5.0.5-android-armeabi-v7a.zip",
+    "qflistudio-5.0.5-android-x86_64.zip",
+    "qflistudio-5.0.5-ios-arm64.zip",
+    "qflistudio-5.0.5-linux-arm64.zip",
+    "qflistudio-5.0.5-linux-x64.zip",
+    "qflistudio-5.0.5-macos-arm64.zip",
+    "qflistudio-5.0.5-macos-x86_64.zip",
+    "qflistudio-5.0.5-ohos-arm64.zip",
+    "qflistudio-5.0.5-windows-arm64.zip",
+    "qflistudio-5.0.5-windows-x64.zip",
+    "SHA256SUMS"
+  ],
+  "all_twelve_zip_api_digests_match_published_manifest": true,
+  "tag_and_source_pins_verified": true,
+  "android_full_archive_sha256": "29fac8992370bf74c7545a39d8ee5d351ff3e738a6c30529e91d90f0adb900f2",
+  "android_inner_checksums_verified": true,
+  "android_actual_apk_inspected": {
+    "apk_entry_count": 84,
+    "abis": [
+      "arm64-v8a"
+    ],
+    "native_git_present": true,
+    "native_elf_aarch64": true,
+    "ca_entry": "assets/flutter_assets/packages/qfli_git/assets/cacert.pem",
+    "ca_digest_verified": true
+  },
+  "android_signing": "debug key (installable; not a store release key)",
+  "android_package": "com.azurekiln.qflistudio",
+  "artifact_execution": false,
+  "local_tests_or_builds": false,
+  "files_frozen": true
+}

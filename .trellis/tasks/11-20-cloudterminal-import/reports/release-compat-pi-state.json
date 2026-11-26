@@ -1,0 +1,14 @@
+{
+  "provider": "pi",
+  "model_override": null,
+  "fresh_session": true,
+  "cwd": "D:\\MyNewProjects\\_wt\\release-v5.0.5\\qfli_studio_core",
+  "started_at": "2026-11-20T15:13:49.092831+08:00",
+  "status": "needs_attention",
+  "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\release-compat-pi.jsonl",
+  "stderr": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\release-compat-pi.stderr.log",
+  "session_dir": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\release-compat-pi-sessions",
+  "pid": 11856,
+  "exit_code": 4294967295,
+  "ended_at": "2026-11-20T15:43:48.411911+08:00"
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "minimal sanitized progress summary",
+  "source_relative_path": "main-workspace-dialog-analysis-gate-20261023T141149Z-fa1dab2d/process-handle-report.json",
+  "schema": 1,
+  "status": "RELEASE",
+  "suite": "workspace-dialog-analysis",
+  "grant": "global381 final narrow analysis after workspace-dialog-regressions PASS and terminal release; user actual-settings fix; bounded serial window",
+  "release_allowed": true,
+  "flutter_exit_code": 0,
+  "completed_utc": "2026-10-23T14:11:54.284599+00:00",
+  "within_110_second_plan": true,
+  "test_result": "PASS",
+  "tests_count": 3,
+  "errors_count": 0,
+  "processes_count": 6,
+  "omitted_fields": [
+    "artifacts",
+    "command",
+    "cwd",
+    "descendant_tracking",
+    "durable_message_file",
+    "processes",
+    "root_pid",
+    "source_after",
+    "source_before",
+    "stderr",
+    "stdout",
+    "taskkill"
+  ],
+  "policy": "Commands, working directories, process identifiers, stdout, stderr, session data and raw transcripts omitted."
+}

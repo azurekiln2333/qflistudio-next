@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "Sibling roots and pinned package graph"}
+{"file": ".trellis/spec/frontend/project-storage.md", "reason": "Clone destination and registration ownership"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "Long Git process lifecycle and cancellation"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "FFI/backend/controller/UI contracts"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Reuse current Git and project owners"}
+{"file": ".trellis/tasks/11-20-studio-git-integration/research/studio-integration.md", "reason": "Source-backed platform and UI gap evidence"}
+{"file": ".trellis/tasks/11-20-studio-git-integration/research/baselines.md", "reason": "Exact release baselines and isolated write roots"}
+{"file": ".trellis/tasks/11-20-studio-git-integration/research/cloud-delivery.md", "reason": "Cloud-only verification and native artifact sequence"}

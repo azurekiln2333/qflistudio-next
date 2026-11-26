@@ -1,0 +1,36 @@
+{
+  "source": "D:/MyNewProjects/qfli_java",
+  "head": "18b8c661c3681756a85bce8666fbcc280d033117",
+  "status": [
+    " M ohos/entry/src/main/ets/entryability/JavaBridge.ets",
+    " M ohos/entry/src/main/ets/interop/InteropAbility.ets",
+    " M ohos/entry/src/main/ets/interop/InteropReceiver.ets",
+    " M ohos/entry/src/main/module.json5",
+    " M ohos/entry/src/main/resources/base/profile/main_pages.json",
+    "?? .trellis/tasks/11-17-app-package-ci/check.jsonl",
+    "?? .trellis/tasks/11-17-app-package-ci/implement.jsonl",
+    "?? .trellis/tasks/11-17-app-package-ci/implement.md",
+    "?? .trellis/tasks/11-17-app-package-ci/prd.md",
+    "?? .trellis/tasks/11-17-app-package-ci/task.json",
+    "?? ohos/entry/src/main/ets/interop/InteropBackgroundAbility.ets",
+    "?? ohos/entry/src/main/ets/interop/InteropBackgroundRunner.ets",
+    "?? ohos/entry/src/main/ets/pages/InteropIdle.ets",
+    "?? output/device-bg/after.json",
+    "?? output/device-bg/evidence.md",
+    "?? output/device-bg/menu.json",
+    "?? tool/verify_background_device.ps1",
+    "?? tool/verify_interop_background.cjs",
+    "?? tool/verify_interop_background.md",
+    "?? tools/ci_app_package.py",
+    "?? tools/ci_native_inputs.py"
+  ],
+  "index_sha256": "902a89efb721cd943694be7db4210e70605b793ca56153ec71721ae4322c64c8",
+  "files": {
+    "ohos/entry/src/main/resources/base/profile/main_pages.json": "ce8390256da01dda785160d97c8c0159d498c30d71ae6319248932907d64625e",
+    "ohos/entry/src/main/ets/pages/InteropIdle.ets": "2c02e2e5b50fc202a205780658ae2033530bcf01edf6e676581757c4727c916f",
+    "ohos/entry/src/main/ets/interop/InteropReceiver.ets": "5dd0c2566c9295264741cd647571799c4fedab0327050be66aff6de75428273b",
+    "ohos/entry/src/main/module.json5": "b67b4e12788bbdad66e054471eac8e32987a1a1e4b6529536646b3bad289ed25",
+    "ohos/entry/src/main/ets/interop/InteropAbility.ets": "f9e737d85a7ef77d1fb9a98ae2d1fab33ebf4b3bf9a9218594d93a931e1533ad",
+    "ohos/entry/src/main/ets/entryability/JavaBridge.ets": "52ba241c4c80fc876b6ed917911c3137a1a8cba0589352abb287a0c1efb8be5b"
+  }
+}

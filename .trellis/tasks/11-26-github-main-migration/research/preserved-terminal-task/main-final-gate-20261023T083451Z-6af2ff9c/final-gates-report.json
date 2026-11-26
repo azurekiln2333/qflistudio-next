@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized progress summary",
+  "source_relative_path": "main-final-gate-20261023T083451Z-6af2ff9c/final-gates-report.json",
+  "schema": 1,
+  "suite": "final",
+  "status": "FAIL",
+  "completed_utc": "2026-10-23T08:34:52.558297+00:00",
+  "commands_count": 2,
+  "planned_commands_count": 8,
+  "errors_count": 1,
+  "main_scope_count": 6,
+  "core_scope_count": 41,
+  "policy": "Raw commands, paths, process data, logs and transcript fields omitted."
+}

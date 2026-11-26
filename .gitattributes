@@ -7,3 +7,8 @@
 # picking either side (task state lives in task.json, not index.md). See
 # .trellis/spec/cli/backend/directory-structure.md for details.
 .trellis/workspace/*/journal-*.md merge=union
+
+# Preservation manifests hash exact bytes across Windows/Linux checkouts.
+.trellis/tasks/11-26-github-main-migration/research/preserved-terminal-task/** -text
+.trellis/tasks/11-26-github-main-migration/research/preserved-remote-account/** -text
+.trellis/tasks/11-26-github-main-migration/research/preserved-staging-tools/** -text

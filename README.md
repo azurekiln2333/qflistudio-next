@@ -2,38 +2,41 @@
 
 基于 Flutter / Material 3 的轻量级代码编辑器 + 开发者社区。
 
-## 仓库结构
+## GitHub 仓库与新电脑克隆
 
-主应用、11 个语言 App 和共享内核是 13 个并列的 Git 仓库。开发时把它们检出到同一父目录，
-各应用通过相对路径引用共享内核，并各自维护 `pubspec.lock`。
+主应用和共享内核是两个独立的 GitHub 仓库。
+新电脑先克隆这两个仓库。
+应用通过 `../qflistudio-core` 引用共享内核。
+内核的 Dart 包名仍为 `qfli_studio_core`。
 
-```
-checkout-parent/
-  qflistudio/                主应用与跨产品校验工具
-  qfli_studio_core/          共享 IDE 内核，内含补丁版 vendor/re_editor
-  qfli_c/                    C/C++ App，内含 packages/qfli_c_runtime
-  qfli_dart/ ... qfli_web/   其余 10 个语言 App
-```
+| 用途 | GitHub 仓库 | 克隆目录 |
+| --- | --- | --- |
+| 主应用 | `azurekiln2333/qflistudio-next` | `qflistudio-next/` |
+| 共享内核 | `azurekiln2333/qflistudio-core` | `qflistudio-core/` |
 
-主应用是全能版；各 `qfli_*` App 是独立仓库、独立构建的单语言产品。
-所有应用仓库都要与 `qfli_studio_core` 并列检出；仅克隆一个 App 时，本地路径依赖无法解析。
-
-每个仓库单独设置 GitHub 远端、提交并推送。例如先为共享包创建 GitHub 仓库，再执行：
+在任意空目录执行：
 
 ```bash
-git -C ../qfli_studio_core remote add origin <共享包仓库 URL>
-git -C ../qfli_studio_core push -u origin main
-git -C ../qfli_c remote add origin <C App 仓库 URL>
-git -C ../qfli_c push -u origin main
+mkdir qflistudio-workspace
+cd qflistudio-workspace
+git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-next.git qflistudio-next
+git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-core.git qflistudio-core
+git -C qflistudio-core checkout --detach 476a30acee21dc486ee2849dd8064a7be665e4d5
 ```
 
-其他 App 和主应用同理。当前本地迁移不自动创建 GitHub 仓库或设置远端。
+上例固定到本次核对的工作流 `CORE_REF`。
+后续版本以目标应用提交的 `CORE_REF` 为准。
+手动云端运行若覆盖此值，必须记录实际内核提交。
+不要把内核 `main` 的最新提交当作兼容版本。
 
-每个语言 App 里只有三个文件与语言相关（`lib/main.dart` 档位、`lib/<id>_runner.dart`
-运行后端、`test/<id>_app_test.dart` 接线测试），其余都是复制来的平台工程。
+这些名称是克隆目标，不代表本机已有目录。
+其他语言仓库按需克隆。
+旧 `apps/`、`packages/` 路径仅作历史记录。
 
-C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式与缺口，见
-[docs/multi-language-apps.md](docs/multi-language-apps.md)。
+构建、测试、分析、代码生成和依赖安装均在 GitHub Actions 执行。
+包名、版本和依赖解析也由云端核对。
+本机不要运行 Flutter、Dart、npm、ohpm、hvigor、Gradle 或原生工具链。
+不要下载或解压构建产物到工作区。
 
 ## 主页
 
@@ -61,7 +64,7 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
   - Python / Dart：桌面端直接运行，输出进终端面板
   - Java / C / C++：桌面端编译+运行；移动端引导使用在线终端
 - 本地终端：沙箱内命令响应式 shell（30 秒超时）
-- 在线终端：业务 API 将已认证请求转交独立的 gVisor 沙箱执行服务；部署和限额见 [安全终端 README](azurekiln-qfli-terminal/README.md)
+- 在线终端：业务 API 将已认证请求转交独立的 gVisor 沙箱执行服务。部署和限额见[云端终端与云项目](docs/deployment.md#云端终端与云项目)。
 
 ## 云端项目与 Git
 
@@ -87,127 +90,66 @@ C、C++、Python、Java、Lua、Web 和 Dart 各版的可行性、运行方式�
 
 后端不在当前仓库中，部署方式见 [官方服务配置](docs/deployment.md)。
 
-## 运行
+## 云端构建与验证
 
-```bash
-flutter pub get
+本仓库不支持在新电脑上执行本地构建、测试、分析、代码生成或依赖解析。
+打开工作区时，请关闭 IDE 自动构建、自动测试、自动依赖安装和项目 Sync。
 
-# 全能版（根工程）
-flutter run -d windows   # 或鸿蒙设备
+通过 [App installers](.github/workflows/app-installers.yml) 查看云端任务。
+检查结果时，核对以下证据：
 
-# 单语言版（在主仓库的并列目录）
-cd ../qfli_c && flutter pub get && flutter run -d windows
+- 应用的完整提交、包名和版本。
+- 内核的完整提交、包名和版本。
+- 工作流 `CORE_REF` 或手动覆盖值。
+- 锁文件中的内核路径和版本。
+- 解析后的包路径确实指向该内核检出。
+- GitHub Actions 运行 ID、任务结果和产物来源。
 
-flutter analyze --no-pub
-```
+路径依赖的锁文件不记录内核 Git 提交。
+云端须另行记录内核检出的完整提交。
+旧提交的绿灯不能证明新提交已验证。
+云端构建通过也不代表真机验收完成。
 
-为尚不存在的语言生成独立 App 仓库（再补运行后端）：
+旧版本地运行、HarmonyOS Sync、测试和分析记录保留在历史文档中。它们不适用于当前工作区。
+仅使用 GitHub Actions 生成的获准产物。不要把本地产物或临时依赖目录放进克隆目录。
 
-```bash
-dart run tool/new_language_app.dart go    # 已存在的目标会跳过；新目标生成在并列目录
-```
+## 独立语言仓库
 
-生成器会一并装好新 App 的 `ohos/` 依赖（`npm install` + `ohpm install`）。
-**这一步不能省**：本机上 flutter 工具不会替你做（`installHvigorPlugin` 排在
-`updateLocalProperties` 后面，后者找不到 HarmonyOS SDK 就退出了），缺了它一在
-DevEco 里 Sync 就报 `Cannot find module 'flutter-hvigor-plugin'`。
-详见 [docs/multi-language-apps.md](docs/multi-language-apps.md)。
+语言 App 是独立仓库。下表只列标准 GitHub 仓库和克隆目录。
+克隆主应用不会自动创建这些目录。
 
-想在命令行里跑 hvigor（不走 DevEco 图形界面）：
+| GitHub 仓库 | 标准克隆目录 | 产品 | 状态 |
+| --- | --- | --- | --- |
+| `azurekiln2333/qflistudio-cpp` | `qflistudio-cpp/` | C/C++ Forge | 独立仓库 |
+| `azurekiln2333/qflistudio-web` | `qflistudio-web/` | WebForge | 独立仓库 |
+| `azurekiln2333/qflistudio-python` | `qflistudio-python/` | PyFlow | 独立仓库 |
+| `azurekiln2333/qflistudio-java` | `qflistudio-java/` | JVMX | 独立仓库 |
+| `azurekiln2333/qflistudio-lua` | `qflistudio-lua/` | Script | 独立仓库 |
+| `azurekiln2333/qflistudio-dart` | `qflistudio-dart/` | DartWing | 独立仓库 |
+| `azurekiln2333/qflistudio-rust` | `qflistudio-rust/` | RustCore | 独立仓库 |
+| `azurekiln2333/qflistudio-go` | `qflistudio-go/` | GoShift | 独立仓库 |
+| `azurekiln2333/qflistudio-sql` | `qflistudio-sql/` | SQLab | 独立仓库 |
+| `azurekiln2333/qflistudio-json` | `qflistudio-json/` | QFLIJson | 独立仓库 |
+| `azurekiln2333/qflistudio-note` | `qflistudio-note/` | QFLINote | 独立仓库 |
 
-```bash
-tool/sync_ohos.sh qfli_c        # Sync：设 DEVECO_SDK_HOME、绕开 ohpm.bat 的递归
-tool/build_hap.sh qfli_c        # 出 HAP（unsigned，签名见下）
-```
+需要了解早期各语言实现和路径时，见历史文档 [多语言 App：各语言在鸿蒙上的可行性与现状](docs/multi-language-apps.md)。
+文中的旧 `apps/`、`packages/` 路径只作历史记录。
 
-两个脚本都会检查对应 App 的 `.flutter-plugins-dependencies`。缺少时先进入那个 App
-目录运行 `flutter pub get`；每个仓库现在自行生成插件清单。
+语言 App 的本地教程和示例读取共享内核的内容资源。当前跨产品生成流程需要对应语言仓库，
+不得假定这些仓库已克隆。运行时状态以各 App 的云端版本为准。
 
-`build_hap.sh` 产出的是 **unsigned** HAP：仓库里的 `.p7b` 绑的是别的 bundleName，
-要装真机得先在 DevEco 里配签名（File → Project Structure → Signing Configs →
-勾 *Automatically generate signature*）。
+鸿蒙运行时研究见历史文档 [语言专属 App 与鸿蒙上的本地编译](docs/c-app-and-harmonyos.md)。
+C/C++ 独立仓库名称为 `qflistudio-cpp`；旧 `qfli_c` 只作为历史路径保留。
 
-各仓库分别运行测试：
+原生 picoc 后端属于 `qflistudio-cpp` 仓库。请先核对该仓库自己的 README 和云端版本。
 
-```bash
-(cd ../qfli_studio_core && flutter test)
-(cd ../qfli_c/packages/qfli_c_runtime && flutter test)
-(cd ../qfli_c && flutter test --no-pub)
-(cd ../qfli_python && flutter test --no-pub)
-(cd ../qfli_java && flutter test --no-pub)
-(cd ../qfli_lua && flutter test --no-pub)
-(cd ../qfli_web && flutter test --no-pub)
-(cd ../qfli_dart && flutter test --no-pub)
-```
+### 历史记录：DevEco 与 C/C++ 设备构建
 
-> 语言 App 的测试建议加 `--no-pub`。它们带了 `ohos/` 平台目录，`flutter test` 不加这个
-> 参数时会先做一遍全平台工具链校验，本机没有 HarmonyOS SDK 就报
-> `No Hmos SDK found` 并**直接退出 1，一个用例都不跑**——看起来像测试挂了，
-> 其实是环境检查没过。共享包没有 `ohos/`，不加也能跑。
+以下路径和操作来自旧目录布局，只供理解历史验证结果。当前工作区禁止本地依赖安装、DevEco Sync、构建、签名和设备验证。请勿执行本节命令。
 
-> 本机如果挂了 HTTP 代理，跑 `flutter test` 前需要
-> `export NO_PROXY="localhost,127.0.0.1,::1"`，否则测试用的本地 WebSocket 会被代理拦掉。
-
-验证 AI 编程（Vibe Coding）是否真的跑通：
-
-```bash
-# 在 qfli_studio_core 目录，用 flutter test 宿主跑三个真实场景（缺凭据则整体跳过）
-flutter test --no-pub test/vibe_live_e2e_test.dart
-
-# 在本仓库，检查环境、调度上面的宿主、把报告读成表格
-dart run tool/verify_vibe_e2e.dart --dry-run
-dart run tool/verify_vibe_e2e.dart --env-file <仓库外的凭据文件>
-```
-
-凭据只从 `QFLI_DEBUG_BASE_URL`、`QFLI_DEBUG_API_KEY`、`QFLI_DEBUG_MODEL` 三个环境变量
-读取，报告只记主机名和长度。缺变量时全部场景记为跳过，不伪造通过。
-详见 [docs/vibe-acceptance.md](docs/vibe-acceptance.md)。
-
-## 语言专属 App
-
-一个语言一个 App，共享同一套 IDE 内核。现有 11 个语言 App，另有主联网全能版：
-
-| App | 运行方式 | 状态 |
-| --- | --- | --- |
-| `../qfli_c` | C/C++ Forge | 独立仓库 |
-| `../qfli_web` | WebForge | 独立仓库 |
-| `../qfli_python` | PyFlow | 独立仓库 |
-| `../qfli_java` | JVMX | 独立仓库 |
-| `../qfli_lua` | Script | 独立仓库 |
-| `../qfli_dart` | DartWing | 独立仓库 |
-| `../qfli_rust` | RustCore | 独立仓库 |
-| `../qfli_go` | GoShift | 独立仓库 |
-| `../qfli_sql` | SQLab | 独立仓库 |
-| `../qfli_json` | QFLIJson | 独立仓库 |
-| `../qfli_note` | QFLINote | 独立仓库 |
-
-C、C++、Python、Java、Lua、Web、Dart 的可行性、教程 JSON、离线页面和路线图，见
-[多语言 App：各语言在鸿蒙上的可行性与现状](docs/multi-language-apps.md)。
-
-语言 App 的第二页由 `TutorialService` 从共享仓库的 `assets/tutorials/<language>.json`
-加载本地教程，第三页从同一份类型化数据展示可复制示例代码。后续把服务实现替换为 API
-时不需要改页面模型；语言运行时仍按各 App 的实际状态展示，未实现的解释器不会伪造运行结果。
-
-之所以是「解释」而不是「编译」（鸿蒙普通应用 exec 不了任何可执行文件），
-以及 C 版是怎么落地的，见 [语言专属 App 与鸿蒙上的本地编译](docs/c-app-and-harmonyos.md)。
-
-原生 picoc 后端（可选，需要 NDK）见 `../qfli_c/native/README.md`。
-
-### 在 DevEco 里构建 C 版
-
-用 DevEco Studio **Open `../qfli_c/ohos`**。等 Sync 跑完
-（它会 `npm install` 装 `flutter-hvigor-plugin`、再 `ohpm install`），点 Run 即可。
-Flutter 产物由 hvigor 插件自动 `flutter assemble` 并拷贝，不用手动跑 `flutter build hap`。
-
-> **全新克隆要先补两个被 gitignore 的文件**：`ohos/local.properties`（写 `flutter.sdk`）
-> 和 `ohos/package.json`（声明 `flutter-hvigor-plugin`）。它们本来由 flutter 工具生成，
-> 但那条链路要先把 HarmonyOS SDK 找出来，本机找不到就直接退出了，所以得手工补。
-> 具体内容见 [docs/c-app-and-harmonyos.md](docs/c-app-and-harmonyos.md#在-deveco-里构建)。
-
-**构建前要配签名**：`ohos/build-profile.json5` 的 `signingConfigs` 是有意留空的。
-`.p7b` 描述文件绑定 bundleName，`D:/Keystore` 下没有属于 `com.azurekiln.qflistudio.c`
-的描述文件。最快的路是 File → Project Structure → Signing Configs →
-勾 `Automatically generate signature`。细节见同一节。
+旧记录曾从 `qfli_c/ohos` 打开 C App，并用 npm、ohpm 和 DevEco 生成 HAP。
+旧源码位置已迁入独立 `qflistudio-cpp` 仓库。当前桌面版和鸿蒙安装包只能通过获准的 GitHub Actions 产物获取。
+签名、产物校验和设备验收须遵循云端发布流程及独立授权。
 
 ## 上线规划与验证
 

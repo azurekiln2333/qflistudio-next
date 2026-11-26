@@ -1,0 +1,303 @@
+<div class="viz-carousel" aria-label="两套界面布局" data-previous-label="上一种设备" data-next-label="下一种设备">
+  <section data-variant="PC / 平板" aria-label="PC 和平板工作台">
+    <div id="qfli-workbench-preview">
+      <header class="wb-title"><strong>QFLI Studio</strong><span class="wb-current">hello_flutter</span></header>
+      <div class="wb-body">
+        <nav class="wb-rail" aria-label="工作台导航">
+          <button type="button" data-section="projects" aria-label="项目" data-tooltip="项目" aria-pressed="true"><i data-lucide="folder-open" aria-hidden="true"></i></button>
+          <button type="button" data-section="files" aria-label="文件树" data-tooltip="文件树" aria-pressed="false"><i data-lucide="files" aria-hidden="true"></i></button>
+          <button type="button" data-section="agents" aria-label="Agents" data-tooltip="Agents" aria-pressed="false"><i data-lucide="bot" aria-hidden="true"></i></button>
+          <div class="wb-rail-divider"></div>
+          <button type="button" data-page="tools" aria-label="工具" data-tooltip="工具"><i data-lucide="wrench" aria-hidden="true"></i></button>
+          <button type="button" data-page="tutorial" aria-label="教程" data-tooltip="教程"><i data-lucide="book-open" aria-hidden="true"></i></button>
+          <div class="wb-rail-space"></div>
+          <button type="button" data-page="settings" aria-label="设置" data-tooltip="设置"><i data-lucide="settings" aria-hidden="true"></i></button>
+          <button type="button" class="wb-avatar" data-page="profile" aria-label="个人页面" data-tooltip="个人页面">我</button>
+        </nav>
+        <aside class="wb-sidebar" aria-label="统一侧栏">
+          <section data-pane="projects">
+            <div class="wb-panel-title">项目</div>
+            <div class="wb-source" aria-label="项目来源">
+              <button type="button" data-source="local" aria-pressed="true">本地</button>
+              <button type="button" data-source="github" aria-pressed="false">GitHub</button>
+            </div>
+            <div class="wb-project-list" data-list="local">
+              <button type="button" class="wb-row is-active" data-project="hello_flutter"><i data-lucide="folder" aria-hidden="true"></i><span>hello_flutter<small>D:\Projects\hello_flutter</small></span></button>
+              <button type="button" class="wb-row" data-project="notes_app"><i data-lucide="folder" aria-hidden="true"></i><span>notes_app<small>D:\Projects\notes_app</small></span></button>
+              <div class="wb-drop"><i data-lucide="folder-input" aria-hidden="true"></i><span>拖入文件夹以打开项目</span></div>
+            </div>
+            <div data-list="github" hidden>
+              <div class="wb-connected-list">
+                <button type="button" class="wb-row" data-project="hello_flutter"><i data-lucide="git-branch" aria-hidden="true"></i><span>hello_flutter<small>已克隆 · 打开</small></span></button>
+                <button type="button" class="wb-row" data-clone><i data-lucide="download" aria-hidden="true"></i><span>sample_app<small class="wb-clone-label">克隆到本地</small></span></button>
+              </div>
+              <button type="button" class="wb-connect-prompt wb-row" data-page="profile" hidden>前往个人页面连接 GitHub</button>
+            </div>
+          </section>
+          <section data-pane="files" hidden>
+            <div class="wb-panel-title">文件树</div>
+            <div class="wb-tree-root wb-current">hello_flutter</div>
+            <details open><summary>lib</summary><button type="button" class="wb-row is-active" data-file="main.dart"><i data-lucide="file-code" aria-hidden="true"></i><span>main.dart</span></button><button type="button" class="wb-row" data-file="home.dart"><i data-lucide="file-code" aria-hidden="true"></i><span>home.dart</span></button></details>
+            <details><summary>assets</summary><div class="wb-subrow">images</div></details>
+            <button type="button" class="wb-row" data-file="pubspec.yaml"><i data-lucide="file" aria-hidden="true"></i><span>pubspec.yaml</span></button>
+          </section>
+          <section data-pane="agents" hidden>
+            <div class="wb-panel-title">Agents</div>
+            <button type="button" class="wb-row" data-agent="界面调整"><i data-lucide="message-square" aria-hidden="true"></i><span>界面调整<small>hello_flutter · 空闲</small></span></button>
+            <button type="button" class="wb-row" data-agent="检查文件"><i data-lucide="message-square" aria-hidden="true"></i><span>检查文件<small>notes_app · 已完成</small></span></button>
+          </section>
+        </aside>
+        <main class="wb-main">
+          <section data-main="editor">
+            <div class="wb-tabs"><span class="wb-file-name">main.dart</span><span class="wb-unsaved" aria-live="polite">●</span></div>
+            <div class="wb-breadcrumb"><span class="wb-current">hello_flutter</span> / lib / <span class="wb-file-name">main.dart</span></div>
+            <textarea class="wb-code" aria-label="代码草稿" spellcheck="false">import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: const HomePage(),
+    );
+  }
+}</textarea>
+            <div class="wb-bottom-tabs"><span>终端</span><span>输出</span><span>问题</span></div>
+            <div class="wb-terminal">D:\Projects\<span class="wb-current">hello_flutter</span> &gt; <span class="wb-caret">▌</span></div>
+          </section>
+          <section data-main="agent" hidden><div class="wb-panel-title wb-agent-title">界面调整</div><div class="wb-chat"><p>文件和编辑草稿仍保留在当前工作区。</p><textarea aria-label="会话草稿" placeholder="输入消息"></textarea></div></section>
+          <section data-main="profile" hidden>
+            <div class="wb-panel-title">个人页面</div>
+            <div class="wb-profile-content"><div class="wb-profile-avatar">我</div><strong>个人账号</strong><div class="wb-account-row"><div>GitHub<small class="wb-github-status">已连接</small></div><button type="button" data-connect-toggle>断开连接</button></div><button type="button" data-back-workspace>返回工作区</button></div>
+          </section>
+          <section data-main="utility" hidden><div class="wb-panel-title wb-utility-title">工具</div><div class="wb-profile-content"><p class="wb-utility-copy"></p><button type="button" data-back-workspace>返回工作区</button></div></section>
+        </main>
+      </div>
+      <footer class="wb-status"><span>main</span><span>UTF-8</span><span class="wb-status-right">Dart</span></footer>
+    </div>
+  </section>
+  <section data-variant="手机" aria-label="手机项目与 GitHub 列表" hidden>
+    <div class="ph-stage"><div id="qfli-phone-preview">
+      <header class="ph-title"><strong class="ph-heading">项目</strong><span>QFLI Studio</span></header>
+      <main class="ph-content">
+        <section data-phone-page="home">
+          <nav class="ph-tabs" aria-label="首页项目标签">
+            <button type="button" data-phone-tab="history">历史</button><button type="button" data-phone-tab="workspace">工作区</button><button type="button" data-phone-tab="all">全部</button><button type="button" data-phone-tab="favorite">收藏</button><button type="button" data-phone-tab="cloud">云端</button><button type="button" data-phone-tab="agents">Agents</button><button type="button" data-phone-tab="github" aria-pressed="true">GitHub</button>
+          </nav>
+          <div class="ph-repos">
+            <label class="ph-search"><i data-lucide="search" aria-hidden="true"></i><input type="search" placeholder="搜索仓库" aria-label="搜索仓库"></label>
+            <button type="button" class="ph-project" data-phone-open><i data-lucide="folder" aria-hidden="true"></i><span>hello_flutter<small>已克隆 · 打开项目</small></span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+            <button type="button" class="ph-project" data-phone-clone><i data-lucide="git-branch" aria-hidden="true"></i><span>sample_app<small class="ph-clone-label">克隆到本地</small></span><i data-lucide="download" aria-hidden="true"></i></button>
+          </div>
+          <div class="ph-local-list" hidden><button type="button" class="ph-project" data-phone-open><i data-lucide="folder" aria-hidden="true"></i><span>hello_flutter<small>打开项目</small></span><i data-lucide="chevron-right" aria-hidden="true"></i></button></div>
+          <div class="ph-agent-list" hidden><button type="button" class="ph-project" data-phone-open><i data-lucide="bot" aria-hidden="true"></i><span>界面调整<small>hello_flutter · 空闲</small></span></button></div>
+        </section>
+        <section data-phone-page="editor" hidden><button type="button" class="ph-back" data-phone-back><i data-lucide="arrow-left" aria-hidden="true"></i>返回项目列表</button><div class="ph-editor-title">hello_flutter / main.dart</div><textarea class="ph-code" aria-label="手机代码草稿" spellcheck="false">void main() {
+  runApp(const MyApp());
+}</textarea></section>
+        <section data-phone-page="profile" hidden><div class="ph-profile"><div class="ph-avatar">我</div><strong>个人账号</strong><div class="ph-account"><span>GitHub<small class="ph-github-status">已连接</small></span><button type="button" data-phone-connect>断开连接</button></div></div></section>
+        <section data-phone-page="utility" hidden><div class="ph-utility-title"></div></section>
+      </main>
+      <nav class="ph-bottom" aria-label="手机主导航"><button type="button" data-phone-nav="home" aria-pressed="true"><i data-lucide="house" aria-hidden="true"></i>首页</button><button type="button" data-phone-nav="tools"><i data-lucide="wrench" aria-hidden="true"></i>工具</button><button type="button" data-phone-nav="tutorial"><i data-lucide="book-open" aria-hidden="true"></i>教程</button><button type="button" data-phone-nav="profile"><i data-lucide="user-round" aria-hidden="true"></i>我的</button></nav>
+    </div></div>
+  </section>
+</div>
+<style>
+#qfli-workbench-preview,#qfli-phone-preview{--q-bg:light-dark(#fff,#1e1f23);--q-panel:light-dark(#f5f6f8,#25262c);--q-rail:light-dark(#eceef2,#202126);--q-text:light-dark(#242731,#e4e6ed);--q-muted:light-dark(#626674,#a7acba);--q-line:light-dark(#dfe2e9,#3a3d46);--q-accent:light-dark(#3357c8,#a4baff);--q-select:light-dark(#e4ebff,#303d5b);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--q-text);background:var(--q-bg);border:1px solid var(--q-line);border-radius:10px;overflow:hidden;color-scheme:light dark}
+#qfli-workbench-preview * ,#qfli-phone-preview *{box-sizing:border-box}
+#qfli-workbench-preview [hidden],#qfli-phone-preview [hidden]{display:none!important}
+#qfli-workbench-preview button,#qfli-phone-preview button{font:inherit;color:inherit;border:0;background:transparent;min-height:44px;padding:8px 12px;border-radius:5px}
+#qfli-workbench-preview button:hover,#qfli-phone-preview button:hover{background:var(--q-select)}
+#qfli-workbench-preview button[aria-pressed=true],#qfli-phone-preview button[aria-pressed=true]{background:var(--q-select);color:var(--q-accent)}
+#qfli-workbench-preview svg,#qfli-phone-preview svg{width:20px;height:20px;flex:none}
+#qfli-workbench-preview small,#qfli-phone-preview small{display:block;color:var(--q-muted);font-size:12px;overflow-wrap:anywhere}
+#qfli-workbench-preview strong,#qfli-phone-preview strong{font-weight:600}
+#qfli-workbench-preview .wb-title{height:45px;padding:0 105px 0 16px;display:flex;align-items:center;gap:20px;background:var(--q-panel);border-bottom:1px solid var(--q-line)}
+#qfli-workbench-preview .wb-title span{font-size:12px;color:var(--q-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#qfli-workbench-preview .wb-body{display:grid;grid-template-columns:52px var(--wb-side-width,270px) minmax(0,1fr);min-height:530px;position:relative}
+#qfli-workbench-preview .wb-rail{grid-column:1;grid-row:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;background:var(--q-rail);gap:5px;border-right:1px solid var(--q-line);z-index:4}
+#qfli-workbench-preview .wb-rail button{width:44px;padding:10px;display:flex;align-items:center;justify-content:center;position:relative}
+#qfli-workbench-preview .wb-rail button[aria-pressed=true]:before{content:"";position:absolute;left:-4px;top:9px;bottom:9px;width:3px;background:var(--q-accent)}
+#qfli-workbench-preview .wb-rail-divider{height:1px;background:var(--q-line);width:28px;margin:6px 0}
+#qfli-workbench-preview .wb-rail-space{flex:1;min-height:20px}
+#qfli-workbench-preview .wb-avatar{border-radius:50%;border:1px solid var(--q-line);background:var(--q-select);color:var(--q-accent)}
+#qfli-workbench-preview .wb-sidebar{grid-column:2;grid-row:1;background:var(--q-panel);border-right:1px solid var(--q-line);min-width:0}
+#qfli-workbench-preview .wb-panel-title{height:49px;display:flex;align-items:center;padding:0 16px;font-weight:600;border-bottom:1px solid var(--q-line)}
+#qfli-workbench-preview .wb-source{display:flex;gap:4px;padding:8px}
+#qfli-workbench-preview .wb-row{display:flex;align-items:center;text-align:left;gap:10px;width:100%;min-height:48px;border-radius:0}
+#qfli-workbench-preview .wb-row span{min-width:0;overflow-wrap:anywhere}
+#qfli-workbench-preview .is-active{background:var(--q-select)}
+#qfli-workbench-preview .wb-drop{margin:28px 12px 12px;padding:24px 10px;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px dashed var(--q-line);border-radius:6px;font-size:12px;color:var(--q-muted);text-align:center}
+#qfli-workbench-preview .wb-tree-root{padding:14px 14px 4px;color:var(--q-muted);overflow-wrap:anywhere}
+#qfli-workbench-preview details summary{padding:12px 16px}
+#qfli-workbench-preview details .wb-row{padding-left:32px}
+#qfli-workbench-preview .wb-subrow{padding:6px 32px}
+#qfli-workbench-preview .wb-main{grid-column:3;grid-row:1;min-width:0;background:var(--q-bg)}
+#qfli-workbench-preview .wb-tabs{display:flex;align-items:center;gap:12px;height:49px;padding:0 18px;border-bottom:1px solid var(--q-line);background:var(--q-panel)}
+#qfli-workbench-preview .wb-unsaved{font-size:10px;color:var(--q-muted)}
+#qfli-workbench-preview .wb-breadcrumb{padding:9px 16px;font-size:12px;color:var(--q-muted);overflow-wrap:anywhere}
+#qfli-workbench-preview textarea,#qfli-phone-preview textarea{display:block;width:100%;resize:vertical;border:0;background:var(--q-bg);color:var(--q-text);padding:16px;font:13px/1.7 ui-monospace,Consolas,monospace}
+#qfli-workbench-preview .wb-code{height:325px;min-height:100px}
+#qfli-workbench-preview .wb-bottom-tabs{display:flex;gap:22px;padding:10px 16px;border-top:1px solid var(--q-line);font-size:12px}
+#qfli-workbench-preview .wb-bottom-tabs span:first-child{color:var(--q-accent)}
+#qfli-workbench-preview .wb-terminal{padding:12px 16px;font:12px/1.5 ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+#qfli-workbench-preview .wb-status{display:flex;gap:18px;padding:5px 12px;font-size:11px;border-top:1px solid var(--q-line);background:var(--q-panel)}
+#qfli-workbench-preview .wb-status-right{margin-left:auto}
+#qfli-workbench-preview .wb-profile-content{padding:24px;display:flex;align-items:flex-start;flex-direction:column;gap:18px}
+#qfli-workbench-preview .wb-profile-avatar{width:50px;height:50px;border-radius:50%;background:var(--q-select);display:grid;place-items:center}
+#qfli-workbench-preview .wb-account-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;width:100%;padding:18px 0;border-top:1px solid var(--q-line);border-bottom:1px solid var(--q-line)}
+#qfli-workbench-preview .wb-account-row button,#qfli-workbench-preview [data-back-workspace]{border:1px solid var(--q-line)}
+#qfli-workbench-preview .wb-chat{padding:20px}
+#qfli-workbench-preview .wb-chat p{color:var(--q-muted)}
+#qfli-workbench-preview .wb-chat textarea{margin-top:140px;min-height:120px;border:1px solid var(--q-line);border-radius:7px}
+#qfli-workbench-preview.is-collapsed .wb-body{grid-template-columns:52px 0 minmax(0,1fr)}
+#qfli-workbench-preview.is-collapsed .wb-sidebar{visibility:hidden}
+.ph-stage{min-height:604px;display:flex;justify-content:center}
+#qfli-phone-preview{width:390px;max-width:100%;min-height:604px;display:flex;flex-direction:column}
+#qfli-phone-preview .ph-title{padding:16px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--q-line)}
+#qfli-phone-preview .ph-title>span{font-size:12px;color:var(--q-muted)}
+#qfli-phone-preview .ph-content{flex:1}
+#qfli-phone-preview .ph-tabs{display:flex;flex-wrap:wrap;padding:8px;gap:2px;border-bottom:1px solid var(--q-line)}
+#qfli-phone-preview .ph-tabs button{padding:8px 10px}
+#qfli-phone-preview .ph-search{display:flex;align-items:center;gap:8px;margin:16px;padding:8px 10px;background:var(--q-panel);border-radius:6px}
+#qfli-phone-preview .ph-search input{font:inherit;border:0;min-width:0;width:100%;background:transparent;color:var(--q-text)}
+#qfli-phone-preview .ph-project{width:calc(100% - 24px);margin:4px 12px;display:flex;gap:12px;align-items:center;text-align:left;border-bottom:1px solid var(--q-line);padding:16px 8px}
+#qfli-phone-preview .ph-project span{flex:1;min-width:0;overflow-wrap:anywhere}
+#qfli-phone-preview .ph-bottom{display:flex;justify-content:space-around;border-top:1px solid var(--q-line);padding:8px 4px;background:var(--q-panel)}
+#qfli-phone-preview .ph-bottom button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;min-width:60px}
+#qfli-phone-preview .ph-back{display:flex;align-items:center;gap:8px;margin:8px}
+#qfli-phone-preview .ph-editor-title{padding:12px;font-size:12px;color:var(--q-muted)}
+#qfli-phone-preview .ph-code{height:350px}
+#qfli-phone-preview .ph-profile{padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px}
+#qfli-phone-preview .ph-avatar{width:60px;height:60px;border-radius:50%;background:var(--q-select);display:grid;place-items:center}
+#qfli-phone-preview .ph-account{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:16px 0;border-top:1px solid var(--q-line)}
+#qfli-phone-preview .ph-account button{border:1px solid var(--q-line)}
+#qfli-phone-preview .ph-utility-title{padding:24px}
+@media(max-width:700px){#qfli-workbench-preview .wb-body{grid-template-columns:52px 0 minmax(0,1fr)}#qfli-workbench-preview .wb-sidebar{position:absolute;left:52px;top:0;bottom:0;width:min(var(--wb-side-width,270px),calc(100% - 52px));z-index:3;box-shadow:8px 0 20px light-dark(#24273114,#0004)}#qfli-workbench-preview .wb-title>span{display:none}#qfli-workbench-preview .wb-title{padding-right:100px}}
+</style>
+<script>
+(() => {
+  const wb = document.getElementById('qfli-workbench-preview');
+  const ph = document.getElementById('qfli-phone-preview');
+  const saved = window.openai?.widgetState?.privateContent || {};
+  let section = ['projects','files','agents'].includes(saved.section) ? saved.section : 'projects';
+  let connected = saved.connected !== false;
+  let project = saved.project === 'notes_app' ? 'notes_app' : 'hello_flutter';
+  let lastMain = 'editor', currentMain = 'editor', phoneTab = 'github', cloned = false;
+  const code = wb.querySelector('.wb-code');
+  const drafts = {'hello_flutter': code.value, 'notes_app': "void main() {\n  // notes_app\n}\n"};
+  const persist = () => { const request = window.openai?.setWidgetState?.({modelContent:{sidebar:section,githubConnected:connected},privateContent:{section,connected,project}}); request?.catch(() => {}); };
+  function main(name) {
+    currentMain = name;
+    if (name === 'editor' || name === 'agent') lastMain = name;
+    wb.querySelectorAll('[data-main]').forEach(el => el.hidden = el.dataset.main !== name);
+  }
+  function showSidebar() {
+    wb.querySelectorAll('[data-pane]').forEach(el => el.hidden = el.dataset.pane !== section);
+    wb.querySelectorAll('[data-section]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.section === section)));
+  }
+  function chooseProject(name) {
+    drafts[project] = code.value; project = name;
+    code.value = drafts[project];
+    wb.querySelectorAll('.wb-current').forEach(el => el.textContent = project);
+    wb.querySelectorAll('[data-project]').forEach(el => el.classList.toggle('is-active',el.dataset.project === project));
+    main('editor'); persist();
+  }
+  function phonePage(name) {
+    ph.querySelectorAll('[data-phone-page]').forEach(el => el.hidden = el.dataset.phonePage !== name);
+    ph.querySelector('.ph-heading').textContent = name === 'profile' ? '我的' : name === 'editor' ? '编辑器' : '项目';
+    ph.querySelectorAll('[data-phone-nav]').forEach(el => el.setAttribute('aria-pressed',String(el.dataset.phoneNav === name)));
+    ph.querySelector('.ph-bottom').hidden = name === 'editor';
+  }
+  function selectPhoneTab(name) {
+    phoneTab = name;
+    ph.querySelectorAll('[data-phone-tab]').forEach(el => el.setAttribute('aria-pressed',String(el.dataset.phoneTab === name)));
+    ph.querySelector('.ph-repos').hidden = name !== 'github';
+    ph.querySelector('.ph-agent-list').hidden = name !== 'agents';
+    ph.querySelector('.ph-local-list').hidden = name === 'github' || name === 'agents';
+  }
+  function connection() {
+    wb.querySelector('.wb-github-status').textContent = connected ? '已连接' : '未连接';
+    ph.querySelector('.ph-github-status').textContent = connected ? '已连接' : '未连接';
+    wb.querySelector('[data-connect-toggle]').textContent = connected ? '断开连接' : '连接 GitHub';
+    ph.querySelector('[data-phone-connect]').textContent = connected ? '断开连接' : '连接 GitHub';
+    wb.querySelector('.wb-connected-list').hidden = !connected;
+    wb.querySelector('.wb-connect-prompt').hidden = connected;
+    ph.querySelector('[data-phone-tab="github"]').hidden = !connected;
+    if (!connected && phoneTab === 'github') selectPhoneTab('history');
+  }
+  wb.querySelectorAll('[data-section]').forEach(button => button.addEventListener('click',() => {
+    const next = button.dataset.section;
+    if (next === section) wb.classList.toggle('is-collapsed'); else wb.classList.remove('is-collapsed');
+    section = next; showSidebar();
+    if (currentMain === 'profile' || currentMain === 'utility') main(lastMain);
+    persist();
+  }));
+  wb.querySelectorAll('[data-project]').forEach(button => button.addEventListener('click',() => chooseProject(button.dataset.project)));
+  wb.querySelectorAll('[data-source]').forEach(button => button.addEventListener('click',() => {
+    wb.querySelectorAll('[data-source]').forEach(el => el.setAttribute('aria-pressed',String(el === button)));
+    wb.querySelectorAll('[data-list]').forEach(el => el.hidden = el.dataset.list !== button.dataset.source);
+  }));
+  wb.querySelectorAll('[data-file]').forEach(button => button.addEventListener('click',() => {
+    wb.querySelectorAll('.wb-file-name').forEach(el => el.textContent = button.dataset.file);
+    main('editor');
+    if (matchMedia('(max-width:700px)').matches) wb.classList.add('is-collapsed');
+  }));
+  wb.querySelectorAll('[data-agent]').forEach(button => button.addEventListener('click',() => {
+    wb.querySelector('.wb-agent-title').textContent = button.dataset.agent; main('agent');
+    if (matchMedia('(max-width:700px)').matches) wb.classList.add('is-collapsed');
+  }));
+  wb.querySelectorAll('[data-page]').forEach(button => button.addEventListener('click',() => {
+    const page = button.dataset.page;
+    if (page === 'profile') main('profile'); else {
+      main('utility');
+      const labels = {tools:'工具',tutorial:'教程',settings:'设置'};
+      wb.querySelector('.wb-utility-title').textContent = labels[page];
+      wb.querySelector('.wb-utility-copy').textContent = {tools:'常用开发工具',tutorial:'教程与示例项目',settings:'外观、编辑器与终端'}[page];
+    }
+    if (matchMedia('(max-width:700px)').matches) wb.classList.add('is-collapsed');
+  }));
+  wb.querySelectorAll('[data-back-workspace]').forEach(button => button.addEventListener('click',() => main(lastMain)));
+  [wb.querySelector('[data-connect-toggle]'),ph.querySelector('[data-phone-connect]')].forEach(button => button.addEventListener('click',() => {connected = !connected; connection();persist();}));
+  ph.querySelectorAll('[data-phone-nav]').forEach(button => button.addEventListener('click',() => {
+    const target = button.dataset.phoneNav;
+    phonePage(target === 'home' || target === 'profile' ? target : 'utility');
+    if (target === 'tools' || target === 'tutorial') ph.querySelector('.ph-utility-title').textContent = target === 'tools' ? '工具' : '教程';
+  }));
+  ph.querySelectorAll('[data-phone-tab]').forEach(button => button.addEventListener('click',() => selectPhoneTab(button.dataset.phoneTab)));
+  ph.querySelectorAll('[data-phone-open]').forEach(button => button.addEventListener('click',() => phonePage('editor')));
+  ph.querySelector('[data-phone-back]').addEventListener('click',() => phonePage('home'));
+  const clone = () => {
+    cloned = true;
+    wb.querySelector('.wb-clone-label').textContent = '已克隆 · 打开';
+    ph.querySelector('.ph-clone-label').textContent = '已克隆 · 打开项目';
+  };
+  wb.querySelector('[data-clone]').addEventListener('click',() => {if (cloned) main('editor');else clone();});
+  ph.querySelector('[data-phone-clone]').addEventListener('click',() => {if (cloned) phonePage('editor');else clone();});
+  ph.querySelector('input[type=search]').addEventListener('input',event => {
+    const query = event.target.value.toLowerCase();
+    ph.querySelectorAll('.ph-repos .ph-project').forEach(el => el.hidden = !el.textContent.toLowerCase().includes(query));
+  });
+  code.addEventListener('input',() => {drafts[project] = code.value;});
+  function restoreState(value) {
+    if (!value) return;
+    if (['projects','files','agents'].includes(value.section)) section = value.section;
+    if (typeof value.connected === 'boolean') connected = value.connected;
+    showSidebar();connection();
+  }
+  window.addEventListener('openai:set_globals',event => restoreState(event.detail?.globals?.widgetState?.privateContent));
+  showSidebar();connection();
+  wb.querySelectorAll('.wb-current').forEach(el => el.textContent = project);
+  code.value = drafts[project];
+  if (globalThis.Tweak) {
+    const sizing = {sidebarWidth:270};
+    const tweak = new Tweak({container:wb,onChange:() => wb.style.setProperty('--wb-side-width',sizing.sidebarWidth + 'px')});
+    tweak.addSlider(sizing,'sidebarWidth',{label:'侧栏宽度',min:240,max:340,step:10,unit:'px'});
+  }
+})();
+</script>

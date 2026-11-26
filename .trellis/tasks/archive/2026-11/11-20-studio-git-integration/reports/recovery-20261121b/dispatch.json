@@ -1,0 +1,36 @@
+{
+  "provider": "pi",
+  "model_override": null,
+  "fresh_sessions": true,
+  "supervisor_pid": 55548,
+  "started_at": "2026-11-21T01:46:31.000330+08:00",
+  "status": "workers_exited_unreviewed",
+  "accepted": false,
+  "workers": {
+    "pi-c": {
+      "cwd": "D:\\MyNewProjects\\_wt\\studio-git-integration\\qfli_studio_core",
+      "brief": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\briefs\\pi-c.md",
+      "session_dir": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\sessions\\pi-c",
+      "started_at": "2026-11-21T01:46:31.002410+08:00",
+      "status": "exited_unreviewed",
+      "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\pi-c.jsonl",
+      "stderr": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\pi-c.stderr.log",
+      "pid": 11752,
+      "exit_code": 0,
+      "ended_at": "2026-11-21T01:58:41.131074+08:00"
+    },
+    "pi-d": {
+      "cwd": "D:\\MyNewProjects\\_wt\\studio-git-integration\\qfli_git",
+      "brief": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\briefs\\pi-d.md",
+      "session_dir": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\sessions\\pi-d",
+      "started_at": "2026-11-21T01:46:31.028333+08:00",
+      "status": "exited_unreviewed",
+      "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\pi-d.jsonl",
+      "stderr": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-studio-git-integration\\reports\\recovery-20261121b\\pi-d.stderr.log",
+      "pid": 54008,
+      "exit_code": 0,
+      "ended_at": "2026-11-21T01:49:16.070563+08:00"
+    }
+  },
+  "updated_at": "2026-11-21T01:58:41.132989+08:00"
+}

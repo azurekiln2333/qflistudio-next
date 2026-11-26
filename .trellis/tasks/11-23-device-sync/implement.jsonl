@@ -1,0 +1,11 @@
+{"file": ".trellis/spec/frontend/remote-companion.md", "reason": "已绑定电脑的通道契约：帧、鉴权、身份与世代栅栏、回环连接，本任务的同步建立在同一条通道上"}
+{"file": ".trellis/spec/frontend/cloud-project-cache.md", "reason": "清单加哈希加暂存改名的既有做法，便携路径检查口径，缓存清理的前置守卫，直接复用而不另起一套"}
+{"file": ".trellis/spec/frontend/project-storage.md", "reason": "项目目录与 .qfli/project.json 的元数据约定，占位项目要沿用同一套写法和语言目录规则"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "外部进程归属与取消，git 拉取和克隆的取消路径必须按此收尾"}
+{"file": ".trellis/spec/frontend/git-clone-progress.md", "reason": "克隆进度与取消的既有接口，git 项目按 origin 拉取时复用 GitCloneService 而不是新写一条"}
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "App 与 Core 的目录解析顺序，决定改动落在 qflistudio 还是 qfli_studio_core"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "规范索引与状态标注，确认哪些条目是 Draft、哪些已冻结"}
+{"file": ".trellis/spec/backend/relay-grants.md", "reason": "中继授权的一次性授予与禁止缓存成功结果，文件同步不能绕过该授权链"}
+{"file": ".trellis/spec/backend/remote-bindings.md", "reason": "设备绑定、撤销与设备元数据来源，设备名与系统信息的权威位置"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "跨层改动核对清单，本任务同时改 TypeScript agent、Dart 镜像与本地存储"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "改动前先找既有实现，同步与缓存要复用 CloudCachePaths、GitCloneService、ProjectConfig"}

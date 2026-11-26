@@ -1,0 +1,11 @@
+# core-check failures, loop 3, run 45020548229, core 2ab7d2e4fcb3c7a01e03b54caa31edb0636a0bb1
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_host_test.dart :: Herdr panes on the paired computer replay snapshots and send keys :: Expected: contains 'π > ready'
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_herdr_platform_test.dart :: executableOnPath accepts a Windows npm shim :: Expected: true
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_herdr_platform_test.dart :: locateHerdrExecutable finds a versioned herdr-* directory under Program Files :: Expected: 'D:\\ProgramFiles\\herdr-windows-x86_64\\herdr.exe'
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_herdr_platform_test.dart :: locateHerdrExecutable falls back to PATH and handles quoted Windows entries :: Expected: 'D:\\Program Files\\herdr\\herdr.exe'
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/github_auth_controller_test.dart :: a newer account intent writes after and wins over the older delayed token :: Expected: 'new-pat'
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/github_auth_controller_test.dart :: disconnect waits behind delayed write and returns after stale token deletion :: Expected: <1>
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/project_card_cloud_actions_test.dart :: R3/R8 busy cloud operations cannot duplicate destructive actions :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/retained_editor_test.dart :: live editor survives Home, tools, content and restore :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: agents surface keeps the studio pane until an external host is chosen :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/experience_test.dart :: 云端目录合并保留收藏，不重复追加已有项目 :: Bad state: No element

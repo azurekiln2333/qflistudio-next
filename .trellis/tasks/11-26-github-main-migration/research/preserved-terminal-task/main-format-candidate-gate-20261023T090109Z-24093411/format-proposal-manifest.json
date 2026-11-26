@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized progress summary",
+  "source_relative_path": "main-format-candidate-gate-20261023T090109Z-24093411/format-proposal-manifest.json",
+  "source_apply_authorized": false,
+  "policy": "Raw commands, paths, process data, logs and transcript fields omitted."
+}

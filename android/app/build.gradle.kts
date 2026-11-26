@@ -1,3 +1,4 @@
+import java.util.Properties
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -10,15 +11,43 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Release signing is read from android/key.properties (git-ignored) or from the
+// ANDROID_* environment variables used by CI. There is deliberately no debug
+// fallback: a release build without an explicit key fails instead of shipping a
+// debug-signed APK.
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { stream -> load(stream) }
+    }
+}
+
+fun signingValue(propertyName: String, environmentName: String): String? {
+    val fromFile = keystoreProperties.getProperty(propertyName)?.trim()
+    if (!fromFile.isNullOrEmpty()) return fromFile
+    val fromEnvironment = System.getenv(environmentName)?.trim()
+    return if (fromEnvironment.isNullOrEmpty()) null else fromEnvironment
+}
+
+val releaseStorePath = signingValue("storeFile", "ANDROID_KEYSTORE_PATH")
+val releaseStorePassword = signingValue("storePassword", "ANDROID_KEYSTORE_PASSWORD")
+val releaseKeyAlias = signingValue("keyAlias", "ANDROID_KEY_ALIAS")
+val releaseKeyPassword = signingValue("keyPassword", "ANDROID_KEY_PASSWORD")
+val hasReleaseSigning = listOf(
+    releaseStorePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { !it.isNullOrEmpty() }
+
 extensions.configure<ApplicationExtension> {
     namespace = "com.azurekiln.qflistudio"
     compileSdk = flutter.compileSdkVersion
-    // flutter_ohos 默认 NDK 28.2 在本机下载解压失败；钉到已完整安装的 27.0。
-    ndkVersion = "28.2.13676358"
+    // Keep the Android NDK aligned with the pinned CI toolchain.
+    ndkVersion = "27.0.12077973"
 
-    // Flutter's current AGP/lint combination crashes in the third-party
-    // file_selector_android CommentDetector during lintVitalAnalyzeRelease.
-    // APK architecture and signing checks below remain the CI gate.
+    // The hosted lint detector can fail inside third-party dependencies.
+    // APK architecture and signing checks remain explicit CI gates.
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -30,6 +59,7 @@ extensions.configure<ApplicationExtension> {
     }
 
     defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.azurekiln.qflistudio"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -39,11 +69,22 @@ extensions.configure<ApplicationExtension> {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(releaseStorePath!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 }
@@ -51,6 +92,20 @@ extensions.configure<ApplicationExtension> {
 extensions.configure<KotlinAndroidProjectExtension> {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
+// Fail only when a release build is actually requested, so debug runs and
+// analyzer-only tasks work on machines without the keystore.
+gradle.taskGraph.whenReady {
+    val buildsRelease = allTasks.any { task -> task.name.contains("Release") }
+    if (buildsRelease && !hasReleaseSigning) {
+        throw GradleException(
+            "Release signing is not configured. Provide android/key.properties " +
+                "or set ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, " +
+                "ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD. The debug key is " +
+                "never used for release builds.",
+        )
     }
 }
 

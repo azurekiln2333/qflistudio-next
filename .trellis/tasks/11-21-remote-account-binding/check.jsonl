@@ -1,0 +1,9 @@
+{"file":".trellis/spec/frontend/authentication.md","reason":"核对 QFLI 登录态接入和失效处理"}
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"核对 App 与 Core 文件边界"}
+{"file":".trellis/spec/frontend/process-lifecycle.md","reason":"核对桌面进程退出和资源释放"}
+{"file":".trellis/spec/backend/gateway-auth.md","reason":"核对 session 与 sub 验证"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"核对授权票据表和迁移"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"核对 API 错误返回"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"核对敏感值日志过滤"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"核对跨服务令牌和设备关系"}
+{"file":".trellis/tasks/11-21-remote-account-binding/research/implementation-contract.md","reason":"核对已确认的跨服务契约"}

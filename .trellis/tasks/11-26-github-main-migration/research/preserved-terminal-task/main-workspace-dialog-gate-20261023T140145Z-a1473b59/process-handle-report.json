@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "minimal sanitized progress summary",
+  "source_relative_path": "main-workspace-dialog-gate-20261023T140145Z-a1473b59/process-handle-report.json",
+  "schema": 1,
+  "status": "RELEASE",
+  "suite": "workspace-dialog",
+  "grant": "global371 user fix focused continuation after373 terminal release; wait full keyboard inset animation before physical project tap; bounded serial verification",
+  "release_allowed": true,
+  "flutter_exit_code": 1,
+  "completed_utc": "2026-10-23T14:01:50.540114+00:00",
+  "within_110_second_plan": true,
+  "test_result": "FAIL_OR_INCONCLUSIVE",
+  "tests_count": 1,
+  "errors_count": 0,
+  "processes_count": 9,
+  "omitted_fields": [
+    "artifacts",
+    "command",
+    "cwd",
+    "descendant_tracking",
+    "durable_message_file",
+    "processes",
+    "root_pid",
+    "source_after",
+    "source_before",
+    "stderr",
+    "stdout",
+    "taskkill"
+  ],
+  "policy": "Commands, working directories, process identifiers, stdout, stderr, session data and raw transcripts omitted."
+}

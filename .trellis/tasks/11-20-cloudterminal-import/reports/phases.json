@@ -1,0 +1,35 @@
+[
+  {
+    "name": "01-foundation",
+    "paths": [
+      "core/lib/remote_control/models/protocol.dart",
+      "core/lib/remote_control/transport/relay_socket.dart",
+      "core/lib/remote_control/state/remote_store.dart",
+      "core/vendor/xterm/LICENSE"
+    ],
+    "report": "phase-01-foundation.md"
+  },
+  {
+    "name": "02-ui",
+    "paths": [
+      "core/lib/remote_control/remote_computer_page.dart",
+      "core/lib/remote_control/widgets/remote_terminal_pane.dart"
+    ],
+    "report": "phase-02-ui.md"
+  },
+  {
+    "name": "03-companion",
+    "paths": [
+      "app/companion/remote_agent/package.json",
+      "app/companion/windows_assistant/pubspec.yaml"
+    ],
+    "report": "phase-03-companion.md"
+  },
+  {
+    "name": "04-verification",
+    "paths": [
+      "core/test/remote_control"
+    ],
+    "report": "phase-04-verification.md"
+  }
+]

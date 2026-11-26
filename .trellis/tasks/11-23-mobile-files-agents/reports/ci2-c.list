@@ -1,0 +1,6 @@
+- test/editor_harness_session_target_test.dart :: 内置 Agent 的会话不进 hub，直接选中会话 id :: Test failed. See exception logs above.
+    The test description was: 内置 Agent 的会话不进 hub，直接选中会话 id
+    The following assertion was thrown running a test:
+    A Timer is still pending even after the widget tree was disposed.
+    'package:flutter_test/src/binding.dart':
+    Failed assertion: line 2243 pos 12: '!timersPending'

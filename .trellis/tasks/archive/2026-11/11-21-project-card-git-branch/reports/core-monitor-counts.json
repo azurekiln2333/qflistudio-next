@@ -1,0 +1,182 @@
+{
+  "run": 44831021588,
+  "core_sha": "7a1161012185b669830fb7be217b67a3369af4d3",
+  "artifact_names": [
+    "core-analyze.log",
+    "core-test.json"
+  ],
+  "all_done": 2696,
+  "visible_passed": 2415,
+  "visible_skipped": 26,
+  "visible_results": {
+    "success": 2441,
+    "error": 2
+  },
+  "errors": [
+    {
+      "id": 105,
+      "name": "keyboard button hides the input method without editing code",
+      "error": "Test failed. See exception logs above.\nThe test description was: keyboard button hides the input method without editing code"
+    },
+    {
+      "id": 107,
+      "name": "keyboard button stays at the right while symbols scroll",
+      "error": "Test failed. See exception logs above.\nThe test description was: keyboard button stays at the right while symbols scroll"
+    }
+  ],
+  "new_tests": {
+    "git_branch_label_test.dart": [
+      {
+        "id": 3208,
+        "name": "reads the branch from the project root HEAD with CRLF",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3209,
+        "name": "keeps a full unborn branch name without reading a ref",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3210,
+        "name": "resolves a relative gitdir against the project directory",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3211,
+        "name": "supports an absolute gitdir path containing spaces",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3212,
+        "name": "labels a detached 40-digit hexadecimal HEAD",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3213,
+        "name": "labels a detached 64-digit hexadecimal HEAD",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3214,
+        "name": "does not discover a repository in a parent directory",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3215,
+        "name": "returns null for missing or malformed HEAD metadata",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 3216,
+        "name": "returns null for a broken gitdir file",
+        "result": "success",
+        "skipped": false
+      }
+    ],
+    "project_card_git_test.dart": [
+      {
+        "id": 150,
+        "name": "repository card displays its branch and full tooltip",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 153,
+        "name": "revision reloads HEAD without replacing the project",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 154,
+        "name": "resuming reloads a branch changed outside the App",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 155,
+        "name": "minimizing the retained editor refreshes Home branch cards",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 157,
+        "name": "ordinary and cloud project cards hide local branch metadata",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 159,
+        "name": "reused card clears the branch when its project path changes",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 160,
+        "name": "cloud conversion hides the branch on the same project object",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 162,
+        "name": "long branch fits a narrow card at text scale 1.0",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 163,
+        "name": "long branch fits a narrow card at text scale 2.0",
+        "result": "success",
+        "skipped": false
+      }
+    ],
+    "git_clone_dialog_layout_test.dart": [
+      {
+        "id": 1697,
+        "name": "mobile clone waits for a field tap before opening the keyboard",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 1699,
+        "name": "clone stays above one keyboard inset at 390.0px and 1.0x text",
+        "result": "success",
+        "skipped": false
+      },
+      {
+        "id": 1700,
+        "name": "clone stays above one keyboard inset at 320.0px and 1.6x text",
+        "result": "success",
+        "skipped": false
+      }
+    ],
+    "symbols_bar_keyboard_test.dart": [
+      {
+        "id": 105,
+        "name": "keyboard button hides the input method without editing code",
+        "result": "error",
+        "skipped": false
+      },
+      {
+        "id": 107,
+        "name": "keyboard button stays at the right while symbols scroll",
+        "result": "error",
+        "skipped": false
+      }
+    ]
+  },
+  "done_event": [
+    {
+      "success": false,
+      "type": "done",
+      "time": 255101
+    }
+  ]
+}

@@ -1,0 +1,2079 @@
+diff --git a/.github/workflows/app-installers.yml b/.github/workflows/app-installers.yml
+index 078338c3ac987a806c8d9166498285102dfdc84d..e64cc0a777f172fae689203bd0fd125a893ccbd9 100644
+--- a/.github/workflows/app-installers.yml
++++ b/.github/workflows/app-installers.yml
+@@ -11,6 +11,7 @@ on:
+       - main
+       - "ci/**"
+       - "release/**"
++      - "remote/**"
+     tags:
+       - "v*"
+     paths:
+@@ -82,7 +83,9 @@ env:
+   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
+   APP_VERSION: "5.0.5"
+   FLUTTER_VERSION: "3.50.0"
+-  CORE_REF: "72c0b0955e4ddd5215dc818327fa5a67a4be22f7"
++  # Resolve this integration branch once, then use its immutable SHA everywhere.
++  # Pin the merged core commit before publishing a release.
++  CORE_REF: "remote/remote-account-binding-core"
+   # The complete core suite reads the Java receiver's committed ArkTS contract.
+   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
+   APP_ID: com.azurekiln.qflistudio
+@@ -99,6 +102,7 @@ jobs:
+     outputs:
+       version: ${{ steps.resolve.outputs.version }}
+       commit: ${{ steps.resolve.outputs.commit }}
++      core-commit: ${{ steps.core.outputs.commit }}
+       # The OHOS job names its artifact after this value in env, so a guard
+       # keeps the two from drifting apart in silence.
+       app-version: ${{ steps.app.outputs.version }}
+@@ -109,6 +113,21 @@ jobs:
+           path: qflistudio
+           persist-credentials: false
+ 
++      - name: Resolve shared core to one immutable commit
++        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
++        with:
++          repository: azurekiln2333/qflistudio-core
++          ref: ${{ inputs.core_ref || env.CORE_REF }}
++          path: qfli_studio_core
++          persist-credentials: false
++
++      - name: Record the shared core commit
++        id: core
++        run: |
++          commit="$(git -C ../qfli_studio_core rev-parse HEAD)"
++          echo "commit=$commit" >> "$GITHUB_OUTPUT"
++          echo "Shared core commit: $commit" >> "$GITHUB_STEP_SUMMARY"
++
+       - name: Resolve the version and its framework commit
+         id: resolve
+         env:
+@@ -137,6 +156,7 @@ jobs:
+ 
+   verify-flutter:
+     name: Verify ${{ matrix.package }} with OHOS Flutter
++    needs: resolve-flutter
+     runs-on: ubuntu-24.04
+     timeout-minutes: 45
+     strategy:
+@@ -171,7 +191,7 @@ jobs:
+           flutter-version: ${{ env.OHOS_FLUTTER_VERSION }}
+           flutter-commit: ${{ env.OHOS_FLUTTER_COMMIT }}
+           flutter-mode: ohos
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: verify-${{ matrix.package }}
+           patch-upstream-core: "false"
+           ohos-platform-tooling: "false"
+@@ -247,7 +267,7 @@ jobs:
+     strategy:
+       fail-fast: false
+       matrix:
+-        os: [ubuntu-24.04, windows-2022]
++        os: [ubuntu-24.04, windows-2022, macos-15]
+     defaults:
+       run:
+         shell: bash
+@@ -273,10 +293,24 @@ jobs:
+       - name: Check companion types
+         run: npm run check 2>&1 | tee "$RUNNER_TEMP/companion-check.log"
+ 
++      - name: Check relay copy provenance and content hashes
++        env:
++          BUILD_REF: ${{ github.ref }}
++        run: |
++          if [[ "$BUILD_REF" == refs/tags/* ]]; then
++            npm run sync-relay -- --check --require-clean
++          else
++            npm run sync-relay -- --check --allow-dirty
++          fi
++
+       - name: Run companion tests
+         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+         run: npm test 2>&1 | tee "$RUNNER_TEMP/companion-test.log"
+ 
++      - name: Check portable bundle verification regressions
++        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
++        run: node --test ../tools/verify_companion_bundle.test.mjs 2>&1 | tee "$RUNNER_TEMP/companion-bundle-test.log"
++
+       - name: Verify pairing, streaming, permissions and questions
+         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+         # The demo uses a scripted provider over the real relay and AgentCore.
+@@ -309,7 +343,7 @@ jobs:
+         with:
+           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: verify-assistant
+           desktop-platforms: windows
+           patch-upstream-core: "true"
+@@ -411,7 +445,7 @@ jobs:
+         with:
+           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: windows-${{ matrix.arch }}
+           desktop-platforms: windows
+           patch-upstream-core: "true"
+@@ -444,6 +478,18 @@ jobs:
+             exit /b 1
+           )
+ 
++      - name: Set up Node for desktop companion packaging
++        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
++        with:
++          node-version: ${{ env.COMPANION_NODE_VERSION }}
++
++      - name: Stage the installed Windows companion
++        shell: pwsh
++        run: |
++          ./tool/ci/stage_desktop_companion.ps1 -Os windows -Arch $env:ARCH `
++            -NodeVersion $env:COMPANION_NODE_VERSION -AppVersion $env:APP_VERSION `
++            -Destination (Join-Path $env:RELEASE_DIR 'companion')
++
+       - name: Locate MSVC inspection tools and runtime
+         run: |
+           temp="$(cygpath -m "$RUNNER_TEMP")"
+@@ -820,7 +866,7 @@ jobs:
+         with:
+           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: linux-${{ matrix.arch }}
+           desktop-platforms: linux
+           patch-upstream-core: "true"
+@@ -837,6 +883,18 @@ jobs:
+         run: |
+           bash tool/ci/run_logged.sh "flutter build linux" flutter build linux --release
+ 
++      - name: Set up Node for desktop companion packaging
++        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
++        with:
++          node-version: ${{ env.COMPANION_NODE_VERSION }}
++
++      - name: Stage the installed Linux companion
++        shell: pwsh
++        run: |
++          ./tool/ci/stage_desktop_companion.ps1 -Os linux -Arch $env:ARCH `
++            -NodeVersion $env:COMPANION_NODE_VERSION -AppVersion $env:APP_VERSION `
++            -Destination (Join-Path $env:BUNDLE_DIR 'companion')
++
+       - name: Inspect the Linux bundle and its ELF machine
+         run: |
+           for path in qflistudio lib/libflutter_linux_gtk.so lib/libapp.so \
+@@ -1013,7 +1071,7 @@ jobs:
+         with:
+           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: macos-${{ matrix.arch }}
+           desktop-platforms: macos
+           patch-upstream-core: "true"
+@@ -1101,6 +1159,25 @@ jobs:
+           echo "MAC_EXECUTABLE=$executable" >> "$GITHUB_ENV"
+           echo "PASS every Mach-O is $ARCH, the bundle ID is right and the ad-hoc signature verifies"
+ 
++      - name: Set up Node for desktop companion packaging
++        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
++        with:
++          node-version: ${{ env.COMPANION_NODE_VERSION }}
++
++      - name: Prepare Intel execution for the x64 companion
++        if: matrix.arch == 'x86_64'
++        run: sudo softwareupdate --install-rosetta --agree-to-license
++
++      - name: Stage the separate macOS companion app
++        shell: pwsh
++        run: |
++          $taskArch = if ($env:ARCH -eq 'x86_64') { 'x64' } else { 'arm64' }
++          $taskCompanion = Join-Path $PWD 'build/desktop-companion/QFLI Remote Companion.app'
++          ./tool/ci/stage_desktop_companion.ps1 -Os macos -Arch $taskArch `
++            -NodeVersion $env:COMPANION_NODE_VERSION -AppVersion $env:APP_VERSION `
++            -Destination $taskCompanion
++          "MAC_COMPANION=$taskCompanion" >> $env:GITHUB_ENV
++
+       - name: Package and stage the DMG
+         env:
+           ARTIFACT: qflistudio-${{ needs.resolve-flutter.outputs.app-version }}-macos-${{ matrix.arch }}
+@@ -1114,6 +1191,7 @@ jobs:
+ 
+           # ditto keeps symlinks and extended attributes, so the signature stays valid.
+           ditto "$MAC_APP" "$work/staging/$app_name"
++          ditto "$MAC_COMPANION" "$work/staging/QFLI Remote Companion.app"
+           ln -s /Applications "$work/staging/Applications"
+ 
+           # hdiutil sometimes fails with "Resource busy" on hosted runners.
+@@ -1148,6 +1226,13 @@ jobs:
+             echo "::error::The app inside the DMG fails signature verification"
+             mounted_ok=0
+           fi
++          companion="$work/mount/QFLI Remote Companion.app"
++          if [ ! -x "$companion/Contents/MacOS/qfli-remote-companion" ] ||
++             [ ! -s "$companion/Contents/Resources/companion/relay-core.json" ] ||
++             ! codesign --verify --deep --strict "$companion"; then
++            echo "::error::The DMG companion is missing or has an invalid signature"
++            mounted_ok=0
++          fi
+           mounted_archs="$(lipo -archs "$work/mount/$app_name/Contents/MacOS/$MAC_EXECUTABLE" || true)"
+           if [ "$mounted_archs" != "$ARCH" ]; then
+             echo "::error::The mounted executable carries '$mounted_archs', expected only $ARCH"
+@@ -1215,7 +1300,7 @@ jobs:
+         with:
+           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: ios
+           patch-upstream-core: "true"
+ 
+@@ -1343,7 +1428,7 @@ jobs:
+         with:
+           flutter-version: ${{ needs.resolve-flutter.outputs.version }}
+           flutter-commit: ${{ needs.resolve-flutter.outputs.commit }}
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: android
+           patch-upstream-core: "true"
+ 
+@@ -1614,6 +1699,7 @@ jobs:
+ 
+   ohos:
+     name: OHOS unsigned HAP
++    needs: resolve-flutter
+     # The HarmonyOS fork predates the arm64 desktop targets and is built here only.
+     runs-on: ubuntu-22.04
+     timeout-minutes: 60
+@@ -1743,7 +1829,7 @@ jobs:
+           flutter-version: ${{ env.OHOS_FLUTTER_VERSION }}
+           flutter-commit: ${{ env.OHOS_FLUTTER_COMMIT }}
+           flutter-mode: ohos
+-          core-ref: ${{ inputs.core_ref || env.CORE_REF }}
++          core-ref: ${{ needs.resolve-flutter.outputs.core-commit }}
+           cache-scope: ohos
+           patch-upstream-core: "false"
+ 
+@@ -1968,6 +2054,8 @@ jobs:
+ 
+   publish-preview:
+     name: Publish verified preview installers
++    env:
++      RESOLVED_CORE_COMMIT: ${{ needs.resolve-flutter.outputs.core-commit }}
+     if: startsWith(github.ref, 'refs/tags/v5.0.5-remote.')
+     needs:
+       - resolve-flutter
+@@ -2030,7 +2118,7 @@ jobs:
+                   'target': name,
+                   'app_version': version,
+                   'app_commit': os.environ['GITHUB_SHA'],
+-                  'core_commit': os.environ['CORE_REF'],
++                  'core_commit': os.environ['RESOLVED_CORE_COMMIT'],
+                   'flutter_mode': 'ohos' if ohos else 'upstream',
+                   'flutter_version': os.environ['OHOS_FLUTTER_VERSION' if ohos else 'OFFICIAL_FLUTTER_VERSION'],
+                   'flutter_commit': os.environ['OHOS_FLUTTER_COMMIT' if ohos else 'OFFICIAL_FLUTTER_COMMIT'],
+@@ -2072,7 +2160,7 @@ jobs:
+               'component': 'windows-assistant',
+               'app_version': os.environ['APP_VERSION'],
+               'app_commit': os.environ['GITHUB_SHA'],
+-              'core_commit': os.environ['CORE_REF'],
++              'core_commit': os.environ['RESOLVED_CORE_COMMIT'],
+               'flutter_version': os.environ['OFFICIAL_FLUTTER_VERSION'],
+               'flutter_commit': os.environ['OFFICIAL_FLUTTER_COMMIT'],
+               'node_version': os.environ['COMPANION_NODE_VERSION'],
+@@ -2100,7 +2188,7 @@ jobs:
+           RELEASE_TAG: ${{ github.ref_name }}
+         run: |
+           {
+-            printf 'App version: %s\nApp commit: %s\nCore commit: %s\n\n' "$APP_VERSION" "$GITHUB_SHA" "$CORE_REF"
++            printf 'App version: %s\nApp commit: %s\nCore commit: %s\n\n' "$APP_VERSION" "$GITHUB_SHA" "$RESOLVED_CORE_COMMIT"
+             printf 'Java receiver commit (contract checks): %s\n\n' "$JAVA_REF"
+             printf '%s\n' 'All installer targets, core/app tests, companion checks and Windows assistant tests passed in this workflow run.'
+             printf '%s\n' 'Companion E2E uses a scripted provider over the real local relay. It does not validate a live Claude account.'
+diff --git a/companion/remote_agent/README.md b/companion/remote_agent/README.md
+index 300f2447fa6adff268df0417f114c659f75e677b..f62a57a7aafc01632818c1900fd0e508158caec5 100644
+--- a/companion/remote_agent/README.md
++++ b/companion/remote_agent/README.md
+@@ -49,19 +49,36 @@ node src/agent/main.ts --help
+ | `--terminal` | 同时在本机接管一个共享终端 |
+ | `--setup` | 交互式填写连接与启动选项 |
+ | `--sidecar` | 供连接助手使用的本机 socket 模式，见下一节 |
++| `--port-file <path>` | 把 `{port, token}` 写成 0600 文件，供桌面版 `本机配对` 连接 |
++| `--console-pairing` | 在终端打印配对码与 `cloudterminal://pair?...` 链接 |
+ | `--reset-pairing` | 生成新身份，已配对手机都要重新配对 |
+ | `--help` | 全部选项 |
+ 
+-运行时按回车会打印新的一次性配对码。
++运行时按回车会打印新的一次性配对码。`start.cmd` / `start.sh` 默认带上
++`--console-pairing`，所以从终端启动时会看到形如：
++
++```
++配对码：ABCD-1234（10 分钟内有效）
++配对链接：cloudterminal://pair?relay=ws%3A%2F%2F192.168.1.20%3A8787%2Fws&code=ABCD1234&v=1
++```
++
++这两个启动脚本**从不**打印 attach token；token 只写进 `--port-file` 指定的文件。
+ 
+ ## sidecar 模式
+ 
+ `companion/windows_assistant` 不直接连中继。它用 `--sidecar` 启动本 agent，然后在本机回环 socket 上收发 JSON 行：
+ 
+-- agent 的第一行标准输出固定是 `{"type":"listening","port":N}`。
+-- socket 只绑定 `127.0.0.1`，不暴露到局域网。
+-- 客户端发 `pair_code`、`reset_pairing`、`tool_probe`、`tool_bind`、`tool_unbind`、`tool_input`、`tool_poll_interval`、`set_relay`、`tool_start_managed`。
+-- agent 发 `snapshot`、`pair_code`、`stream_event`、`managed_started`、`error`。
++- agent 的第一行标准输出固定是 `{"type":"listening","port":N}`。**不含 token**：
++  token 只写进 `--port-file` 指定的 0600 文件，避免被终端回滚、`tee` 或 CI 日志收集。
++- socket 只绑定 `127.0.0.1`，不暴露到局域网。使用 `--port-file` 时首帧必须是
++  `{"type":"auth","token":"..."}`，5 秒内未认证的连接会被断开，且断线前收不到任何
++  `snapshot` / `pair_code` / `stream_event`。
++- 客户端发 `pair_code`、`reset_pairing`、`tool_probe`、`discover`、`open_session`、
++  `input`、`tool_bind`、`tool_unbind`、`tool_input`、`tool_poll_interval`、`set_relay`、
++  `tool_start_managed`。
++- agent 发 `snapshot`、`pair_code`、`discovered`、`session_opened`、`stream_event`、
++  `managed_started`、`notice`、`error`。`stream_event` 的会话字段是 `sessionId`，
++  与手机协议同名。
+ 
+ 协议实现与不变量见 `src/agent/sidecar.ts` 与 `test/sidecar.test.ts`。Studio 手机端走的是同一套中继协议，没有另立一套。
+ 
+diff --git a/companion/remote_agent/relay-core.json b/companion/remote_agent/relay-core.json
+index 0c9ef33688cd95f4aa54189ab3af68468de51796..d2aadc10ada83c39d74703c63c31b08b783d5093 100644
+--- a/companion/remote_agent/relay-core.json
++++ b/companion/remote_agent/relay-core.json
+@@ -1,9 +1,11 @@
+ {
+   "source": "https://github.com/azurekiln2333/cloudterminal-relay-server",
+-  "commit": "841cc86e8fdf0461b2ff73e379b051740b21570a",
++  "commit": null,
++  "base_commit": "841cc86e8fdf0461b2ff73e379b051740b21570a",
++  "working_tree_sha256": "a7870137aeb27e6ede4c451c8f3683268453e84573964153875309eed3bff2dc",
+   "files": {
+-    "src/relay/relay.ts": "c204a785e7f9dbbbed6d3046fb8d52d966bbb9d46fd47ec20cc0491ca8125ae6",
+-    "src/shared/relay-protocol.ts": "7ed809a73b8b933f7aac49bd3de139838de110a7ad095d218ebcafa629eba881",
++    "src/relay/relay.ts": "a5cca4ae489dacc276ae31bd2b7d35446ee5fd4a9e371601cf6fff579568fe30",
++    "src/shared/relay-protocol.ts": "187ece186696f506a63d825868c8fc3bcb2275530f577f612ede05a7b5f91323",
+     "src/shared/protocol-account.ts": "6c93328d72e5c7deba01a04f52523fcad664baed5d58f2e29465f3ff6a67aad5",
+     "src/shared/crypto.ts": "92228b0c03df673ef972591fb3fe99aaad93a468e09a3a7966fdacf1c6656700",
+     "src/shared/log.ts": "43b235df066dc07cb27e734f1085a7f766ff09020eaaa7ee5982252496af0952"
+diff --git a/companion/remote_agent/scripts/sync-relay.ts b/companion/remote_agent/scripts/sync-relay.ts
+index 128c4309227f78b17df37fb8655a854cf8ca158e..fa2e24f1f5f5c8228b7716ba0994bed31374b45b 100644
+--- a/companion/remote_agent/scripts/sync-relay.ts
++++ b/companion/remote_agent/scripts/sync-relay.ts
+@@ -6,6 +6,8 @@
+ //
+ //   npm run sync-relay -- <relay-server-repo>           copy + rewrite manifest
+ //   npm run sync-relay -- <relay-server-repo> --check   compare only, exit 1
++//   npm run sync-relay -- <relay-server-repo> --allow-dirty  draft snapshot
++//   npm run sync-relay -- --check --require-clean     release provenance gate
+ //
+ // Never edit the copy in place: change the file in the relay server repo, then
+ // run this script here. `test/relay-core-sync.test.ts` fails when the copy and
+@@ -35,15 +37,18 @@ export const SERVER_DIR = path.resolve(import.meta.dirname, '..');
+ 
+ export const MANIFEST_PATH = path.join(SERVER_DIR, 'relay-core.json');
+ 
+-export type RelayCoreManifest = {
++type ManifestContents = {
+   /** Where the copy came from. */
+   source: string;
+-  /** Commit of the relay server repo the copy was taken from. */
+-  commit: string;
+   /** Path → sha256 of the LF-normalized contents. */
+   files: Record<string, string>;
+ };
+ 
++export type RelayCoreManifest = ManifestContents & (
++  | { commit: string; base_commit?: never; working_tree_sha256?: never }
++  | { commit: null; base_commit: string; working_tree_sha256: string }
++);
++
+ /**
+  * Hash file contents with CRLF folded to LF first, so a Windows clone and a
+  * Linux checkout of the same commit produce the same hash.
+@@ -63,6 +68,24 @@ export async function hashAll(root: string): Promise<Record<string, string>> {
+   return hashes;
+ }
+ 
++/** Bind a draft to all five paths and LF-normalized file hashes. */
++export function snapshotHash(files: Record<string, string>): string {
++  return hashContents(JSON.stringify(Object.entries(files).sort(([a], [b]) => a.localeCompare(b, 'en'))));
++}
++
++export function provenanceProblems(manifest: RelayCoreManifest, requireClean = false): string[] {
++  const problems: string[] = [];
++  if (manifest.commit === null) {
++    if (requireClean) problems.push('draft relay core cannot be released; commit the source and synchronize again');
++    if (!/^[0-9a-f]{40}$/.test(manifest.base_commit)) problems.push('invalid draft base_commit');
++    if (manifest.working_tree_sha256 !== snapshotHash(manifest.files)) problems.push('draft snapshot digest mismatch');
++  } else {
++    if (!/^[0-9a-f]{40}$/.test(manifest.commit)) problems.push('invalid relay commit');
++    if ('base_commit' in manifest || 'working_tree_sha256' in manifest) problems.push('clean and draft provenance cannot be mixed');
++  }
++  return problems;
++}
++
+ export async function readManifest(file = MANIFEST_PATH): Promise<RelayCoreManifest> {
+   return JSON.parse(await readFile(file, 'utf8')) as RelayCoreManifest;
+ }
+@@ -91,18 +114,43 @@ async function headCommit(dir: string): Promise<string> {
+   return stdout.trim();
+ }
+ 
++/** Only the mirrored paths determine whether HEAD describes this copy. */
++export async function sourceManifest(
++  dir: string,
++  files: Record<string, string>,
++  allowDirty = false,
++): Promise<RelayCoreManifest> {
++  const commit = await headCommit(dir);
++  const committed: Record<string, string> = {};
++  for (const file of RELAY_CORE_FILES) {
++    const { stdout } = await run('git', ['-C', dir, 'show', `${commit}:${file}`], { maxBuffer: 8 * 1024 * 1024 });
++    committed[file] = hashContents(stdout);
++  }
++  if (diffHashes(committed, files).length === 0) return { source: DEFAULT_SOURCE, commit, files };
++  if (!allowDirty) throw new Error('relay core source differs from HEAD; commit it first or use --allow-dirty for a draft');
++  return { source: DEFAULT_SOURCE, commit: null, base_commit: commit, working_tree_sha256: snapshotHash(files), files };
++}
++
++function revisionLabel(manifest: RelayCoreManifest): string {
++  return manifest.commit === null
++    ? `draft:${manifest.base_commit.slice(0, 12)}+${manifest.working_tree_sha256.slice(0, 12)}`
++    : manifest.commit.slice(0, 12);
++}
++
+ async function main(argv: string[]): Promise<number> {
+   const check = argv.includes('--check');
++  const allowDirty = argv.includes('--allow-dirty');
++  const requireClean = argv.includes('--require-clean');
+   const dirArg = argv.find((arg) => !arg.startsWith('--'));
+-  if (!dirArg) {
+-    console.error('usage: node scripts/sync-relay.ts <relay-server-repo> [--check]');
++  if ((!dirArg && !check) || (allowDirty && requireClean)) {
++    console.error('usage: node scripts/sync-relay.ts [relay-server-repo] [--check] [--allow-dirty | --require-clean]');
+     return 2;
+   }
+-  const source = path.resolve(dirArg);
++  const source = dirArg ? path.resolve(dirArg) : null;
+ 
+-  let sourceHashes: Record<string, string>;
++  let expected: RelayCoreManifest | null = null;
+   try {
+-    sourceHashes = await hashAll(source);
++    if (source) expected = await sourceManifest(source, await hashAll(source), allowDirty);
+   } catch (err) {
+     console.error(`cannot read the relay server repo at ${source}: ${(err as Error).message}`);
+     return 2;
+@@ -119,26 +167,35 @@ async function main(argv: string[]): Promise<number> {
+       return 1;
+     }
+     const problems = [
+-      ...new Set([...diffHashes(manifest.files, localHashes), ...diffHashes(manifest.files, sourceHashes)]),
++      ...provenanceProblems(manifest, requireClean),
++      ...(manifest.commit === null && !allowDirty ? ['draft verification requires --allow-dirty'] : []),
++      ...diffHashes(manifest.files, localHashes),
++      ...(expected ? diffHashes(manifest.files, expected.files) : []),
+     ];
++    if (expected && (manifest.commit !== expected.commit ||
++        (manifest.commit === null && expected.commit === null && manifest.base_commit !== expected.base_commit))) {
++      problems.push('source revision differs from the recorded provenance; synchronize again');
++    }
+     if (problems.length > 0) {
+       console.error(['relay core is out of sync:', ...problems.map((line) => `  ${line}`), SYNC_HINT].join('\n'));
+       return 1;
+     }
+-    console.log(`relay core is in sync with ${manifest.source}@${manifest.commit.slice(0, 12)}`);
++    console.log(`relay core is in sync with ${manifest.source}@${revisionLabel(manifest)}`);
+     return 0;
+   }
+ 
++  if (!source || !expected) return 2;
+   for (const file of RELAY_CORE_FILES) {
+     const target = path.join(SERVER_DIR, file);
+     await mkdir(path.dirname(target), { recursive: true });
+     await copyFile(path.join(source, file), target);
+   }
+ 
+-  const commit = await headCommit(source);
+-  const manifest: RelayCoreManifest = { source: DEFAULT_SOURCE, commit, files: await hashAll(SERVER_DIR) };
++  const manifest = expected;
++  const problems = diffHashes(manifest.files, await hashAll(SERVER_DIR));
++  if (problems.length > 0) throw new Error(`source changed during synchronization: ${problems.join(', ')}`);
+   await writeFile(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+-  console.log(`copied ${RELAY_CORE_FILES.length} files from ${DEFAULT_SOURCE}@${commit.slice(0, 12)}`);
++  console.log(`copied ${RELAY_CORE_FILES.length} files from ${DEFAULT_SOURCE}@${revisionLabel(manifest)}`);
+   console.log(`wrote ${path.relative(process.cwd(), MANIFEST_PATH)}`);
+   return 0;
+ }
+diff --git a/companion/remote_agent/src/agent/link.ts b/companion/remote_agent/src/agent/link.ts
+index 587a26b9ee769685e90aff790e097d5f59801a75..8c67ff33ce704c46c3d25c58dd9a6fff70af2e53 100644
+--- a/companion/remote_agent/src/agent/link.ts
++++ b/companion/remote_agent/src/agent/link.ts
+@@ -4,6 +4,7 @@
+ import { randomInt } from 'node:crypto';
+ import { WebSocket } from 'ws';
+ 
++
+ import { sha256Hex } from '../shared/crypto.ts';
+ import { type Logger, silentLogger } from '../shared/log.ts';
+ import {
+@@ -18,10 +19,20 @@ import type { AgentCore } from './core.ts';
+ 
+ export type RelayLinkOptions = {
+   url: string;
++  /** Phone-reachable relay URL used in pairing links. */
++  pairingUrl?: string;
+   agentId: string;
+   secret: string;
+   relayKey?: string;
+   name: string;
++  /**
++   * Optional device platform reported in the agent `hello` (`process.platform`).
++   *
++   * Optional in the relay protocol too, so an agent built before this field
++   * existed still connects, and the relay records the device row only when it
++   * receives one.
++   */
++  platform?: string;
+   core: AgentCore;
+   logger?: Logger;
+   onOnline?: () => void;
+@@ -45,6 +56,21 @@ export function formatPairCode(code: string): string {
+ 
+ export class RelayLink {
+   private readonly opts: RelayLinkOptions;
++  private readonly helloPlatform: string | undefined;
++
++  /**
++   * Relay this link is connected to.
++   *
++   * The pairing URI must name the same relay the code was requested from;
++   * anything else would hand the phone an address that does not know the code.
++   */
++  get url(): string {
++    return this.opts.url;
++  }
++
++  get pairingUrl(): string {
++    return this.opts.pairingUrl ?? this.opts.url;
++  }
+   private readonly log: Logger;
+   private ws: WebSocket | null = null;
+   private online = false;
+@@ -58,6 +84,7 @@ export class RelayLink {
+ 
+   constructor(opts: RelayLinkOptions) {
+     this.opts = opts;
++    this.helloPlatform = opts.platform;
+     this.log = opts.logger ?? silentLogger;
+     // The sink is registered in start(), not here: an agent can hold several
+     // links at once (LAN + public relay), and attaching in the constructor
+@@ -124,6 +151,10 @@ export class RelayLink {
+           secretHash: sha256Hex(this.opts.secret),
+           relayKey: this.opts.relayKey,
+           name: this.opts.name,
++          // Optional device metadata for `GET /api/v1/devices` (R9). The field is
++          // optional in the relay protocol, so it is always safe to send; the
++          // relay records it when present.
++          platform: this.helloPlatform,
+           v: PROTOCOL_VERSION,
+         }),
+       );
+diff --git a/companion/remote_agent/src/agent/main.ts b/companion/remote_agent/src/agent/main.ts
+index bc263c700061bdaacbe425f221fc363314185b78..77e1b9a33c1eb7048ced5731b4a84243ad04a5c9 100644
+--- a/companion/remote_agent/src/agent/main.ts
++++ b/companion/remote_agent/src/agent/main.ts
+@@ -21,6 +21,7 @@ import { HerdrBridge } from './herdr.ts';
+ import { HerdrSocketClient, HERDR_LIVE_SUBSCRIPTIONS } from './herdr-socket.ts';
+ import { HerdrLivePush } from './herdr-live.ts';
+ import { RelayLink } from './link.ts';
++import { encodePairUri } from '../shared/pairing.ts';
+ import { lanAddress } from './lan-address.ts';
+ import { sdkHistory, sdkQueryFn } from './sdk.ts';
+ 
+@@ -48,6 +49,11 @@ Options:
+   --herdr-path <p>     Path to the herdr executable (default: auto-detected).
+   --no-herdr           Do not connect to the local Herdr workspace manager.
+   --reset-pairing      Generate a new identity; all paired phones must re-pair.
++  --sidecar            Speak the local JSON protocol (used by the desktop app).
++  --port-file <path>   Publish {port, token} for the desktop app to attach with.
++                       Enables the attach-token handshake on the sidecar socket.
++  --console-pairing    With --sidecar: print the pairing code and pair link.
++                       Never prints the attach token.
+   -h, --help           Show this help.
+ 
+ Press Enter while running to print a new one-time pairing code.`;
+@@ -72,13 +78,26 @@ const { values } = parseArgs({
+     'no-herdr': { type: 'boolean' },
+     'reset-pairing': { type: 'boolean' },
+     sidecar: { type: 'boolean' },
++    // Read by `sidecar.ts`. Declared here because `parseArgs` rejects unknown
++    // options: without it, the `start.sh` / `start.cmd` launchers that pass
++    // `--port-file` would exit before the sidecar ever starts.
++    'port-file': { type: 'string' },
++    // Forwarded to `sidecar.ts`, which uses it to print the pairing code and
++    // link for a human at a terminal.
++    'console-pairing': { type: 'boolean' },
+     help: { type: 'boolean', short: 'h' },
+   },
++  // The launcher may append a user argument this build does not know yet;
++  // tolerate it rather than refusing to start the companion.
++  strict: true,
++  allowPositionals: true,
+ });
+ 
+ if (values.sidecar) {
+-  // The Windows assistant runs the sidecar, which shares this process's
+-  // config and relay link but speaks a local JSON protocol instead of a TUI.
++  // The desktop app and the Windows assistant run the sidecar, which shares this
++  // process's config and relay link but speaks a local JSON protocol instead of
++  // a TUI. `--port-file` is parsed by `sidecar.ts` from the same argv; it is
++  // declared above only so this strict parser forwards it instead of exiting.
+   await import('./sidecar.ts');
+   // sidecar.ts never returns; keep the process alive on its servers.
+   await new Promise<never>(() => {});
+@@ -267,6 +286,7 @@ const onPaired = () => { if (!attached) console.log('\n✓ 手机已配对。按
+ if (localRelayUrl) {
+   const local = new RelayLink({
+     url: localRelayUrl,
++    pairingUrl: values['public-url'] ?? lanRelayUrl ?? localRelayUrl,
+     agentId: config.agentId,
+     secret: config.secret,
+     relayKey: localRelayKey,
+@@ -282,6 +302,7 @@ if (localRelayUrl) {
+ if (remoteRelayUrl) {
+   const remote = new RelayLink({
+     url: remoteRelayUrl,
++    pairingUrl: values['public-url'] ?? remoteRelayUrl,
+     agentId: config.agentId,
+     secret: config.secret,
+     relayKey: relayRegistrationKey,
+@@ -321,12 +342,25 @@ async function printPairing(): Promise<void> {
+     if (lanRelayUrl) entries.push(`│ 局域网：    ${lanRelayUrl}`);
+     if (remoteRelayUrl) entries.push(`│ 外网：      ${remoteRelayUrl}`);
+     if (!entries.length) entries.push(`│ 服务器地址：${publicUrl}`);
++    // The link must point at the relay that actually issued this code. `primary`
++    // is the link `requestPairCode()` ran on, so its own URL is the only correct
++    // answer: preferring the LAN URL would be wrong when the code came from the
++    // public relay.
++    // Encoded by the shared `encodePairUri`, the same function the desktop
++    // sidecar and the phone's decoder use, so the URI format cannot drift.
++    // It carries only relay + 8-digit code + version: never the device secret and
++    // never the sidecar attach token.
++    const linkRelay = primary.pairingUrl;
++    const pairUri = linkRelay
++      ? encodePairUri({ relayUrl: linkRelay, code: code.display, version: 1 })
++      : undefined;
+     console.log(
+       [
+         '',
+         '┌──────────────────── 手机配对 ────────────────────',
+         ...entries,
+         `│ 配对码：    ${code.display}   （${mins} 分钟内有效，仅可使用一次）`,
++        ...(pairUri ? [`│ 配对链接：  ${pairUri}`] : []),
+         '│',
+         `│ 也可手动填写：设备 ID ${config.agentId}`,
+         `│              密钥见 ${configPath()}`,
+diff --git a/companion/remote_agent/src/agent/sdk.ts b/companion/remote_agent/src/agent/sdk.ts
+index 4e6725bdd7727ff0d6cdd8b92a3ff24473896f00..5df689b06e76ff6353cf974d2ba8327d8df0b6fd 100644
+--- a/companion/remote_agent/src/agent/sdk.ts
++++ b/companion/remote_agent/src/agent/sdk.ts
+@@ -4,6 +4,35 @@ import { getSessionMessages, listSessions, query } from '@anthropic-ai/claude-ag
+ 
+ import type { HistoryLoader } from './core.ts';
+ import type { QueryFn, QueryHandle } from './session.ts';
++import type { HistoryItem } from '../shared/protocol.ts';
++
++const PHONE_HISTORY_LIMIT = 30;
++const DESKTOP_HISTORY_PAGE_SIZE = 100;
++const MAX_DESKTOP_HISTORY_PAGES = 100;
++
++function toHistoryItems(sessions: Awaited<ReturnType<typeof listSessions>>): HistoryItem[] {
++  return sessions.map((s) => ({
++    sessionId: s.sessionId,
++    summary: s.customTitle || s.summary || s.firstPrompt || s.sessionId,
++    cwd: s.cwd,
++    lastModified: s.lastModified,
++  }));
++}
++
++/** Lists a bounded desktop history page set for one configured root. */
++export async function listDesktopClaudeHistory(cwd?: string): Promise<HistoryItem[]> {
++  const all: Awaited<ReturnType<typeof listSessions>> = [];
++  for (let page = 0; page < MAX_DESKTOP_HISTORY_PAGES; page += 1) {
++    const sessions = await listSessions({
++      dir: cwd,
++      limit: DESKTOP_HISTORY_PAGE_SIZE,
++      offset: page * DESKTOP_HISTORY_PAGE_SIZE,
++    });
++    all.push(...sessions);
++    if (sessions.length < DESKTOP_HISTORY_PAGE_SIZE) break;
++  }
++  return toHistoryItems(all);
++}
+ 
+ export function sdkQueryFn(onStderr?: (line: string) => void): QueryFn {
+   return ({ prompt, options }) =>
+@@ -20,13 +49,8 @@ export function sdkQueryFn(onStderr?: (line: string) => void): QueryFn {
+ 
+ export const sdkHistory: HistoryLoader = {
+   async list(cwd) {
+-    const sessions = await listSessions({ dir: cwd, limit: 30 });
+-    return sessions.map((s) => ({
+-      sessionId: s.sessionId,
+-      summary: s.customTitle || s.summary || s.firstPrompt || s.sessionId,
+-      cwd: s.cwd,
+-      lastModified: s.lastModified,
+-    }));
++    const sessions = await listSessions({ dir: cwd, limit: PHONE_HISTORY_LIMIT });
++    return toHistoryItems(sessions);
+   },
+   async messages(claudeSessionId, cwd) {
+     return getSessionMessages(claudeSessionId, { dir: cwd });
+diff --git a/companion/remote_agent/src/agent/sidecar.ts b/companion/remote_agent/src/agent/sidecar.ts
+index f746b3ea919384dcf37c035052c6eacce00226bb..51af2ed77b2bc7e4d79a9b298137bc04cdf53a48 100644
+--- a/companion/remote_agent/src/agent/sidecar.ts
++++ b/companion/remote_agent/src/agent/sidecar.ts
+@@ -18,19 +18,22 @@ import { parseArgs } from 'node:util';
+ import { createRelay } from '../relay/relay.ts';
+ import { randomToken } from '../shared/crypto.ts';
+ import { consoleLogger, type Logger } from '../shared/log.ts';
+-import { type ClientMessage } from '../shared/protocol.ts';
++import { type ClientMessage, type HistoryItem } from '../shared/protocol.ts';
+ import { loadConfig, saveConfig, configPath } from './config.ts';
+ import { loadBootstrap } from './bootstrap.ts';
++import { encodePairUri } from '../shared/pairing.ts';
+ import { relayAddress } from './setup.ts';
+ import { AgentCore } from './core.ts';
+ import { CodexBridge } from './codex.ts';
+ import { HerdrBridge } from './herdr.ts';
+ import { RelayLink } from './link.ts';
+ import { lanAddress } from './lan-address.ts';
+-import { sdkHistory, sdkQueryFn } from './sdk.ts';
++import { listDesktopClaudeHistory, sdkHistory, sdkQueryFn } from './sdk.ts';
++import { discoverSessions, type Discovery } from './desktop-discovery.ts';
+ import { nativePty } from './pty.ts';
+ import { probeTools, type ToolProbeResult } from './tool-probe.ts';
+ import { createToolStreams, type ToolStreams } from './tool-streams.ts';
++import { createPortFile, removePortFileIfOwned, type PortFileOwnership } from './sidecar-port-file.ts';
+ 
+ const { values } = parseArgs({
+   options: {
+@@ -47,6 +50,12 @@ const { values } = parseArgs({
+     'herdr-path': { type: 'string' },
+     'no-herdr': { type: 'boolean' },
+     'reset-pairing': { type: 'boolean' },
++    // Publishes only the loopback port so a sandboxed desktop app (macOS) can
++    // attach to an already-running companion instead of spawning one.
++    'port-file': { type: 'string' },
++    // Human-facing launchers ask for the pairing code + link banner. Studio's
++    // launchers omit it, so their stdout stays pure JSON for the app.
++    'console-pairing': { type: 'boolean' },
+   },
+ });
+ 
+@@ -103,8 +112,24 @@ if (useLocalRelay) {
+ const roots = (config.roots?.length ? config.roots : [process.cwd()]).map((r) => path.resolve(r));
+ const defaultCwd = path.resolve(config.defaultCwd ?? process.cwd());
+ 
++/**
++ * Claude Code history for the desktop page.
++ *
++ * Uses the same loader the phone's `list_history` request uses, so both surfaces
++ * show the same real sessions. Returns [] when the SDK cannot list anything:
++ * an empty history is a fact, not a failure to hide.
++ */
++async function listClaudeHistory(cwd?: string): Promise<HistoryItem[]> {
++  return listDesktopClaudeHistory(cwd ?? defaultCwd);
++}
++
++// One bridge instance for the whole process: AgentCore uses it for the phone's
++// `codex_*` requests and the desktop sidecar uses it to open a discovered
++// thread. Two instances would fight over the same app-server connection.
++const codexBridge = new CodexBridge();
++
+ const core = new AgentCore({
+-  codex: new CodexBridge(),
++  codex: codexBridge,
+   herdr: values['no-herdr'] ? undefined : new HerdrBridge({ binary: values['herdr-path'] ?? config.herdrPath, logger: log }),
+   ptyFactory: nativePty,
+   queryFn: sdkQueryFn((line) => log.warn('claude stderr', { line: line.trimEnd() })),
+@@ -118,6 +143,10 @@ const core = new AgentCore({
+ type Client = {
+   socket: Socket;
+   buffer: string;
++  /** True once the socket proved it holds the attach token (or auth is off). */
++  authed: boolean;
++  /** Timer that drops a socket that never authenticated. */
++  authTimer?: NodeJS.Timeout;
+ };
+ 
+ const clients = new Set<Client>();
+@@ -126,18 +155,52 @@ let lastError: string | undefined;
+ let seq = 0;
+ let tools: ToolProbeResult[] = [];
+ let pairCode: { display: string; uri: string; expiresAt: number } | undefined;
++/** Last `discover` result, reused by `open_session` so both agree. */
++let lastDiscovery: Discovery | undefined;
++// Pairings completed by this process. The relay owns the authoritative client
++// list and is out of this repository, so the sidecar reports what it actually
++// observed instead of inventing a connected-client count.
++let pairingsSinceStart = 0;
++
++/**
++ * Per-run credential for attaching to an existing sidecar.
++ *
++ * The loopback port is not an identity: any local process can connect to it.
++ * When `--port-file` is used, the first frame must be
++ * `{"type":"auth","token":...}` matching this token, and every unauthenticated
++ * socket is dropped after a short deadline. Without `--port-file` the sidecar
++ * keeps the legacy behaviour (local socket, no handshake) so the existing
++ * assistant and its contract tests stay compatible.
++ */
++const attachToken = randomToken(24);
++const requireAuth = typeof values['port-file'] === 'string' && values['port-file'].length > 0;
++const authDeadlineMs = 5_000;
++
++function tokenEquals(received: unknown): boolean {
++  if (typeof received !== 'string' || received.length !== attachToken.length) return false;
++  // Constant-time compare: the token authorises controlling this machine.
++  let diff = 0;
++  for (let i = 0; i < attachToken.length; i++) diff |= received.charCodeAt(i) ^ attachToken.charCodeAt(i);
++  return diff === 0;
++}
+ 
+ const streams: ToolStreams = createToolStreams({
+   emit: (event) => broadcast({ type: 'stream_event', seq: ++seq, ...event }),
+   logger: log,
+   roots,
+   defaultCwd,
++  history: sdkHistory,
++  // Reuses the same bridge AgentCore uses for `codex_resume` / `codex_send`;
++  // opening a discovered thread must go through the real app-server, not a
++  // read-only listing.
++  codex: codexBridge,
+ });
+ 
+-function buildPairUri(display: string, expiresAt: number): string {
++function buildPairUri(display: string): string {
+   const relay = publicUrl ?? relayUrl ?? '';
+-  const params = new URLSearchParams({ relay, code: display.replace('-', ''), v: '1' });
+-  return `cloudterminal://pair?${params.toString()}`;
++  // Shared encoder: the CLI banner, this sidecar and the phone's decoder must
++  // agree on scheme, host, 8-digit code and `v=1`.
++  return encodePairUri({ relayUrl: relay, code: display, version: 1 });
+ }
+ 
+ function snapshot(): Record<string, unknown> {
+@@ -147,9 +210,25 @@ function snapshot(): Record<string, unknown> {
+     relayOnline: link.isOnline,
+     connectionMode: useLocalRelay ? 'local' : 'remote',
+     relayUrl: useLocalRelay ? publicUrl : publicUrl ?? relayUrl,
++    // The LAN address is what a phone on the same network must use; it is
++    // ``publicUrl`` in local mode and empty when no interface was found.
++    lanUrl: useLocalRelay ? publicUrl : undefined,
+     retries,
+     lastError,
+-    pairedClients: 0,
++    // `null` means "this process cannot know": the authoritative client list
++    // lives in the relay, which this repository does not own. The Windows
++    // assistant renders it as 未知 rather than a fabricated 0.
++    pairedClients: null,
++    pairingsSinceStart,
++    device: {
++      agentId: config.agentId,
++      name: values.name ?? hostname(),
++    },
++    runtime: {
++      platform: process.platform,
++      arch: process.arch,
++      node: process.version,
++    },
+     tools,
+     bindings: streams.bindings(),
+   };
+@@ -158,7 +237,12 @@ function snapshot(): Record<string, unknown> {
+ function broadcast(frame: Record<string, unknown>): void {
+   const line = `${JSON.stringify(frame)}\n`;
+   for (const client of clients) {
+-    if (!client.socket.destroyed) client.socket.write(line);
++    // A socket that has not presented the attach token receives nothing: the
++    // snapshot carries the relay address and device id, the pair_code frame is
++    // the pairing secret itself, and stream_event carries session output. The
++    // port is not an identity, so `!destroyed` is not enough.
++    if (!client.authed || client.socket.destroyed) continue;
++    client.socket.write(line);
+   }
+ }
+ 
+@@ -175,19 +259,20 @@ async function refreshPairCode(): Promise<void> {
+     return;
+   }
+   const code = await link.requestPairCode().catch((err: unknown) => {
+-    lastError = err instanceof Error ? err.message : String(err);
+-    return undefined;
++    lastError = err instanceof Error ? err.message : String(err);    return undefined;
+   });
+   if (!code) {
+     broadcast(snapshot());
+     return;
+   }
+-  pairCode = { display: code.display, uri: buildPairUri(code.display, code.expiresAt), expiresAt: code.expiresAt };
++  pairCode = { display: code.display, uri: buildPairUri(code.display), expiresAt: code.expiresAt };
++  printPairingBanner(pairCode);
+   broadcast({ type: 'pair_code', seq: ++seq, ...pairCode });
+ }
+ 
+ const link = new RelayLink({
+   url: relayUrl ?? '',
++  pairingUrl: publicUrl ?? relayUrl ?? '',
+   agentId: config.agentId,
+   secret: config.secret,
+   relayKey: localRelay ? localRelayKey : relayRegistrationKey,
+@@ -206,15 +291,30 @@ const link = new RelayLink({
+     lastError = reason;
+     broadcast(snapshot());
+   },
+-  onPaired: () => broadcast(snapshot()),
++  onPaired: () => {
++    pairingsSinceStart += 1;
++    broadcast(snapshot());
++  },
+ });
+ if (relayUrl) link.start();
+ 
+ const server: Server = createServer((socket) => {
+-  const client: Client = { socket, buffer: '' };
++  const client: Client = { socket, buffer: '', authed: !requireAuth };
+   clients.add(client);
+-  client.socket.write(`${JSON.stringify(snapshot())}\n`);
+-  if (pairCode) client.socket.write(`${JSON.stringify({ type: 'pair_code', ...pairCode })}\n`);
++
++  // The port alone is not an identity: while auth is required, nothing (not
++  // even the snapshot) is sent until the first frame presents the token.
++  if (requireAuth) {
++    client.authTimer = setTimeout(() => {
++      socket.write(`${JSON.stringify({ type: 'error', message: '未认证连接已断开' })}\n`);
++      socket.destroy();
++      clients.delete(client);
++    }, authDeadlineMs);
++    client.authTimer.unref?.();
++  } else {
++    client.socket.write(`${JSON.stringify(snapshot())}\n`);
++    if (pairCode) client.socket.write(`${JSON.stringify({ type: 'pair_code', ...pairCode })}\n`);
++  }
+ 
+   socket.setEncoding('utf8');
+   socket.on('data', (chunk: string) => {
+@@ -227,8 +327,14 @@ const server: Server = createServer((socket) => {
+       index = client.buffer.indexOf('\n');
+     }
+   });
+-  socket.on('close', () => clients.delete(client));
+-  socket.on('error', () => clients.delete(client));
++  socket.on('close', () => {
++    if (client.authTimer) clearTimeout(client.authTimer);
++    clients.delete(client);
++  });
++  socket.on('error', () => {
++    if (client.authTimer) clearTimeout(client.authTimer);
++    clients.delete(client);
++  });
+ });
+ 
+ function handle(line: string, client: Client): void {
+@@ -241,6 +347,28 @@ function handle(line: string, client: Client): void {
+     client.socket.write(`${JSON.stringify({ type: 'error', message: '无效的请求' })}\n`);
+     return;
+   }
++  if (!client.authed) {
++    // Only `auth` is accepted before the handshake completes.
++    if (message.type !== 'auth') {
++      client.socket.write(`${JSON.stringify({ type: 'error', message: '需要先认证' })}\n`);
++      return;
++    }
++    if (!tokenEquals(message.token)) {
++      client.socket.write(`${JSON.stringify({ type: 'error', message: '凭据不正确' })}\n`);
++      client.socket.destroy();
++      clients.delete(client);
++      return;
++    }
++    client.authed = true;
++    if (client.authTimer) {
++      clearTimeout(client.authTimer);
++      client.authTimer = undefined;
++    }
++    client.socket.write(`${JSON.stringify(snapshot())}\n`);
++    if (pairCode) client.socket.write(`${JSON.stringify({ type: 'pair_code', ...pairCode })}\n`);
++    return;
++  }
++  if (message.type === 'auth') return;
+   void dispatchSidecar(message, client);
+ }
+ 
+@@ -262,6 +390,89 @@ async function dispatchSidecar(message: Record<string, unknown>, client: Client)
+       case 'tool_probe':
+         await refreshTools();
+         break;
++      case 'discover': {
++        // Existing sessions, not just this run's bindings. Each source is
++        // independent; a failure is reported instead of hidden.
++        const discovery = await discoverSessions(
++          {
++            logger: log,
++            probe: probeTools,
++            claudeHistory: {
++              list: (cwd) => listClaudeHistory(cwd),
++            },
++            defaultCwd,
++            roots,
++          },
++          new Set(streams.bindings().map((binding) => binding.id)),
++        );
++        lastDiscovery = discovery;
++        reply({
++          type: 'discovered',
++          sessions: discovery.sessions.map((session) => ({
++            id: session.id,
++            kind: session.kind,
++            title: session.title,
++            subtitle: session.subtitle,
++            origin: session.origin,
++            lastUsed: session.lastUsed,
++            bound: session.bound,
++            canOpen: session.canOpen,
++            canAcceptInput: session.canAcceptInput,
++          })),
++          bound: discovery.bound,
++          failures: discovery.failures,
++        });
++        break;
++      }
++      case 'open_session': {
++        const id = String(message.id ?? '');
++        if (!id) {
++          reply({ type: 'error', message: '缺少会话 id' });
++          break;
++        }
++        // The discovered entry decides the provider. `tool_bind` alone only
++        // knows `listReadOnly()` (Herdr panes and `claude agents`), so a Codex
++        // thread or an SDK history id would be rejected there.
++        lastDiscovery ??= await discoverSessions(
++          {
++            logger: log,
++            probe: probeTools,
++            claudeHistory: { list: (cwd) => listClaudeHistory(cwd) },
++            defaultCwd,
++            roots,
++          },
++          new Set(streams.bindings().map((binding) => binding.id)),
++        );
++        const found = lastDiscovery.sessions.find((session) => session.id === id);
++        if (!found) {
++          reply({ type: 'error', message: `找不到会话 ${id}` });
++          break;
++        }
++        if (!found.canOpen) {
++          reply({ type: 'error', message: '该会话目前仅可查看，无法打开。' });
++          break;
++        }
++        try {
++          await streams.bindView({
++            kind: found.kind,
++            id: found.id,
++            title: found.title,
++            subtitle: found.subtitle,
++            // Discovery names map onto the stream origins the binder understands.
++            origin: found.origin === 'pane' ? 'pane-poll' : 'daemon-history',
++            canAcceptInput: found.canAcceptInput,
++            cwd: found.cwd,
++          });
++          reply({ type: 'session_opened', id });
++        } catch (err) {
++          reply({ type: 'error', message: err instanceof Error ? err.message : String(err) });
++        }
++        break;
++      }
++      case 'input':
++        // Same request name the phone protocol uses for bound-tool input.
++        await streams.input(String(message.id ?? ''), String(message.text ?? ''));
++        break;
+       case 'tool_bind':
+         await streams.bind(String(message.id ?? ''));
+         broadcast(snapshot());
+@@ -321,14 +532,79 @@ async function dispatchSidecar(message: Record<string, unknown>, client: Client)
+ await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+ const address = server.address();
+ const port = typeof address === 'object' && address ? address.port : 0;
++// `token` is never written to stdout: stdout is inherited by terminals, logs and
++// CI artefacts. The attach credential only goes into the `--port-file` document,
++// which the companion creates with owner-only permissions. A console launch
++// therefore prints the pairing code and link instead — see `printPairingBanner`.
+ process.stdout.write(`${JSON.stringify({ type: 'listening', port })}\n`);
+ if (relayUrl) log.info('sidecar listening', { port, relay: publicUrl ?? relayUrl });
+ else log.warn('sidecar started without a relay; set one in the app');
+ 
++/**
++ * Publishes `{port, token}` so a desktop app that cannot spawn Node (macOS app
++ * sandbox) can attach to this already-running companion.
++ *
++ * The file carries the loopback port and the per-run attach token, never a
++ * pairing code or the device secret. It is written 0600 inside a 0700 directory
++ * because the token authorises driving this agent. A failure to write it is
++ * reported but never fatal: the CLI banner already carries what a terminal user
++ * needs.
++ */
++/**
++ * The attach document this process published, if any.
++ *
++ * Only an owned file may be removed: `--port-file` is a caller-supplied path, and
++ * deleting whatever sits there could destroy another running companion's
++ * handshake, or an unrelated file the user mistyped.
++ */
++let ownedPortFile: PortFileOwnership | undefined;
++
++async function writePortFile(target: string | undefined): Promise<void> {
++  if (!target) return;
++  const resolved = path.resolve(target);
++  try {
++    ownedPortFile = await createPortFile(resolved, port, attachToken);
++    log.info('sidecar attach file written', { target: resolved });
++  } catch (err) {
++    log.warn('could not write the sidecar attach file', {
++      target,
++      err: err instanceof Error ? err.message : String(err),
++    });
++  }
++}
++await writePortFile(values['port-file']);
++
++/**
++ * Console banner for a CLI launch.
++ *
++ * A terminal user needs the pairing code and the `cloudterminal://pair?...` link;
++ * they never need the attach token, and printing it would put a machine-driving
++ * credential into scrollback, `tee` output and CI logs.
++ *
++ * Gated on `--console-pairing`, the flag the human-facing wrappers pass. It is
++ * deliberately *not* derived from `--port-file`: Studio's own launchers pass
++ * `--port-file` too, and their stdout carries only JSON frames for the app.
++ */
++function printPairingBanner(code: { display: string; uri: string; expiresAt: number }): void {
++  if (values['console-pairing'] !== true) return;
++  const minutes = Math.max(1, Math.round((code.expiresAt - Date.now()) / 60_000));
++  console.log('');
++  console.log(`配对码：${code.display}（${minutes} 分钟内有效）`);
++  console.log(`配对链接：${code.uri}`);
++  console.log('在手机的「添加电脑」里输入配对码，或扫描上面的链接生成的二维码。');
++  console.log('');
++}
++
+ let stopping = false;
+ async function shutdown(): Promise<void> {
+   if (stopping) return;
+   stopping = true;
++  // Remove the published attach file first: a stale document would let the
++  // desktop app attach to a port that is about to disappear — and, once the port
++  // is reused, possibly to an unrelated listener. Removal is ownership-checked,
++  // so a file another companion has since replaced stays untouched.
++  removePortFileIfOwned(ownedPortFile);
++  ownedPortFile = undefined;
+   await streams.close();
+   await core.closeAll();
+   link.stop();
+@@ -338,6 +614,14 @@ async function shutdown(): Promise<void> {
+ }
+ process.on('SIGINT', () => void shutdown());
+ process.on('SIGTERM', () => void shutdown());
++// Last-resort cleanup for a normal exit that bypassed `shutdown()` (for example
++// `process.exit()` from another module). `exit` handlers must be synchronous,
++// which is why the removal helper is sync. SIGKILL cannot be handled; the
++// desktop side then finds a dead socket and shows its retry state.
++process.on('exit', () => {
++  removePortFileIfOwned(ownedPortFile);
++  ownedPortFile = undefined;
++});
+ 
+ // Bridge the relay link's core messages so a future feature can surface them.
+ export type { ClientMessage };
+diff --git a/companion/remote_agent/src/agent/tool-streams.ts b/companion/remote_agent/src/agent/tool-streams.ts
+index 1d6cc09b8792c5f20762953b8f0a9975c40d0efe..7de55689b73932940182a85a531949b10eb8d605 100644
+--- a/companion/remote_agent/src/agent/tool-streams.ts
++++ b/companion/remote_agent/src/agent/tool-streams.ts
+@@ -14,6 +14,7 @@ import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+ 
+ import type { Logger } from '../shared/log.ts';
+ import { HerdrBridge } from './herdr.ts';
++import type { CodexBridge } from './codex.ts';
+ import { probeTools } from './tool-probe.ts';
+ 
+ export type StreamOrigin = 'managed-stream' | 'daemon-history' | 'pane-poll';
+@@ -41,6 +42,14 @@ export type StreamEventPayload = {
+ export type ToolStreams = {
+   bindings(): BindingView[];
+   bind(id: string): Promise<void>;
++  /**
++   * Binds a view the caller already resolved.
++   *
++   * Discovery lists sources `bind()` cannot resolve (SDK Claude history, Codex
++   * threads), so those entries must be openable by descriptor rather than by id
++   * alone.
++   */
++  bindView(view: BindingView): Promise<void>;
+   unbind(id: string): Promise<void>;
+   input(id: string, text: string): Promise<void>;
+   setPollInterval(id: string, milliseconds: number): Promise<void>;
+@@ -58,10 +67,52 @@ export type ToolStreamsOptions = {
+   spawnFn?: typeof spawn;
+   /** Test seam: override tool discovery. */
+   probeFn?: typeof probeTools;
++  /**
++   * Read-only transcript source for SDK Claude sessions.
++   *
++   * Desktop discovery lists sessions from the Claude SDK history, which the
++   * `claude agents` listing does not contain. Without this, opening a discovered
++   * session would silently show nothing.
++   */
++  history?: { messages(sessionId: string, cwd?: string): Promise<unknown[]> };
++  /**
++   * Codex app-server bridge, used to open a discovered thread.
++   *
++   * A thread can only be opened through `thread/resume`, the same call the phone
++   * uses; the read-only lister never returns Codex rows at all.
++   */
++  codex?: CodexBridge;
+ };
+ 
+ const MANAGED_PREFIX = 'managed:';
+ 
++/**
++ * Renders one stored SDK message as a line of text.
++ *
++ * Only the assistant/user text is shown; tool payloads and metadata are skipped
++ * so a transcript does not leak internal ids into the page.
++ */
++function renderHistoryMessage(message: unknown): string {
++  if (!message || typeof message !== 'object') return '';
++  const record = message as Record<string, unknown>;
++  const inner = record.message && typeof record.message === 'object'
++    ? (record.message as Record<string, unknown>)
++    : record;
++  const content = inner.content;
++  if (typeof content === 'string') return content.trim();
++  if (Array.isArray(content)) {
++    return content
++      .map((part) => {
++        if (!part || typeof part !== 'object') return '';
++        const block = part as Record<string, unknown>;
++        return block.type === 'text' && typeof block.text === 'string' ? block.text.trim() : '';
++      })
++      .filter(Boolean)
++      .join('\n');
++  }
++  return '';
++}
++
+ export function createToolStreams(options: ToolStreamsOptions): ToolStreams {
+   const log = options.logger;
+   const spawnFn = options.spawnFn ?? spawn;
+@@ -156,16 +207,89 @@ export function createToolStreams(options: ToolStreamsOptions): ToolStreams {
+     const all = await listReadOnly();
+     const view = all.find((b) => b.id === id);
+     if (!view) throw new Error(`找不到会话 ${id}`);
+-    connected.set(id, view);
+-    if (view.origin === 'pane-poll') {
++    await bindView(view);
++  }
++
++  /**
++   * Binds a view the caller already resolved.
++   *
++   * Desktop discovery lists Codex threads and SDK Claude history, which
++   * `listReadOnly()` never enumerates. Passing the view through keeps one bind
++   * path: whichever source produced the entry decides how it is opened.
++   */
++  async function bindView(view: BindingView): Promise<void> {
++    if (connected.has(view.id)) return;
++    // Register only after the provider succeeded. Recording first made a failed
++    // open look like a live binding, so every retry returned early on
++    // `connected.has(id)` and the page could never recover.
++    // Codex is decided by kind first: discovery labels a thread `thread`, which
++    // the sidecar maps onto `daemon-history`, and that branch only knows how to
++    // read a Claude transcript. Opening a Codex thread through it produced an
++    // empty view.
++    if (view.kind === 'codex') {
++      await openCodexThread(view);
++    } else if (view.origin === 'pane-poll') {
+       await startPolling(view);
+     } else if (view.origin === 'daemon-history') {
+       await readOnce(view);
+     }
++    connected.set(view.id, view);
++  }
++
++  /**
++   * Opens a Codex thread through the app-server, then emits its turns.
++   *
++   * Two providers, chosen by capability rather than by availability:
++   *
++   *   * `CanAcceptInput` — `resume()` joins the thread and lets input arrive.
++   *   * otherwise — `read()` returns the same turns without taking control. A
++   *     thread owned by Codex Desktop is still a real, openable history, so
++   *     discovery lists it and this path shows it read-only. Requiring resume
++   *     hid those sessions entirely.
++   */
++  async function openCodexThread(view: BindingView): Promise<void> {
++    const codex = options.codex;
++    if (!codex) throw new Error('Codex 控制不可用：未连接 Codex app-server。');
++    const snapshot = view.canAcceptInput ? await codex.resume(view.id) : await codex.read(view.id);
++    // A turn carries `items[]`; there is no `turn.text`. Rendering the item text
++    // is what the phone's `codex_read` view shows.
++    const text = snapshot.turns
++      .flatMap((turn) => turn.items ?? [])
++      .map((item) => (typeof item.text === 'string' ? item.text.trim() : ''))
++      .filter(Boolean)
++      .join('\n');
++    options.emit({
++      kind: 'codex',
++      sessionId: view.id,
++      eventKind: 'snapshot',
++      text: text || '（该 Codex 会话没有可显示的历史输出）',
++    });
+   }
+ 
+   async function readOnce(view: BindingView): Promise<void> {
+     if (view.kind === 'claude') {
++      // Prefer the SDK history loader when the caller supplied one: the desktop
++      // page lists SDK sessions, and `claude agents` is a different source that
++      // does not contain them. Falling back to `claude logs` keeps the existing
++      // daemon-history behaviour for the assistant's own listing.
++      if (options.history) {
++        try {
++          const messages = await options.history.messages(view.id, view.cwd);
++          options.emit({
++            kind: 'claude',
++            sessionId: view.id,
++            eventKind: 'snapshot',
++            text: messages.map(renderHistoryMessage).filter(Boolean).join('\n') ||
++              '（没有可显示的历史输出）',
++          });
++          return;
++        } catch (err) {
++          log.warn('history read failed; falling back to claude logs', {
++            id: view.id,
++            error: err instanceof Error ? err.message : String(err),
++          });
++        }
++      }
+       const tools = await probeFn();
+       const claude = tools.find((t) => t.kind === 'claude');
+       if (!claude?.executable) return;
+@@ -233,6 +357,14 @@ export function createToolStreams(options: ToolStreamsOptions): ToolStreams {
+     if (!view.canAcceptInput) {
+       throw new Error('该会话是只读来源，不能发送输入。');
+     }
++    if (view.kind === 'codex') {
++      const codex = options.codex;
++      if (!codex) throw new Error('Codex 控制不可用：未连接 Codex app-server。');
++      // The same request the phone's `codex_send` uses.
++      await codex.send(id, text);
++      options.emit({ kind: 'codex', sessionId: id, eventKind: 'input', text: `> ${text}` });
++      return;
++    }
+     const child = children.get(id);
+     if (!child) throw new Error('该会话没有可写入的进程');
+     child.stdin.write(`${text}\n`);
+@@ -370,6 +502,7 @@ export function createToolStreams(options: ToolStreamsOptions): ToolStreams {
+   return {
+     bindings: () => [...connected.values()].map((v) => ({ ...v })),
+     bind,
++    bindView,
+     unbind,
+     input,
+     setPollInterval,
+diff --git a/companion/remote_agent/src/relay/relay.ts b/companion/remote_agent/src/relay/relay.ts
+index 5f4a2910b003f9cf804038d86127abeecff18153..f6cd5d704657610390e59d246def92b4828ffa34 100644
+--- a/companion/remote_agent/src/relay/relay.ts
++++ b/companion/remote_agent/src/relay/relay.ts
+@@ -26,7 +26,10 @@ type AnyClientHello = Extract<Hello, { role: 'client' }> | AccountClientHello;
+  */
+ export type AccountClientResult =
+   | { ok: true; accountId: string }
+-  | { ok: false; reason: 'no_database' | 'invalid_token' | 'not_bound' | 'unavailable' };
++  | {
++      ok: false;
++      reason: 'no_database' | 'invalid_token' | 'not_bound' | 'unavailable' | 'device_revoked';
++    };
+ 
+ /**
+  * The account layer the relay needs, and nothing more. `tenancy.ts` implements
+@@ -35,7 +38,32 @@ export type AccountClientResult =
+ export type AccountAuthorizer = {
+   readonly available: boolean;
+   authorizeClient(token: string, deviceId: string): Promise<AccountClientResult>;
++  /**
++   * Whether this device may still authenticate clients with its own secret.
++   *
++   * Returns false once the device has ever been account-managed or has been
++   * revoked, so a previously saved device secret cannot bypass an account
++   * revocation (design §Relay 安全修复). Implementations without the notion
++   * (the legacy no-database relay) may omit it; the relay then keeps the old
++   * behaviour.
++   */
++  allowsLegacySecret?(deviceId: string, secretHash: string): Promise<boolean>;
+   invalidate(accountId: string, deviceId: string): void;
++  /** Optional: drop every cached decision for a device. */
++  invalidateDevice?(deviceId: string): void;
++  /**
++   * Record an authenticated agent's self-description, so the account device
++   * list shows a real name and platform instead of an empty row.
++   *
++   * Optional, and called only after the hello's credential was verified. Must
++   * never throw: metadata is not worth dropping a working connection.
++   */
++  onAgentOnline?(info: {
++    deviceId: string;
++    secretHash: string;
++    name: string | null;
++    platform: string | null;
++  }): void;
+ };
+ 
+ /** Behaviour of the legacy relay when no account layer is configured. */
+@@ -69,11 +97,16 @@ type AgentEntry = {
+   agentId: string;
+   secretHash: string;
+   name: string;
++  /** Platform announced by the agent; empty for older clients. */
++  platform: string;
+   socket: WebSocket | null;
+   clients: Map<string, WebSocket>;
+   offlineSince: number;
+ };
+ 
++/** Clients opened with a relay token, keyed for revocation by account. */
++type ClientBook = Map<string, { agentId: string; accountId: string | null; ws: WebSocket }>;
++
+ type Alive = { alive: boolean };
+ 
+ export type Relay = {
+@@ -92,8 +125,31 @@ export type Relay = {
+   resolvePairCode(code: string): Promise<string | null>;
+   /** Whether a device currently holds a live agent socket. */
+   isDeviceOnline(deviceId: string): boolean;
++  /** The name the connected agent announced, or null when it is not online. */
++  deviceName(deviceId: string): string | null;
++  /** The platform the connected agent announced, or null. */
++  devicePlatform(deviceId: string): string | null;
+   /** Drop a cached binding decision after the HTTP API revokes it. */
+   invalidateBinding(accountId: string, deviceId: string): void;
++  /**
++   * Close every client socket that belongs to `accountId`, optionally limited
++   * to one device. Used after a binding is revoked so an already-connected
++   * client does not keep a session the account just lost.
++   */
++  closeAccountClients(accountId: string, deviceId?: string | null): number;
++  /** Close every client socket attached to a device (device revocation). */
++  closeDeviceClients(deviceId: string): number;
++  /**
++   * Close the client sockets of a device that were admitted through the legacy
++   * device-secret path (`accountId === null`).
++   *
++   * Used when a device binds its first account: those sessions predate account
++   * binding and must not outlive it, while account-bound clients of the same
++   * device keep running.
++   */
++  closeLegacyClients(deviceId: string): number;
++  /** Drop every cached authorizer decision for a device. */
++  invalidateDevice(deviceId: string): void;
+ };
+ 
+ const CLOSE_POLICY = 1008;
+@@ -112,8 +168,30 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+   const authFailures = new Map<string, { count: number; since: number }>();
+   const pairCodes = new Map<string, { agentId: string; expiresAt: number }>();
+   const pendingPairs = new Map<string, { ws: WebSocket; agentId: string; timer: NodeJS.Timeout }>();
++  const clientBook: ClientBook = new Map();
+   const servers: Server[] = [];
+ 
++  /**
++   * Revocation fence for joins.
++   *
++   * Authorization (`authorizeClient`, `allowsLegacySecret`) is asynchronous; a
++   * revoke can land between the check and the `joinClient` call. Without a
++   * fence, that revoke would close the sockets it knows about and then the
++   * stale join would add a new one that survived it. The counters are captured
++   * before awaiting and re-checked after: any revocation of this device (or any
++   * global revocation) in between makes the join fail closed.
++   */
++  const fence = { global: 0, devices: new Map<string, number>() };
++
++  function fenceOf(deviceId: string): string {
++    return `${fence.global}:${fence.devices.get(deviceId) ?? 0}`;
++  }
++
++  function bumpFence(deviceId: string | null): void {
++    fence.global++;
++    if (deviceId !== null) fence.devices.set(deviceId, (fence.devices.get(deviceId) ?? 0) + 1);
++  }
++
+   const heartbeat = setInterval(() => {
+     // Forget agents that have been offline for a day with nobody waiting.
+     const now = Date.now();
+@@ -207,14 +285,41 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+       return fail(ws, 'agent_conflict', 'agentId already registered with a different secret');
+     }
+     if (!entry) {
+-      entry = { agentId: hello.agentId, secretHash: hello.secretHash, name: '', socket: null, clients: new Map(), offlineSince: 0 };
++      entry = {
++        agentId: hello.agentId,
++        secretHash: hello.secretHash,
++        name: '',
++        platform: '',
++        socket: null,
++        clients: new Map(),
++        offlineSince: 0,
++      };
+       agents.set(hello.agentId, entry);
+     }
+     const previous = entry.socket;
+     entry.socket = ws;
+     entry.name = (hello.name ?? '').slice(0, 64);
++    entry.platform = (typeof hello.platform === 'string' ? hello.platform : '').slice(0, 64);
+     if (previous && previous !== ws) previous.close(CLOSE_REPLACED, 'replaced');
+ 
++    // The hello is now authenticated: `secretHash` matched the registered
++    // digest (or registered the device) and the relay key passed. Only here is
++    // the agent's self-description trusted enough to store, so an unauthenticated
++    // hello cannot rename a device or rewrite its metadata.
++    if (accounts.onAgentOnline) {
++      try {
++        accounts.onAgentOnline({
++          deviceId: entry.agentId,
++          secretHash: entry.secretHash,
++          name: entry.name || null,
++          platform: typeof hello.platform === 'string' ? hello.platform.slice(0, 64) || null : null,
++        });
++      } catch (err) {
++        // Metadata is a convenience: never drop a working agent over it.
++        log.warn('could not record device metadata', { agentId: entry.agentId, err: (err as Error).message });
++      }
++    }
++
+     const agent = entry;
+     send(ws, { t: 'hello_ok' });
+     log.info('agent online', { agentId: agent.agentId, name: agent.name, ip });
+@@ -331,14 +436,55 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+       // retrying, and there is no secret to brute-force here.
+       return fail(ws, 'agent_offline', 'device has not connected to this relay yet');
+     }
+-    if (!hexDigestEquals(entry.secretHash, sha256Hex(hello.secret))) {
++    void onLegacyClient(ws, hello.agentId, hello.secret, ip, entry);
++  }
++
++  /**
++   * Legacy device-secret client. Kept for devices that never opted into
++   * account binding, and refused for devices that did.
++   *
++   * The account-managed lookup happens before the secret comparison so a
++   * revoked account cannot be re-entered with a secret the phone saved months
++   * ago. It is asynchronous, so the whole check moved into a helper.
++   */
++  async function onLegacyClient(
++    ws: WebSocket,
++    deviceId: string,
++    secret: string,
++    ip: string,
++    entry: AgentEntry,
++  ): Promise<void> {
++    if (!hexDigestEquals(entry.secretHash, sha256Hex(secret))) {
+       recordAuthFailure(ip);
+       log.warn('client rejected: bad credentials', { ip });
+       return fail(ws, 'unauthorized', 'invalid pairing secret');
+     }
+-
+-    const agent = entry;
+-    joinClient(ws, agent, ip, null);
++    // The secret is correct; the device may still be off-limits because it is
++    // account-managed or revoked. Fail closed when the lookup itself fails.
++    const fenceBefore = fenceOf(deviceId);
++    let legacyAllowed = true;
++    if (accounts.available && accounts.allowsLegacySecret) {
++      try {
++        legacyAllowed = await accounts.allowsLegacySecret(deviceId, entry.secretHash);
++      } catch (err) {
++        log.warn('legacy secret check failed', { deviceId, ip, err: (err as Error).message });
++        return fail(ws, 'account_unavailable', 'account lookup failed, retry shortly');
++      }
++    }
++    if (!legacyAllowed) {
++      recordAuthFailure(ip);
++      log.warn('client rejected: device is account-managed', { deviceId, ip });
++      return fail(ws, 'unauthorized', 'this device requires account authorization');
++    }
++    // A binding may have been created while the check was in flight; that
++    // revokes the legacy path this hello was about to use.
++    if (fenceOf(deviceId) !== fenceBefore) {
++      recordAuthFailure(ip);
++      log.warn('client rejected: device changed during authorization', { deviceId, ip });
++      return fail(ws, 'unauthorized', 'this device requires account authorization');
++    }
++    if (ws.readyState !== WebSocket.OPEN) return; // closed while we awaited
++    joinClient(ws, entry, ip, null);
+   }
+ 
+   /**
+@@ -358,6 +504,7 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+       return fail(ws, 'account_unavailable', 'account login is not configured on this relay');
+     }
+     let result;
++    const fenceBefore = fenceOf(deviceId);
+     try {
+       result = await accounts.authorizeClient(relayToken, deviceId);
+     } catch (err) {
+@@ -369,11 +516,23 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+         log.warn('account client rejected: database unavailable', { deviceId, ip });
+         return fail(ws, 'account_unavailable', 'account lookup failed, retry shortly');
+       }
++      if (result.reason === 'device_revoked') {
++        recordAuthFailure(ip);
++        log.warn('account client rejected: device revoked', { deviceId, ip });
++        return fail(ws, 'unauthorized', 'this device has been revoked');
++      }
+       recordAuthFailure(ip);
+       log.warn('account client rejected', { deviceId, ip, reason: result.reason });
+       return fail(ws, 'unauthorized', 'invalid account token for this device');
+     }
+     if (ws.readyState !== WebSocket.OPEN) return; // closed while we awaited
++    // A revoke that landed during the lookup has already closed the sockets it
++    // knew about; joining now would add one that outlives it.
++    if (fenceOf(deviceId) !== fenceBefore) {
++      recordAuthFailure(ip);
++      log.warn('account client rejected: authorization revoked during lookup', { deviceId, ip });
++      return fail(ws, 'unauthorized', 'this device authorization has been revoked');
++    }
+     const entry = agents.get(deviceId);
+     if (!entry) {
+       // The device has never registered on this relay instance.
+@@ -391,6 +550,7 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+   ): void {
+     const clientId = randomToken(9);
+     agent.clients.set(clientId, ws);
++    clientBook.set(clientId, { agentId: agent.agentId, accountId: account?.accountId ?? null, ws });
+     send(ws, { t: 'hello_ok', clientId, online: agent.socket !== null, name: agent.name });
+     if (agent.socket) send(agent.socket, { t: 'client_joined', clientId });
+     log.info('client joined', { agentId: agent.agentId, clientId, ip, accountId: account?.accountId });
+@@ -413,6 +573,7 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+ 
+     ws.on('close', () => {
+       agent.clients.delete(clientId);
++      clientBook.delete(clientId);
+       if (agent.socket) send(agent.socket, { t: 'client_left', clientId });
+       log.info('client left', { agentId: agent.agentId, clientId, accountId: account?.accountId });
+     });
+@@ -505,11 +666,93 @@ export function createRelay(opts: RelayOptions = {}): Relay {
+     },
+ 
+     isDeviceOnline(deviceId) {
+-      return agents.get(deviceId)?.socket !== null && agents.get(deviceId) !== undefined;
++      const agent = agents.get(deviceId);
++      return agent !== undefined && agent.socket !== null;
++    },
++
++    deviceName(deviceId) {
++      return agents.get(deviceId)?.name || null;
++    },
++
++    devicePlatform(deviceId) {
++      return agents.get(deviceId)?.platform || null;
+     },
+ 
+     invalidateBinding(accountId, deviceId) {
+       accounts.invalidate(accountId, deviceId);
++      // No fence bump here: this runs before `closeAccountClients`, which owns
++      // the bump. Bumping twice would make a concurrent retry believe a second
++      // mutation had landed and give up instead of returning a fresh answer.
++    },
++
++    closeAccountClients(accountId, deviceId = null) {
++      let closed = 0;
++      // Bump before the sweep: a join already in flight must fail its re-check
++      // even though it is not in `clientBook` yet.
++      bumpFence(deviceId);
++      for (const [clientId, entry] of clientBook) {
++        if (entry.accountId !== accountId) continue;
++        if (deviceId !== null && entry.agentId !== deviceId) continue;
++        clientBook.delete(clientId);
++        const agent = agents.get(entry.agentId);
++        agent?.clients.delete(clientId);
++        // 1008 (policy violation) so the client logs an authorization end
++        // rather than an unexplained drop, and does not retry the same token.
++        try {
++          entry.ws.close(CLOSE_POLICY, 'authorization revoked');
++        } catch {
++          entry.ws.terminate();
++        }
++        closed++;
++      }
++      log.info('closed clients after revocation', { accountId, deviceId, closed });
++      return closed;
++    },
++
++    closeDeviceClients(deviceId) {
++      let closed = 0;
++      bumpFence(deviceId);
++      for (const [clientId, entry] of clientBook) {
++        if (entry.agentId !== deviceId) continue;
++        clientBook.delete(clientId);
++        const agent = agents.get(entry.agentId);
++        agent?.clients.delete(clientId);
++        try {
++          entry.ws.close(CLOSE_POLICY, 'device revoked');
++        } catch {
++          entry.ws.terminate();
++        }
++        closed++;
++      }
++      log.info('closed clients after device revocation', { deviceId, closed });
++      return closed;
++    },
++
++    closeLegacyClients(deviceId) {
++      let closed = 0;
++      bumpFence(deviceId);
++      for (const [clientId, entry] of clientBook) {
++        if (entry.agentId !== deviceId || entry.accountId !== null) continue;
++        clientBook.delete(clientId);
++        const agent = agents.get(entry.agentId);
++        agent?.clients.delete(clientId);
++        try {
++          // This client was admitted with the device secret, which no longer
++          // authorizes anything now that the device is account-managed.
++          entry.ws.close(CLOSE_POLICY, 'device now requires account authorization');
++        } catch {
++          entry.ws.terminate();
++        }
++        closed++;
++      }
++      log.info('closed legacy clients after first account binding', { deviceId, closed });
++      return closed;
++    },
++
++    invalidateDevice(deviceId) {
++      accounts.invalidateDevice?.(deviceId);
++      // Same split as `invalidateBinding`: `closeDeviceClients` (or
++      // `closeLegacyClients`) performs the fence bump for this mutation.
+     },
+   };
+ }
+diff --git a/companion/remote_agent/src/shared/relay-protocol.ts b/companion/remote_agent/src/shared/relay-protocol.ts
+index c729ba3c04c63cedc6c1d0684d857463ed2108c4..5e0afd0fa057102df4a75b7b9e7ce7a6d1188194 100644
+--- a/companion/remote_agent/src/shared/relay-protocol.ts
++++ b/companion/remote_agent/src/shared/relay-protocol.ts
+@@ -25,6 +25,14 @@ export type AgentHello = {
+   secretHash: string;
+   relayKey?: string;
+   name?: string;
++  /**
++   * Host platform, e.g. `linux`, `darwin`, `win32`.
++   *
++   * Optional and additive: older agents do not send it, and a relay that does
++   * not store it still accepts them. The relay shows it in the device list so a
++   * user can tell two machines of the same account apart.
++   */
++  platform?: string;
+   v?: number;
+ };
+ 
+diff --git a/companion/remote_agent/start.cmd b/companion/remote_agent/start.cmd
+index c0032fb8e5c8b6be9c6b9dc5f7739af9b442b24e..577d896491d2457e9822178f36630fbb6a4a3277 100644
+--- a/companion/remote_agent/start.cmd
++++ b/companion/remote_agent/start.cmd
+@@ -32,7 +32,7 @@ if not exist node_modules\node-pty\package.json (
+   )
+ )
+ 
+-node src/agent/main.ts %*
++node src/agent/main.ts --console-pairing %*
+ set "agent_exit=%errorlevel%"
+ if not "%agent_exit%"=="0" pause
+ exit /b %agent_exit%
+diff --git a/companion/remote_agent/start.sh b/companion/remote_agent/start.sh
+index 82bebc17272537948abc4a923f19b6d5c54b8ea8..1988db8e310667030efdb9f1f891ada6461d0ded 100644
+--- a/companion/remote_agent/start.sh
++++ b/companion/remote_agent/start.sh
+@@ -11,4 +11,4 @@ if ! node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.e
+   exit 1
+ fi
+ if [ ! -f node_modules/node-pty/package.json ]; then npm ci; fi
+-exec node src/agent/main.ts "$@"
++exec node src/agent/main.ts --console-pairing "$@"
+diff --git a/companion/remote_agent/test/relay-core-sync.test.ts b/companion/remote_agent/test/relay-core-sync.test.ts
+index d6af3ba85e92a6f0c350b361ef99d2c1971727c8..9783bb861433ba80b3cdb6962b37145d2fa15797 100644
+--- a/companion/remote_agent/test/relay-core-sync.test.ts
++++ b/companion/remote_agent/test/relay-core-sync.test.ts
+@@ -6,7 +6,12 @@
+ // from. This test fails when the copy drifts from that record.
+ 
+ import assert from 'node:assert/strict';
++import { execFile } from 'node:child_process';
++import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
++import os from 'node:os';
++import path from 'node:path';
+ import { test } from 'node:test';
++import { promisify } from 'node:util';
+ 
+ import {
+   RELAY_CORE_FILES,
+@@ -14,14 +19,19 @@ import {
+   SYNC_HINT,
+   diffHashes,
+   hashAll,
++  hashContents,
++  provenanceProblems,
+   readManifest,
++  snapshotHash,
++  sourceManifest,
+ } from '../scripts/sync-relay.ts';
++import type { RelayCoreManifest } from '../scripts/sync-relay.ts';
+ 
+ test('the relay core copy matches relay-core.json', async () => {
+   const manifest = await readManifest();
+ 
+   assert.match(manifest.source, /^https:\/\/github\.com\//, `relay-core.json: unexpected source ${manifest.source}`);
+-  assert.match(manifest.commit, /^[0-9a-f]{40}$/, `relay-core.json: unexpected commit ${manifest.commit}`);
++  assert.deepEqual(provenanceProblems(manifest), [], 'relay-core.json: invalid source provenance');
+ 
+   // A file added to one repo but forgotten here would otherwise never be checked.
+   assert.deepEqual(
+@@ -33,3 +43,48 @@ test('the relay core copy matches relay-core.json', async () => {
+   const problems = diffHashes(manifest.files, await hashAll(SERVER_DIR));
+   assert.deepEqual(problems, [], `relay core copy is out of sync:\n${problems.join('\n')}\n${SYNC_HINT}`);
+ });
++
++test('draft provenance binds every path and content hash and cannot pass a release gate', () => {
++  const files = Object.fromEntries(RELAY_CORE_FILES.map((file) => [file, hashContents(file)]));
++  const draft: RelayCoreManifest = {
++    source: 'https://github.com/example/relay',
++    commit: null,
++    base_commit: 'a'.repeat(40),
++    working_tree_sha256: snapshotHash(files),
++    files,
++  };
++  assert.deepEqual(provenanceProblems(draft), []);
++  assert.match(provenanceProblems(draft, true).join(' '), /cannot be released/);
++  const modified = { ...draft, files: { ...files, [RELAY_CORE_FILES[0]!]: hashContents('changed') } };
++  assert.match(provenanceProblems(modified).join(' '), /digest mismatch/);
++  const reordered = Object.fromEntries(Object.entries(files).reverse());
++  assert.equal(snapshotHash(reordered), draft.working_tree_sha256);
++  const mixed = { ...draft, commit: 'a'.repeat(40) } as unknown as RelayCoreManifest;
++  assert.match(provenanceProblems(mixed).join(' '), /cannot be mixed/);
++});
++
++test('synchronizing changed source requires an explicit draft and records its actual base', async (t) => {
++  const fixture = await mkdtemp(path.join(os.tmpdir(), 'relay-provenance-'));
++  t.after(() => rm(fixture, { recursive: true, force: true }));
++  const run = promisify(execFile);
++  const git = (...args: string[]) => run('git', ['-C', fixture, ...args]);
++  for (const file of RELAY_CORE_FILES) {
++    await mkdir(path.dirname(path.join(fixture, file)), { recursive: true });
++    await writeFile(path.join(fixture, file), `// ${file}\n`);
++  }
++  await git('init');
++  await git('add', '--', ...RELAY_CORE_FILES);
++  await git('-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-m', 'fixture');
++  const clean = await sourceManifest(fixture, await hashAll(fixture));
++  assert.match(clean.commit ?? '', /^[0-9a-f]{40}$/);
++
++  const changed = path.join(fixture, RELAY_CORE_FILES[0]!);
++  await writeFile(changed, `${await readFile(changed, 'utf8')}// uncommitted change\n`);
++  const hashes = await hashAll(fixture);
++  await assert.rejects(sourceManifest(fixture, hashes), /differs from HEAD/);
++  const draft = await sourceManifest(fixture, hashes, true);
++  assert.equal(draft.commit, null);
++  assert.equal(draft.base_commit, clean.commit);
++  assert.equal(draft.working_tree_sha256, snapshotHash(hashes));
++  assert.deepEqual(provenanceProblems(draft), []);
++});
+diff --git a/lib/main.dart b/lib/main.dart
+index 9402f5b23b0fc09494756d48600b8a7d4e4ffd40..ea1433f0e2bc3793dddfc4aa444569bc69e9d8a2 100644
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -9,6 +9,7 @@ import 'package:qfli_studio_core/config/ohos_platform.dart';
+ import 'package:qfli_studio_core/services/project_templates.dart';
+ import 'package:qfli_studio_core/interop/interop_runner.dart';
+ import 'package:qfli_studio_core/interop/interop_background_transport.dart';
++import 'package:qfli_studio_core/remote_control/account/account_scope.dart';
+ import 'package:qfli_studio_core/services/studio_profile.dart';
+ import 'package:qfli_studio_core/splash_screen.dart';
+ import 'package:qfli_studio_core/store/auth_store.dart';
+@@ -74,7 +75,12 @@ Future<void> main() async {
+   final auth = AuthStore();
+   final settings = SettingsStore();
+   final ready = ValueNotifier<bool>(false);
+-  runApp(QfliApp(store: store, auth: auth, settings: settings, ready: ready));
++  runApp(
++    RemoteAccountScope(
++      auth: auth,
++      child: QfliApp(store: store, auth: auth, settings: settings, ready: ready),
++    ),
++  );
+ 
+   const platformChannel = MethodChannel('qflistudio/platform');
+   Future<void> reportProgress(double progress) async {
+diff --git a/lib/studio_tools_tab.dart b/lib/studio_tools_tab.dart
+index f7302686ec4caa3f8f36c14f287cd231423a13a4..464afd09b657f6aa91716961edc631ef4cc338e7 100644
+--- a/lib/studio_tools_tab.dart
++++ b/lib/studio_tools_tab.dart
+@@ -1,6 +1,10 @@
+ import 'package:flutter/material.dart';
+ 
++import 'package:qfli_studio_core/pages/auth/login_page.dart';
+ import 'package:qfli_studio_core/pages/tools_grid.dart';
++import 'package:qfli_studio_core/remote_control/account/account_devices_page.dart';
++import 'package:qfli_studio_core/remote_control/account/account_scope.dart';
++import 'package:qfli_studio_core/remote_control/desktop/desktop_companion_entry.dart';
+ import 'package:qfli_studio_core/remote_control/remote_computer_page.dart';
+ import 'package:qfli_studio_core/services/studio_profile.dart';
+ import 'package:qfli_studio_core/store/project_store.dart';
+@@ -13,8 +17,12 @@ import 'package:qfli_studio_core/store/project_store.dart';
+ /// renders and then adds exactly one card:
+ ///
+ /// * 终端 — the 快捷入口 card from [onOpenTerminal] (`ToolsGrid` adds it itself);
+-/// * 远程电脑 — the single new entry, gated on
+-///   [RemoteComputerPage.isSupported];
++/// * 本机配对 — pair this computer's own companion with a phone. Desktop only:
++///   it needs a local process, a loopback socket and an installed companion;
++///   gated on [isLocalCompanionSupported];
++/// * 远程电脑 — the client entry, for driving *another* computer. Gated on
++///   [RemoteComputerPage.isSupported] and kept separate on purpose: one page
++///   publishes this machine, the other connects to a different one;
+ /// * 通用 — the shared offline group (`ToolsGrid` adds it itself).
+ ///
+ /// The shared grid also renders a 专用 group when the product is a content
+@@ -32,6 +40,19 @@ Widget buildStudioToolsTab(ProjectStore store, VoidCallback onOpenTerminal) {
+   return ToolsGrid(
+     onOpenTerminal: onOpenTerminal,
+     sections: [
++      if (isLocalCompanionSupported)
++        ToolSection(
++          title: '本机配对',
++          icon: Icons.qr_code_2_outlined,
++          tools: [
++            ToolDefinition(
++              icon: Icons.qr_code_2_outlined,
++              title: '本机配对',
++              description: '让手机读取本机 Agent 会话',
++              builder: (_) => const DesktopCompanionEntryPage(),
++            ),
++          ],
++        ),
+       if (RemoteComputerPage.isSupported)
+         ToolSection(
+           title: '远程电脑',
+@@ -41,7 +62,7 @@ Widget buildStudioToolsTab(ProjectStore store, VoidCallback onOpenTerminal) {
+               icon: Icons.desktop_windows_outlined,
+               title: '远程电脑',
+               description: '配对电脑后操作其终端、Herdr 与 AI 会话',
+-              builder: (_) => const RemoteComputerPage(),
++              builder: _buildRemoteComputerPage,
+             ),
+           ],
+         ),
+@@ -49,6 +70,19 @@ Widget buildStudioToolsTab(ProjectStore store, VoidCallback onOpenTerminal) {
+   );
+ }
+ 
++Widget _buildRemoteComputerPage(BuildContext context) {
++  final auth = RemoteAccountScope.maybeAuthOf(context);
++  if (auth == null) return const RemoteComputerPage();
++  return AccountSignInHook(
++    onSignIn: () async {
++      await Navigator.of(context).push<void>(
++        MaterialPageRoute<void>(builder: (_) => LoginPage(auth: auth)),
++      );
++    },
++    child: const RemoteComputerPage(),
++  );
++}
++
+ /// Debug tripwire for the 专用 group that [buildStudioToolsTab] does not render.
+ ///
+ /// Keep in sync with `FunctionsTab._isContentProduct` in the shared core. If it
+diff --git a/macos/Runner/DebugProfile.entitlements b/macos/Runner/DebugProfile.entitlements
+index d160f24737250f69047d3ede666a47ca47e78ee4..d7670847f540c2766ea5efd043944532f4f14ab8 100644
+--- a/macos/Runner/DebugProfile.entitlements
++++ b/macos/Runner/DebugProfile.entitlements
+@@ -4,6 +4,8 @@
+ <dict>
+ 	<key>com.apple.security.app-sandbox</key>
+ 	<true/>
++	<key>com.apple.security.files.user-selected.read-only</key>
++	<true/>
+ 	<key>com.apple.security.network.client</key>
+ 	<true/>
+ 	<key>com.apple.security.cs.allow-jit</key>
+diff --git a/macos/Runner/Release.entitlements b/macos/Runner/Release.entitlements
+index 7a2230dc331daf312fe2ca6bcc81540bd5baa215..6584c276fce3b6685d42cbde3727b9c62a5c2390 100644
+--- a/macos/Runner/Release.entitlements
++++ b/macos/Runner/Release.entitlements
+@@ -4,6 +4,8 @@
+ <dict>
+ 	<key>com.apple.security.app-sandbox</key>
+ 	<true/>
++	<key>com.apple.security.files.user-selected.read-only</key>
++	<true/>
+ 	<key>com.apple.security.network.client</key>
+ 	<true/>
+ 	<key>com.apple.security.network.server</key>
+diff --git a/pubspec.lock b/pubspec.lock
+index f97baef1d9f6463211d57d9975271bcfbb7dca87..395295a707ac2b2dd0730e65375ace2e9371409d 100644
+--- a/pubspec.lock
++++ b/pubspec.lock
+@@ -388,6 +388,22 @@ packages:
+       relative: true
+     source: path
+     version: "1.0.0+1"
++  qr:
++    dependency: transitive
++    description:
++      name: qr
++      sha256: "5a1d2586170e172b8a8c8470bbbffd5eb0cd38a66c0d77155ea138d3af3a4445"
++      url: "https://pub.dev"
++    source: hosted
++    version: "3.0.2"
++  qr_flutter:
++    dependency: transitive
++    description:
++      name: qr_flutter
++      sha256: "5095f0fc6e3f71d08adef8feccc8cea4f12eec18a2e31c2e8d82cb6019f4b097"
++      url: "https://pub.dev"
++    source: hosted
++    version: "4.1.0"
+   quiver:
+     dependency: transitive
+     description:
+diff --git a/tool/ci/package_linux.sh b/tool/ci/package_linux.sh
+index 3f35084df2bea6ac53709b6dfdb358b4ac3016ce..ed6142d2c81c289c5fe654e0b39835ff4efe3286 100644
+--- a/tool/ci/package_linux.sh
++++ b/tool/ci/package_linux.sh
+@@ -110,6 +110,14 @@ find "$deb_root" -type d -exec chmod 0755 {} +
+ find "$deb_root" -type f -exec chmod 0644 {} +
+ chmod 0755 "$deb_root$install_dir/$binary_name" "$deb_root/usr/bin/$package_name"
+ 
++# Preserve the executable modes required by the bundled Node and sidecar launcher.
++if [ -d "$deb_root$install_dir/companion" ]; then
++  while IFS= read -r -d '' executable; do
++    relative="${executable#"$bundle/"}"
++    chmod 0755 "$deb_root$install_dir/$relative"
++  done < <(find "$bundle/companion" -type f -perm /111 -print0)
++fi
++
+ installed_kib="$(du -sk --exclude=DEBIAN "$deb_root" | cut -f1)"
+ cat > "$deb_root/DEBIAN/control" <<EOF
+ Package: $package_name

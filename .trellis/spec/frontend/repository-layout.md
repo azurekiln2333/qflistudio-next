@@ -2,56 +2,69 @@
 
 ## 1. Scope / Trigger
 
-Apply this contract when changing an app's package dependencies, creating a language App, or running cross-product validation. `qflistudio`, `qfli_studio_core`, and the 11 `qfli_*` Apps are sibling Git roots. The main App does not own the language App source tree.
+Apply this contract when reviewing dependency layout, cloud installer checkouts or a new-machine clone. The current app repository is `azurekiln2333/qflistudio-next`; the current shared-core repository is `azurekiln2333/qflistudio-core`. Clone destinations are sibling directories `qflistudio-next/` and `qflistudio-core/`. The Dart package identifier remains `qfli_studio_core`. A clone name is not evidence that the sibling checkout exists.
 
-## 2. Signatures
+The 11 language apps are independent repositories. Do not assume they are cloned beside the main app. Historical `apps/`, `packages/`, and `qfli_*` filesystem paths in source documents describe the former layout only. Package and import identifiers such as `qfli_studio_core` are not directory names to rename.
 
-- `flutter pub get` runs separately in each repository and updates that repository's `pubspec.lock`.
-- `dart run tool/new_language_app.dart <supported-id> [--force]` runs from `qflistudio` and creates `../qfli_<id>` as a Git repository when absent.
-- `tool/sync_ohos.sh <app-name>` and `tool/build_hap.sh <app-name>` operate on `../<app-name>/ohos`.
-- `dart run tool/verify_runtime_matrix.dart` and `dart run tool/verify_ohos_products.dart` inspect the sibling App manifests.
+## 2. Signatures and clone contract
+
+New machines clone the two required GitHub repositories explicitly:
+
+```bash
+git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-next.git qflistudio-next
+git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-core.git qflistudio-core
+git -C qflistudio-core checkout --detach 476a30acee21dc486ee2849dd8064a7be665e4d5
+```
+
+The final command uses the `CORE_REF` found in the reviewed workflow snapshot. For another app revision, use that revision's reviewed full `CORE_REF`. Record any authorized `workflow_dispatch.core_ref` override and its resolved full SHA. Do not infer that the core `main` head is the compatible version.
+
+The app declares the Dart package `qfli_studio_core` through the relative sibling directory `../qflistudio-core`; it also uses the vendored `re_editor` and `xterm` overrides within that sibling. Keep filesystem directory names distinct from package/import names.
+
+All package resolution, package-version checks, generation, formatting, analysis, tests and builds run in GitHub Actions. Do not run these commands on a developer checkout, including `flutter pub get` and commands with `--no-pub`. Disable IDE automatic builds, tests, dependency setup and Sync. Do not start WSL or download build artifacts into this workspace.
+
+Cloud logs must record both repository SHAs, app package/version, core package/version, the selected `CORE_REF`, and the lockfile's core path/version. Verify that the resolved package configuration points to that core checkout. A path dependency's lock entry does not contain the core Git SHA; record the checkout SHA separately. Fail cloud verification on a mismatch.
 
 ## 3. Contracts
 
-- Every App declares `qfli_studio_core` at `../qfli_studio_core` and overrides `re_editor` at `../qfli_studio_core/vendor/re_editor`.
-- `qfli_c` additionally declares `qfli_c_runtime` at `packages/qfli_c_runtime` within its own Git root.
-- `qfli_studio_core` owns the patched `vendor/re_editor` and its own path override.
-- No package declares `resolution: workspace`; there is no root Dart pub workspace.
-- Before editing shared code, inspect local `pubspec_overrides.yaml` and
-  `.dart_tool/package_config.json`. An integration build may resolve
-  `qfli_studio_core` to a Git worktree rather than the sibling checkout. Edit
-  the resolved checkout and preserve local overrides unless the task changes
-  dependency wiring.
+- `qflistudio-next` owns the main app and its app-local tools.
+- `qflistudio-core` owns package `qfli_studio_core`, patched `vendor/re_editor`, and the `vendor/xterm` override.
+- C/C++ runtime source is maintained in the separately versioned `qflistudio-cpp` repository. Its nested package paths are internal to that repository; do not project former `apps/` or `packages/` paths onto the new-machine workspace.
+- No app/core pub workspace is implied by two sibling clones. Verify the checked-out manifests and versions in cloud CI rather than relying on workspace-wide local package resolution.
+- Machine-local `pubspec_overrides.yaml` and `.dart_tool/package_config.json` may refer to private worktrees. Never publish those files or treat their paths as the canonical layout.
 
 ## 4. Validation & Error Matrix
 
-| Condition | Expected result |
+| Condition | Required result |
 | --- | --- |
-| Shared core sibling checkout missing | `flutter pub get` fails; restore `../qfli_studio_core`. |
-| App plugin manifest missing before OHOS Sync | Run `flutter pub get` in that App, then retry Sync. |
-| New App target already exists without `--force` | Generator skips it without overwriting files. |
-| Python MicroPython gitlink absent after clone | Run `git submodule update --init` in `qfli_python`. |
+| The cloud runner lacks the pinned core checkout | Fail before dependency resolution; check out the exact `CORE_REF` into `qflistudio-core/`. |
+| App path dependency does not resolve to the pinned sibling | Fail the cloud package/version check. |
+| App or core package name/version differs from the reviewed pair | Fail and report both manifest versions and SHAs. |
+| An optional language checkout is absent | Do not fail a main-app-only job; run cross-product jobs only with their declared inputs. |
+| Python checkout needs its MicroPython gitlink | Initialize that submodule in the owning Python cloud job. |
 
 ## 5. Good / Base / Bad Cases
 
-- Good: all sibling repos checked out; run `flutter pub get` in each and build one App independently.
-- Base: use the shared core checkout with a local App but leave unrelated Apps absent.
-- Bad: reference `apps/qfli_*` or `packages/qfli_studio_core` from the main App after the split.
+- Good: cloud CI checks out the app and exact reviewed core commit into the two canonical sibling directories, records package/version resolution, then runs its declared jobs.
+- Base: a new workstation contains only `qflistudio-next/` and `qflistudio-core/`; no language-app checkout is implied.
+- Bad: call `qfli_studio_core` the directory name, assume `qflistudio-cpp/` already exists, or run `pub get` to test a new workstation locally.
 
-## 6. Tests Required
+## 6. Tests Required (cloud only)
 
-- Run `flutter pub get --offline` in the main App, shared core, and every language App; assert all resolve to sibling paths.
-- Run `flutter test --no-pub` in each language App; assert the App-specific wiring tests pass.
-- Run `flutter analyze --no-pub lib/main.dart` in the main App and `tool/verify_ohos_products.dart`; assert the tool finds all 12 product IDs.
+- In GitHub Actions, resolve the app's package graph against the pinned core. Assert manifest package identities/versions, the lockfile's core path/version, the resolved package path, and the independently recorded checkout SHA.
+- Run package-version, analysis, tests and installer jobs in GitHub Actions against the exact reviewed SHA pair.
+- Cross-product cloud jobs explicitly check out each required language repository, run its own dependency resolution and wiring tests, and run `tool/verify_runtime_matrix.dart` or `tool/verify_ohos_products.dart` when required. Preserve the 12-product identity assertion; a main-app-only job does not require optional language checkouts.
+- Record job/run IDs and actual results. A green run for a different app/core SHA pair does not validate this pair.
+- Do not describe a release or device verification as complete from a local checkout or stale cloud run.
 
 ## 7. Wrong vs Correct
 
-Wrong: `qfli_studio_core: {path: ../../packages/qfli_studio_core}` in a language App.
+Wrong: use `qfli_studio_core/` as the canonical clone destination, or infer that all 11 language repositories exist beside the app.
 
-Correct: `qfli_studio_core: {path: ../qfli_studio_core}` and a matching sibling `re_editor` override.
+Correct: clone `qflistudio-next/` and `qflistudio-core/`, preserve the package identifier `qfli_studio_core`, pin the reviewed core SHA in CI, and check package versions in the cloud.
+
 ## 8. CI Installer Layout
 
-The installer workflow checks out the app as `qflistudio/` and the shared core as sibling `qfli_studio_core/`. This layout is required by both path dependencies in `pubspec.yaml`.
+The installer workflow deliberately checks out the app as `qflistudio/` and the core as sibling `qflistudio-core/` inside the cloud runner. `qflistudio/` is a CI checkout alias, not the canonical new-machine directory `qflistudio-next/` and not evidence of an existing local folder. Both app names resolve `../qflistudio-core` to the same sibling. Keep workflow working directories and composite-action paths consistent with this alias.
 
 Windows, Linux, macOS, iOS and Android consume one upstream stable version resolved at the start of the run. OHOS uses the pinned OHOS Flutter fork and its own cache. Keep these SDKs separate.
 
@@ -106,7 +119,7 @@ both architectures. Log the inspected binary, tool path and native exit code.
 A nonzero tool exit or missing imported runtime must stop packaging. Do not
 turn a runner/native-tool crash into a skipped dependency check.
 
-## 9. Preview release verification
+## 10. Preview release verification
 
 `app-installers.yml` pins `CORE_REF` and `JAVA_REF` to full GitHub commit IDs.
 The complete app/core suites use the OHOS Flutter fork, with
@@ -114,7 +127,7 @@ The complete app/core suites use the OHOS Flutter fork, with
 enables OHOS generation after installing platform tools. Keep infos visible
 across the different SDK exports; warnings and errors remain fatal.
 
-A `v5.0.5-remote.*` or `v5.0.5-git.*` tag publishes this preview. Publication waits for the
+A release tag matching the current `APP_VERSION` publishes this preview. Publication waits for the
 app/core suites, Node suites on Windows/Linux, the Java receiver host tests,
 the Windows assistant build and every main app installer target. It checks
 each artifact's version, source revisions, SDK and checksums before publishing.
@@ -136,7 +149,7 @@ ad-hoc signing, and iOS/OHOS require signing before installation. Cloud host
 tests do not establish device or live-provider acceptance. Do not include
 developer identities or local signing material in any preview artifact.
 
-## 10. Git plugin release contract
+## 11. Git plugin release contract
 
 ### Scope / Trigger
 
@@ -208,3 +221,45 @@ an IPA build or a native symbol check alone is not a runtime integration test.
 Wrong: add project repositories globally to fix Flutter plugin resolution.
 The SDK settings use `FAIL_ON_PROJECT_REPOS`. Correct: add Maven Central only
 to `settings.pluginManagement.repositories` from the CI init script.
+
+## 12. GitHub client ID in installer builds
+
+### Scope / Trigger
+
+Apply this contract when changing app build commands in `app-installers.yml`.
+
+### Signatures
+
+Bash build commands pass `--dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID"`.
+The Windows ARM64 CMD build uses `%QFLI_GITHUB_CLIENT_ID%` instead.
+
+### Contracts
+
+The workflow reads repository variable `vars.QFLI_GITHUB_CLIENT_ID` and falls back to the committed public app identifier. Pass the value to the seven build-command families in the retained contract: Windows x64, Windows ARM64, Linux, macOS, iOS, Android and OHOS. Every architecture/ABI matrix expansion must inherit that define too; seven is not a fixed installer-artifact count. The standalone Windows assistant does not use GitHub login. Never substitute a client secret or personal access token for this public identifier.
+
+This section preserves the release contract from `1052f3b`, renumbered after the existing sections. Documenting or inspecting the wiring does not establish a successful cloud run.
+
+### Validation & Error Matrix
+
+| Condition | Required result |
+| --- | --- |
+| Repository variable is absent or empty | Use the committed public client ID. |
+| Repository variable is set | Compile with that public client ID. |
+| Environment variable is set without `--dart-define` | The app receives an empty ID and disables OAuth. |
+
+### Good / Base / Bad Cases
+
+- Good: override the repository variable and pass it to every main-app build command.
+- Base: build with the committed public ID and no repository variable.
+- Bad: configure only the process environment or use Bash variable syntax in the CMD step.
+
+### Tests Required
+
+Only in GitHub Actions: parse the workflow YAML, syntax-check Bash blocks, and inspect every main-app build command and matrix variant for the define and correct shell syntax. Assert both repository-variable override and empty/unset-variable fallback. Verify OAuth behavior in a cloud test or separately authorized device acceptance. Do not run these checks or builds on a developer PC.
+
+### Wrong vs Correct
+
+Wrong: expect Dart `String.fromEnvironment` to read the runner process environment.
+
+Correct: pass the public value through Flutter's `--dart-define` option.
+

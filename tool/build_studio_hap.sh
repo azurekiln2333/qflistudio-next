@@ -15,7 +15,7 @@
 #   ohos/entry/build/default/outputs/default/entry-default-signed.hap
 #
 # 关于依赖的内核仓库：
-#   pubspec.yaml 里 qfli_studio_core 指向 ../qfli_studio_core。要打包集成分支里的
+#   pubspec.yaml 里 qfli_studio_core 指向 ../qflistudio-core。要打包集成分支里的
 #   内核，就在 studio 根目录放一个**未跟踪**的 pubspec_overrides.yaml（见
 #   docs/agent-workbench-device.md）。本脚本只检查它是否存在、指向哪里，不创建它。
 set -euo pipefail
@@ -63,7 +63,7 @@ if [[ -f "$OVERRIDES" ]]; then
     echo "          ↑ 指向 worktree，这是集成前的正常状态"
   fi
 else
-  echo "内核    : ../qfli_studio_core（没有 pubspec_overrides.yaml）"
+  echo "内核    : ../qflistudio-core（没有 pubspec_overrides.yaml）"
 fi
 echo
 

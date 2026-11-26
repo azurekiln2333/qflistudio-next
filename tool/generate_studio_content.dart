@@ -229,13 +229,13 @@ const _sharedSource = _ContentSource(
   tutorials: [
     _SourceFile(
       'qfli_studio_core',
-      '../qfli_studio_core/assets/content/tutorials.json',
+      '../qflistudio-core/assets/content/tutorials.json',
     ),
   ],
   examples: [
     _SourceFile(
       'qfli_studio_core',
-      '../qfli_studio_core/assets/content/examples.json',
+      '../qflistudio-core/assets/content/examples.json',
     ),
   ],
 );

@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-11-23T20:50:16.248071+00:00",
+  "repo": "qflistudio-next",
+  "workflow": "App installers",
+  "branch": "feat/large-screen-workbench",
+  "sha": "384671b0114e86d45327376b615d4ec400c2a1d7",
+  "run_id": 45263306245,
+  "run_attempt": 1,
+  "status": "pending",
+  "conclusion": null,
+  "url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45263306245",
+  "jobs": []
+}

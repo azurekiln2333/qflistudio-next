@@ -1,6 +1,17 @@
 # 多语言 App：各语言在鸿蒙上的可行性与现状
 
-> 本文保留 2026-09-21 的技术研究记录，其中的 `apps/`、`packages/` 和 pub workspace 路径是拆分前布局。当前 13 个并列 Git 仓库的检出与构建命令见 [README](../README.md#仓库结构)。
+> 本文保留 2026-09-21 的技术研究记录。
+> 文中的 `apps/`、`packages/` 和 pub workspace 路径属于历史布局。
+> 当前主应用和共享内核分别克隆到 `qflistudio-next/` 与 `qflistudio-core/`。
+> 语言 App 按需从各自 GitHub 仓库克隆。本文的构建和验证命令只作历史记录。
+
+新电脑先按 [README](../README.md#github-仓库与新电脑克隆) 克隆主应用和共享内核。
+以上名称是克隆目标，不代表本机已有目录。
+构建、测试、分析、代码生成和依赖解析只在 GitHub Actions 执行。
+本机不要执行本文命令，包括 `--no-pub` 变体。
+请关闭 IDE 自动构建、自动测试、依赖安装和 Sync。
+下文状态、路线图和用例数均属于 2026-09-21 的快照。
+不要把历史结果作为当前提交的验收证据。
 
 回答一个问题：**C / C++ / Python / Java / Lua / Web / Dart 这七个语言，各自能不能在鸿蒙上先做起来、
 做到哪一步、还差什么。**
@@ -92,9 +103,12 @@ Python、Java、Dart、C++、Lua 五个 App 已经建好，档位、模板、入
 集成在同一个应用里，多个解释器（再加未来十几个语言）会让体积膨胀到不可接受。
 每个语言一个 App，共享同一套 IDE 内核，各自只带自己需要的运行时。
 
-### 目录
+### 历史目录结构
 
-```
+以下目录只保留研究上下文，不代表当前磁盘布局。
+当前语言仓库按需克隆到并列的 `qflistudio-*` 目录。
+
+```text
 packages/qfli_studio_core     IDE 内核：编辑器、文件树、高亮、主题、项目管理、教程加载
 packages/qfli_c_runtime       C 运行时（纯 Dart 解释器 + 可选原生后端）
 apps/qfli_c                   C 版
@@ -107,8 +121,9 @@ apps/qfli_dart                Dart 版
 tool/new_language_app.dart    App 生成器
 ```
 
-这些包在一个 Dart pub workspace 里，一次 `flutter pub get` 全部解析，共用一份
-`pubspec.lock`；只有根 pubspec 的 `dependency_overrides` 生效。
+当时这些包属于一个 Dart pub workspace。
+一次 `flutter pub get` 解析全部包，共用一份 `pubspec.lock`。
+只有根 pubspec 的 `dependency_overrides` 生效。
 
 ### 每个 App 只有三个文件不同
 
@@ -220,6 +235,12 @@ id 唯一性、缓存命中。
 | `apps/qfli_dart` | 10 |
 | **合计** | **224** |
 
+#### 历史构建记录
+
+以下命令只记录旧 pub workspace 流程。
+当前验证只在 GitHub Actions 执行。
+`--no-pub` 不授权本地验证。
+
 ```bash
 # 全量静态检查
 flutter analyze
@@ -234,7 +255,7 @@ flutter test --no-pub
 
 ## 六、教程 JSON 的格式
 
-路径：`packages/qfli_studio_core/assets/tutorials/<language>.json`
+历史路径：`packages/qfli_studio_core/assets/tutorials/<language>.json`
 
 ```jsonc
 {
@@ -328,7 +349,11 @@ C++ 和 Lua 的 App 壳、模板、本地教程和示例代码已经存在。下
 
 ---
 
-## 八、加第 8 个语言要做什么
+## 八、加第 8 个语言要做什么（历史流程）
+
+本节保留生成器接线与依赖故障记录。
+不要在本机运行生成器、依赖安装、Sync 或构建命令。
+当前生成与验证只在 GitHub Actions 执行。
 
 内核里已经有 16 个 `ProjectTemplate`（Java / Python / C / C++ / Web / Dart / Lua /
 JavaScript / TypeScript / Kotlin / Go / Rust / C# / PHP / Ruby / 空项目），
@@ -477,7 +502,7 @@ tool/sync_ohos.sh qfli_python     # 重跑 Sync，重建 .hvigor/dependencyMap �
 
 ---
 
-## 九、已知限制与未验证项
+## 九、已知限制与未验证项（历史快照）
 
 **还没验证的**
 

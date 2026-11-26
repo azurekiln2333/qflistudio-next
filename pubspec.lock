@@ -449,7 +449,7 @@ packages:
   qfli_studio_core:
     dependency: "direct main"
     description:
-      path: "../qfli_studio_core"
+      path: "../qflistudio-core"
       relative: true
     source: path
     version: "1.0.0+1"
@@ -464,7 +464,7 @@ packages:
   re_editor:
     dependency: "direct overridden"
     description:
-      path: "../qfli_studio_core/vendor/re_editor"
+      path: "../qflistudio-core/vendor/re_editor"
       relative: true
     source: path
     version: "0.10.0"
@@ -604,7 +604,7 @@ packages:
   xterm:
     dependency: "direct overridden"
     description:
-      path: "../qfli_studio_core/vendor/xterm"
+      path: "../qflistudio-core/vendor/xterm"
       relative: true
     source: path
     version: "4.0.0"

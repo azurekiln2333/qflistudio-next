@@ -1,0 +1,115 @@
+{
+  "purpose": "C421 exact minimal Home named-workspace dependency; artifacts only",
+  "created_utc": "2026-10-24T01:32:58.182426+00:00",
+  "authorization": "C, as sole core publisher, may integrate ONLY this exact six-hunk Home candidate plus exact saved_workspaces_tab.dart frozen here into its next candidate. No wholesale current Home staging. This extends the published v4 closure without changing its authorized versions. No other Home/catalog/cloud/menu/cards/points/tools/assets/spec/page WIP is authorized.",
+  "base": {
+    "core_head": "36697b04836a9dc6178f96071eca010f1685218c",
+    "home": {
+      "path": "lib/pages/home_page.dart",
+      "bytes": 46055,
+      "sha256": "6E34DF40613FD37117991577B4AE109DB0228CE8DAEBF1491B5B4ECA00058E97",
+      "git_blob": "38163e47bdd203d0c5f181d6162de2bae5ab83fd"
+    }
+  },
+  "files": [
+    {
+      "path": "lib/pages/home_page.dart",
+      "bytes": 46854,
+      "sha256": "A1C78304A21C06248607651431D81395A243B17579EF238E8D71C12CD62B53B5",
+      "git_blob": "e46f263dfa7ce8ad41b619c3cde71e236e3b261b",
+      "frozen_path": "<LOCAL_PATH>",
+      "scope": "Only the six-hunk candidate diff from the recorded base Home"
+    },
+    {
+      "path": "lib/workspace/saved_workspaces_tab.dart",
+      "bytes": 12763,
+      "sha256": "D63E6E55D4CFADF4982FF841A2C3835D6D7EE727D966682A5A1914494B4536A5",
+      "git_blob": "bc87afdf211d2af490c367538efb63a274607d82",
+      "frozen_path": "<LOCAL_PATH>",
+      "scope": "Exact complete new tab module"
+    }
+  ],
+  "patches": [
+    {
+      "path": "<LOCAL_PATH>",
+      "sha256": "B890519610DCDA1D708B1697C646A0F0C2C243F544A4D61C2F9BE53ACB5A7E7B",
+      "scope": "Home only; six hunks"
+    },
+    {
+      "path": "<LOCAL_PATH>",
+      "sha256": "4A6F989C349B579CDF487FE7DA84655526F1404E0C1F9FC2A77E503D92CE809F",
+      "scope": "Same Home plus exact tab addition"
+    }
+  ],
+  "current_home_wip_observed": {
+    "path": "lib/pages/home_page.dart",
+    "bytes": 50071,
+    "sha256": "84CDFC0F3E6FD16C001E2200B45447A470FE66E7EFF363BBB54773F02085BE3C",
+    "git_blob": "fd44d302a808e6aabfa2d0d74ea99eefc73c7016"
+  },
+  "capability_dependency": {
+    "manifest": "<LOCAL_PATH>",
+    "manifest_sha256": "140AB255BA98F176181158CFFC302F756C01DEB6891069A8B5BBAB784AEE4F80",
+    "patch": "<LOCAL_PATH>",
+    "patch_sha256": "CC8779BCB2EC18A00DC761547352FCAFB6967DCD5D99081B963CED25557CD9F4",
+    "composition": "This final capability-controlled Home mapping SUBSUMES the JSON Home hunk. Do not apply that old Home hunk a second time or import its broader main-cloud rule. Apply only the other three separately C-authorized capability paths (studio_profile, saved_workspace, file_explorer) alongside this Home candidate.",
+    "required_api": "supportsSavedWorkspaces getter backed by StudioProfile.supportsSavedWorkspaces default true; tab also requires existing v4 workspace models/store/dialogs/retained-host/page closure."
+  },
+  "scope_policy": "Preserve HEAD cloud behavior: cloud iff offlineOnly != true. Workspace iff supportsSavedWorkspaces, independently of offlineOnly and showHomeTabs. No _reloadProjects change is required: its existing scope guard already excludes workspace; tab owns workspace refresh.",
+  "verification": {
+    "isolated_patch_check_exit": 0,
+    "source_index_page_mutation": false,
+    "heavy_commands_run": false,
+    "runtime_candidate_pass": false,
+    "existing_evidence_boundary": "JSON435 real-profile Home worktree PASS is observed historical evidence; it does not validate this smaller isolated candidate. C must verify its eventual composed candidate in its serial slot."
+  },
+  "guards_before": {
+    "core_head": "36697b04836a9dc6178f96071eca010f1685218c",
+    "real_index_sha256": "450863656656139853C6E63F913DB4FBBF1F83EADD7AC0992C7D08C59F279ADF",
+    "files": {
+      "lib/pages/home_page.dart": "84CDFC0F3E6FD16C001E2200B45447A470FE66E7EFF363BBB54773F02085BE3C",
+      "lib/workspace/saved_workspaces_tab.dart": "D63E6E55D4CFADF4982FF841A2C3835D6D7EE727D966682A5A1914494B4536A5",
+      "lib/editor/editor_page.dart": "487267B43BD2E80C60F412B74CF89FD8D9C3DE349BD8E5943993249C99A6547E",
+      "lib/editor/editor_controller.dart": "1F5C479936575046F6AF374E1D41538B00C69AF93124B0B0781A2C6D400311F2",
+      "lib/editor/file_explorer.dart": "57E662D534E721284DC41B7F90374D117E6D392925D09703C6998928BEADAE5C",
+      "lib/editor/retained_editor_host.dart": "AF9F514AF1CD1EC7D94BBD2378CFC3029960AE7EAAB0826761475AB01676FC77",
+      "lib/editor/terminal_pane.dart": "023242FD0BB0BA1EA9165C898C9DC799EECA67974E5D993D841A38AA48FC6EFF",
+      "lib/services/studio_profile.dart": "0368FE6860309229369814DEDD656EC370F47D2DB7F6F3D9E0141CD5CDA9C81C",
+      "lib/workspace/saved_workspace.dart": "F658B3DDCA9DCF8152282304428523836B4B3B93AB95A1D034B43316F3BC5720",
+      "lib/pages/local_content_pages.dart": "82D0BE20BF537410BD1B37C10372AB9B781A3A4F61708BAF8EA166B1D45652B6",
+      "lib/pages/points_page.dart": "41C0EB63CBD0BBB3F3367E8D5F0478DE1BBB47103C6BE8E360D14930D54E0AB7",
+      "lib/pages/tasks_page.dart": "2A65482B0AF228656896CB4C236F5DCCD569115DBFCC67F9BD64F042077FE61F",
+      "lib/pages/tools_grid.dart": "B12C17A4B58E70CBD8165D880249BEF2D969F74F1FFF8B06911A57406C8A89E1",
+      ".trellis/spec/frontend/saved-workspaces.md": "15F50F9DD6BA702496D438FC79FA8023BDDB091AF1E81F0B40CE154CCC933F46"
+    }
+  },
+  "guards_after": {
+    "core_head": "36697b04836a9dc6178f96071eca010f1685218c",
+    "real_index_sha256": "450863656656139853C6E63F913DB4FBBF1F83EADD7AC0992C7D08C59F279ADF",
+    "files": {
+      "lib/pages/home_page.dart": "84CDFC0F3E6FD16C001E2200B45447A470FE66E7EFF363BBB54773F02085BE3C",
+      "lib/workspace/saved_workspaces_tab.dart": "D63E6E55D4CFADF4982FF841A2C3835D6D7EE727D966682A5A1914494B4536A5",
+      "lib/editor/editor_page.dart": "487267B43BD2E80C60F412B74CF89FD8D9C3DE349BD8E5943993249C99A6547E",
+      "lib/editor/editor_controller.dart": "1F5C479936575046F6AF374E1D41538B00C69AF93124B0B0781A2C6D400311F2",
+      "lib/editor/file_explorer.dart": "57E662D534E721284DC41B7F90374D117E6D392925D09703C6998928BEADAE5C",
+      "lib/editor/retained_editor_host.dart": "AF9F514AF1CD1EC7D94BBD2378CFC3029960AE7EAAB0826761475AB01676FC77",
+      "lib/editor/terminal_pane.dart": "023242FD0BB0BA1EA9165C898C9DC799EECA67974E5D993D841A38AA48FC6EFF",
+      "lib/services/studio_profile.dart": "0368FE6860309229369814DEDD656EC370F47D2DB7F6F3D9E0141CD5CDA9C81C",
+      "lib/workspace/saved_workspace.dart": "F658B3DDCA9DCF8152282304428523836B4B3B93AB95A1D034B43316F3BC5720",
+      "lib/pages/local_content_pages.dart": "82D0BE20BF537410BD1B37C10372AB9B781A3A4F61708BAF8EA166B1D45652B6",
+      "lib/pages/points_page.dart": "41C0EB63CBD0BBB3F3367E8D5F0478DE1BBB47103C6BE8E360D14930D54E0AB7",
+      "lib/pages/tasks_page.dart": "2A65482B0AF228656896CB4C236F5DCCD569115DBFCC67F9BD64F042077FE61F",
+      "lib/pages/tools_grid.dart": "B12C17A4B58E70CBD8165D880249BEF2D969F74F1FFF8B06911A57406C8A89E1",
+      ".trellis/spec/frontend/saved-workspaces.md": "15F50F9DD6BA702496D438FC79FA8023BDDB091AF1E81F0B40CE154CCC933F46"
+    }
+  },
+  "exclusions": [
+    "all other current Home WIP",
+    "catalog routing and main profile fallback",
+    "main cloud filtering/create/fetch suppression",
+    "popup label ellipsis and other cards/menu changes",
+    "points/tools/content/assets",
+    "same-id retained metadata follow-up",
+    "all source/index/page writes"
+  ]
+}

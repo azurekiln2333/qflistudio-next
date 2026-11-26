@@ -1,0 +1,4 @@
+{"file":".trellis/tasks/11-24-large-screen-workbench/prd.md","reason":"Product boundary and acceptance mappings for final review"}
+{"file":".trellis/tasks/11-24-large-screen-workbench/design.md","reason":"Shell ownership, GitHub lifecycle, folder-drop contract"}
+{"file":".trellis/spec/frontend/editor-paging.md","reason":"Retained editor identity, page caching and drafts"}
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"Separate Core and App sibling repositories"}

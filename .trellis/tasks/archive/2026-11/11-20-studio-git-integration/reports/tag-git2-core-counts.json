@@ -1,0 +1,20 @@
+[
+  {
+    "run": 44820763009,
+    "job": 136580776505,
+    "visible_passed": 2394,
+    "visible_skipped": 26,
+    "errors": 0,
+    "finished_including_hidden": 2667,
+    "success": true
+  },
+  {
+    "run": 44820635209,
+    "job": 136580330193,
+    "visible_passed": 2394,
+    "visible_skipped": 26,
+    "errors": 0,
+    "finished_including_hidden": 2667,
+    "success": true
+  }
+]

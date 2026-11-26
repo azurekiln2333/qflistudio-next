@@ -1,0 +1,5 @@
+{"file":".trellis/spec/frontend/repository-layout.md","reason":"Repository roots"}
+{"file":".trellis/spec/frontend/git-clone-progress.md","reason":"Clone ownership/lifecycle"}
+{"file":".trellis/spec/frontend/project-storage.md","reason":"Project paths/registry"}
+{"file":".trellis/spec/frontend/authentication.md","reason":"Auth safety"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Cross-layer contracts"}

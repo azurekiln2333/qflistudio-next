@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized progress summary",
+  "source_relative_path": "main-final-remaining-gate-20261023T084155Z-85594cfa/final-gates-report.json",
+  "schema": 1,
+  "suite": "final-remaining",
+  "status": "PASS",
+  "full_final_pass": false,
+  "completed_utc": "2026-10-23T08:42:18.526956+00:00",
+  "result_scope": "remaining-six-gates-only",
+  "prior_format_failure_remains_unresolved": true,
+  "commands_count": 6,
+  "planned_commands_count": 6,
+  "errors_count": 0,
+  "main_scope_count": 6,
+  "core_scope_count": 41,
+  "policy": "Raw commands, paths, process data, logs and transcript fields omitted."
+}

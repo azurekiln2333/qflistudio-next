@@ -70,7 +70,7 @@ defaults:
     working-directory: qflistudio
 
 env:
-  # The app reads the core through path: ../qfli_studio_core, so both
+  # The app reads the core through path: ../qflistudio-core, so both
   # repositories are checked out as siblings inside the workspace.
   OHOS_TOOLS_VERSION: "26.0.0.821"
   OHOS_API_LEVEL: "26"
@@ -88,14 +88,40 @@ env:
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
   # package whose embedded Git payload reports another version.
   QFLI_GIT_API_VERSION: "3"
+  # Public GitHub app identifier. A repository variable can override the default.
+  # Main app builds pass it through --dart-define for String.fromEnvironment.
+  QFLI_GITHUB_CLIENT_ID: ${{ vars.QFLI_GITHUB_CLIENT_ID || 'Iv23li1bQRrcVnX5ZUsQ' }}
   APP_ID: com.azurekiln.qflistudio
   OHOS_BUNDLE_NAME: com.azurekiln.qflistudio
   ANDROID_NDK_VERSION: "27.0.12077973"
   ANDROID_CMAKE_VERSION: "3.22.1"
 
 jobs:
+  cloud-guard:
+    name: Require GitHub-hosted execution
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Assert the cloud runner context
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        env:
+          EXPECTED_WORKSPACE: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          test "${GITHUB_ACTIONS:-}" = true
+          test "${CI:-}" = true
+          test "${RUNNER_ENVIRONMENT:-}" = github-hosted
+          test -n "${GITHUB_RUN_ID:-}"
+          test -n "${GITHUB_SHA:-}"
+          test -n "${RUNNER_TEMP:-}"
+          test -d "${GITHUB_WORKSPACE:-}"
+          test "${GITHUB_WORKSPACE:-}" = "$EXPECTED_WORKSPACE"
+          printf 'cloud_run=%s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+
   # One Flutter version for all ten official packages, so a run is consistent.
   resolve-flutter:
+    needs: cloud-guard
     name: Resolve the Flutter stable version
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -140,6 +166,7 @@ jobs:
 
   verify-flutter:
     name: Verify ${{ matrix.package }} with OHOS Flutter
+    needs: cloud-guard
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
@@ -147,7 +174,7 @@ jobs:
       matrix:
         include:
           - package: core
-            directory: qfli_studio_core
+            directory: qflistudio-core
           - package: app
             directory: qflistudio
     steps:
@@ -182,7 +209,7 @@ jobs:
       - name: Resolve all Dart packages read by the analyzer
         id: dependencies
         run: |
-          (cd ../qfli_studio_core && flutter pub get)
+          (cd ../qflistudio-core && flutter pub get)
           (cd companion/windows_assistant && flutter pub get)
 
       - name: Analyze the complete package
@@ -284,6 +311,7 @@ jobs:
 
   verify-java-interop:
     name: Verify pinned Java foreground receiver
+    needs: cloud-guard
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     defaults:
@@ -320,6 +348,7 @@ jobs:
 
   verify-companion:
     name: Verify Node companion on ${{ matrix.os }}
+    needs: cloud-guard
     runs-on: ${{ matrix.os }}
     timeout-minutes: 25
     strategy:
@@ -372,7 +401,9 @@ jobs:
 
   verify-assistant:
     name: Verify and package Windows assistant
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: windows-2022
     timeout-minutes: 45
     steps:
@@ -456,7 +487,9 @@ jobs:
 
   windows:
     name: Windows ${{ matrix.arch }} installer
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -504,7 +537,8 @@ jobs:
       - name: Build Windows release
         if: matrix.arch == 'x64'
         run: |
-          bash tool/ci/run_logged.sh "flutter build windows" flutter build windows --release
+          bash tool/ci/run_logged.sh "flutter build windows" flutter build windows --release \
+            --dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID"
           if [ ! -s "$RELEASE_DIR/$APP_EXE" ]; then
             echo "::error::flutter build windows produced no $RELEASE_DIR/$APP_EXE"
             exit 1
@@ -516,7 +550,7 @@ jobs:
         shell: cmd
         working-directory: qflistudio
         run: |
-          flutter build windows --release
+          flutter build windows --release --dart-define="QFLI_GITHUB_CLIENT_ID=%QFLI_GITHUB_CLIENT_ID%"
           if not exist "%RELEASE_DIR%\%APP_EXE%" (
             echo Flutter build windows produced no %RELEASE_DIR%\%APP_EXE%
             exit /b 1
@@ -867,7 +901,9 @@ jobs:
 
   linux:
     name: Linux ${{ matrix.arch }} packages
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     strategy:
@@ -913,7 +949,8 @@ jobs:
 
       - name: Build the Linux release bundle
         run: |
-          bash tool/ci/run_logged.sh "flutter build linux" flutter build linux --release
+          bash tool/ci/run_logged.sh "flutter build linux" flutter build linux --release \
+            --dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID"
 
       - name: Inspect the Linux bundle and its ELF machine
         run: |
@@ -1064,7 +1101,9 @@ jobs:
 
   macos:
     name: macOS ${{ matrix.arch }} DMG
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: macos-15
     timeout-minutes: 60
     strategy:
@@ -1096,6 +1135,12 @@ jobs:
           desktop-platforms: macos
           patch-upstream-core: "true"
 
+      - name: Restore Apple dependency cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('qflistudio/ios/Podfile', 'qflistudio/ios/Podfile.lock', 'qflistudio/ios/Runner.xcodeproj/project.pbxproj', 'qflistudio/macos/Podfile', 'qflistudio/macos/Podfile.lock', 'qflistudio/macos/Runner.xcodeproj/project.pbxproj', 'qflistudio/pubspec.lock') }}
+
       - name: Show the Apple toolchain
         run: |
           xcodebuild -version
@@ -1110,7 +1155,8 @@ jobs:
         env:
           FLUTTER_XCODE_ARCHS: ${{ matrix.arch }}
         run: |
-          bash tool/ci/run_logged.sh "flutter build macos" flutter build macos --release
+          bash tool/ci/run_logged.sh "flutter build macos" flutter build macos --release \
+            --dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID"
 
       - name: Thin and inspect the macOS app
         run: |
@@ -1275,7 +1321,9 @@ jobs:
 
   ios:
     name: iOS unsigned IPA
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: macos-15
     timeout-minutes: 60
     env:
@@ -1297,11 +1345,18 @@ jobs:
           cache-scope: ios
           patch-upstream-core: "true"
 
+      - name: Restore Apple dependency cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('qflistudio/ios/Podfile', 'qflistudio/ios/Podfile.lock', 'qflistudio/ios/Runner.xcodeproj/project.pbxproj', 'qflistudio/macos/Podfile', 'qflistudio/macos/Podfile.lock', 'qflistudio/macos/Runner.xcodeproj/project.pbxproj', 'qflistudio/pubspec.lock') }}
+
       - name: Build the iOS release app
         run: |
           CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
             bash tool/ci/run_logged.sh "flutter build ios" \
-              flutter build ios --release --no-codesign
+              flutter build ios --release --no-codesign \
+              --dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID"
 
       - name: Inspect the iOS app
         run: |
@@ -1426,7 +1481,9 @@ jobs:
   # commit that the app release carries.
   git-ios-integration:
     name: Studio Git iOS integration test
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: macos-15
     timeout-minutes: 25
     defaults:
@@ -1597,12 +1654,14 @@ jobs:
 
   android:
     name: Android release APKs
-    needs: resolve-flutter
+    needs:
+      - cloud-guard
+      - resolve-flutter
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
       APK_DIR: build/app/outputs/flutter-apk
-      SIGNING_STATE: "debug key (installable; not a store release key)"
+      SIGNING_STATE: "CI test signing with a debug key (non-production; not a store release key)"
     steps:
       - name: Check out app
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -1618,6 +1677,16 @@ jobs:
           core-ref: ${{ inputs.core_ref || env.CORE_REF }}
           cache-scope: android
           patch-upstream-core: "true"
+
+      - name: Restore Android dependency and native toolchain caches
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            /usr/local/lib/android/sdk/ndk/${{ env.ANDROID_NDK_VERSION }}
+            /usr/local/lib/android/sdk/cmake/${{ env.ANDROID_CMAKE_VERSION }}
+          key: gradle-android-${{ runner.os }}-${{ runner.arch }}-${{ env.ANDROID_NDK_VERSION }}-${{ env.ANDROID_CMAKE_VERSION }}-${{ hashFiles('qflistudio/android/gradle/wrapper/gradle-wrapper.properties', 'qflistudio/android/settings.gradle.kts', 'qflistudio/android/build.gradle.kts', 'qflistudio/android/app/build.gradle.kts', 'qflistudio/pubspec.lock', 'qflistudio-core/pubspec.lock') }}
 
       - name: Select JDK 17 and install the pinned Android build tools
         run: |
@@ -1642,12 +1711,10 @@ jobs:
             exit 1
           fi
 
-      # build.gradle.kts fails a release build without a key store. CI has no
-      # release key, so a debug key is created here and passed through the
-      # ANDROID_* variables the build reads. It also lands in the default
-      # debug key store location, which the Android Gradle plugin falls back
-      # to, so either build variant signs with the same key.
-      - name: Create the debug key store
+      # Strict release signing requires an explicit key and all four ANDROID_*
+      # variables. Generate one temporary debug key for CI test signing and pass
+      # it explicitly below. This is not a production or store release key.
+      - name: Create the temporary CI debug signing key
         run: |
           keystore="$HOME/.android/debug.keystore"
           mkdir -p "$HOME/.android"
@@ -1670,9 +1737,29 @@ jobs:
 
       - name: Build the split release APKs
         run: |
-          bash tool/ci/run_logged.sh "flutter build apk" \
-            flutter build apk --release --android-skip-build-dependency-validation --split-per-abi \
-            --target-platform android-arm,android-arm64,android-x64
+          set -euo pipefail
+          retryable='Received status code (429|502|503|504)|Read timed out|Connection (reset|timed out)|Temporary failure in name resolution|UnknownHostException|ConnectException'
+          for attempt in 1 2 3; do
+            log="$RUNNER_TEMP/flutter-build-apk-$attempt.log"
+            rm -f "$log"
+            set +e
+            bash tool/ci/run_logged.sh "flutter build apk attempt $attempt" \
+              flutter build apk --release --android-skip-build-dependency-validation --split-per-abi \
+              --target-platform android-arm,android-arm64,android-x64 \
+              --dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID" 2>&1 | tee "$log"
+            status=${PIPESTATUS[0]}
+            set -e
+            if [ "$status" -eq 0 ]; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ] || ! grep -Eq "$retryable" "$log"; then
+              echo "::error::Android build failed without a retryable Gradle download error"
+              exit "$status"
+            fi
+            delay=$((attempt * 30))
+            echo "::warning::Retryable Gradle download failure on attempt $attempt; retrying in ${delay}s"
+            sleep "$delay"
+          done
           ls -l "$APK_DIR"
 
       - name: Inspect each APK's ABI, signature and package ID
@@ -1907,6 +1994,9 @@ jobs:
 
   ohos:
     name: OHOS unsigned HAP
+    needs:
+      - cloud-guard
+      - resolve-flutter
     # The HarmonyOS fork predates the arm64 desktop targets and is built here only.
     runs-on: ubuntu-22.04
     timeout-minutes: 60
@@ -1926,6 +2016,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes libgl1-mesa-dev
+
+      - name: Cache HarmonyOS command-line tools
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/ohos-sdk
+          key: ohos-tools-${{ runner.os }}-${{ runner.arch }}-${{ env.OHOS_TOOLS_VERSION }}
 
       - name: Install the HarmonyOS command-line tools
         id: ohos-tools
@@ -2124,7 +2220,8 @@ jobs:
       - name: Build the unsigned release HAP
         run: |
           bash tool/ci/run_logged.sh "flutter build hap" \
-            flutter build hap --release --target-platform ohos-arm64 --no-codesign
+            flutter build hap --release --target-platform ohos-arm64 --no-codesign \
+            --dart-define="QFLI_GITHUB_CLIENT_ID=$QFLI_GITHUB_CLIENT_ID"
           # Neither the fork nor hvigor agrees on one output directory, so the
           # newest unsigned HAP is taken and pinned for the later steps.
           hap=""
@@ -2282,6 +2379,7 @@ jobs:
     name: Publish verified release or preview
     if: github.ref == 'refs/tags/v5.0.14' || startsWith(github.ref, 'refs/tags/v5.0.14-remote.') || startsWith(github.ref, 'refs/tags/v5.0.14-git.')
     needs:
+      - cloud-guard
       - resolve-flutter
       - verify-flutter
       - verify-java-interop

@@ -1,0 +1,13 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "评审清单与测试要求；逐条核对新增代码与新增用例"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "契约类型、枚举与 JSON 解码的校验要求；检查快照读回与设备信息解析"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "状态边界检查；确认快照、订阅与 hub 生命周期没有重复来源"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "释放顺序检查；确认首页 hub 与编辑器 hub 的归属与取消都收尾"}
+{"file": ".trellis/spec/frontend/remote-companion.md", "reason": "已绑定电脑的规则检查；确认会话来源、错误呈现与不造假会话"}
+{"file": ".trellis/spec/frontend/editor-paging.md", "reason": "编辑器首帧与保留会话检查；确认新参数不改变原有打开路径"}
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "仓库边界检查；确认改动只在 core，App 仓库无改动"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "跨层一致性检查；契约、hub、界面、原生四层字段同名同义"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "复用检查；确认没有重复实现会话列表、状态配色与主机装配"}
+{"file": ".trellis/tasks/11-23-mobile-files-agents/prd.md", "reason": "父任务验收标准；逐条对照本任务的交付"}
+{"file": ".trellis/tasks/11-23-home-agents-tab/prd.md", "reason": "本任务验收标准；逐条勾选并给出证据"}
+{"file": ".trellis/tasks/11-23-home-agents-tab/design.md", "reason": "设计契约与兼容性分析；核对实现是否偏离设计"}
+{"file": ".trellis/tasks/11-23-home-agents-tab/implement.md", "reason": "每步的静态检查与评审门；核对是否逐步执行并留有回滚点"}

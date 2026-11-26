@@ -1,0 +1,216 @@
+{
+  "observed_at": "2026-11-24T10:24:37.152412+00:00",
+  "repo": "qflistudio-core",
+  "workflow": "core-check",
+  "branch": "feat/large-screen-workbench",
+  "sha": "beb68c78c6ff9f0d1a62c48e14a7225127986cb6",
+  "run_id": 45263165666,
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45263165666",
+  "jobs": [
+    {
+      "id": 138003009323,
+      "run_id": 45263165666,
+      "workflow_name": "core-check",
+      "head_branch": "feat/large-screen-workbench",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/runs/45263165666",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUxXzgM8AAAAgIZ7PKw",
+      "head_sha": "beb68c78c6ff9f0d1a62c48e14a7225127986cb6",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/jobs/138003009323",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45263165666/job/138003009323",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-23T20:48:31Z",
+      "started_at": "2026-11-23T20:48:34Z",
+      "completed_at": "2026-11-23T20:54:28Z",
+      "name": "check",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T20:48:34Z",
+          "completed_at": "2026-11-23T20:48:37Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T20:48:37Z",
+          "completed_at": "2026-11-23T20:48:42Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T20:48:42Z",
+          "completed_at": "2026-11-23T20:48:43Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T20:48:43Z",
+          "completed_at": "2026-11-23T20:48:44Z"
+        },
+        {
+          "name": "Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T20:48:44Z",
+          "completed_at": "2026-11-23T20:48:48Z"
+        },
+        {
+          "name": "Install the pinned OHOS Flutter SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T20:48:48Z",
+          "completed_at": "2026-11-23T20:48:48Z"
+        },
+        {
+          "name": "Resolve packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T20:48:48Z",
+          "completed_at": "2026-11-23T20:48:50Z"
+        },
+        {
+          "name": "Check changed Dart formatting",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T20:48:50Z",
+          "completed_at": "2026-11-23T20:48:50Z"
+        },
+        {
+          "name": "Analyze",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T20:48:50Z",
+          "completed_at": "2026-11-23T20:49:15Z"
+        },
+        {
+          "name": "Run the complete test suite",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 10,
+          "started_at": "2026-11-23T20:49:15Z",
+          "completed_at": "2026-11-23T20:54:25Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T20:54:25Z",
+          "completed_at": "2026-11-23T20:54:25Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T20:54:25Z",
+          "completed_at": "2026-11-23T20:54:26Z"
+        },
+        {
+          "name": "Post Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-11-23T20:54:26Z",
+          "completed_at": "2026-11-23T20:54:26Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T20:54:26Z",
+          "completed_at": "2026-11-23T20:54:26Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T20:54:26Z",
+          "completed_at": "2026-11-23T20:54:26Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-23T20:54:26Z",
+          "completed_at": "2026-11-23T20:54:26Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-23T20:54:26Z",
+          "completed_at": "2026-11-23T20:54:26Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/check-runs/138003009323",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002579,
+      "runner_name": "GitHub Actions 1000002579",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions",
+      "failure_annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/beb68c78c6ff9f0d1a62c48e14a7225127986cb6/.github",
+          "start_line": 75,
+          "start_column": null,
+          "end_line": 75,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/retained_editor_test.dart :: AppFormFactor.tablet uses one workbench and preserves live project state :: Test failed. See exception logs above.\n    The test description was: AppFormFactor.tablet uses one workbench and preserves live project state\n    The following TestFailure was thrown running a test:\n    Expected: same instance as _FileExplorerState:<_FileExplorerState#c9ea4(lifecycle state: defunct,\n    not mounted)>\n    Actual: _FileExplorerState:<_FileExplorerState#abf43>\n    #4      main.<anonymous closure> (test/retained_editor_test.dart:152:7)\n    test/retained_editor_test.dart line 152",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/beb68c78c6ff9f0d1a62c48e14a7225127986cb6/.github",
+          "start_line": 67,
+          "start_column": null,
+          "end_line": 67,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/retained_editor_test.dart :: AppFormFactor.desktop uses one workbench and preserves live project state :: Test failed. See exception logs above.\n    The test description was: AppFormFactor.desktop uses one workbench and preserves live project state\n    The following TestFailure was thrown running a test:\n    Expected: same instance as _FileExplorerState:<_FileExplorerState#33c53(lifecycle state: defunct,\n    not mounted)>\n    Actual: _FileExplorerState:<_FileExplorerState#017da>\n    #4      main.<anonymous closure> (test/retained_editor_test.dart:152:7)\n    test/retained_editor_test.dart line 152",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/beb68c78c6ff9f0d1a62c48e14a7225127986cb6/.github",
+          "start_line": 8810,
+          "start_column": null,
+          "end_line": 8810,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        }
+      ]
+    }
+  ]
+}

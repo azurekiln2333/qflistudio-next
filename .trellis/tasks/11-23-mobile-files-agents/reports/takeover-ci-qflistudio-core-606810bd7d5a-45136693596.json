@@ -1,0 +1,304 @@
+{
+  "observed_at": "2026-11-23T10:19:05.377630+00:00",
+  "repo": "qflistudio-core",
+  "workflow": "core-check",
+  "branch": "ci/mobile-files",
+  "sha": "606810bd7d5a359851305f4573b4f1460137e0ea",
+  "run_id": 45136693596,
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45136693596",
+  "jobs": [
+    {
+      "id": 137564557287,
+      "run_id": 45136693596,
+      "workflow_name": "core-check",
+      "head_branch": "ci/mobile-files",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/runs/45136693596",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUxXzgM8AAAAgB3yP5w",
+      "head_sha": "606810bd7d5a359851305f4573b4f1460137e0ea",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/jobs/137564557287",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45136693596/job/137564557287",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-23T08:12:07Z",
+      "started_at": "2026-11-23T08:12:10Z",
+      "completed_at": "2026-11-23T08:28:28Z",
+      "name": "check",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T08:12:11Z",
+          "completed_at": "2026-11-23T08:12:13Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T08:12:13Z",
+          "completed_at": "2026-11-23T08:12:18Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T08:12:18Z",
+          "completed_at": "2026-11-23T08:12:19Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T08:12:19Z",
+          "completed_at": "2026-11-23T08:12:20Z"
+        },
+        {
+          "name": "Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T08:12:20Z",
+          "completed_at": "2026-11-23T08:12:27Z"
+        },
+        {
+          "name": "Install the pinned OHOS Flutter SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T08:12:27Z",
+          "completed_at": "2026-11-23T08:12:27Z"
+        },
+        {
+          "name": "Resolve packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T08:12:27Z",
+          "completed_at": "2026-11-23T08:12:28Z"
+        },
+        {
+          "name": "Analyze",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T08:12:28Z",
+          "completed_at": "2026-11-23T08:12:55Z"
+        },
+        {
+          "name": "Run the complete test suite",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-23T08:12:55Z",
+          "completed_at": "2026-11-23T08:28:23Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T08:28:23Z",
+          "completed_at": "2026-11-23T08:28:23Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T08:28:23Z",
+          "completed_at": "2026-11-23T08:28:25Z"
+        },
+        {
+          "name": "Post Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-23T08:28:25Z",
+          "completed_at": "2026-11-23T08:28:25Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-23T08:28:25Z",
+          "completed_at": "2026-11-23T08:28:25Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T08:28:25Z",
+          "completed_at": "2026-11-23T08:28:25Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T08:28:25Z",
+          "completed_at": "2026-11-23T08:28:25Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T08:28:25Z",
+          "completed_at": "2026-11-23T08:28:25Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/check-runs/137564557287",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002262,
+      "runner_name": "GitHub Actions 1000002262",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions",
+      "failure_annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 106,
+          "start_column": null,
+          "end_line": 106,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/external_agent_files_test.dart :: read 与 write 走协调通道 :: 文件不是 UTF-8 文本，工具拒绝读取或覆盖\n    package:qfli_studio_core/vibe_coding/vibe_tools.dart 531:7   VibeProjectFiles._decodeText\n    package:qfli_studio_core/vibe_coding/vibe_tools.dart 517:18  VibeProjectFiles.read",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 100,
+          "start_column": null,
+          "end_line": 100,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/editor_harness_session_target_test.dart :: 内置 Agent 的会话不进 hub，直接选中会话 id :: Test failed. See exception logs above.\n    The test description was: 内置 Agent 的会话不进 hub，直接选中会话 id\n    The following assertion was thrown running a test:\n    A Timer is still pending even after the widget tree was disposed.\n    'package:flutter_test/src/binding.dart':\n    Failed assertion: line 2243 pos 12: '!timersPending'",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 96,
+          "start_column": null,
+          "end_line": 96,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: harnessDeviceOf finds the device host :: Expected: '工作台'\n    Actual: <null>\n    Which: not an <Instance of 'String'>\n    test/harness_remote_device_test.dart 293:5          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 92,
+          "start_column": null,
+          "end_line": 92,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: an old agent that sends no device fields falls back to platform :: Expected: HarnessDeviceOs:<HarnessDeviceOs.windows>\n    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>\n    platform 兜底\n    test/harness_remote_device_test.dart 250:7          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 89,
+          "start_column": null,
+          "end_line": 89,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: a missing os falls back to the platform value :: Expected: HarnessDeviceOs:<HarnessDeviceOs.macos>\n    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>\n    test/harness_remote_device_test.dart 229:5          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 85,
+          "start_column": null,
+          "end_line": 85,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: os other falls back to the platform value :: Expected: HarnessDeviceOs:<HarnessDeviceOs.windows>\n    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>\n    win32\n    test/harness_remote_device_test.dart 219:7          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 81,
+          "start_column": null,
+          "end_line": 81,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: os maps the three reported short names :: Expected: HarnessDeviceOs:<HarnessDeviceOs.windows>\n    Actual: HarnessDeviceOs:<HarnessDeviceOs.unknown>\n    windows\n    test/harness_remote_device_test.dart 204:7          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 77,
+          "start_column": null,
+          "end_line": 77,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: a missing hostName falls back to host :: Expected: 'DESKTOP-7'\n    Actual: <null>\n    Which: not an <Instance of 'String'>\n    test/harness_remote_device_test.dart 193:5          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 73,
+          "start_column": null,
+          "end_line": 73,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness_remote_device_test.dart :: reported device fields reach the host unchanged :: Expected: '工作台'\n    Actual: <null>\n    Which: not an <Instance of 'String'>\n    test/harness_remote_device_test.dart 182:5          main.<fn>",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 67,
+          "start_column": null,
+          "end_line": 67,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/external_explorer_menu_test.dart :: 外部根条目不提供删除 :: Test failed. See exception logs above.\n    The test description was: 外部根条目不提供删除\n    The following assertion was thrown running a test:\n    The finder \"Found 0 widgets with text \"note.md\": []\" (used in a call to \"longPress()\") could not\n    find any matching widgets.\n    #3      main.<anonymous closure> (test/external_explorer_menu_test.dart:119:18)",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/606810bd7d5a359851305f4573b4f1460137e0ea/.github",
+          "start_line": 8575,
+          "start_column": null,
+          "end_line": 8575,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        }
+      ]
+    }
+  ]
+}

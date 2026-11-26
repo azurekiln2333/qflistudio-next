@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "minimal sanitized progress summary",
+  "source_relative_path": "main-first-gate-20261023T080848Z-a061190b/process-handle-report.json",
+  "schema": 1,
+  "status": "RELEASE",
+  "grant": "Dart341 terminal RELEASE to Note/main; main ACCEPT346 after Note primary plain-shell confirmation",
+  "release_allowed": true,
+  "flutter_exit_code": 0,
+  "completed_utc": "2026-10-23T08:08:59.969122+00:00",
+  "within_110_second_plan": true,
+  "test_result": "PASS",
+  "errors_count": 0,
+  "processes_count": 11,
+  "omitted_fields": [
+    "artifacts",
+    "command",
+    "cwd",
+    "descendant_tracking",
+    "durable_message_file",
+    "processes",
+    "root_pid",
+    "source_after",
+    "source_before",
+    "stderr",
+    "stdout",
+    "taskkill"
+  ],
+  "policy": "Commands, working directories, process identifiers, stdout, stderr, session data and raw transcripts omitted."
+}

@@ -1,0 +1,12 @@
+{
+  "run": 44831062943,
+  "head_sha": "32edbe6c9fbbb227da4f3cd2754415119592ff36",
+  "head_branch": "v5.0.5-git.4",
+  "status": "completed",
+  "conclusion": "failure",
+  "successful_jobs": 16,
+  "failed_jobs": 1,
+  "skipped_jobs": 1,
+  "ios_test": "success; All tests passed",
+  "publication": "skipped; no release claim"
+}

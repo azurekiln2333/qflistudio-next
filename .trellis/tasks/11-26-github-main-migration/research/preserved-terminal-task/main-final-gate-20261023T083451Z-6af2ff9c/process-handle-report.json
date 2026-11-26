@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "minimal sanitized progress summary",
+  "source_relative_path": "main-final-gate-20261023T083451Z-6af2ff9c/process-handle-report.json",
+  "schema": 1,
+  "status": "RELEASE",
+  "suite": "final",
+  "grant": "global355 bounded serial window under original user verification and continue authorization; no claimed external handoff; fresh empty heavy inventory",
+  "release_allowed": true,
+  "flutter_exit_code": 1,
+  "gate_exit_code": 1,
+  "completed_utc": "2026-10-23T08:34:53.171356+00:00",
+  "within_110_second_plan": true,
+  "test_result": "FAIL_OR_INCONCLUSIVE",
+  "tests_count": 0,
+  "errors_count": 0,
+  "processes_count": 6,
+  "omitted_fields": [
+    "artifacts",
+    "command",
+    "cwd",
+    "descendant_tracking",
+    "durable_message_file",
+    "processes",
+    "root_pid",
+    "source_after",
+    "source_before",
+    "stderr",
+    "stdout",
+    "taskkill"
+  ],
+  "policy": "Commands, working directories, process identifiers, stdout, stderr, session data and raw transcripts omitted."
+}

@@ -1,0 +1,30 @@
+{
+  "id": "tools-card-columns",
+  "name": "tools-card-columns",
+  "title": "Tools card column preference",
+  "description": "Let users select and persist one or two columns in the tools browser card view.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-22",
+  "completedAt": null,
+  "branch": "main",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "Implementation committed in integration Core. Static checks passed. Runtime and release acceptance remain pending. See closeout.md.",
+  "meta": {
+    "core_root": "D:/MyNewProjects/_wt/studio-git-integration/qfli_studio_core",
+    "core_branch": "release/studio-git-ui-20261120",
+    "core_commit": "ea3901a99a26dfc11f6ada68cee26f9d932a50dd"
+  }
+}

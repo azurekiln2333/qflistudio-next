@@ -1,0 +1,105 @@
+{
+  "roots": [
+    {
+      "repo": "core",
+      "path": "D:\\MyNewProjects\\_wt\\studio-git-integration\\qfli_studio_core",
+      "head": "96f459590bac95a876b5efc786db6ee7186b542c",
+      "index_tree": "166092e7ca40b6bf1737a89c08c80bf064a819fc",
+      "clean": true
+    },
+    {
+      "repo": "app",
+      "path": "D:\\MyNewProjects\\_wt\\studio-git-integration\\qflistudio",
+      "head": "d31ad298afaf38652805b56195c2fa30492b27c9",
+      "index_tree": "8ebff71b1169f3e742e22bdbc6dddee525292a9d",
+      "clean": true
+    }
+  ],
+  "frozen_bundles": [
+    {
+      "bundle": "b",
+      "copies_checked": 26,
+      "final_paths_checked": 9,
+      "all_copy_hashes_match": true,
+      "source_bytes_match": true,
+      "head_content_matches": true
+    },
+    {
+      "bundle": "c",
+      "copies_checked": 19,
+      "final_paths_checked": 13,
+      "all_copy_hashes_match": true,
+      "source_bytes_match": true,
+      "head_content_matches": true
+    },
+    {
+      "bundle": "d",
+      "copies_checked": 31,
+      "final_paths_checked": 21,
+      "all_copy_hashes_match": true,
+      "source_bytes_match": true,
+      "head_content_matches": true
+    }
+  ],
+  "stage_analysis": [
+    {
+      "stage": "R1-1840b34408",
+      "exit_code": 0,
+      "index_tree": "1840b344089e0d6cb46b11cfbba5bd23b832ead9",
+      "evidence": "_index_validation\\R1-1840b34408\\evidence.json"
+    },
+    {
+      "stage": "R3-225f0044e9",
+      "exit_code": 0,
+      "index_tree": "225f0044e9aaaac9eb9a0b89c628efbe142f6903",
+      "evidence": "_index_validation\\R3-225f0044e9\\evidence.json"
+    },
+    {
+      "stage": "R4-a8672b252c",
+      "exit_code": 0,
+      "index_tree": "a8672b252cafa6956490da3d8bc0bcb3a1ac3207",
+      "evidence": "_index_validation\\R4-a8672b252c\\evidence.json"
+    },
+    {
+      "stage": "R5-ab67532da6",
+      "exit_code": 0,
+      "index_tree": "ab67532da6aa87ee3d3c72c794a168de957a48ac",
+      "evidence": "_index_validation\\R5-ab67532da6\\evidence.json"
+    },
+    {
+      "stage": "R6-620b022b90",
+      "exit_code": 0,
+      "index_tree": "620b022b90f4f406ab876c0c0fe7bedcacf9407b",
+      "evidence": "_index_validation\\R6-620b022b90\\evidence.json"
+    },
+    {
+      "stage": "R7-adb1ca8780",
+      "exit_code": 0,
+      "index_tree": "adb1ca8780fb0c97d2882781e1c7aa001309bd0c",
+      "evidence": "_index_validation\\R7-adb1ca8780\\evidence.json"
+    },
+    {
+      "stage": "R8-166092e7ca",
+      "exit_code": 0,
+      "index_tree": "166092e7ca40b6bf1737a89c08c80bf064a819fc",
+      "evidence": "_index_validation\\R8-166092e7ca\\evidence.json"
+    },
+    {
+      "stage": "R1-835ed7c11c",
+      "exit_code": 0,
+      "index_tree": "835ed7c11c1cc8af3c5937dfb252ff81fa87cac2",
+      "evidence": "_app_index_validation\\R1-835ed7c11c\\evidence.json"
+    },
+    {
+      "stage": "R4-8ebff71b11",
+      "exit_code": 0,
+      "index_tree": "8ebff71b1169f3e742e22bdbc6dddee525292a9d",
+      "evidence": "_app_index_validation\\R4-8ebff71b11\\evidence.json"
+    }
+  ],
+  "runtime_tests_run": false,
+  "native_compilation_run": false,
+  "builds_run": false,
+  "pushed": false,
+  "released": false
+}

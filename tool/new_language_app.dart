@@ -599,13 +599,13 @@ dependencies:
     sdk: flutter
 
   qfli_studio_core:
-    path: ../qfli_studio_core
+    path: ../qflistudio-core
 
   cupertino_icons: ^1.0.8
 
 dependency_overrides:
   re_editor:
-    path: ../qfli_studio_core/vendor/re_editor
+    path: ../qflistudio-core/vendor/re_editor
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,735 @@
+{
+  "counts": {
+    "success": 2485,
+    "failure": 67,
+    "skipped": 26,
+    "error": 5
+  },
+  "done": {
+    "success": false,
+    "type": "done",
+    "time": 350782
+  },
+  "failures": [
+    {
+      "name": "controller read_file reads an allowlisted outside file through the tool",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_attachment_read_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_attachment_read_test.dart 188:7           main.<fn>.settle\n"
+      ]
+    },
+    {
+      "name": "controller read_file still refuses an outside file that is not allowlisted",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_attachment_read_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_attachment_read_test.dart 188:7           main.<fn>.settle\n"
+      ]
+    },
+    {
+      "name": "controller read_file keeps the old behaviour for project relative paths",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_attachment_read_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_attachment_read_test.dart 188:7           main.<fn>.settle\n"
+      ]
+    },
+    {
+      "name": "controller read_file facade registers workspace attachments before sending",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_attachment_read_test.dart",
+      "errors": [
+        "Expected: an object with length of <2>\n  Actual: []\n   Which: has length of <0>\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_attachment_read_test.dart 288:7           main.<fn>.<fn>\n"
+      ]
+    },
+    {
+      "name": "whole-turn relay projects history without mutating it",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/ai_chat_stream_relay_test.dart",
+      "errors": [
+        "Invalid argument (string): Contains invalid characters.: \"{\\\"type\\\":\\\"result\\\",\\\"model\\\":\\\"fixture-reasoner\\\",\\\"aiGenerated\\\":true,\\\"message\\\":{\\\"role\\\":\\\"assistant\\\",\\\"content\\\":\\\"我先搜索。\\\",\\\"reasoning_content\\\":\\\"先想清楚再查。\\\",\\\"tool_calls\\\":[{\\\"id\\\":\\\"call_fixture_1\\\",\\\"type\\\":\\\"function\\\",\\\"function\\\":{\\\"name\\\":\\\"web_search\\\",\\\"arguments\\\":\\\"{\\\\\\\"query\\\\\\\": \\\\\\\"示例 查询\\\\\\\"}\\\"}}]},\\\"usage\\\":{\\\"prompt_tokens\\\":9,\\\"completion_tokens\\\":12,\\\"total_tokens\\\":21}}\""
+      ],
+      "trace": [
+        "dart:convert                                Latin1Codec.encode\npackage:http/src/response.dart 39:49        new Response\ntest/ai_chat_stream_relay_test.dart 249:21  main.<fn>.<fn>\npackage:http/src/mock_client.dart 54:36     new MockClient.<fn>\n"
+      ]
+    },
+    {
+      "name": "Herdr grid padding the captured pane with no fill is unchanged",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/remote_control/herdr_test.dart",
+      "errors": [
+        "Expected: ' 测试必须继续过）；前导/行内空格一律不动；宽度未达 \\x1B[0m\\x1B[38;2;167;152;215mmaxWidth\\x1B[0m 的行一律不动（ \\n'\n            ' 保护 \\x1B[0m\\x1B[38;2;167;152;215mwJ:pZ\\x1B[0m 的 2-cell 行）；无填充时该变换为 no-op。用户输入走             \\n'\n            ' \\x1B[0m\\x1B[38;2;167;152;215mherdr_send_text\\x1B[0m（\\x1B[0m\\x1B[38;2;167;152;215msession_screen.dart:165\\x1B[0m），根本不经过 \\x1B[0m\\x1B[38;2;167;152;215mreplayText\\x1B[0m，故显示 \\n'\n            ' 层改动不会污染输入。                                                      \\n'\n            '                                                                           \\n'\n            ' \\x1B[0m\\x1B[1m是否阻塞\\x1B[0m：不阻塞正确性/设备安全（纯显示），但它是原始\"莫名空格换行\"投诉的 \\n'\n            ' 最后一项用户可见问题，且对\\x1B[0m\\x1B[1m所有带填充的 pane\\x1B[0m（本机每个正常 pane 都填充到   \\n'\n            ' 75）都会显现。建议在设备验收前修，并补一个\"75 cells 短行在 ~40 列下只产生 \\n'\n            ' 一条可见行、每个真实空行仍占一行\"的 widget 测试。                         \\n'\n            '                                                                           \\n'\n            ' §1–§5 保持\"已修\"：reconnect 补发 watch、\\x1B[0m\\x1B[38;2;167;152;215msendKeys\\x1B[0m 按 \\x1B[0m\\x1B[38;2;167;152;215mPANE_ID\\x1B[0m 分流到 \\x1B[0m\\x1B[38;2;167;152;215mpane   \\x1B[0m\\n'\n            ' \\x1B[0m\\x1B[38;2;167;152;215msend-keys\\x1B[0m、\\x1B[0m\\x1B[38;2;167;152;215mallowEmpty\\x1B[0m 仅对 void mutation 放行、\\x1B[0m\\x1B[38;2;167;152;215mformat\\x1B[0m 透传，均已在冻结    \\n'\n            ' server 代码与对应测试中核实（\\x1B[0m\\x1B[38;2;167;152;215mserver/src/agent/herdr.ts:778-789\\x1B[0m、          \\n'\n            ' \\x1B[0m\\x1B[38;2;167;152;215m:596-609\\x1B[0m，测试                                                            \\n'\n            ' \\x1B[0m\\x1B[38;2;167;152;215mserver/test/herdr.test.ts:449/460/470/483/494/507/518/525/533\\x1B[0m）。         \\n'\n            '\\n'\n            '\\x1B[0m\\x1B[38;2;108;118;123m───────────────────────────────────────────────────────────────────────────\\x1B[0m\\n'\n            '\\x1B[0m\\x1B[7m \\x1B[0m                                                                          \\n'\n            '\\x1B[0m\\x1B[38;2;108;118;123m───────────────────────────────────────────────────────────────────────────\\x1B[0m\\n'\n            '\\x1B[0m\\x1B[38;2;157;165;169m⎇\\x1B[0m \\x1B[0m\\x1B[38;2;157;165;169mcodex/general-terminal\\x1B[0m\\x1B[38;2;"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/remote_control/herdr_test.dart 3684:5          _gridPaddingTests.<fn>\n"
+      ]
+    },
+    {
+      "name": "the controller answers search_text with real matches",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_search_text_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_search_text_test.dart 160:5               main.<fn>\n"
+      ]
+    },
+    {
+      "name": "keeps the real assistant tool_calls and tool results across rounds",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "Java receiver delivers one terminal event carrying the aggregated output",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/interop_arkts_contract_test.dart",
+      "errors": [
+        "Expected: contains 'formatAggregate'\n  Actual: '/*\\n'\n            ' * qfli-interop/1 receiver for QFLIJVMX.\\n'\n            ' *\\n'\n            ' * Studio sends a project to this app instead of compiling it itself. The two\\n'\n            ' * apps are separate sandboxes, so the project arrives as files that Studio has\\n'\n            ' * already written to its own cache and as a validated directory name. This file\\n'\n            ' * re-validates everything, copies the project into its own cache, compiles with\\n'\n            ' * the bundled JDK and runs the entry class.\\n'\n            ' *\\n'\n            ' * Rules here mirror `qfli_studio_core/lib/interop/interop_protocol.dart`. A rule\\n'\n            ' * on only one side is a hole, so change both together.\\n'\n            ' */\\n'\n            'import { common, Want } from \\'@kit.AbilityKit\\';\\n'\n            'import { BusinessError } from \\'@kit.BasicServicesKit\\';\\n'\n            'import { fileIo as fs } from \\'@kit.CoreFileKit\\';\\n'\n            'import { util } from \\'@kit.ArkTS\\';\\n'\n            'import { getLayout, startJava, pollJava, cancelJava } from \\'libqfli_jdk_layout.so\\';\\n'\n            '\\n'\n            'export const PROTOCOL = \\'qfli-interop/1\\';\\n'\n            'export const LANGUAGE = \\'java\\';\\n'\n            '\\n'\n            '/** The only caller this app answers. */\\n'\n            'const ALLOWED_CALLER = \\'com.azurekiln.qflistudio\\';\\n'\n            '\\n'\n            '/** Studio\\'s bridge ability, which receives our events. */\\n'\n            'const BRIDGE_ABILITY = \\'InteropBridgeAbility\\';\\n'\n            '\\n'\n            'const MAX_FILES = 64;\\n'\n            'const MAX_PAYLOAD_BYTES = 256 * 1024;\\n'\n            'const MAX_PATH_LENGTH = 240;\\n'\n            'const MAX_STDIN_BYTES = 4 * 1024;\\n'\n            'const MIN_TIMEOUT_MS = 1000;\\n'\n            'const MAX_TIMEOUT_MS = 120000;\\n'\n            'const POLL_INTERVAL_MS = 80;\\n'\n            'const OUTPUT_TAIL_BYTES = 128 * 1024;\\n'\n            '\\n'\n            'export interface InteropRequest {\\n'\n            '  sessionId: string;\\n'\n            '  language: string;\\n'\n            '  entry: string;\\n'\n            '  action: string;\\n'\n            '  stdin: str"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/interop_arkts_contract_test.dart 260:7         main.<fn>.<fn>\n"
+      ]
+    },
+    {
+      "name": "a JSON write keeps the file parseable and marks it alongside",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "edit_file also leaves the AI note on the changed file",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "a rejected approval leaves no file and tells the model why",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_controller_agent_hooks_test.dart 48:5     main.settle\n"
+      ]
+    },
+    {
+      "name": "runs failure -> real error -> fix -> rerun",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "an allowed approval writes and reports the changed path",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_controller_agent_hooks_test.dart 48:5     main.settle\n"
+      ]
+    },
+    {
+      "name": "rejects a write after an external disk change as a conflict",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "approval runs before the read-before-write policy check",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_controller_agent_hooks_test.dart 48:5     main.settle\n"
+      ]
+    },
+    {
+      "name": "surfaces a buffer guard rejection as a conflict without writing",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "stops at the round limit instead of looping forever",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '上限'\n  Actual: 'AI 流式响应提前结束'\n   Which: does not contain '上限'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 407:5         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "stops a tool call that repeats identical arguments",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "lists the project root for . and an empty path",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "keeps a planning round alive inside the setup rounds",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "stops setup-only rounds once the setup budget is spent",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '没有进展'\n  Actual: 'AI 流式响应提前结束'\n   Which: does not contain '没有进展'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 509:5         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "checks a written page locally instead of asking for a script",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "reports a missing local reference in the write result",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "points a too long command at a script file",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "tells the model to cite the URLs it actually got",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "finishes successfully when the terminal rejects the login",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "fails when the terminal rejects the login and nothing was written",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '终端不可用'\n  Actual: 'AI 流式响应提前结束'\n   Which: does not contain '终端不可用'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 666:7         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "counts four distinct fetches as progress",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "stops when every fetch repeats the same url",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '没有进展'\n  Actual: 'AI 流式响应提前结束'\n   Which: does not contain '没有进展'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 702:5         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "tells the model to summarise after three fetches",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "finishes successfully when the terminal cannot connect",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "finishes successfully when the terminal gateway fails",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "fails when the terminal times out with nothing written",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '终端不可用'\n  Actual: 'AI 流式响应提前结束'\n   Which: does not contain '终端不可用'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 788:5         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "keeps a written site alive through read-only rounds",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "stops after two rounds without progress",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '没有进展'\n  Actual: 'AI 流式响应提前结束'\n   Which: does not contain '没有进展'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 849:5         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "refuses an edit of an existing file this send never read",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "validates a tool call against the local tool schemas",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "turns malformed tool arguments into a tool error and continues",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "cancels a running terminal command for real",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: true\n  Actual: <false>\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 971:5         main.<fn>\n"
+      ]
+    },
+    {
+      "name": "ignores duplicate sends while a turn is running",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: contains '上一条任务仍在执行'\n  Actual: []\n   Which: does not contain '上一条任务仍在执行'\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 1008:5        main.<fn>\n"
+      ]
+    },
+    {
+      "name": "bounds the command output tail",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "cancelling while an approval is pending does not hang",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts"
+      ],
+      "trace": [
+        "dart:isolate  _RawReceivePort._handleMessage\n"
+      ]
+    },
+    {
+      "name": "rejects at the commit point through shouldWrite",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_coding_controller_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_coding_controller_test.dart 51:5          main.settle\n"
+      ]
+    },
+    {
+      "name": "restored absolute attachment keeps its tail: C:\\work\\src\\Util.java",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: restored absolute attachment keeps its tail: C:\\work\\src\\Util.java"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "restored absolute attachment keeps its tail: \\\\server\\share\\src\\Util.java",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: restored absolute attachment keeps its tail: \\\\server\\share\\src\\Util.java"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "disposing while an approval is pending does not hang",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts"
+      ],
+      "trace": [
+        "dart:isolate  _RawReceivePort._handleMessage\n"
+      ]
+    },
+    {
+      "name": "restored history keeps complete pairs and drops the rest",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_controller_agent_hooks_test.dart 48:5     main.settle\n"
+      ]
+    },
+    {
+      "name": "the history getter exposes what a session would persist",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_controller_agent_hooks_test.dart 48:5     main.settle\n"
+      ]
+    },
+    {
+      "name": "E1 two sessions run at the same time",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_hub_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                fail\ntest/agent_hub_test.dart 61:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "model and reasoning effort reach the relay only when set",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_controller_agent_hooks_test.dart",
+      "errors": [
+        "Expected: VibePhase:<VibePhase.succeeded>\n  Actual: VibePhase:<VibePhase.failed>\nAI 流式响应提前结束 | null:null:null\n"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/vibe_controller_agent_hooks_test.dart 48:5     main.settle\n"
+      ]
+    },
+    {
+      "name": "maps run state to the sidebar status",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_hub_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                fail\ntest/agent_hub_test.dart 61:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "agent 覆盖已有文件时写进与手动保存同一份版本历史",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_write_backup_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                         fail\ntest/agent_write_backup_test.dart 52:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "agent 新建文件不产生历史版本，也不报错",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_write_backup_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                         fail\ntest/agent_write_backup_test.dart 52:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "awaiting approval is visible from the hub",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_hub_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                fail\ntest/agent_hub_test.dart 61:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "E4 the second session gets a conflict and the file is not overwritten",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_hub_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                fail\ntest/agent_hub_test.dart 61:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "starting send does not flicker finishedUnread before completion",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/agent_hub_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                fail\ntest/agent_hub_test.dart 61:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "read only mode refuses writes without asking",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "ask every write surfaces the approval and honours allow",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "approval was never requested"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "ask every write honours deny",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "auto accept edits writes without asking",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "attachments travel as paths, not as file bodies",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "source text and attachments survive a reopen",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "retryLast sends the same attachments again",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "later sends retain each earlier user message source and attachments",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "attachment-only sends and retries retain an empty source on reopen",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "persists messages and restores the model history",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "retryLast resends the previous prompt",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "send shows the user message and running state in the same frame",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "activity names the tool that is running",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "truncates tool output on disk but keeps it in memory",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    },
+    {
+      "name": "send and retryLast ignore duplicate triggers while active",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/vibe_agent_facade_test.dart",
+      "errors": [
+        "condition not met"
+      ],
+      "trace": [
+        "package:matcher                        fail\ntest/vibe_agent_facade_test.dart 63:5  main.waitFor\n"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+{"file": ".trellis/spec/frontend/git-ui.md", "reason": "UI and keyboard contracts"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "Process ownership and cancellation"}
+{"file": ".trellis/spec/frontend/git-clone-progress.md", "reason": "Per-task progress, isolate barriers, TLS and release contracts"}

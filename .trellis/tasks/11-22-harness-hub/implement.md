@@ -23,7 +23,7 @@
 
 ## 检查
 
-- [ ] 本地只运行 `flutter pub get`、`dart format`、`flutter analyze`、`node --check`。
+- [ ] 在 GitHub Actions 运行 `flutter pub get`、`dart format`、`flutter analyze`、`node --check`。
 - [ ] 单元测试写入仓库，交给云端 CI 运行。
 - [ ] 不在本地运行测试、构建、模拟器、虚拟机、WSL 或服务。
 - [ ] 不对真实 Herdr 窗格执行 prompt、send-keys、start 或 attach。

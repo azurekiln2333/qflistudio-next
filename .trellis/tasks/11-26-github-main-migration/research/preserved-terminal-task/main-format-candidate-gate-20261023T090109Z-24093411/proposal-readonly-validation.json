@@ -1,0 +1,28 @@
+{
+  "source_apply_authorized": false,
+  "source_unmodified": true,
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "--whitespace=error",
+        "<LOCAL_PATH>"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "patch_stats": {
+    "files": 13,
+    "insertions": 344,
+    "deletions": 321,
+    "patch_lines": 990,
+    "patch_bytes": 37433
+  },
+  "patch_sha256": "ae7490cba8d1c5274181d4937b7dfb6e328d0784aa6059a06e57bb8bd73b7440",
+  "page_sha256": "6d4e56d1f5cc6e95f4bba48bfda8582df676bbfc25d8bb93f6bc7b46c18c4b89",
+  "core_real_index_sha256": "29299ab25bf221d7b41ebd1341019d2d2e7521ece9b478ad731eb71ad2f90b1c",
+  "main_real_index_sha256": "76abe16c889b735fdee4d5475b38ed58da513e6e1969e069065fe4ff783c7287",
+  "supplemental_comparison": "All13 old/new byte sequences equal after removing whitespace and commas; no new Unicode replacement characters. This is not a parser/runtime proof."
+}

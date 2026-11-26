@@ -1,0 +1,156 @@
+diff --git a/lib/interop/ohos_runtime_catalog.dart b/lib/interop/ohos_runtime_catalog.dart
+index ac9c6a2..166fa68 100644
+--- a/lib/interop/ohos_runtime_catalog.dart
++++ b/lib/interop/ohos_runtime_catalog.dart
+@@ -49,9 +49,8 @@ class OhosRuntimeApp {
+   final String iconAsset;
+ 
+   /// AppGallery 详情页。
+-  Uri get storeUri => Uri.parse(
+-    _storeUrlTemplate.replaceFirst('<bundleName>', bundleName),
+-  );
++  Uri get storeUri =>
++      Uri.parse(_storeUrlTemplate.replaceFirst('<bundleName>', bundleName));
+ 
+   /// [language] 是否与该条目相关（忽略大小写与两端空白）。
+   bool supports(String? language) {
+diff --git a/lib/interop/ohos_runtime_guide.dart b/lib/interop/ohos_runtime_guide.dart
+index cfc44d1..fd7f8e6 100644
+--- a/lib/interop/ohos_runtime_guide.dart
++++ b/lib/interop/ohos_runtime_guide.dart
+@@ -30,10 +30,7 @@ Future<void> _defaultOpenStore(Uri uri) async {
+ ///
+ /// 只推入一个普通 [MaterialPageRoute]。页面跟随根主题与本地化。
+ /// [language] 是当前项目语言，用于把对应工具排到最前并高亮。
+-Future<void> showOhosRuntimeGuide(
+-  BuildContext context, {
+-  String? language,
+-}) {
++Future<void> showOhosRuntimeGuide(BuildContext context, {String? language}) {
+   return Navigator.of(context).push<void>(
+     MaterialPageRoute<void>(
+       builder: (_) => OhosRuntimeGuide(language: language),
+@@ -80,9 +77,9 @@ class _OhosRuntimeGuideState extends State<OhosRuntimeGuide> {
+             // 720 是侧栏展开后仍能放下两列卡片的宽度。
+             final wide = constraints.maxWidth >= 720;
+             // 固定高度的网格单元要随文字缩放一起长，否则大字号会溢出。
+-            final scaled = MediaQuery.textScalerOf(context)
+-                .scale(1.0)
+-                .clamp(1.0, 2.0);
++            final scaled = MediaQuery.textScalerOf(
++              context,
++            ).scale(1.0).clamp(1.0, 2.0);
+             final extent = (wide ? 168.0 : 152.0) * scaled;
+             return CustomScrollView(
+               slivers: <Widget>[
+@@ -157,10 +154,7 @@ class _OhosRuntimeGuideState extends State<OhosRuntimeGuide> {
+   /// Studio 用固定 id 识别，避免运行时被当成本语言工具。
+   static bool _isStudio(OhosRuntimeApp app) => app.id.toLowerCase() == 'studio';
+ 
+-  Future<void> _install(
+-    OhosRuntimeApp app,
+-    StudioLocalizations l,
+-  ) async {
++  Future<void> _install(OhosRuntimeApp app, StudioLocalizations l) async {
+     if (_opening != null) return;
+     setState(() {
+       _opening = app.id;
+@@ -212,9 +206,9 @@ class _OhosRuntimeGuideState extends State<OhosRuntimeGuide> {
+               await Clipboard.setData(ClipboardData(text: link));
+               if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+               if (mounted) {
+-                ScaffoldMessenger.of(context).showSnackBar(
+-                  SnackBar(content: Text(_copied(l))),
+-                );
++                ScaffoldMessenger.of(
++                  context,
++                ).showSnackBar(SnackBar(content: Text(_copied(l))));
+               }
+             },
+             child: Text(_copyLink(l)),
+@@ -340,7 +334,9 @@ class _AppCard extends StatelessWidget {
+                         app.id == 'studio'
+                             ? (StudioLocalizations.of(context).isEnglish
+                                   ? 'Multi-language editor'
+-                                  : StudioLocalizations.of(context).isTraditionalChinese
++                                  : StudioLocalizations.of(
++                                      context,
++                                    ).isTraditionalChinese
+                                   ? '多語言編輯器'
+                                   : '多语言编辑器')
+                             : app.id == 'web'
+diff --git a/test/ohos_runtime_guide_test.dart b/test/ohos_runtime_guide_test.dart
+index 65afcbe..7c19721 100644
+--- a/test/ohos_runtime_guide_test.dart
++++ b/test/ohos_runtime_guide_test.dart
+@@ -40,8 +40,7 @@ const _expectedBundles = <String>[
+ ];
+ 
+ /// AppGallery 链接的固定前缀。
+-const String _storePrefix =
+-    'https://appgallery.huawei.com/app/detail?id=';
++const String _storePrefix = 'https://appgallery.huawei.com/app/detail?id=';
+ 
+ /// 卡片按钮的三种界面文案，随本地化变化。
+ const List<String> _downloadLabels = <String>['下载', '下載', 'Download'];
+@@ -141,10 +140,7 @@ void main() {
+       await _pumpGuide(tester, language: 'python');
+ 
+       expect(find.text('本地运行工具'), findsOneWidget);
+-      expect(
+-        find.textContaining(StudioProductCatalog.pyFlow),
+-        findsWidgets,
+-      );
++      expect(find.textContaining(StudioProductCatalog.pyFlow), findsWidgets);
+       // 提示语点名首选工具，同时不隐藏其它工具。
+       expect(find.textContaining('这个项目使用'), findsOneWidget);
+ 
+@@ -197,7 +193,9 @@ void main() {
+       await _pumpGuide(tester);
+ 
+       for (final app in ohosRuntimeApps) {
+-        final bytes = await rootBundle.load('packages/qfli_studio_core/${app.iconAsset}');
++        final bytes = await rootBundle.load(
++          'packages/qfli_studio_core/${app.iconAsset}',
++        );
+         expect(bytes.lengthInBytes, greaterThan(0));
+         await _bringIntoView(tester, app.name);
+         final image = tester.widget<Image>(
+@@ -419,9 +417,9 @@ Future<void> _pumpGuide(
+         GlobalCupertinoLocalizations.delegate,
+       ],
+       builder: (context, child) => MediaQuery(
+-        data: MediaQuery.of(context).copyWith(
+-          textScaler: TextScaler.linear(textScale),
+-        ),
++        data: MediaQuery.of(
++          context,
++        ).copyWith(textScaler: TextScaler.linear(textScale)),
+         child: child!,
+       ),
+       home: OhosRuntimeGuide(language: language, openStore: opener),
+diff --git a/test/terminal_pane_test.dart b/test/terminal_pane_test.dart
+index 9bcf61f..970b310 100644
+--- a/test/terminal_pane_test.dart
++++ b/test/terminal_pane_test.dart
+@@ -57,12 +57,18 @@ void main() {
+       expect(tester.getSize(entry).shortestSide, greaterThanOrEqualTo(44));
+       await tester.tap(entry);
+       await tester.pumpAndSettle();
+-      expect(tester.widget<OhosRuntimeGuide>(find.byType(OhosRuntimeGuide)).language, 'python');
++      expect(
++        tester.widget<OhosRuntimeGuide>(find.byType(OhosRuntimeGuide)).language,
++        'python',
++      );
+       await tester.pageBack();
+       await tester.pumpAndSettle();
+       expect(fixture.pane, same(pane));
+       expect(pane.sessionCount, 2);
+-      expect(tester.widget<TextField>(find.byType(TextField)).controller, same(input));
++      expect(
++        tester.widget<TextField>(find.byType(TextField)).controller,
++        same(input),
++      );
+       expect(input!.text, 'unfinished command');
+       await tester.tap(find.byTooltip('终端操作'));
+       await tester.pumpAndSettle();

@@ -1,0 +1,100 @@
+{
+  "counts": {
+    "success": 2571,
+    "skipped": 26,
+    "error": 8
+  },
+  "done": {
+    "success": false,
+    "type": "done",
+    "time": 252824
+  },
+  "failures": [
+    {
+      "name": "terminal replacement retains streaming and replay ownership",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: terminal replacement retains streaming and replay ownership"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "claude replacement retains streaming and replay ownership",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: claude replacement retains streaming and replay ownership",
+        "pumpAndSettle timed out"
+      ],
+      "trace": [
+        "",
+        "package:flutter_test/src/widget_tester.dart 721:11     WidgetTester.pumpAndSettle.<fn>\n===== asynchronous gap ===========================\ndart:async                                             new Future.error\npackage:flutter_test/src/test_async_utils.dart 125:16  TestAsyncUtils.guard.completionHandler\n===== asynchronous gap ===========================\ndart:async                                             Future.then\npackage:flutter_test/src/test_async_utils.dart 130:19  TestAsyncUtils.guard\npackage:flutter_test/src/widget_tester.dart 716:27     WidgetTester.pumpAndSettle\ntest/remote_control/session_ownership_test.dart 87:18  _connect.<fn>\n="
+      ]
+    },
+    {
+      "name": "A to B to A releases only the obsolete route owners",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: A to B to A releases only the obsolete route owners"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R1 Claude sessions are not terminals HomeScreen opens a Claude session without Herdr routing or a pane action",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: HomeScreen opens a Claude session without Herdr routing or a pane action",
+        "pumpAndSettle timed out"
+      ],
+      "trace": [
+        "",
+        "package:flutter_test/src/widget_tester.dart 721:11             WidgetTester.pumpAndSettle.<fn>\n===== asynchronous gap ===========================\ndart:async                                                     new Future.error\npackage:flutter_test/src/test_async_utils.dart 125:16          TestAsyncUtils.guard.completionHandler\n===== asynchronous gap ===========================\ndart:async                                                     Future.then\npackage:flutter_test/src/test_async_utils.dart 130:19          TestAsyncUtils.guard\npackage:flutter_test/src/widget_tester.dart 716:27             WidgetTester.pumpAndSettle\ntest/remote_control/re"
+      ]
+    },
+    {
+      "name": "R1 Claude sessions are not terminals a directly built Claude SessionScreen ignores an injected Herdr controller",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: a directly built Claude SessionScreen ignores an injected Herdr controller"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit the drawer offers the exit in the narrow paired layout",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: the drawer offers the exit in the narrow paired layout",
+        "pumpAndSettle timed out"
+      ],
+      "trace": [
+        "",
+        "package:flutter_test/src/widget_tester.dart 721:11             WidgetTester.pumpAndSettle.<fn>\n===== asynchronous gap ===========================\ndart:async                                                     new Future.error\npackage:flutter_test/src/test_async_utils.dart 125:16          TestAsyncUtils.guard.completionHandler\n===== asynchronous gap ===========================\ndart:async                                                     Future.then\npackage:flutter_test/src/test_async_utils.dart 130:19          TestAsyncUtils.guard\npackage:flutter_test/src/widget_tester.dart 716:27             WidgetTester.pumpAndSettle\ntest/remote_control/re"
+      ]
+    },
+    {
+      "name": "R3 module exit an injected exit callback replaces the default pop",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: an injected exit callback replaces the default pop"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit internal back navigation still works inside the module",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: internal back navigation still works inside the module"
+      ],
+      "trace": [
+        ""
+      ]
+    }
+  ]
+}

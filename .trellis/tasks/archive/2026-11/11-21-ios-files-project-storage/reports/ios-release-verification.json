@@ -1,0 +1,11 @@
+{
+  "release_tag": "v5.0.5-git.6",
+  "sha256": "e6014ba172208e9e8e707a475c78bebdf1075c47e86ce14e8112cb6961b80bb5",
+  "ipa": "QFLIStudioN-5.0.5-ios-unsigned.ipa",
+  "app_commit": "07d8082abaf9d1aabd3f91058ff1430d2097f0c4",
+  "core_commit": "123602be34ab6fa9725bb93f0d3bc27a630c7b44",
+  "CFBundleIdentifier": "com.azurekiln.qflistudio",
+  "CFBundleDisplayName": "QFLIStudioN",
+  "UIFileSharingEnabled": true,
+  "LSSupportsOpeningDocumentsInPlace": true
+}

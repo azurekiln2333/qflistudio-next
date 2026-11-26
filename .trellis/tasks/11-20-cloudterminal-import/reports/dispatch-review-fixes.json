@@ -1,0 +1,25 @@
+{
+  "provider": "pi",
+  "pid": 22116,
+  "started_at": "2026-11-20T15:03:59.676460+08:00",
+  "status": "implementation_ready_for_review",
+  "phases": [
+    {
+      "name": "05-review-fixes",
+      "status": "artifacts_ready_unreviewed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "started_at": "2026-11-20T15:04:00.187777+08:00",
+          "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\05-review-fixes-1.jsonl",
+          "pid": 22124,
+          "exit_code": 0,
+          "ended_at": "2026-11-20T16:10:30.545076+08:00",
+          "missing_artifacts": []
+        }
+      ]
+    }
+  ],
+  "accepted": false,
+  "ended_at": "2026-11-20T16:10:30.780347+08:00"
+}

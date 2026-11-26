@@ -1,0 +1,11 @@
+[
+  {
+    "name": "06-session-ownership",
+    "paths": [
+      "core/lib/remote_control/state/remote_controller.dart",
+      "core/lib/remote_control/pages/session_screen.dart",
+      "core/test/remote_control/session_ownership_test.dart"
+    ],
+    "report": "phase-06-session-ownership.md"
+  }
+]

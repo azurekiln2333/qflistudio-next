@@ -1,0 +1,9 @@
+{"file": "D:/MyNewProjects/qflistudio/.trellis/spec/frontend/repository-layout.md", "reason": "Sibling repository and dependency boundaries"}
+{"file": "D:/MyNewProjects/qflistudio/.trellis/spec/frontend/editor-terminal.md", "reason": "Preserve local and cloud terminal behavior"}
+{"file": "D:/MyNewProjects/qflistudio/.trellis/spec/frontend/process-lifecycle.md", "reason": "Resource ownership and cancellation"}
+{"file": "D:/MyNewProjects/_wt/cloudterminal-import/source/cloudterminal/.trellis/spec/frontend/index.md", "reason": "Source frontend contracts"}
+{"file": "D:/MyNewProjects/_wt/cloudterminal-import/source/cloudterminal/.trellis/spec/frontend/state-management.md", "reason": "Connection, replay and storage semantics"}
+{"file": "D:/MyNewProjects/_wt/cloudterminal-import/source/cloudterminal/.trellis/spec/frontend/herdr-ui.md", "reason": "Herdr UI behavior"}
+{"file": "D:/MyNewProjects/_wt/cloudterminal-import/source/cloudterminal/.trellis/spec/backend/terminal-protocol.md", "reason": "PTY wire contract"}
+{"file": "D:/MyNewProjects/_wt/cloudterminal-import/source/cloudterminal/.trellis/spec/backend/herdr-protocol.md", "reason": "Herdr wire contract"}
+{"file": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\research\\session-audit.md", "reason": "Active task ownership and readiness"}

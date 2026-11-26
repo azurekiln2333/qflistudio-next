@@ -1,0 +1,630 @@
+{
+  "schema": 1,
+  "scope": "Report JSON email fields only; source code, attribution, commits, run/artifact IDs and progress retained",
+  "private_originals_retained": true,
+  "files": [
+    {
+      "path": ".trellis/tasks/11-20-cloudterminal-import/reports/cloud/app-a4d1efd-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "7a8a5d6e3fd491bfb8632fcf9756953fb25d9c7d0a6bae32b7126beab4995326",
+      "published_sha256": "89efe3aee2de893ab16de724c331b77fc9a964640045efaef68b7db702ec5acf"
+    },
+    {
+      "path": ".trellis/tasks/11-20-cloudterminal-import/reports/cloud/core-72c0b09-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "a5efe6ebebf6168243c474b4048d8d1882f5441010f217214cd082bafac5d64b",
+      "published_sha256": "1d6a897fec3b3943ad9f3dc5bc9f593a85a8698dbfb5d2d430d262342455033a"
+    },
+    {
+      "path": ".trellis/tasks/11-20-cloudterminal-import/reports/cloud/tag2-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "0f98c196de9b0cfd861a3b00fc1d3bdaf8bc39613f78491fba4db27b4845b1cd",
+      "published_sha256": "cc116d2722c966b1e635a0915e8dcaa5c1c6dd67c56db899b16cfe6fcd44e52f"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-core-45243367753-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "9e003cce3ad8c087ade28755c0b16cfa53206bea67d902389fec2da6d5ec8be4",
+      "published_sha256": "27436a8714afa9b0da9ae4e690e8ce28a36b7f3b0c72b544f4e0ae58cf51b685"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-core-45250672504-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "8d24a1163d4cd2606005bca293ff1dbee5095388c73bc842ac10029d2e9f2e83",
+      "published_sha256": "b10b6f703f0c23ce62c013108fe506fd88c910b125ba7ea318e384b121b9bbc7"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-next-45224073234-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "165dc27f880f5f4f7946c4e7bce5017451c30823f24745c4432439fb95925d55",
+      "published_sha256": "f81293247e11544260b536ccf174d5747fbf0a1b96ebee6a145ca29626ba95e9"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-next-45224073234-attempt-2.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "13137db82e25b29e9e07df7e02eebb48a42741c5aae387937422b2a35c52888a",
+      "published_sha256": "12997499385484c4e016bc2569061e69ac9767dc89e92222a539a295f9c97dcd"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-next-45244494258-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "e695269dc14db6b014d80fe8d8b4313ece6df3f0715a7eb2c6823e59e14807ed",
+      "published_sha256": "6085bf69322c74ea0169a671030d552009823a1cd4280bf1ab749d2e890b9e47"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-next-45261332689-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "7ec2c682ac5a296cac908c67bc441977b066a650b862be5a0d12634cc3ffcd0b",
+      "published_sha256": "5bbdf709e9172210da6e55e7eec663172d808531962cd026020f8d5155bc3d75"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-next-45263306245-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "a40c7b821de62424c8f35d5e1c653217085e26ccdd9dff88e90777dbf2c1bafb",
+      "published_sha256": "5438a938c53f137a194947bfa56b0b4f8d8aa3a09a971b5cf0a0ab868e272b3b"
+    },
+    {
+      "path": ".trellis/tasks/11-24-large-screen-workbench/reports/ci-qflistudio-next-45379444606-attempt-1.json",
+      "fields": [
+        "$.run.head_commit.author.email",
+        "$.run.head_commit.committer.email"
+      ],
+      "original_sha256": "165a6dc33719a8e4a79265553192849624476d74f8d06e48c966a70dc94bfdf8",
+      "published_sha256": "189af0db47ba3b747d43f627a87edea9ba1d8a217e12f2dac7957ed79c04e90a"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/app-gate-status.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "7cf26f42de4ff3ee3ad12975a085ee5c44ef173c1916749b67e94e3c3aa42317",
+      "published_sha256": "8cbebd5a9495bd2ed09769e42e41a41144b21d03f7c397abdeead67e433f91bb"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/app-latest.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "f8150bea8c5871d11a8340bee8cd83790f898c61f3b80c9b9381d5eb5b68bde6",
+      "published_sha256": "e85669050abfd1f3e08c400d8d23a69a9e6aea155dfa556fb88654cfb4fd245c"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/app-new-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "48126b3eb73fca13c9b4fdfd9bdcf433c590771742ec43f16abec2653e7c4ced",
+      "published_sha256": "df8fa1b787d35dd14333f75c91f4c241ce12db69f3597dfea741730be02f6c31"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/app-source-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "1c0a23cfecffc2b32171a0aca80ba09af59fe2855e81cdbecdae8762fcfa0e07",
+      "published_sha256": "0537b10d5cb8be509fa37b0fe6b440929dbb97a405b80ff2fb67e5ee64fcadb1"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/core-final-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "f83fa3941ed94dc15cbc16a4cb92c296d16192116a4e72ebc415628df6ffe16c",
+      "published_sha256": "63f98133880c689fd2cbb1c4696c732ee5fc5a835d9d42cd461268083f6656c7"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/core-new-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email",
+        "$.workflow_runs[2].head_commit.author.email",
+        "$.workflow_runs[2].head_commit.committer.email"
+      ],
+      "original_sha256": "1f3fd51973409af36e54b2dc2be9782b257e5833737299aa05be2105ff014a4c",
+      "published_sha256": "2ae3512f42c709bb0121f0d30b133e0ac32d490928c7d4e694fd13cb7dd7d612"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/core-phase-current.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "f4cb563ac945f03a1734a1231e63ddb81a30267bf17905ebe54841a88d901c7b",
+      "published_sha256": "f9d6d75f0ed0696d161e7933f9c05391e7ed23577a56e0d2d4ae48b02e18ce29"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/core-source-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "8243d019082ed6a149e12e1ecce30403b481900f94af0fc8ffe1bdf0c8f12bb3",
+      "published_sha256": "6309f4842afdec308447cc9044dad9a3b07d986cdb6e7ce7dcf03d35c8072c15"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/git2-app-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "6a36ec0f701be22009e58b1ea71460d43b830a20548388185abbd51e3280577e",
+      "published_sha256": "7354276466cec5c8d2df7e746da8800be2ef2bdfd7ba8c4d7ab5b2c18ea6a84e"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/git2-core-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "539f2c93bf19a5babb7ae863d3ea9e3918bd134fa7099e9a633e83352ba0e75f",
+      "published_sha256": "bc2ef5c16fb408e02b7d1bbcbdc6cad147794b17f0ae1c8623793b7a0da4b0b7"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/git2-plugin-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "e4d84e3f41a8ec8728d84d5990446f915ba51e0fd1641b6cf1912d372ffeb0e0",
+      "published_sha256": "d63e82c46fded5167ff49aed35d8f8561b917851be3a13d1f188f842df3c8192"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-artifact-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email",
+        "$.workflow_runs[2].head_commit.author.email",
+        "$.workflow_runs[2].head_commit.committer.email"
+      ],
+      "original_sha256": "1fd7bf63c67a6d298c3a5b0dbaa2780b79e590e112844c7741d96f3ba1677d1d",
+      "published_sha256": "8a72bf5f4136ccf962adfeeb1f607a542fe966bffcc5ebf63c2309ff3ecab416"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-gate-status.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "39927a7374db43d1a95f022eb5d4ce01da8538c22c68b94154883f4fd4881f2f",
+      "published_sha256": "608f68b2796245b27e67e3f312ad7c85616097b71d3f5bf7b31ec02feee2330d"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-new-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email",
+        "$.workflow_runs[2].head_commit.author.email",
+        "$.workflow_runs[2].head_commit.committer.email"
+      ],
+      "original_sha256": "fd31893e09deb7e11280da45b2d63ab0e2cd8d634008bc7a40b38f1a776e6c9b",
+      "published_sha256": "8b7101c990d08407a628c0441e80f0eb5fe2a1fd77753302c80d84eb5482c2f1"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-old-run-final.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "8662ec59ddaaf1c175811024f4798d7d6557e49b03099dea289b20de65e17228",
+      "published_sha256": "6b01c0f006bd79840acceced084f634e31379676c56bcaf069bdd81cbbf11bc0"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-old-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "c7be40ede51235be4614dadbe574307a46cf7741a94e68b8de2107ca0250b45f",
+      "published_sha256": "942069165669615144d3f39b4bcbe26f8ccae6d9be59b037e2852c038ee4cfa7"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-source-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "bce5bbd028a8a355c5be851daa09ae27b6d612c3d70c384f02349a79c1cb5192",
+      "published_sha256": "6152a56758c6dada3f12790aba48795f834039731cd5a2ac8525b457831e115f"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/plugin-source-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "bf58bcf6f5c91dbd6193fd3a2080fc1a6f580affd9195454560b00d0292d57e5",
+      "published_sha256": "5b72137a524d22a2ebe8aed1074f476db74e25c4c57e439169dfcd9dafeae93a"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/tag-candidate-start.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email",
+        "$.workflow_runs[2].head_commit.author.email",
+        "$.workflow_runs[2].head_commit.committer.email",
+        "$.workflow_runs[3].head_commit.author.email",
+        "$.workflow_runs[3].head_commit.committer.email",
+        "$.workflow_runs[4].head_commit.author.email",
+        "$.workflow_runs[4].head_commit.committer.email"
+      ],
+      "original_sha256": "cea09199dc7526b86653d0329ea3ff098c54ea2f4e2034bb0efcaf9a247d044d",
+      "published_sha256": "3c79a2ab1f62e1d1cd2c847a864b7307653d9cce7a0cf79d50b8994d81e52edd"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-20-studio-git-integration/reports/tag2-final-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "53941f34c371524b6512b89fe390d14391bd6aea3bab3c65985fa22a157923c5",
+      "published_sha256": "957929521b5f9c6196f5366bce5190761a760422c1b12fc05864823bfef20c37"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-506-run-final.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "1082bc161e8e4eb8f848d56604b0677e9a92f7df1347fbd39d38c8dd01c085d4",
+      "published_sha256": "1514399808a109995a1ecef348c65396a72b3855a01079788464d04ebf378bac"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-506-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "6243e6dd31f6edc8345a9c09469b10bcad7e46a121b9b0dad6036753e1a738e5",
+      "published_sha256": "19f119c84656867c2b20df7c55b3b4cd6fbb1c0054beaf5b5a941e31bb9e056b"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-tag-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "dddd031b617ec52b14c26eeeae54707956c784b7f57c8a59cdef6c5795c5b4af",
+      "published_sha256": "a4086afd40943e36059cc6a9ca28dd5c5b08b5677ca363fc08d69d5cf10dd9f6"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-tag-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "07d4452fd385fa452da211a92175f91b16985562993682dcd16bfc53b8db682d",
+      "published_sha256": "e78af44b8f4a6448cb757c14e93d0f1231f5ccda940f14d6dedc2d2b9b3a2d60"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-watch-44870753378-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "e88d318714a299f2fc74c3c16dd64f4529b3efc369afe9694d86eb744f3901fc",
+      "published_sha256": "2bfa610bcdc222781f5edcc625f7c1324898d461bbb9051ddbd7465236b1ea9b"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-watch-core-c619f9ff-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "1369f925f35b0ba2e27718662da1060a764a5123a84ff030f7f06bdcec825db5",
+      "published_sha256": "22f1a52324274e6732fcff196091dd318fc69c4ebda3f01908af56440889a563"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app-watch-plugin-697291a-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "c247d6578e49de16a14261232d35e240c0269086ca9fcc783ad550ffd552fe26",
+      "published_sha256": "099dd95555176a77a90d07c808f7004c83fedf069ed5839000d77b2cc2633472"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-run-after-digest.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "cb753e3044be792c255a89509d90aab95e426bef903c9d2375117ff7acaeac17",
+      "published_sha256": "a5fa7fa13a2f654b7493983c75ea9a4762eb8ac4c6cb8bcfde86add946380690"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-run-finalcheck.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "24d58330b80d23661b35aaceac0458b8bca5a4e40037b07552b00aca43d04114",
+      "published_sha256": "fd1c4dd1bde0179fbf9566c12ab7842418d364d1b2b6ab3e4fec2faf45bd2841"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-run-latest.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "24d58330b80d23661b35aaceac0458b8bca5a4e40037b07552b00aca43d04114",
+      "published_sha256": "fd1c4dd1bde0179fbf9566c12ab7842418d364d1b2b6ab3e4fec2faf45bd2841"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-run-publishcheck.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "1082bc161e8e4eb8f848d56604b0677e9a92f7df1347fbd39d38c8dd01c085d4",
+      "published_sha256": "1514399808a109995a1ecef348c65396a72b3855a01079788464d04ebf378bac"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-run-watch2.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "24d58330b80d23661b35aaceac0458b8bca5a4e40037b07552b00aca43d04114",
+      "published_sha256": "fd1c4dd1bde0179fbf9566c12ab7842418d364d1b2b6ab3e4fec2faf45bd2841"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "24d58330b80d23661b35aaceac0458b8bca5a4e40037b07552b00aca43d04114",
+      "published_sha256": "fd1c4dd1bde0179fbf9566c12ab7842418d364d1b2b6ab3e4fec2faf45bd2841"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-tag-object-after-digest.json",
+      "fields": [
+        "$.tagger.email"
+      ],
+      "original_sha256": "cf1f71d6b5caa46910b0ab2b67ca7102a67d1002224ccea55260f69321eb7b4a",
+      "published_sha256": "a8606e5a1d9b47c53052963683901614429202f66988c3d4e762b82c1a97edc8"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/app506-J-tag-object.json",
+      "fields": [
+        "$.tagger.email"
+      ],
+      "original_sha256": "cf1f71d6b5caa46910b0ab2b67ca7102a67d1002224ccea55260f69321eb7b4a",
+      "published_sha256": "a8606e5a1d9b47c53052963683901614429202f66988c3d4e762b82c1a97edc8"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/core-final-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "817f8410d9d233fd5f51e91b9266a6bd9b674a88acf773ad80f7a5b01904fa33",
+      "published_sha256": "3cd5568d71243881b086b95695765bdebeafcd014ff521697e5ba7cd38f4ed1c"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/core-release-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "dd0b925b78f4bb69e23fdeae0765e9b9bb08cb8c0e6efb32d5064547525d2d8e",
+      "published_sha256": "0ba9ae02b926f07094b42a59e061fb7e1273596ad9482a79954eb4eb9cb4ebc4"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/native-source-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "500c4051c4cd95024ea611844a0edfc4d7d0c88648c5e84075ee83f087f2ca53",
+      "published_sha256": "00f7ee8026e78dcd97b2a349fecded41ea3df033453839c3bf89ae2af4703efa"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/plugin-final-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "ab547f527dc3b3b38f537000467f7980377ac19866c3697e634d192a830dc1cd",
+      "published_sha256": "313abc7ca5123b6e78aadf96f494b8077d65c525178ddf1a840c482662f954cf"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/plugin-host-fix-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "7371e2217e9c1cb756d464a655d8097004f149c2156854a6bdb915bc707472e4",
+      "published_sha256": "7da2829c46288d88993b0a9eb23abe8ff759aa0ba5bf8aeaa39ec17a444560ab"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/plugin-release-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "64933630595f5198725f9d8aede083c58e7d836d16df2e980e78cf0433859461",
+      "published_sha256": "894fcb36c65e648aa94818062ac09d3040b8045a715dd2aebf19715668800080"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-git-clone-parallel-progress/reports/plugin-release-runs.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "881d5f16c629df2ebb9359d7ecb14b62a9260c7c0f4a82f53df7d966c1ec23d4",
+      "published_sha256": "ad72412df29560b759dfb48b4e1fd06fd1188bc581d07f81993b81681aa00baf"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-ios-files-project-storage/reports/app-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "01ea081bbc0aa373f5343d651c747ba2b82877f2770eedeeab8f36a00bdf25db",
+      "published_sha256": "f6f388c9673e554dd0d3c50588969bf25a666453eb234a25acc82ea6863e0165"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/app-monitor-git5-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "a58372a766848ff68fb41f4c7269eac44ec447dd67e6cb65e3243704bfa819ee",
+      "published_sha256": "decbbf930c3bf4216a62923ca13659c36935d501ce82ef5a627dce93f0428dc6"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/app-monitor-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "fa69689504d5692968bfd40bffa3c64e6782595e8e918f83f5d470f5e3a00699",
+      "published_sha256": "7b47c7ffcf6eefd53f25ee8ed96f8a3e2b1065ad416baf42e2670b8e2aca47de"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/app-runs-git3.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "cc14732655d0eb80969c504fb8eeb61378e6341597f7656016c2fd5ce89c9cd3",
+      "published_sha256": "4bfe9e3975db57a14d564c01026f5ee970b74cf50adb1638b87700eda67caa95"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/app-runs-git4.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "204c2b418d0b95672d149763f197b845979446abd7a38e86ed2ee142c6a55585",
+      "published_sha256": "ab7a57fd28be5553d509b2eaf71ad88af9795c961055419874433096cd725019"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/app-runs-git5.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email",
+        "$.workflow_runs[1].head_commit.author.email",
+        "$.workflow_runs[1].head_commit.committer.email"
+      ],
+      "original_sha256": "cdda7fefa56dd633327f8012e81d7bb7c46562d297fe9ace0d529efa02806c15",
+      "published_sha256": "cafe37c307100aa901db0f1976048064aa81d8fda1c1fc035b6a5af6045c55c2"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/core-branch-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "4df6258a7a1a67c2ab279be15710923e73b9f66ac41764791746de9b55dd0d73",
+      "published_sha256": "488298096ebb2a613a076a876cb6c99372ae17e9523b137448078849dda449e4"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/core-monitor-git5-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "edd5ee430c5dcf710e67ed44bd28ea7e21f4bc89e9abc3b009ef4b3301bdba39",
+      "published_sha256": "d43009c7f722ee27cfda6849fcaed398155bcdef4d26978f1094b73771fcf631"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/core-monitor-run.json",
+      "fields": [
+        "$.head_commit.author.email",
+        "$.head_commit.committer.email"
+      ],
+      "original_sha256": "f0095f62de6ace6765aa7858a5afe4f96e428fa110cc0c7f839ce8893859b66b",
+      "published_sha256": "cde69bb6dfb915516e6a9380205a726e53aa98c914abb7062c89dec523fad512"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/core-runs-branch.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "33a22081247c3699d37c28e9bc7f38b9de1afe1ba484e6d22df75c9fc1f77084",
+      "published_sha256": "2131312b1c6cd9ef4a5c2ff856cbedcaf27e312403263ba937d4619e2a62dafb"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/core-runs-git5.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "613e8004218ba54379c1f9b170fa8bcc6e6a5b459ca132dc7f4049ba5b8989b5",
+      "published_sha256": "679d703ef388ac6ae531d207550357263883747ee81a9068ad59bb820dd4aacb"
+    },
+    {
+      "path": ".trellis/tasks/archive/2026-11/11-21-project-card-git-branch/reports/core-runs-keyboard.json",
+      "fields": [
+        "$.workflow_runs[0].head_commit.author.email",
+        "$.workflow_runs[0].head_commit.committer.email"
+      ],
+      "original_sha256": "faa7466bdef08f5bbf53c44d10fa8ce8cddfc16bbf9f9c37f8946735f30e4898",
+      "published_sha256": "8f9d4abd2f49a646cbf0d6886902592311868d472fc18271002b16d444b51034"
+    }
+  ]
+}

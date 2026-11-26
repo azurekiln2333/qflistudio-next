@@ -69,15 +69,10 @@ app.*.map.json
 # Native language runtime build output
 **/native/build/
 
-# 电脑侧组件（companion/）：Node agent 依赖、分发配置与本机身份都来自本机，
-# 不进版本库。分发用的 bootstrap.json 若需随包发布，请显式用 ! 规则加回。
-/companion/**/node_modules/
+# Local AI/editor tool state; project instructions remain tracked in .agents/.trellis.
 /companion/remote_agent/bootstrap.json
 /companion/remote_agent/cloudterminal.bootstrap.json
-/companion/remote_agent/*.log
-/companion/windows_assistant/.flutter-plugins-dependencies
 
-# Local AI/editor tool state; project instructions remain tracked in .agents/.trellis.
 /.agent/
 /.claude/
 /.codebuddy/
@@ -88,18 +83,56 @@ app.*.map.json
 /.workbuddy-ai/
 /.zcode/
 
-# Local Trellis/agent runtime metadata. Committed task artifacts remain visible.
-/.agents/
+# Portable Trellis skills, specs, tasks, journals and workflow support are tracked.
+# Only machine/runtime state and generated diagnostic output stay local.
 /.dsh/
-/.trellis/.gitignore
 /.trellis/.template-hashes.json
-/.trellis/.version
-/.trellis/agents/
-/.trellis/config.yaml
-/.trellis/scripts/
-/.trellis/tasks/00-bootstrap-guidelines/
-/.trellis/workflow.md
-/.trellis/workspace/
+/.trellis/tasks/**/.artifacts/
+/.trellis/tasks/**/reports/staging/*/
+/.trellis/tasks/**/reports/**/*.zip
+/.trellis/tasks/**/reports/**/*.tgz
+/.trellis/tasks/**/reports/**/*.tar.gz
+/.trellis/tasks/**/reports/**/*.apk
+/.trellis/tasks/**/reports/**/*.ipa
+/.trellis/tasks/**/reports/**/*.hap
+/.trellis/tasks/**/reports/**/*.exe
+/.trellis/tasks/**/reports/**/*.dll
+/.trellis/tasks/**/reports/**/*.so
+/.trellis/tasks/**/reports/**/*.dylib
+/.trellis/tasks/**/reports/**/*.a
+/.trellis/tasks/**/reports/**/*.o
+/.trellis/tasks/**/reports/**/*.jsonl
+/.trellis/tasks/**/check/**/*.jsonl
+/.trellis/tasks/**/screens/**/*.png
+/.trellis/tasks/**/screens/**/*.jpg
+/.trellis/tasks/**/screens/**/*.jpeg
+/.trellis/tasks/**/reports/**/*log*.txt
+/.trellis/tasks/**/reports/*-test.json
+/.trellis/tasks/**/reports/*-tests.json
+/.trellis/tasks/**/reports/core-test-*.json
+/.trellis/tasks/**/reports/**/*.xcframework/**/qfli_git.framework/qfli_git
+/.trellis/tasks/**/*.done
+/.trellis/tasks/**/*.fixed
+
+# Build/dependency/runtime output must never enter a fresh source checkout.
+**/node_modules/
+**/.gradle/
+**/.cxx/
+**/.hvigor/
+**/oh_modules/
+**/__pycache__/
+**/.pytest_cache/
+**/coverage/
+**/test-results/
+**/test-output/
+**/DerivedData/
+**/Pods/
+**/native/target/
+/.artifacts/
+/pubspec_overrides.yaml
+/Roboto_Mono.zip
+# Empty legacy Groovy placeholder; Android uses build.gradle.kts.
+/android/build.gradle
 
 # Local diagnostic exports and shell inspection fragments
 /_*.txt

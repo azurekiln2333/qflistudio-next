@@ -2,7 +2,7 @@ name: QFLIStudioN app build setup
 description: >-
   Check out the pinned shared core beside the app, install Flutter and resolve
   Dart packages. The app must be checked out at qflistudio inside the workspace,
-  and the core at qfli_studio_core.
+  and the core at qflistudio-core.
 
 inputs:
   flutter-version:
@@ -51,16 +51,106 @@ runs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         repository: azurekiln2333/qflistudio-core
-        # The app resolves the core through path: ../qfli_studio_core.
+        # The app resolves the core through path: ../qflistudio-core.
         ref: ${{ inputs.core-ref }}
-        path: qfli_studio_core
+        path: qflistudio-core
         persist-credentials: false
+
+    - name: Restore Dart pub cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ runner.temp }}/pub-cache
+        key: pub-${{ inputs.flutter-mode }}-${{ inputs.flutter-version }}-${{ inputs.flutter-commit }}-${{ inputs.core-ref }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('qflistudio/pubspec.yaml', 'qflistudio/pubspec.lock', 'qflistudio/pubspec_overrides.yaml', 'qflistudio-core/pubspec.yaml', 'qflistudio-core/pubspec.lock', 'qflistudio-core/pubspec_overrides.yaml', 'qflistudio/companion/windows_assistant/pubspec.lock') }}
+
+    - name: Set pub cache location
+      shell: bash
+      run: |
+        pub_cache="$RUNNER_TEMP/pub-cache"
+        if [ "${RUNNER_OS:-}" = "Windows" ]; then
+          if command -v cygpath >/dev/null 2>&1; then
+            temp_posix="$(cygpath -u "$RUNNER_TEMP")"
+            pub_cache="$(cygpath -w -a "$temp_posix/pub-cache" | tr -d '\r')"
+          else
+            pub_cache="$RUNNER_TEMP\\pub-cache"
+          fi
+        fi
+        echo "PUB_CACHE=$pub_cache" >> "$GITHUB_ENV"
+        echo "QFLI_PUB_CACHE=$pub_cache" >> "$GITHUB_ENV"
+
+    - name: Verify canonical package paths and imports
+      shell: bash
+      working-directory: qflistudio
+      run: |
+        set -euo pipefail
+        python_bin=""
+        for candidate in python3 python; do
+          if command -v "$candidate" >/dev/null 2>&1 &&
+            "$candidate" -c 'import sys; sys.exit(0 if sys.version_info[0] == 3 else 1)' >/dev/null 2>&1; then
+            python_bin="$candidate"
+            break
+          fi
+        done
+        if [ -z "$python_bin" ]; then
+          echo "::error::python 3 was not found on this runner."
+          exit 1
+        fi
+        "$python_bin" - <<'PY'
+        from pathlib import Path
+        import re
+        import sys
+
+        app = Path.cwd()
+        core = app.parent / "qflistudio-core"
+        required = {
+            "core": core,
+            "re_editor": core / "vendor" / "re_editor",
+            "xterm": core / "vendor" / "xterm",
+        }
+        missing = [f"{name}: {path}" for name, path in required.items() if not path.is_dir()]
+        if missing:
+            raise SystemExit("Missing canonical sibling path(s): " + ", ".join(missing))
+
+        app_pubspec = (app / "pubspec.yaml").read_text(encoding="utf-8")
+        app_lock = (app / "pubspec.lock").read_text(encoding="utf-8")
+        core_pubspec = (core / "pubspec.yaml").read_text(encoding="utf-8")
+        expected_paths = {
+            "qfli_studio_core": "../qflistudio-core",
+            "re_editor": "../qflistudio-core/vendor/re_editor",
+            "xterm": "../qflistudio-core/vendor/xterm",
+        }
+        for package, relative in expected_paths.items():
+            pattern = rf"(?m)^\s*(?:{re.escape(package)}):\s*\n\s+path:\s*{re.escape(relative)}\s*$"
+            if not re.search(pattern, app_pubspec):
+                raise SystemExit(f"{package} does not use canonical path {relative}")
+            lock_pattern = rf"(?m)^\s*path:\s*[\"']{re.escape(relative)}[\"']\s*$"
+            if not re.search(lock_pattern, app_lock):
+                raise SystemExit(f"pubspec.lock does not contain canonical path {relative}")
+
+        core_name = re.search(r"(?m)^name:\s*([^\s#]+)\s*$", core_pubspec)
+        if not core_name or core_name.group(1) != "qfli_studio_core":
+            raise SystemExit("Shared core package name is not qfli_studio_core")
+
+        sources = [*app.joinpath("lib").rglob("*.dart"), *app.joinpath("test").rglob("*.dart")]
+        sources += [*core.joinpath("lib").rglob("*.dart"), *core.joinpath("test").rglob("*.dart")]
+        wrong = []
+        for path in sources:
+            text = path.read_text(encoding="utf-8")
+            for match in re.finditer(r"package:([^/'\"]+)/", text):
+                package = match.group(1)
+                if package != "qfli_studio_core" and "studio" in package and "core" in package:
+                    wrong.append(f"{path}: package:{package}/")
+        if not any("package:qfli_studio_core/" in path.read_text(encoding="utf-8") for path in sources if path.is_file()):
+            raise SystemExit("No canonical package:qfli_studio_core/ import was found")
+        if wrong:
+            raise SystemExit("Non-canonical shared-core import(s): " + ", ".join(wrong))
+        print("PASS canonical app/core package name, imports and three relative paths")
+        PY
 
     - name: Restore Flutter SDK
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/flutter
-        key: flutter-${{ inputs.flutter-mode }}-${{ inputs.flutter-version }}-${{ runner.os }}-${{ runner.arch }}-${{ inputs.cache-scope }}
+        key: flutter-${{ inputs.flutter-mode }}-${{ inputs.flutter-version }}-${{ inputs.flutter-commit }}-${{ runner.os }}-${{ runner.arch }}-${{ inputs.cache-scope }}
 
     - name: Install Flutter SDK
       shell: bash
@@ -80,14 +170,14 @@ runs:
           echo "QFLI_FLUTTER_ROOT=$RUNNER_TEMP/flutter"
           echo "QFLI_FLUTTER_VERSION=$FLUTTER_VERSION"
           echo "QFLI_FLUTTER_MODE=$FLUTTER_MODE"
-          echo "QFLI_CORE_COMMIT=$(git -C ../qfli_studio_core rev-parse HEAD)"
+          echo "QFLI_CORE_COMMIT=$(git -C ../qflistudio-core rev-parse HEAD)"
         } >> "$GITHUB_ENV"
 
     - name: Patch shared core for upstream Flutter
       if: inputs.patch-upstream-core == 'true'
       shell: bash
       working-directory: qflistudio
-      run: bash tool/ci/patch_upstream_core.sh "$PWD" ../qfli_studio_core
+      run: bash tool/ci/patch_upstream_core.sh "$PWD" ../qflistudio-core
 
     - name: Resolve Dart packages
       shell: bash

@@ -1,0 +1,115 @@
+{
+  "counts": {
+    "success": 2556,
+    "skipped": 26,
+    "error": 9,
+    "failure": 1
+  },
+  "done": {
+    "success": false,
+    "type": "done",
+    "time": 241299
+  },
+  "failures": [
+    {
+      "name": "loading /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/ai_chat_stream_relay_test.dart",
+      "url": null,
+      "errors": [
+        "Failed to load \"/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/ai_chat_stream_relay_test.dart\":\nCompilation failed for testPath=/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/ai_chat_stream_relay_test.dart: test/ai_chat_stream_relay_test.dart:249:61: Error: No named parameter with the name 'encoding'.\n        return http.Response(jsonEncode(_relayResult), 200, encoding: utf8);\n                                                            ^^^^^^^^\n../../../../.pub-cache/hosted/pub.dev/http-1.6.0/lib/src/response.dart:33:3: Context: Found this candidate, but the arguments don't match.\n  Response(String body, int statusCode,\n  ^^^^^^^^\n."
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "claude replacement retains streaming and replay ownership",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: claude replacement retains streaming and replay ownership"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "A to B to A releases only the obsolete route owners",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: A to B to A releases only the obsolete route owners"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R1 Claude sessions are not terminals HomeScreen opens a Claude session without Herdr routing or a pane action",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: HomeScreen opens a Claude session without Herdr routing or a pane action"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit paired, narrow: the visible exit returns to the host",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: paired, narrow: the visible exit returns to the host"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit paired, wide: the visible exit returns to the host",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: paired, wide: the visible exit returns to the host"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit the drawer offers the exit in the narrow paired layout",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: the drawer offers the exit in the narrow paired layout"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit an injected exit callback replaces the default pop",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: an injected exit callback replaces the default pop"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "R3 module exit internal back navigation still works inside the module",
+      "url": "package:flutter_test/src/widget_tester.dart",
+      "errors": [
+        "Test failed. See exception logs above.\nThe test description was: internal back navigation still works inside the module"
+      ],
+      "trace": [
+        ""
+      ]
+    },
+    {
+      "name": "Java receiver delivers one terminal event carrying the aggregated output",
+      "url": "file:///home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/interop_arkts_contract_test.dart",
+      "errors": [
+        "Expected: contains 'formatAggregate'\n  Actual: '/*\\n'\n            ' * qfli-interop/1 receiver for QFLIJVMX.\\n'\n            ' *\\n'\n            ' * Studio sends a project to this app instead of compiling it itself. The two\\n'\n            ' * apps are separate sandboxes, so the project arrives as files that Studio has\\n'\n            ' * already written to its own cache and as a validated directory name. This file\\n'\n            ' * re-validates everything, copies the project into its own cache, compiles with\\n'\n            ' * the bundled JDK and runs the entry class.\\n'\n            ' *\\n'\n            ' * Rules here mirror `qfli_studio_core/lib/interop/interop_protocol.dart`. A rule\\n'\n            ' * on only one side is a hole, so change both together.\\n'\n            ' */\\n'\n            'import { common, Want } from \\'@kit.AbilityKit\\';\\n'\n            'import { BusinessError } from \\'@kit.BasicServicesKit\\';\\n'\n            'import { fileIo as fs } from \\'@kit.CoreFileKit\\';\\n'\n            'import { util } from \\'@kit.ArkTS\\';\\n'\n            'import { getLayout, startJava, pollJava, cancelJava } from \\'libqfli_jdk_layout.so\\';\\n'\n            '\\n'\n            'export const PROTOCOL = \\'qfli-interop/1\\';\\n'\n            'export const LANGUAGE = \\'java\\';\\n'\n            '\\n'\n            '/** The only caller this app answers. */\\n'\n            'const ALLOWED_CALLER = \\'com.azurekiln.qflistudio\\';\\n'\n            '\\n'\n            '/** Studio\\'s bridge ability, which receives our events. */\\n'\n            'const BRIDGE_ABILITY = \\'InteropBridgeAbility\\';\\n'\n            '\\n'\n            'const MAX_FILES = 64;\\n'\n            'const MAX_PAYLOAD_BYTES = 256 * 1024;\\n'\n            'const MAX_PATH_LENGTH = 240;\\n'\n            'const MAX_STDIN_BYTES = 4 * 1024;\\n'\n            'const MIN_TIMEOUT_MS = 1000;\\n'\n            'const MAX_TIMEOUT_MS = 120000;\\n'\n            'const POLL_INTERVAL_MS = 80;\\n'\n            'const OUTPUT_TAIL_BYTES = 128 * 1024;\\n'\n            '\\n'\n            'export interface InteropRequest {\\n'\n            '  sessionId: string;\\n'\n            '  language: string;\\n'\n            '  entry: string;\\n'\n            '  action: string;\\n'\n            '  stdin: str"
+      ],
+      "trace": [
+        "package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 477:18  expect\ntest/interop_arkts_contract_test.dart 260:7         main.<fn>.<fn>\n"
+      ]
+    }
+  ]
+}

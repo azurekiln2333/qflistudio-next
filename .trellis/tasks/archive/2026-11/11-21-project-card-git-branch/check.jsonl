@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "Review package pins and cloud-only validation"}
+{"file": ".trellis/spec/frontend/git-ui.md", "reason": "Assert rendered button bounds, input-method hiding, retained refresh and dialog geometry"}

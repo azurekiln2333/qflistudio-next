@@ -1,0 +1,9 @@
+- test/external_agent_files_test.dart :: read 与 write 走协调通道 :: 文件不是 UTF-8 文本，工具拒绝读取或覆盖
+    package:qfli_studio_core/vibe_coding/vibe_tools.dart 531:7   VibeProjectFiles._decodeText
+    package:qfli_studio_core/vibe_coding/vibe_tools.dart 517:18  VibeProjectFiles.read
+- test/external_explorer_menu_test.dart :: 外部根条目不提供删除 :: Test failed. See exception logs above.
+    The test description was: 外部根条目不提供删除
+    The following assertion was thrown running a test:
+    The finder "Found 0 widgets with text "note.md": []" (used in a call to "longPress()") could not
+    find any matching widgets.
+    #3      main.<anonymous closure> (test/external_explorer_menu_test.dart:119:18)

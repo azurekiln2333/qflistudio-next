@@ -1,0 +1,9 @@
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "检查提交是否只落在本步声明的仓库，且没有改动生成的插件注册文件。"}
+{"file": ".trellis/spec/frontend/interop.md", "reason": "检查鸿蒙 skill 与 Want 解析是否与既有 interop 通道冲突，参数校验是否照旧。"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "检查通道字段在边界处是否先校验再转模型，坏字段是否逐项回落。"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "检查静态检查是否通过，是否引入禁止模式或调试残留。"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "检查选择面板的组件拆分、回调命名与无障碍标签是否合规。"}
+{"file": ".trellis/spec/frontend/cloud-project-cache.md", "reason": "检查上限与清理逻辑是否与既有缓存实现同口径，清理失败是否只记日志。"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "检查复制与清理是否可取消，页面销毁后是否还有回调写入。"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "检查三端错误码是否一致，缺通道时是否静默降级而不是报错弹窗。"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "检查是否重复实现了已有的路径校验、复制与分享能力。"}

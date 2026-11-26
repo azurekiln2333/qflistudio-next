@@ -1,0 +1,74 @@
+{
+  "schema_version": 3,
+  "kind": "read-only migration preservation report",
+  "captured_at_utc": "2026-11-26T20:05:35.125613+00:00",
+  "head_observed": "c5f4bc3afe9c81ba488fd3f544d43c3dac061512",
+  "merge_or_worktree_state": "Report generated without Git mutation; current worktree status was observed only.",
+  "source_verification": {
+    "original_root_relative": ".trellis/tasks/10-23-studio-release-ux-workspaces/.artifacts/",
+    "allowlisted_count": 104,
+    "matched_original_sha256_before_restore": 104,
+    "missing_originals": 0
+  },
+  "restoration": {
+    "published_root_relative": ".trellis/tasks/11-26-github-main-migration/research/preserved-terminal-task/",
+    "published_content_count": 104,
+    "exact_source_bytes": {
+      "dart": 36,
+      "patch": 3,
+      "yaml": 1
+    },
+    "process_json_count_found": 22,
+    "process_json_treatment": "All 22 actual process JSON files became minimal sanitized progress summaries. The earlier count of 18 was incorrect.",
+    "markdown_count": 34,
+    "other_evidence_json_count": 8,
+    "private_originals_retained": true,
+    "backup_root_published": false
+  },
+  "sanitization": {
+    "source_bytes_changed": false,
+    "source_categories": [
+      ".dart",
+      ".patch",
+      ".yaml"
+    ],
+    "path_replacements_allowed_for": [
+      ".md",
+      "evidence JSON"
+    ],
+    "process_fields_omitted": [
+      "command",
+      "cwd",
+      "pid",
+      "parent_pid",
+      "handle_value",
+      "processes",
+      "stdout",
+      "stderr",
+      "environment",
+      "session data",
+      "raw logs"
+    ],
+    "raw_transcripts_published": false,
+    "generated_bundles_published": false
+  },
+  "staging_root": {
+    "reviewed_file_count": 5,
+    "copied_content": false,
+    "subdirectories_published": false
+  },
+  "evidence_files": [
+    "preserved-terminal-task/README.md",
+    "preserved-terminal-task/hash-manifest.json",
+    "preserved-terminal-task/staging-root-review.json"
+  ],
+  "local_originals": "Kept in the private publication hold. No deletion or overwrite performed.",
+  "scope": {
+    "git_mutation": false,
+    "build": false,
+    "test": false,
+    "install": false,
+    "only_authorized_paths_written": true
+  },
+  "observed_status_line_count": 125
+}

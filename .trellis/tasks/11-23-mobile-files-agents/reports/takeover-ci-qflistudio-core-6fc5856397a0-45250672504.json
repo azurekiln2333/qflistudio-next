@@ -1,0 +1,256 @@
+{
+  "observed_at": "2026-11-23T19:49:12.086501+00:00",
+  "repo": "qflistudio-core",
+  "workflow": "core-check",
+  "branch": "feat/large-screen-workbench",
+  "sha": "6fc5856397a05a76828326bda296a25d3c490cc7",
+  "run_id": 45250672504,
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45250672504",
+  "jobs": [
+    {
+      "id": 137959134980,
+      "run_id": 45250672504,
+      "workflow_name": "core-check",
+      "head_branch": "feat/large-screen-workbench",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/runs/45250672504",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUxXzgM8AAAAgHwFXBA",
+      "head_sha": "6fc5856397a05a76828326bda296a25d3c490cc7",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/jobs/137959134980",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45250672504/job/137959134980",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-23T19:36:21Z",
+      "started_at": "2026-11-23T19:36:24Z",
+      "completed_at": "2026-11-23T19:44:46Z",
+      "name": "check",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T19:36:25Z",
+          "completed_at": "2026-11-23T19:36:26Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T19:36:26Z",
+          "completed_at": "2026-11-23T19:36:28Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T19:36:28Z",
+          "completed_at": "2026-11-23T19:36:29Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T19:36:29Z",
+          "completed_at": "2026-11-23T19:36:30Z"
+        },
+        {
+          "name": "Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T19:36:30Z",
+          "completed_at": "2026-11-23T19:36:39Z"
+        },
+        {
+          "name": "Install the pinned OHOS Flutter SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T19:36:39Z",
+          "completed_at": "2026-11-23T19:36:39Z"
+        },
+        {
+          "name": "Resolve packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T19:36:39Z",
+          "completed_at": "2026-11-23T19:36:40Z"
+        },
+        {
+          "name": "Analyze",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T19:36:40Z",
+          "completed_at": "2026-11-23T19:37:15Z"
+        },
+        {
+          "name": "Run the complete test suite",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-23T19:37:15Z",
+          "completed_at": "2026-11-23T19:44:39Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T19:44:39Z",
+          "completed_at": "2026-11-23T19:44:40Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T19:44:40Z",
+          "completed_at": "2026-11-23T19:44:41Z"
+        },
+        {
+          "name": "Post Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-23T19:44:41Z",
+          "completed_at": "2026-11-23T19:44:41Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-23T19:44:41Z",
+          "completed_at": "2026-11-23T19:44:41Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T19:44:41Z",
+          "completed_at": "2026-11-23T19:44:42Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T19:44:42Z",
+          "completed_at": "2026-11-23T19:44:42Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T19:44:42Z",
+          "completed_at": "2026-11-23T19:44:42Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/check-runs/137959134980",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002551,
+      "runner_name": "GitHub Actions 1000002551",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions",
+      "failure_annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 102,
+          "start_column": null,
+          "end_line": 102,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/retained_editor_test.dart :: AppFormFactor.tablet uses one workbench and preserves live project state :: Test failed. See exception logs above.\n    The test description was: AppFormFactor.tablet uses one workbench and preserves live project state\n    The following TestFailure was thrown running a test:\n    Expected: an object with length of <2>\n    Actual: [\n    ({String key, Project project, Null workspace}):(key:\n    standalone:/tmp/qfli_retained_editor_RWSQEX/case_MKLTNK/Alpha, project: Instance of 'Project',\n    workspace: null)\n    ]\n    Which: has length of <1>\n    #4      main.<anonymous closure> (test/retained_editor_test.dart:108:7)\n    test/retained_editor_test.dart line 108",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 90,
+          "start_column": null,
+          "end_line": 90,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/retained_editor_test.dart :: AppFormFactor.desktop uses one workbench and preserves live project state :: Test failed. See exception logs above.\n    The test description was: AppFormFactor.desktop uses one workbench and preserves live project state\n    The following TestFailure was thrown running a test:\n    Expected: an object with length of <2>\n    Actual: [\n    ({String key, Project project, Null workspace}):(key:\n    standalone:/tmp/qfli_retained_editor_RWSQEX/case_OOSKUA/Alpha, project: Instance of 'Project',\n    workspace: null)\n    ]\n    Which: has length of <1>\n    #4      main.<anonymous closure> (test/retained_editor_test.dart:108:7)\n    test/retained_editor_test.dart line 108",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 85,
+          "start_column": null,
+          "end_line": 85,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/experience_test.dart :: 窄屏大字体的个人页与登录页没有服务器自定义入口 :: Test failed. See exception logs above.\n    The test description was: 窄屏大字体的个人页与登录页没有服务器自定义入口\n    The following assertion was thrown running a test:\n    pumpAndSettle timed out\n    #2      main.<anonymous closure> (test/experience_test.dart:237:5)",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 77,
+          "start_column": null,
+          "end_line": 77,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/github_workbench_widgets_test.dart :: Profile connects GitHub while Studio remains signed out :: Test failed. See exception logs above.\n    The test description was: Profile connects GitHub while Studio remains signed out\n    The following TestFailure was thrown running a test:\n    Expected: exactly one matching candidate\n    Actual: _TextWidgetFinder:<Found 0 widgets with text \"octocat\": []>\n    Which: means none were found but one was expected\n    #4      main.<anonymous closure> (test/github_workbench_widgets_test.dart:80:5)\n    test/github_workbench_widgets_test.dart line 80",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 72,
+          "start_column": null,
+          "end_line": 72,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/workbench_chrome_test.dart :: WorkbenchActivityRail 中文界面使用中文标签 :: Test failed. See exception logs above.\n    The test description was: 中文界面使用中文标签\n    The following assertion was thrown running a test:\n    A SemanticsHandle was active at the end of the test.\n    All SemanticsHandle instances must be disposed by calling dispose() on the SemanticsHandle.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 67,
+          "start_column": null,
+          "end_line": 67,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/workbench_chrome_test.dart :: WorkbenchActivityRail 选中项在语义树里报告 selected，其余不报告 :: Test failed. See exception logs above.\n    The test description was: 选中项在语义树里报告 selected，其余不报告\n    The following assertion was thrown running a test:\n    A SemanticsHandle was active at the end of the test.\n    All SemanticsHandle instances must be disposed by calling dispose() on the SemanticsHandle.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/6fc5856397a05a76828326bda296a25d3c490cc7/.github",
+          "start_line": 8773,
+          "start_column": null,
+          "end_line": 8773,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        }
+      ]
+    }
+  ]
+}

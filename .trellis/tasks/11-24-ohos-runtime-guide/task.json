@@ -1,0 +1,31 @@
+{
+  "id": "ohos-runtime-guide",
+  "name": "ohos-runtime-guide",
+  "title": "鸿蒙本地运行工具安装指引",
+  "description": "本地终端增加九款应用的安装指引，使用用户提供的图标与应用市场链接。",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-24",
+  "completedAt": "2026-11-24",
+  "branch": "feat/large-screen-workbench",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": "ee83f1c0d72708547d0692e6cd05498d3539ce02",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "User explicitly requested immediate four-Pi implementation, then check/commit/push/tag/CI. Scope narrowed to entry and guide; user will supplement runtime later. Cloud verification passed. Core main ee83f1c0d72708547d0692e6cd05498d3539ce02; App main/tag v5.0.13 7104c64ef545ca006533140794729c2f2f40795f.",
+  "meta": {
+    "implementation_approved": true,
+    "validation": "all-checks-cloud-only",
+    "release_authorized": true,
+    "merge_main_authorized": true
+  }
+}

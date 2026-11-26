@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 2,
+  "platform": "android",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "commit": "d002bd3e9febb478758b75b6670a24ba8a3c610c",
+  "generatedUtc": "2026-11-20T19:34:15.165209+00:00",
+  "upstream": {
+    "libgit2": "1.9.7",
+    "mbedtls": "3.6.8",
+    "cacert": "2026-11-05"
+  },
+  "licenses": [
+    "licenses/CACERT-LICENSE",
+    "licenses/LIBGIT2-LICENSE",
+    "licenses/MBEDTLS-LICENSE",
+    "licenses/PROJECT-LICENSE"
+  ],
+  "checks": [
+    {
+      "abi": "arm64-v8a",
+      "kind": "elf",
+      "pageAlignment": 16384,
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "exportedSymbols": [
+        "qg_add_all",
+        "qg_api_version",
+        "qg_branch_create",
+        "qg_branches_json",
+        "qg_checkout_branch",
+        "qg_clone",
+        "qg_commit",
+        "qg_conflicts_json",
+        "qg_diff_json",
+        "qg_fetch",
+        "qg_head_json",
+        "qg_init",
+        "qg_libgit2_version",
+        "qg_log_json",
+        "qg_mbedtls_version",
+        "qg_merge",
+        "qg_merge_commit",
+        "qg_push",
+        "qg_remote_set_url",
+        "qg_remotes_json",
+        "qg_repo_free",
+        "qg_repo_init",
+        "qg_repo_open",
+        "qg_shutdown",
+        "qg_stage_paths",
+        "qg_status_json",
+        "qg_string_free",
+        "qg_unstage_paths"
+      ]
+    },
+    {
+      "abi": "armeabi-v7a",
+      "kind": "elf",
+      "pageAlignment": 16384,
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "exportedSymbols": [
+        "qg_add_all",
+        "qg_api_version",
+        "qg_branch_create",
+        "qg_branches_json",
+        "qg_checkout_branch",
+        "qg_clone",
+        "qg_commit",
+        "qg_conflicts_json",
+        "qg_diff_json",
+        "qg_fetch",
+        "qg_head_json",
+        "qg_init",
+        "qg_libgit2_version",
+        "qg_log_json",
+        "qg_mbedtls_version",
+        "qg_merge",
+        "qg_merge_commit",
+        "qg_push",
+        "qg_remote_set_url",
+        "qg_remotes_json",
+        "qg_repo_free",
+        "qg_repo_init",
+        "qg_repo_open",
+        "qg_shutdown",
+        "qg_stage_paths",
+        "qg_status_json",
+        "qg_string_free",
+        "qg_unstage_paths"
+      ]
+    },
+    {
+      "abi": "x86_64",
+      "kind": "elf",
+      "pageAlignment": 16384,
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "exportedSymbols": [
+        "qg_add_all",
+        "qg_api_version",
+        "qg_branch_create",
+        "qg_branches_json",
+        "qg_checkout_branch",
+        "qg_clone",
+        "qg_commit",
+        "qg_conflicts_json",
+        "qg_diff_json",
+        "qg_fetch",
+        "qg_head_json",
+        "qg_init",
+        "qg_libgit2_version",
+        "qg_log_json",
+        "qg_mbedtls_version",
+        "qg_merge",
+        "qg_merge_commit",
+        "qg_push",
+        "qg_remote_set_url",
+        "qg_remotes_json",
+        "qg_repo_free",
+        "qg_repo_init",
+        "qg_repo_open",
+        "qg_shutdown",
+        "qg_stage_paths",
+        "qg_status_json",
+        "qg_string_free",
+        "qg_unstage_paths"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "arm64-v8a/libqfli_git.so",
+      "abi": "arm64-v8a",
+      "bytes": 1813960,
+      "sha256": "a84501356975cb79ed01cc4ee1a31953fe9aafb4a1d4ddd4d95e6c85c761286d",
+      "zipBytes": 831893
+    },
+    {
+      "path": "arm64-v8a/qfli_git.h",
+      "abi": "arm64-v8a",
+      "bytes": 6516,
+      "sha256": "e9439ed753c3a62c5ea2540ab09481dac15daacea0efa272c29ec10bfbb72c5f",
+      "zipBytes": 2379
+    },
+    {
+      "path": "armeabi-v7a/libqfli_git.so",
+      "abi": "armeabi-v7a",
+      "bytes": 1330060,
+      "sha256": "7d96c605bb086bcbad2875ab1ad521877f446d4729f3f7344d082400c98c1e7b",
+      "zipBytes": 758036
+    },
+    {
+      "path": "armeabi-v7a/qfli_git.h",
+      "abi": "armeabi-v7a",
+      "bytes": 6516,
+      "sha256": "e9439ed753c3a62c5ea2540ab09481dac15daacea0efa272c29ec10bfbb72c5f",
+      "zipBytes": 2379
+    },
+    {
+      "path": "x86_64/libqfli_git.so",
+      "abi": "x86_64",
+      "bytes": 1901760,
+      "sha256": "3dbf0763eff0ba1cfcdf25c1a7c2bd56640c4ac1b2551ff8b1122b80fcd03d87",
+      "zipBytes": 868227
+    },
+    {
+      "path": "x86_64/qfli_git.h",
+      "abi": "x86_64",
+      "bytes": 6516,
+      "sha256": "e9439ed753c3a62c5ea2540ab09481dac15daacea0efa272c29ec10bfbb72c5f",
+      "zipBytes": 2379
+    },
+    {
+      "path": "licenses/CACERT-LICENSE",
+      "abi": null,
+      "bytes": 776,
+      "sha256": "5e2ab3d06943b20ab44609dd32ebf43575b58ed045990a23f482921ab63ec1b3",
+      "zipBytes": 432
+    },
+    {
+      "path": "licenses/LIBGIT2-LICENSE",
+      "abi": null,
+      "bytes": 72970,
+      "sha256": "e0938121c0554985fe17196ac38fc590d149268e9c46e0c0e7a2eae1354fae71",
+      "zipBytes": 20279
+    },
+    {
+      "path": "licenses/MBEDTLS-LICENSE",
+      "abi": null,
+      "bytes": 29852,
+      "sha256": "9b405ef4c89342f5eae1dd828882f931747f71001cfba7d114801039b52ad09b",
+      "zipBytes": 10280
+    },
+    {
+      "path": "licenses/PROJECT-LICENSE",
+      "abi": null,
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "zipBytes": 12106
+    }
+  ],
+  "apiVersion": 2,
+  "requiredExports": [
+    "qg_api_version",
+    "qg_libgit2_version",
+    "qg_mbedtls_version",
+    "qg_init",
+    "qg_shutdown",
+    "qg_repo_init",
+    "qg_repo_open",
+    "qg_repo_free",
+    "qg_clone",
+    "qg_fetch",
+    "qg_push",
+    "qg_add_all",
+    "qg_stage_paths",
+    "qg_unstage_paths",
+    "qg_commit",
+    "qg_branch_create",
+    "qg_checkout_branch",
+    "qg_merge",
+    "qg_merge_commit",
+    "qg_conflicts_json",
+    "qg_diff_json",
+    "qg_log_json",
+    "qg_branches_json",
+    "qg_remotes_json",
+    "qg_remote_set_url",
+    "qg_status_json",
+    "qg_head_json",
+    "qg_string_free"
+  ],
+  "contractSha256": "4004ce5129808f6973ca4207f3b54d8800c55783a0eb353b41a2549d0b6e3b75"
+}

@@ -1,0 +1,15 @@
+diff --git a/lib/shell/large_screen_workbench.dart b/lib/shell/large_screen_workbench.dart
+index db0b078..940f41a 100644
+--- a/lib/shell/large_screen_workbench.dart
++++ b/lib/shell/large_screen_workbench.dart
+@@ -327,7 +327,9 @@ class _LargeScreenWorkbenchState extends State<LargeScreenWorkbench> {
+                                       ),
+                                     ),
+                                   Positioned(
+-                                    key: const ValueKey('workbench-sidebar-slot'),
++                                    key: const ValueKey(
++                                      'workbench-sidebar-slot',
++                                    ),
+                                     left: 0,
+                                     top: 0,
+                                     bottom: 0,

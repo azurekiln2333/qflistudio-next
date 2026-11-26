@@ -1,0 +1,196 @@
+{
+  "observed_at": "2026-11-23T16:22:52.806149+00:00",
+  "repo": "qflistudio-core",
+  "workflow": "core-check",
+  "branch": "ci/agents-tabs",
+  "sha": "e2ba82c1caf3d2ddcf64b699d32dfd1526384cdc",
+  "run_id": 45214563775,
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45214563775",
+  "jobs": [
+    {
+      "id": 137832091738,
+      "run_id": 45214563775,
+      "workflow_name": "core-check",
+      "head_branch": "ci/agents-tabs",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/runs/45214563775",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUxXzgM8AAAAgF27QWg",
+      "head_sha": "e2ba82c1caf3d2ddcf64b699d32dfd1526384cdc",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/actions/jobs/137832091738",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-core/actions/runs/45214563775/job/137832091738",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-23T16:16:08Z",
+      "started_at": "2026-11-23T16:16:11Z",
+      "completed_at": "2026-11-23T16:21:51Z",
+      "name": "check",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T16:16:11Z",
+          "completed_at": "2026-11-23T16:16:14Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T16:16:14Z",
+          "completed_at": "2026-11-23T16:16:20Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T16:16:20Z",
+          "completed_at": "2026-11-23T16:16:20Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T16:16:20Z",
+          "completed_at": "2026-11-23T16:16:21Z"
+        },
+        {
+          "name": "Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T16:16:21Z",
+          "completed_at": "2026-11-23T16:16:25Z"
+        },
+        {
+          "name": "Install the pinned OHOS Flutter SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T16:16:25Z",
+          "completed_at": "2026-11-23T16:16:25Z"
+        },
+        {
+          "name": "Resolve packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T16:16:25Z",
+          "completed_at": "2026-11-23T16:16:28Z"
+        },
+        {
+          "name": "Analyze",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T16:16:28Z",
+          "completed_at": "2026-11-23T16:16:52Z"
+        },
+        {
+          "name": "Run the complete test suite",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2026-11-23T16:16:52Z",
+          "completed_at": "2026-11-23T16:21:47Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T16:21:47Z",
+          "completed_at": "2026-11-23T16:21:47Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T16:21:47Z",
+          "completed_at": "2026-11-23T16:21:48Z"
+        },
+        {
+          "name": "Post Run actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-23T16:21:48Z",
+          "completed_at": "2026-11-23T16:21:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-23T16:21:48Z",
+          "completed_at": "2026-11-23T16:21:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T16:21:48Z",
+          "completed_at": "2026-11-23T16:21:49Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T16:21:49Z",
+          "completed_at": "2026-11-23T16:21:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T16:21:49Z",
+          "completed_at": "2026-11-23T16:21:49Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-core/check-runs/137832091738",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002416,
+      "runner_name": "GitHub Actions 1000002416",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions",
+      "failure_annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/e2ba82c1caf3d2ddcf64b699d32dfd1526384cdc/.github",
+          "start_line": 67,
+          "start_column": null,
+          "end_line": 67,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "Failed test",
+          "message": "/home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/home_project_tabs_widget_test.dart :: dragging selected Agents keeps its state and persists its order :: Test failed. See exception logs above.\n    The test description was: dragging selected Agents keeps its state and persists its order\n    The following TestFailure was thrown running a test:\n    Expected: exactly one matching candidate\n    Actual: _HitTestableWidgetFinder:<Found 0 widgets with text \"Session 0\" (considering only\n    hit-testable widgets with a RenderBox): []>\n    Which: means none were found but one was expected\n    #4      main.<anonymous closure> (test/home_project_tabs_widget_test.dart:209:7)\n    test/home_project_tabs_widget_test.dart line 209",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/azurekiln2333/qflistudio-core/blob/e2ba82c1caf3d2ddcf64b699d32dfd1526384cdc/.github",
+          "start_line": 8568,
+          "start_column": null,
+          "end_line": 8568,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "Process completed with exit code 1.",
+          "raw_details": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{"file": ".trellis/spec/frontend/remote-companion.md", "reason": "核对新增请求是否只在已授权通道上发出，身份与世代失配时必须丢弃结果"}
+{"file": ".trellis/spec/frontend/cloud-project-cache.md", "reason": "核对便携路径的逐级前缀检查、清单哈希与文件数一致性、失败时保留上一份完整副本"}
+{"file": ".trellis/spec/frontend/project-storage.md", "reason": "核对占位项目目录名与元数据字段，确认不破坏已有项目的读取路径"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "核对克隆与抓取的取消是否释放子进程与文件句柄"}
+{"file": ".trellis/spec/frontend/git-clone-progress.md", "reason": "核对 git 拉取复用了既有进度与取消接口，没有旁路"}
+{"file": ".trellis/spec/backend/relay-grants.md", "reason": "核对中继仍只转发，不存文件也不存清单，也不缓存授权结果"}
+{"file": ".trellis/spec/backend/remote-bindings.md", "reason": "核对设备撤销后同步立即失效，设备信息只取自已认证通道"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "按层核对改动：协议、镜像、存储、界面四层是否都覆盖"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "核对没有重复实现路径检查、克隆、项目配置写入"}

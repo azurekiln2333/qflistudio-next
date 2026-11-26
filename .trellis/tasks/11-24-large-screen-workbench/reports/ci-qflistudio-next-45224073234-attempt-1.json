@@ -1,0 +1,2605 @@
+{
+  "observed_at": "2026-11-23T18:32:37.088016+00:00",
+  "run": {
+    "id": 45224073234,
+    "name": "App installers",
+    "node_id": "WFR_kwLOUZFhxs8AAAAKh5CYEg",
+    "head_branch": "main",
+    "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+    "path": ".github/workflows/app-installers.yml",
+    "display_title": "ci(home): pin atomic tab-order restoration",
+    "run_number": 62,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "workflow_id": 422094787,
+    "check_suite_id": 122378632911,
+    "check_suite_node_id": "CS_kwDOUZFhxs8AAAAcflW-zw",
+    "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+    "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+    "pull_requests": [],
+    "created_at": "2026-11-23T17:07:03Z",
+    "updated_at": "2026-11-23T17:31:10Z",
+    "actor": {
+      "login": "azurekiln2333",
+      "id": 43383580,
+      "node_id": "MDQ6VXNlcjQzMzgzNTgw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43383580?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/azurekiln2333",
+      "html_url": "https://github.com/azurekiln2333",
+      "followers_url": "https://api.github.com/users/azurekiln2333/followers",
+      "following_url": "https://api.github.com/users/azurekiln2333/following{/other_user}",
+      "gists_url": "https://api.github.com/users/azurekiln2333/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/azurekiln2333/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/azurekiln2333/subscriptions",
+      "organizations_url": "https://api.github.com/users/azurekiln2333/orgs",
+      "repos_url": "https://api.github.com/users/azurekiln2333/repos",
+      "events_url": "https://api.github.com/users/azurekiln2333/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/azurekiln2333/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "run_attempt": 1,
+    "referenced_workflows": [],
+    "run_started_at": "2026-11-23T17:07:03Z",
+    "triggering_actor": {
+      "login": "azurekiln2333",
+      "id": 43383580,
+      "node_id": "MDQ6VXNlcjQzMzgzNTgw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43383580?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/azurekiln2333",
+      "html_url": "https://github.com/azurekiln2333",
+      "followers_url": "https://api.github.com/users/azurekiln2333/followers",
+      "following_url": "https://api.github.com/users/azurekiln2333/following{/other_user}",
+      "gists_url": "https://api.github.com/users/azurekiln2333/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/azurekiln2333/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/azurekiln2333/subscriptions",
+      "organizations_url": "https://api.github.com/users/azurekiln2333/orgs",
+      "repos_url": "https://api.github.com/users/azurekiln2333/repos",
+      "events_url": "https://api.github.com/users/azurekiln2333/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/azurekiln2333/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "jobs_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234/jobs",
+    "logs_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234/logs",
+    "check_suite_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-suites/122378632911",
+    "artifacts_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234/artifacts",
+    "cancel_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234/cancel",
+    "rerun_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234/rerun",
+    "previous_attempt_url": null,
+    "workflow_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/workflows/422094787",
+    "head_commit": {
+      "id": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "tree_id": "71cfd642673fffa6911fc30cb96f31b714e207e4",
+      "message": "ci(home): pin atomic tab-order restoration",
+      "timestamp": "2026-11-23T16:26:04Z",
+      "author": {
+        "name": "azurekiln2333",
+        "email": "[redacted-email]"
+      },
+      "committer": {
+        "name": "azurekiln2333",
+        "email": "[redacted-email]"
+      }
+    },
+    "repository": {
+      "id": 1368482246,
+      "node_id": "R_kgDOUZFhxg",
+      "name": "qflistudio-next",
+      "full_name": "azurekiln2333/qflistudio-next",
+      "private": false,
+      "owner": {
+        "login": "azurekiln2333",
+        "id": 43383580,
+        "node_id": "MDQ6VXNlcjQzMzgzNTgw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/43383580?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/azurekiln2333",
+        "html_url": "https://github.com/azurekiln2333",
+        "followers_url": "https://api.github.com/users/azurekiln2333/followers",
+        "following_url": "https://api.github.com/users/azurekiln2333/following{/other_user}",
+        "gists_url": "https://api.github.com/users/azurekiln2333/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/azurekiln2333/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/azurekiln2333/subscriptions",
+        "organizations_url": "https://api.github.com/users/azurekiln2333/orgs",
+        "repos_url": "https://api.github.com/users/azurekiln2333/repos",
+        "events_url": "https://api.github.com/users/azurekiln2333/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/azurekiln2333/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next",
+      "description": "A modern, cross-platform and multi-language IDE built with Flutter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next",
+      "forks_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/forks",
+      "keys_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/teams",
+      "hooks_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/hooks",
+      "issue_events_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/events",
+      "assignees_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/tags",
+      "blobs_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/languages",
+      "stargazers_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/stargazers",
+      "contributors_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/contributors",
+      "subscribers_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/subscribers",
+      "subscription_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/subscription",
+      "commits_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/merges",
+      "archive_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/downloads",
+      "issues_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/labels{/name}",
+      "releases_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/deployments"
+    },
+    "head_repository": {
+      "id": 1368482246,
+      "node_id": "R_kgDOUZFhxg",
+      "name": "qflistudio-next",
+      "full_name": "azurekiln2333/qflistudio-next",
+      "private": false,
+      "owner": {
+        "login": "azurekiln2333",
+        "id": 43383580,
+        "node_id": "MDQ6VXNlcjQzMzgzNTgw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/43383580?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/azurekiln2333",
+        "html_url": "https://github.com/azurekiln2333",
+        "followers_url": "https://api.github.com/users/azurekiln2333/followers",
+        "following_url": "https://api.github.com/users/azurekiln2333/following{/other_user}",
+        "gists_url": "https://api.github.com/users/azurekiln2333/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/azurekiln2333/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/azurekiln2333/subscriptions",
+        "organizations_url": "https://api.github.com/users/azurekiln2333/orgs",
+        "repos_url": "https://api.github.com/users/azurekiln2333/repos",
+        "events_url": "https://api.github.com/users/azurekiln2333/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/azurekiln2333/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next",
+      "description": "A modern, cross-platform and multi-language IDE built with Flutter.",
+      "fork": false,
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next",
+      "forks_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/forks",
+      "keys_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/teams",
+      "hooks_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/hooks",
+      "issue_events_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/events",
+      "assignees_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/tags",
+      "blobs_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/languages",
+      "stargazers_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/stargazers",
+      "contributors_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/contributors",
+      "subscribers_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/subscribers",
+      "subscription_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/subscription",
+      "commits_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/merges",
+      "archive_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/downloads",
+      "issues_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/labels{/name}",
+      "releases_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/deployments"
+    }
+  },
+  "jobs": [
+    {
+      "id": 137865749030,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBiJg",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865749030",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865749030",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:08Z",
+      "completed_at": "2026-11-23T17:09:01Z",
+      "name": "Verify Node companion on ubuntu-24.04",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:12Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:12Z",
+          "completed_at": "2026-11-23T17:07:17Z"
+        },
+        {
+          "name": "Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:17Z",
+          "completed_at": "2026-11-23T17:07:25Z"
+        },
+        {
+          "name": "Install companion dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:25Z",
+          "completed_at": "2026-11-23T17:07:35Z"
+        },
+        {
+          "name": "Check companion types",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:35Z",
+          "completed_at": "2026-11-23T17:07:37Z"
+        },
+        {
+          "name": "Run companion tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:07:37Z",
+          "completed_at": "2026-11-23T17:08:55Z"
+        },
+        {
+          "name": "Verify pairing, streaming, permissions and questions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:08:55Z",
+          "completed_at": "2026-11-23T17:08:55Z"
+        },
+        {
+          "name": "Upload companion verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:08:55Z",
+          "completed_at": "2026-11-23T17:08:57Z"
+        },
+        {
+          "name": "Post Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-23T17:08:57Z",
+          "completed_at": "2026-11-23T17:08:57Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-23T17:08:57Z",
+          "completed_at": "2026-11-23T17:08:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-23T17:08:57Z",
+          "completed_at": "2026-11-23T17:08:57Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865749030",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002475,
+      "runner_name": "GitHub Actions 1000002475",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865749577,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBkSQ",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865749577",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865749577",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:07Z",
+      "completed_at": "2026-11-23T17:07:14Z",
+      "name": "Resolve the Flutter stable version",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:08Z",
+          "completed_at": "2026-11-23T17:07:09Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Resolve the version and its framework commit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Resolve the app version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865749577",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002478,
+      "runner_name": "GitHub Actions 1000002478",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865749611,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBkaw",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865749611",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865749611",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:08Z",
+      "completed_at": "2026-11-23T17:07:29Z",
+      "name": "Verify pinned Java foreground receiver",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:12Z"
+        },
+        {
+          "name": "Check out the Java receiver",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:12Z",
+          "completed_at": "2026-11-23T17:07:18Z"
+        },
+        {
+          "name": "Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:22Z"
+        },
+        {
+          "name": "Install the pinned ArkTS host test transpiler",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:22Z",
+          "completed_at": "2026-11-23T17:07:24Z"
+        },
+        {
+          "name": "Exercise the native entry and receiver with platform stubs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:24Z",
+          "completed_at": "2026-11-23T17:07:24Z"
+        },
+        {
+          "name": "Upload Java verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:07:24Z",
+          "completed_at": "2026-11-23T17:07:26Z"
+        },
+        {
+          "name": "Post Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:07:26Z",
+          "completed_at": "2026-11-23T17:07:26Z"
+        },
+        {
+          "name": "Post Check out the Java receiver",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T17:07:26Z",
+          "completed_at": "2026-11-23T17:07:26Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-23T17:07:26Z",
+          "completed_at": "2026-11-23T17:07:26Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865749611",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002476,
+      "runner_name": "GitHub Actions 1000002476",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865749649,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBkkQ",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865749649",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865749649",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:08Z",
+      "completed_at": "2026-11-23T17:08:23Z",
+      "name": "Verify app with OHOS Flutter",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:09Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Check out the Java interop contract",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Set up OHOS Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:36Z"
+        },
+        {
+          "name": "Resolve all Dart packages read by the analyzer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:36Z",
+          "completed_at": "2026-11-23T17:07:37Z"
+        },
+        {
+          "name": "Analyze the complete package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:07:37Z",
+          "completed_at": "2026-11-23T17:07:58Z"
+        },
+        {
+          "name": "Run the complete package test suite",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:07:58Z",
+          "completed_at": "2026-11-23T17:08:17Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-23T17:08:17Z",
+          "completed_at": "2026-11-23T17:08:17Z"
+        },
+        {
+          "name": "Test the CI helper scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:08:17Z",
+          "completed_at": "2026-11-23T17:08:18Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:08:18Z",
+          "completed_at": "2026-11-23T17:08:19Z"
+        },
+        {
+          "name": "Post Set up OHOS Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-23T17:08:19Z",
+          "completed_at": "2026-11-23T17:08:20Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-23T17:08:20Z",
+          "completed_at": "2026-11-23T17:08:20Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T17:08:20Z",
+          "completed_at": "2026-11-23T17:08:20Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865749649",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002477,
+      "runner_name": "GitHub Actions 1000002477",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865749706,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBkyg",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865749706",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865749706",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:07Z",
+      "completed_at": "2026-11-23T17:11:01Z",
+      "name": "OHOS unsigned HAP",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:08Z",
+          "completed_at": "2026-11-23T17:07:09Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Install the command-line tools prerequisite",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:26Z"
+        },
+        {
+          "name": "Install the HarmonyOS command-line tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:26Z",
+          "completed_at": "2026-11-23T17:08:38Z"
+        },
+        {
+          "name": "Verify the tools layout and the API level",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:08:38Z",
+          "completed_at": "2026-11-23T17:08:38Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:08:38Z",
+          "completed_at": "2026-11-23T17:09:06Z"
+        },
+        {
+          "name": "Select Node 24 for hvigor",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:09:06Z",
+          "completed_at": "2026-11-23T17:09:11Z"
+        },
+        {
+          "name": "Pin NODE_HOME and require Node 24.14.1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:09:11Z",
+          "completed_at": "2026-11-23T17:09:11Z"
+        },
+        {
+          "name": "Record the OHOS toolchain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:09:11Z",
+          "completed_at": "2026-11-23T17:09:12Z"
+        },
+        {
+          "name": "Remove local signing from the runner's build profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:09:12Z",
+          "completed_at": "2026-11-23T17:09:12Z"
+        },
+        {
+          "name": "Build the unsigned release HAP",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:09:12Z",
+          "completed_at": "2026-11-23T17:10:52Z"
+        },
+        {
+          "name": "Show the hvigor logs after a failed build",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12,
+          "started_at": "2026-11-23T17:10:52Z",
+          "completed_at": "2026-11-23T17:10:52Z"
+        },
+        {
+          "name": "Inspect the HAP entries, the bundle name and the libraries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-23T17:10:52Z",
+          "completed_at": "2026-11-23T17:10:53Z"
+        },
+        {
+          "name": "Verify qfli_git native payload and provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-23T17:10:53Z",
+          "completed_at": "2026-11-23T17:10:53Z"
+        },
+        {
+          "name": "Stage the OHOS package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-23T17:10:53Z",
+          "completed_at": "2026-11-23T17:10:53Z"
+        },
+        {
+          "name": "Upload the OHOS package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-23T17:10:53Z",
+          "completed_at": "2026-11-23T17:10:56Z"
+        },
+        {
+          "name": "Summarize the OHOS package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-23T17:10:56Z",
+          "completed_at": "2026-11-23T17:10:56Z"
+        },
+        {
+          "name": "Post Select Node 24 for hvigor",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 32,
+          "started_at": "2026-11-23T17:10:56Z",
+          "completed_at": "2026-11-23T17:10:56Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33,
+          "started_at": "2026-11-23T17:10:56Z",
+          "completed_at": "2026-11-23T17:10:57Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 34,
+          "started_at": "2026-11-23T17:10:57Z",
+          "completed_at": "2026-11-23T17:10:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-11-23T17:10:57Z",
+          "completed_at": "2026-11-23T17:10:57Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865749706",
+      "labels": [
+        "ubuntu-22.04"
+      ],
+      "runner_id": 1000002473,
+      "runner_name": "GitHub Actions 1000002473",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865749724,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBk3A",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865749724",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865749724",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:07Z",
+      "completed_at": "2026-11-23T17:09:10Z",
+      "name": "Verify Node companion on windows-2022",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:08Z",
+          "completed_at": "2026-11-23T17:07:09Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:18Z"
+        },
+        {
+          "name": "Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:31Z"
+        },
+        {
+          "name": "Install companion dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:31Z",
+          "completed_at": "2026-11-23T17:07:40Z"
+        },
+        {
+          "name": "Check companion types",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:40Z",
+          "completed_at": "2026-11-23T17:07:44Z"
+        },
+        {
+          "name": "Run companion tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:07:44Z",
+          "completed_at": "2026-11-23T17:09:04Z"
+        },
+        {
+          "name": "Verify pairing, streaming, permissions and questions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:09:04Z",
+          "completed_at": "2026-11-23T17:09:05Z"
+        },
+        {
+          "name": "Upload companion verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:09:05Z",
+          "completed_at": "2026-11-23T17:09:06Z"
+        },
+        {
+          "name": "Post Set up Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-23T17:09:06Z",
+          "completed_at": "2026-11-23T17:09:07Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-23T17:09:07Z",
+          "completed_at": "2026-11-23T17:09:08Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-23T17:09:08Z",
+          "completed_at": "2026-11-23T17:09:08Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865749724",
+      "labels": [
+        "windows-2022"
+      ],
+      "runner_id": 1000002474,
+      "runner_name": "GitHub Actions 1000002474",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865750322,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXBnMg",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865750322",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865750322",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:04Z",
+      "started_at": "2026-11-23T17:07:07Z",
+      "completed_at": "2026-11-23T17:15:16Z",
+      "name": "Verify core with OHOS Flutter",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:08Z",
+          "completed_at": "2026-11-23T17:07:09Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:09Z",
+          "completed_at": "2026-11-23T17:07:10Z"
+        },
+        {
+          "name": "Check out the Java interop contract",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:10Z",
+          "completed_at": "2026-11-23T17:07:11Z"
+        },
+        {
+          "name": "Set up OHOS Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:11Z",
+          "completed_at": "2026-11-23T17:07:32Z"
+        },
+        {
+          "name": "Resolve all Dart packages read by the analyzer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:32Z",
+          "completed_at": "2026-11-23T17:07:34Z"
+        },
+        {
+          "name": "Analyze the complete package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:07:34Z",
+          "completed_at": "2026-11-23T17:08:10Z"
+        },
+        {
+          "name": "Run the complete package test suite",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:08:10Z",
+          "completed_at": "2026-11-23T17:15:12Z"
+        },
+        {
+          "name": "Report failed tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-23T17:15:12Z",
+          "completed_at": "2026-11-23T17:15:12Z"
+        },
+        {
+          "name": "Test the CI helper scripts",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-11-23T17:15:12Z",
+          "completed_at": "2026-11-23T17:15:12Z"
+        },
+        {
+          "name": "Upload verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:15:12Z",
+          "completed_at": "2026-11-23T17:15:13Z"
+        },
+        {
+          "name": "Post Set up OHOS Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-11-23T17:15:13Z",
+          "completed_at": "2026-11-23T17:15:14Z"
+        },
+        {
+          "name": "Post Check out the Java interop contract",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-23T17:15:14Z",
+          "completed_at": "2026-11-23T17:15:14Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-23T17:15:14Z",
+          "completed_at": "2026-11-23T17:15:14Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T17:15:14Z",
+          "completed_at": "2026-11-23T17:15:14Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865750322",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002479,
+      "runner_name": "GitHub Actions 1000002479",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865863953,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIjEQ",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865863953",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865863953",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:18Z",
+      "completed_at": "2026-11-23T17:10:33Z",
+      "name": "iOS unsigned IPA",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:19Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:19Z",
+          "completed_at": "2026-11-23T17:07:21Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:21Z",
+          "completed_at": "2026-11-23T17:07:58Z"
+        },
+        {
+          "name": "Build the iOS release app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:58Z",
+          "completed_at": "2026-11-23T17:10:16Z"
+        },
+        {
+          "name": "Inspect the iOS app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:10:16Z",
+          "completed_at": "2026-11-23T17:10:20Z"
+        },
+        {
+          "name": "Package and stage the unsigned IPA",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:10:20Z",
+          "completed_at": "2026-11-23T17:10:24Z"
+        },
+        {
+          "name": "Upload the iOS IPA",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:10:24Z",
+          "completed_at": "2026-11-23T17:10:27Z"
+        },
+        {
+          "name": "Summarize the iOS IPA",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:10:27Z",
+          "completed_at": "2026-11-23T17:10:27Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-23T17:10:27Z",
+          "completed_at": "2026-11-23T17:10:28Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-23T17:10:28Z",
+          "completed_at": "2026-11-23T17:10:28Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-23T17:10:28Z",
+          "completed_at": "2026-11-23T17:10:29Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865863953",
+      "labels": [
+        "macos-15"
+      ],
+      "runner_id": 1000002487,
+      "runner_name": "GitHub Actions 1000002487",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865863982,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIjLg",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865863982",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865863982",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:19Z",
+      "completed_at": "2026-11-23T17:09:33Z",
+      "name": "Linux arm64 packages",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:20Z",
+          "completed_at": "2026-11-23T17:07:21Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:21Z",
+          "completed_at": "2026-11-23T17:07:22Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:22Z",
+          "completed_at": "2026-11-23T17:07:42Z"
+        },
+        {
+          "name": "Install Linux desktop build tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:42Z",
+          "completed_at": "2026-11-23T17:08:11Z"
+        },
+        {
+          "name": "Build the Linux release bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:08:11Z",
+          "completed_at": "2026-11-23T17:09:09Z"
+        },
+        {
+          "name": "Inspect the Linux bundle and its ELF machine",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:09:09Z",
+          "completed_at": "2026-11-23T17:09:09Z"
+        },
+        {
+          "name": "Package the deb and the tar.gz",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:09:09Z",
+          "completed_at": "2026-11-23T17:09:24Z"
+        },
+        {
+          "name": "Inspect the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:09:24Z",
+          "completed_at": "2026-11-23T17:09:25Z"
+        },
+        {
+          "name": "Stage the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:09:25Z",
+          "completed_at": "2026-11-23T17:09:25Z"
+        },
+        {
+          "name": "Upload the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:09:25Z",
+          "completed_at": "2026-11-23T17:09:28Z"
+        },
+        {
+          "name": "Summarize the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:09:28Z",
+          "completed_at": "2026-11-23T17:09:28Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T17:09:28Z",
+          "completed_at": "2026-11-23T17:09:29Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T17:09:29Z",
+          "completed_at": "2026-11-23T17:09:29Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T17:09:29Z",
+          "completed_at": "2026-11-23T17:09:29Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865863982",
+      "labels": [
+        "ubuntu-22.04-arm"
+      ],
+      "runner_id": 1000002490,
+      "runner_name": "GitHub Actions 1000002490",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864015,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIjTw",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864015",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864015",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:18Z",
+      "completed_at": "2026-11-23T17:10:47Z",
+      "name": "macOS x86_64 DMG",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:19Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:19Z",
+          "completed_at": "2026-11-23T17:07:22Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:22Z",
+          "completed_at": "2026-11-23T17:07:57Z"
+        },
+        {
+          "name": "Show the Apple toolchain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:57Z",
+          "completed_at": "2026-11-23T17:07:59Z"
+        },
+        {
+          "name": "Build the macOS release app for one architecture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:59Z",
+          "completed_at": "2026-11-23T17:10:22Z"
+        },
+        {
+          "name": "Thin and inspect the macOS app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:10:22Z",
+          "completed_at": "2026-11-23T17:10:26Z"
+        },
+        {
+          "name": "Package and stage the DMG",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:10:26Z",
+          "completed_at": "2026-11-23T17:10:37Z"
+        },
+        {
+          "name": "Upload the macOS DMG",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:10:37Z",
+          "completed_at": "2026-11-23T17:10:40Z"
+        },
+        {
+          "name": "Summarize the macOS DMG",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:10:40Z",
+          "completed_at": "2026-11-23T17:10:40Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-23T17:10:40Z",
+          "completed_at": "2026-11-23T17:10:41Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-11-23T17:10:41Z",
+          "completed_at": "2026-11-23T17:10:41Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-23T17:10:41Z",
+          "completed_at": "2026-11-23T17:10:42Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864015",
+      "labels": [
+        "macos-15"
+      ],
+      "runner_id": 1000002488,
+      "runner_name": "GitHub Actions 1000002488",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864065,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIjgQ",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864065",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864065",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:17Z",
+      "completed_at": "2026-11-23T17:09:32Z",
+      "name": "Linux x64 packages",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:18Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:19Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:19Z",
+          "completed_at": "2026-11-23T17:07:36Z"
+        },
+        {
+          "name": "Install Linux desktop build tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:36Z",
+          "completed_at": "2026-11-23T17:07:55Z"
+        },
+        {
+          "name": "Build the Linux release bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:07:55Z",
+          "completed_at": "2026-11-23T17:09:03Z"
+        },
+        {
+          "name": "Inspect the Linux bundle and its ELF machine",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:09:03Z",
+          "completed_at": "2026-11-23T17:09:04Z"
+        },
+        {
+          "name": "Package the deb and the tar.gz",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:09:04Z",
+          "completed_at": "2026-11-23T17:09:26Z"
+        },
+        {
+          "name": "Inspect the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:09:26Z",
+          "completed_at": "2026-11-23T17:09:26Z"
+        },
+        {
+          "name": "Stage the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:09:26Z",
+          "completed_at": "2026-11-23T17:09:27Z"
+        },
+        {
+          "name": "Upload the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:09:27Z",
+          "completed_at": "2026-11-23T17:09:29Z"
+        },
+        {
+          "name": "Summarize the Linux packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:09:29Z",
+          "completed_at": "2026-11-23T17:09:29Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-23T17:09:29Z",
+          "completed_at": "2026-11-23T17:09:29Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T17:09:29Z",
+          "completed_at": "2026-11-23T17:09:30Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T17:09:30Z",
+          "completed_at": "2026-11-23T17:09:30Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864065",
+      "labels": [
+        "ubuntu-22.04"
+      ],
+      "runner_id": 1000002492,
+      "runner_name": "GitHub Actions 1000002492",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864074,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIjig",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864074",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864074",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:17Z",
+      "completed_at": "2026-11-23T17:11:28Z",
+      "name": "Windows x64 installer",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:17Z",
+          "completed_at": "2026-11-23T17:07:18Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:18Z",
+          "completed_at": "2026-11-23T17:07:27Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:27Z",
+          "completed_at": "2026-11-23T17:08:27Z"
+        },
+        {
+          "name": "Build Windows release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:08:27Z",
+          "completed_at": "2026-11-23T17:10:32Z"
+        },
+        {
+          "name": "Build Windows release with the batch entry point",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-23T17:10:32Z",
+          "completed_at": "2026-11-23T17:10:32Z"
+        },
+        {
+          "name": "Locate MSVC inspection tools and runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:10:32Z",
+          "completed_at": "2026-11-23T17:10:33Z"
+        },
+        {
+          "name": "Inspect the release directory and the PE machine",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:10:33Z",
+          "completed_at": "2026-11-23T17:10:33Z"
+        },
+        {
+          "name": "Assemble the package directory with the MSVC runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:10:33Z",
+          "completed_at": "2026-11-23T17:10:34Z"
+        },
+        {
+          "name": "Create the portable zip",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:10:34Z",
+          "completed_at": "2026-11-23T17:10:55Z"
+        },
+        {
+          "name": "Build the installer with Inno Setup",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:10:55Z",
+          "completed_at": "2026-11-23T17:11:13Z"
+        },
+        {
+          "name": "Inspect the portable zip and the installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:11:13Z",
+          "completed_at": "2026-11-23T17:11:13Z"
+        },
+        {
+          "name": "Install silently and inspect the installed files",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T17:11:13Z",
+          "completed_at": "2026-11-23T17:11:17Z"
+        },
+        {
+          "name": "Stage the Windows packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-23T17:11:17Z",
+          "completed_at": "2026-11-23T17:11:18Z"
+        },
+        {
+          "name": "Upload the Windows packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-23T17:11:18Z",
+          "completed_at": "2026-11-23T17:11:20Z"
+        },
+        {
+          "name": "Summarize the Windows package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-23T17:11:20Z",
+          "completed_at": "2026-11-23T17:11:20Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-23T17:11:20Z",
+          "completed_at": "2026-11-23T17:11:23Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-11-23T17:11:23Z",
+          "completed_at": "2026-11-23T17:11:25Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-11-23T17:11:25Z",
+          "completed_at": "2026-11-23T17:11:25Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864074",
+      "labels": [
+        "windows-2022"
+      ],
+      "runner_id": 1000002491,
+      "runner_name": "GitHub Actions 1000002491",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864083,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIjkw",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864083",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864083",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:20:37Z",
+      "completed_at": "2026-11-23T17:23:13Z",
+      "name": "macOS arm64 DMG",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:20:38Z",
+          "completed_at": "2026-11-23T17:20:38Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:20:38Z",
+          "completed_at": "2026-11-23T17:20:42Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:20:42Z",
+          "completed_at": "2026-11-23T17:21:09Z"
+        },
+        {
+          "name": "Show the Apple toolchain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:21:09Z",
+          "completed_at": "2026-11-23T17:21:11Z"
+        },
+        {
+          "name": "Build the macOS release app for one architecture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:21:11Z",
+          "completed_at": "2026-11-23T17:22:47Z"
+        },
+        {
+          "name": "Thin and inspect the macOS app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:22:47Z",
+          "completed_at": "2026-11-23T17:22:51Z"
+        },
+        {
+          "name": "Package and stage the DMG",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:22:51Z",
+          "completed_at": "2026-11-23T17:23:04Z"
+        },
+        {
+          "name": "Upload the macOS DMG",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:23:04Z",
+          "completed_at": "2026-11-23T17:23:07Z"
+        },
+        {
+          "name": "Summarize the macOS DMG",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:23:07Z",
+          "completed_at": "2026-11-23T17:23:07Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-23T17:23:07Z",
+          "completed_at": "2026-11-23T17:23:08Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-11-23T17:23:08Z",
+          "completed_at": "2026-11-23T17:23:08Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-11-23T17:23:08Z",
+          "completed_at": "2026-11-23T17:23:10Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864083",
+      "labels": [
+        "macos-15"
+      ],
+      "runner_id": 1000002511,
+      "runner_name": "GitHub Actions 1000002511",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864225,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIkIQ",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864225",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864225",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:28Z",
+      "completed_at": "2026-11-23T17:13:45Z",
+      "name": "Windows arm64 installer",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:29Z",
+          "completed_at": "2026-11-23T17:07:30Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:30Z",
+          "completed_at": "2026-11-23T17:07:47Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:47Z",
+          "completed_at": "2026-11-23T17:09:44Z"
+        },
+        {
+          "name": "Build Windows release",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 4,
+          "started_at": "2026-11-23T17:09:44Z",
+          "completed_at": "2026-11-23T17:09:44Z"
+        },
+        {
+          "name": "Build Windows release with the batch entry point",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:09:44Z",
+          "completed_at": "2026-11-23T17:12:30Z"
+        },
+        {
+          "name": "Locate MSVC inspection tools and runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:12:30Z",
+          "completed_at": "2026-11-23T17:12:33Z"
+        },
+        {
+          "name": "Inspect the release directory and the PE machine",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:12:33Z",
+          "completed_at": "2026-11-23T17:12:34Z"
+        },
+        {
+          "name": "Assemble the package directory with the MSVC runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:12:34Z",
+          "completed_at": "2026-11-23T17:12:35Z"
+        },
+        {
+          "name": "Create the portable zip",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:12:35Z",
+          "completed_at": "2026-11-23T17:12:55Z"
+        },
+        {
+          "name": "Build the installer with Inno Setup",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:12:55Z",
+          "completed_at": "2026-11-23T17:13:12Z"
+        },
+        {
+          "name": "Inspect the portable zip and the installer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:13:12Z",
+          "completed_at": "2026-11-23T17:13:13Z"
+        },
+        {
+          "name": "Install silently and inspect the installed files",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T17:13:13Z",
+          "completed_at": "2026-11-23T17:13:19Z"
+        },
+        {
+          "name": "Stage the Windows packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-23T17:13:19Z",
+          "completed_at": "2026-11-23T17:13:21Z"
+        },
+        {
+          "name": "Upload the Windows packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-23T17:13:21Z",
+          "completed_at": "2026-11-23T17:13:24Z"
+        },
+        {
+          "name": "Summarize the Windows package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-23T17:13:24Z",
+          "completed_at": "2026-11-23T17:13:24Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-23T17:13:24Z",
+          "completed_at": "2026-11-23T17:13:29Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-11-23T17:13:29Z",
+          "completed_at": "2026-11-23T17:13:33Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-11-23T17:13:33Z",
+          "completed_at": "2026-11-23T17:13:33Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864225",
+      "labels": [
+        "windows-11-arm"
+      ],
+      "runner_id": 1000002495,
+      "runner_name": "GitHub Actions 1000002495",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864257,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIkQQ",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864257",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864257",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:32Z",
+      "completed_at": "2026-11-23T17:12:43Z",
+      "name": "Android release APKs",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:33Z",
+          "completed_at": "2026-11-23T17:07:33Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:33Z",
+          "completed_at": "2026-11-23T17:07:35Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:35Z",
+          "completed_at": "2026-11-23T17:07:51Z"
+        },
+        {
+          "name": "Select JDK 17 and install the pinned Android build tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:07:51Z",
+          "completed_at": "2026-11-23T17:08:22Z"
+        },
+        {
+          "name": "Create the debug key store",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:08:22Z",
+          "completed_at": "2026-11-23T17:08:23Z"
+        },
+        {
+          "name": "Build the split release APKs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:08:23Z",
+          "completed_at": "2026-11-23T17:12:28Z"
+        },
+        {
+          "name": "Inspect each APK's ABI, signature and package ID",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:12:28Z",
+          "completed_at": "2026-11-23T17:12:30Z"
+        },
+        {
+          "name": "Inspect the ELF machine of the packaged runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:12:30Z",
+          "completed_at": "2026-11-23T17:12:30Z"
+        },
+        {
+          "name": "Verify qfli_git native payload and provenance",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:12:30Z",
+          "completed_at": "2026-11-23T17:12:31Z"
+        },
+        {
+          "name": "Stage the Android packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:12:31Z",
+          "completed_at": "2026-11-23T17:12:31Z"
+        },
+        {
+          "name": "Upload the x86_64 APK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:12:31Z",
+          "completed_at": "2026-11-23T17:12:34Z"
+        },
+        {
+          "name": "Upload the armeabi-v7a APK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T17:12:34Z",
+          "completed_at": "2026-11-23T17:12:36Z"
+        },
+        {
+          "name": "Upload the arm64-v8a APK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-23T17:12:36Z",
+          "completed_at": "2026-11-23T17:12:39Z"
+        },
+        {
+          "name": "Summarize the Android packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-23T17:12:39Z",
+          "completed_at": "2026-11-23T17:12:39Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27,
+          "started_at": "2026-11-23T17:12:39Z",
+          "completed_at": "2026-11-23T17:12:39Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 28,
+          "started_at": "2026-11-23T17:12:39Z",
+          "completed_at": "2026-11-23T17:12:40Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-23T17:12:40Z",
+          "completed_at": "2026-11-23T17:12:40Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864257",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000002496,
+      "runner_name": "GitHub Actions 1000002496",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864284,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIkXA",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864284",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864284",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:18Z",
+      "completed_at": "2026-11-23T17:10:31Z",
+      "name": "Verify and package Windows assistant",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:19Z",
+          "completed_at": "2026-11-23T17:07:20Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:20Z",
+          "completed_at": "2026-11-23T17:07:26Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:26Z",
+          "completed_at": "2026-11-23T17:08:21Z"
+        },
+        {
+          "name": "Set up Node for sidecar integration tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:08:21Z",
+          "completed_at": "2026-11-23T17:08:35Z"
+        },
+        {
+          "name": "Install the real sidecar dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:08:35Z",
+          "completed_at": "2026-11-23T17:08:41Z"
+        },
+        {
+          "name": "Resolve assistant dependencies and require sidecar fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:08:41Z",
+          "completed_at": "2026-11-23T17:08:42Z"
+        },
+        {
+          "name": "Analyze Windows assistant",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:08:42Z",
+          "completed_at": "2026-11-23T17:08:52Z"
+        },
+        {
+          "name": "Run all assistant tests, including sidecar IPC",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:08:52Z",
+          "completed_at": "2026-11-23T17:09:02Z"
+        },
+        {
+          "name": "Build Windows assistant release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:09:02Z",
+          "completed_at": "2026-11-23T17:09:53Z"
+        },
+        {
+          "name": "Bundle assistant, production agent and Node runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-23T17:09:53Z",
+          "completed_at": "2026-11-23T17:10:05Z"
+        },
+        {
+          "name": "Upload portable Windows assistant",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:10:05Z",
+          "completed_at": "2026-11-23T17:10:23Z"
+        },
+        {
+          "name": "Upload assistant verification logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T17:10:23Z",
+          "completed_at": "2026-11-23T17:10:25Z"
+        },
+        {
+          "name": "Post Set up Node for sidecar integration tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-23T17:10:25Z",
+          "completed_at": "2026-11-23T17:10:25Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-23T17:10:25Z",
+          "completed_at": "2026-11-23T17:10:27Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-23T17:10:27Z",
+          "completed_at": "2026-11-23T17:10:28Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-23T17:10:28Z",
+          "completed_at": "2026-11-23T17:10:28Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864284",
+      "labels": [
+        "windows-2022"
+      ],
+      "runner_id": 1000002493,
+      "runner_name": "GitHub Actions 1000002493",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137865864290,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGXIkYg",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137865864290",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137865864290",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-23T17:07:14Z",
+      "started_at": "2026-11-23T17:07:29Z",
+      "completed_at": "2026-11-23T17:31:09Z",
+      "name": "Studio Git iOS integration test",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-23T17:07:30Z",
+          "completed_at": "2026-11-23T17:07:31Z"
+        },
+        {
+          "name": "Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-23T17:07:31Z",
+          "completed_at": "2026-11-23T17:07:35Z"
+        },
+        {
+          "name": "Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-23T17:07:35Z",
+          "completed_at": "2026-11-23T17:08:18Z"
+        },
+        {
+          "name": "Assert the fixture ref is the released plugin commit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-23T17:08:18Z",
+          "completed_at": "2026-11-23T17:08:18Z"
+        },
+        {
+          "name": "Check out the released plugin commit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-23T17:08:18Z",
+          "completed_at": "2026-11-23T17:08:20Z"
+        },
+        {
+          "name": "Verify the fixture is that exact commit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-23T17:08:20Z",
+          "completed_at": "2026-11-23T17:08:20Z"
+        },
+        {
+          "name": "Check the fixture native lock",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-23T17:08:20Z",
+          "completed_at": "2026-11-23T17:08:20Z"
+        },
+        {
+          "name": "Resolve the example packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-23T17:08:20Z",
+          "completed_at": "2026-11-23T17:08:22Z"
+        },
+        {
+          "name": "Boot an iPhone simulator",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-23T17:08:22Z",
+          "completed_at": "2026-11-23T17:10:10Z"
+        },
+        {
+          "name": "Run the plugin integration test on the simulator",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 10,
+          "started_at": "2026-11-23T17:10:11Z",
+          "completed_at": "2026-11-23T17:30:27Z"
+        },
+        {
+          "name": "Collect the Runner system log",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-23T17:30:27Z",
+          "completed_at": "2026-11-23T17:30:38Z"
+        },
+        {
+          "name": "Upload the integration diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-23T17:30:38Z",
+          "completed_at": "2026-11-23T17:30:42Z"
+        },
+        {
+          "name": "Summarize the plugin integration run",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-23T17:30:42Z",
+          "completed_at": "2026-11-23T17:30:42Z"
+        },
+        {
+          "name": "Post Check out the released plugin commit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-23T17:30:42Z",
+          "completed_at": "2026-11-23T17:30:43Z"
+        },
+        {
+          "name": "Post Set up Flutter and shared core",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-23T17:30:43Z",
+          "completed_at": "2026-11-23T17:30:44Z"
+        },
+        {
+          "name": "Post Check out app",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26,
+          "started_at": "2026-11-23T17:30:44Z",
+          "completed_at": "2026-11-23T17:30:45Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27,
+          "started_at": "2026-11-23T17:30:45Z",
+          "completed_at": "2026-11-23T17:31:04Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137865864290",
+      "labels": [
+        "macos-15"
+      ],
+      "runner_id": 1000002494,
+      "runner_name": "GitHub Actions 1000002494",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 137881493590,
+      "run_id": 45224073234,
+      "workflow_name": "App installers",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/runs/45224073234",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUZFhxs8AAAAgGmCgVg",
+      "head_sha": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+      "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/actions/jobs/137881493590",
+      "html_url": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/45224073234/job/137881493590",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-11-23T17:31:10Z",
+      "started_at": "2026-11-23T17:31:10Z",
+      "completed_at": "2026-11-23T17:31:09Z",
+      "name": "Publish verified release or preview",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/check-runs/137881493590",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    }
+  ],
+  "retry": {}
+}

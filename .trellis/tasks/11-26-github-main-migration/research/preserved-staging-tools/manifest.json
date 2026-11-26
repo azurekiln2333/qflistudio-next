@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "files": [
+    {
+      "path": "b/build_cumulative.py",
+      "source": ".trellis/tasks/11-21-github-repo-clone/reports/staging/b/build_cumulative.py",
+      "bytes": 28501,
+      "sha256": "30db24064d443c0a2ef645f530ab179cee37ea29a89f76b97891df177156866e"
+    },
+    {
+      "path": "b/validate_cumulative.py",
+      "source": ".trellis/tasks/11-21-github-repo-clone/reports/staging/b/validate_cumulative.py",
+      "bytes": 5343,
+      "sha256": "e8a9583970a83d131acc86aad8f0afa78130492bfb4d5da8deb98525208e63c6"
+    },
+    {
+      "path": "b/verify_bundle.py",
+      "source": ".trellis/tasks/11-21-github-repo-clone/reports/staging/b/verify_bundle.py",
+      "bytes": 3202,
+      "sha256": "52fc7d4ffbcdeb31c57c49d9b9cd1ea511698674d55a7bbc6625856f64c64312"
+    },
+    {
+      "path": "c/build_cumulative.py",
+      "source": ".trellis/tasks/11-21-github-repo-clone/reports/staging/c/build_cumulative.py",
+      "bytes": 24993,
+      "sha256": "f28237e03738c3b0a3ba18d6b6470871ae7dec5d6e7aa99b98f7c05fee761be6"
+    },
+    {
+      "path": "c/verify_bundle.py",
+      "source": ".trellis/tasks/11-21-github-repo-clone/reports/staging/c/verify_bundle.py",
+      "bytes": 6346,
+      "sha256": "ef9ce67fdc667022fe6dccb6f08ab5ab19cde3ade9d607811715f8f8374fa2be"
+    },
+    {
+      "path": "d/build_cumulative.py",
+      "source": ".trellis/tasks/11-21-github-repo-clone/reports/staging/d/build_cumulative.py",
+      "bytes": 17445,
+      "sha256": "f90f5a9eb40dcdeab6428ea63c382c77d98f62c6c9e8560568834d4536eca3c3"
+    }
+  ],
+  "execution": "Historical scripts; do not execute locally. Review paths and run only in an approved GitHub workflow."
+}

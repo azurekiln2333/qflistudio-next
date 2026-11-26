@@ -1,0 +1,11 @@
+# core-check failures, loop 1, run 45014758649, core 54bbfe640db99f8f54582fe0c588241dde9b4180
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: agents surface keeps the studio pane until an external host is chosen :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: approval options reply with the request id :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: chat tab sends prompts through the handle :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: closing the view detaches and keeps the session running :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/hub_ui_test.dart :: stopping a session asks for confirmation first :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/harness/harness_hub_test.dart :: mobile hides local and herdr hosts :: Expected: 'remote-pc'
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/experience_test.dart :: 云端目录合并保留收藏，不重复追加已有项目 :: Bad state: No element
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/editor_agent_embed_test.dart :: 会话列表与角标 空会话列表给出说明和主操作 :: Test failed. See exception logs above.
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/trellis_context_test.dart :: context text stays within the character budget with many tasks :: Expected: contains '上下文已截断'
+- /home/runner/work/qflistudio-core/qflistudio-core/qfli_studio_core/test/github_repository_picker_test.dart :: OAuth is default and PAT input remains obscured :: Test failed. See exception logs above.

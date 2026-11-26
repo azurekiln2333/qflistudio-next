@@ -1,0 +1,31 @@
+{
+  "asset": "qflistudio-5.0.5-android-arm64-v8a.zip",
+  "download_bytes": 15559757,
+  "sha256_matches": true,
+  "apk": "QFLIStudioN-5.0.5-android-arm64-v8a.apk",
+  "facts": {
+    "target": "qflistudio-5.0.5-android-arm64-v8a",
+    "app_version": "5.0.5",
+    "app_commit": "6d1b96d7118740f71e5dadf393cc8bd58238b6af",
+    "core_commit": "72c0b0955e4ddd5215dc818327fa5a67a4be22f7",
+    "flutter_version": "3.50.0",
+    "flutter_commit": "ab2912035e160d9cad6306df307576da6128ebdb",
+    "flutter_mode": "upstream",
+    "build_mode": "release",
+    "runner": "Linux X64 ubuntu24",
+    "signing": "debug key (installable; not a store release key)",
+    "device_validation": "none",
+    "run": "https://github.com/azurekiln2333/qflistudio-next/actions/runs/44720423052",
+    "apk_abi": "arm64-v8a",
+    "apk_package": "com.azurekiln.qflistudio",
+    "apk_signer": "Android Debug key generated in the job",
+    "java": "openjdk version \"17.0.21\" 2026-10-20",
+    "ndk": "27.0.12077973",
+    "cmake": "cmake version 3.22.1-g37088a8",
+    "gradle": "9.5.0",
+    "android_gradle_plugin": "9.3.1",
+    "kotlin": "2.4.10",
+    "apk_inspected_with": "build-tools 37.0.0",
+    "apk_libapp_elf": "ELF machine checked for 3 ABIs"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "large-screen-workbench",
+  "name": "large-screen-workbench",
+  "title": "平板与 PC 大屏工作台",
+  "description": "平板和 PC 使用单页工作台。手机首页增加 GitHub 标签。个人页面管理 GitHub 连接。",
+  "status": "completed",
+  "dev_type": "fullstack",
+  "scope": "large-screen-workbench",
+  "package": null,
+  "priority": "P2",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-24",
+  "completedAt": "2026-11-24",
+  "branch": "feat/large-screen-workbench",
+  "base_branch": "main",
+  "worktree_path": "D:/MyNewProjects/_wt/large-screen-workbench/qflistudio",
+  "commit": "7104c64ef545ca006533140794729c2f2f40795f",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    "prd.md",
+    "design.md",
+    "implement.md",
+    "workbench-preview.html"
+  ],
+  "notes": "User approved the final planning summary with 继续. Implementation may proceed. Parent owns app/retained-editor integration; four Pi peers own bounded disjoint components. Cloud verification passed. Core main ee83f1c0d72708547d0692e6cd05498d3539ce02; App main/tag v5.0.13 7104c64ef545ca006533140794729c2f2f40795f.",
+  "meta": {
+    "planning_artifacts_ready": true,
+    "implementation_approved": true,
+    "core_base": "d2eca95626726961fd5461e94e5c50c1389fd088",
+    "app_base": "0830e392fcf5dc7bc48dec59758e3d6347351950",
+    "validation": "cloud-only"
+  }
+}

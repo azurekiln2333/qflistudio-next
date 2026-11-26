@@ -1,0 +1,49 @@
+{
+  "id": "remote-account-binding",
+  "name": "remote-account-binding",
+  "title": "桌面端与手机端远程互联",
+  "description": "让 QFLIStudio 手机端安全连接桌面电脑并读取 Agent 会话。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "cross-repo",
+  "package": null,
+  "priority": "P1",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-21",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {
+    "worktrees": {
+      "studio": {
+        "path": "D:/MyNewProjects/_wt/remote-account-binding/studio",
+        "branch": "remote/remote-account-binding-studio",
+        "base": "6d1b96d7118740f71e5dadf393cc8bd58238b6af"
+      },
+      "core": {
+        "path": "D:/MyNewProjects/_wt/remote-account-binding/core",
+        "branch": "remote/remote-account-binding-core",
+        "base": "72c0b0955e4ddd5215dc818327fa5a67a4be22f7"
+      },
+      "qfli_server": {
+        "path": "D:/MyNewProjects/_wt/remote-account-binding/qfli-server",
+        "branch": "remote/remote-account-binding-qfli",
+        "base": "d919a91990615f17310391d0e84ba0cdb77c8ffa"
+      },
+      "relay_server": {
+        "path": "D:/MyNewProjects/_wt/remote-account-binding/relay-server",
+        "branch": "remote/remote-account-binding-relay",
+        "base": "841cc86e8fdf0461b2ff73e379b051740b21570a"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "artifact": 14685796517,
+  "sha256": "042ed4f8538867f79e40ee829a7b5f8d813c6afc512389c267194b357e1e913e",
+  "ipa": "QFLIStudioN-5.0.5-ios-unsigned.ipa",
+  "app_commit": "07d8082abaf9d1aabd3f91058ff1430d2097f0c4",
+  "core_commit": "123602be34ab6fa9725bb93f0d3bc27a630c7b44",
+  "CFBundleIdentifier": "com.azurekiln.qflistudio",
+  "CFBundleDisplayName": "QFLIStudioN",
+  "UIFileSharingEnabled": true,
+  "LSSupportsOpeningDocumentsInPlace": true
+}

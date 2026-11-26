@@ -1,0 +1,16 @@
+Mozilla CA bundle (cacert.pem)
+
+Source: the dated file from https://curl.se/ca/ published by the curl project,
+which extracts the trusted certificates from the Mozilla trust store. The exact
+file name and SHA-256 are pinned in third_party/versions.json. The bundle is
+copied to assets/cacert.pem and shipped inside this plugin.
+
+License: Mozilla Public License 2.0 (MPL-2.0)
+
+  This Source Code Form is subject to the terms of the Mozilla Public License,
+  v. 2.0. If a copy of the MPL was not distributed with this file, You can
+  obtain one at https://mozilla.org/MPL/2.0/.
+
+The certificates themselves are public data. The bundle file produced by the
+curl project is covered by MPL-2.0. The full license text is available at
+https://www.mozilla.org/media/MPL/2.0/index.txt.

@@ -1,0 +1,13 @@
+{
+  "provider": "pi",
+  "name": "CloudTerminal migration",
+  "pid": 22196,
+  "started_at": "2026-11-20T02:29:10.9655554+08:00",
+  "cwd": "D:\\MyNewProjects\\_wt\\cloudterminal-import\\work\\qfli_studio_core",
+  "status": "exited",
+  "session_dir": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\pi-sessions",
+  "stdout": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\pi-output.jsonl",
+  "stderr": "D:\\MyNewProjects\\qflistudio\\.trellis\\tasks\\11-20-cloudterminal-import\\reports\\pi-stderr.log",
+  "exit_code": 0,
+  "ended_at": "2026-11-20T02:46:29.8542045+08:00"
+}

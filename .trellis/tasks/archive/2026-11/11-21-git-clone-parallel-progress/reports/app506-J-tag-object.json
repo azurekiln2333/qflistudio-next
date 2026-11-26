@@ -1,0 +1,24 @@
+{
+  "node_id": "TA_kwDOUZFhxtoAKGMxYThjMmJhNzU1YTUxNjBlY2I4MWJlMTg2NTdlNzdlZDJkNWI4MDg",
+  "sha": "c1a8c2ba755a5160ecb81be18657e77ed2d5b808",
+  "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/tags/c1a8c2ba755a5160ecb81be18657e77ed2d5b808",
+  "tagger": {
+    "name": "azurekiln2333",
+    "email": "[redacted-email]",
+    "date": "2026-11-21T05:44:15Z"
+  },
+  "object": {
+    "sha": "1cea02946e5191f2a76bd8915ff0a527547f0463",
+    "type": "commit",
+    "url": "https://api.github.com/repos/azurekiln2333/qflistudio-next/git/commits/1cea02946e5191f2a76bd8915ff0a527547f0463"
+  },
+  "tag": "v5.0.6",
+  "message": "QFLIStudioN 5.0.6 with verified Git integration and parallel clone progress\n",
+  "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+  }
+}

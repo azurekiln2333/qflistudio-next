@@ -1,0 +1,18 @@
+[
+  {
+    "name": "04a-tests",
+    "paths": [
+      "core/test/remote_control/pairing_uri_test.dart",
+      "core/test/remote_control/remote_controller_test.dart"
+    ],
+    "report": "phase-04a-tests.md"
+  },
+  {
+    "name": "04b-ci",
+    "paths": [
+      "core/.github/workflows/remote-control.yml",
+      "app/.github/workflows/remote-companion.yml"
+    ],
+    "report": "phase-04b-ci.md"
+  }
+]

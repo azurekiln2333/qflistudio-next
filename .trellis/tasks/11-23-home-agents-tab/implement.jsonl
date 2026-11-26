@@ -1,0 +1,15 @@
+{"file": ".trellis/spec/frontend/remote-companion.md", "reason": "已绑定电脑的主机、配对与 provider 规则；本任务的会话来源与设备信息上报都受它约束"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "hub 与主机的释放顺序；首页 hub 与编辑器 hub 共用时的所有权与取消要求"}
+{"file": ".trellis/spec/frontend/editor-paging.md", "reason": "编辑器页的保留会话、Agent 面板展开与首帧边界；新增首帧选中会话要落在这里"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "ChangeNotifier 与流的状态划分；快照、订阅与本地存储的边界"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "禁止模式、必守模式与代码评审清单；提交前逐条对照"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "契约类型与 JSON 解码的写法；快照读回与枚举解析要按它做校验"}
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "两个仓库的边界与构建命令；本任务只改 core，需确认路径与命令"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "组件结构、属性与无障碍约定；首页入口按钮与详情页按它组织"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "模块与文件命名；新增的 harness 文件要放对目录"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "规范索引；确认各文件的 Active 与 Draft 状态后再动手"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "复用现有 hub 与 Agents 组件；避免另起一套会话列表"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "契约、hub、界面与原生通道的跨层顺序；设备信息从原生到详情页要一条链走通"}
+{"file": ".trellis/tasks/11-23-mobile-files-agents/prd.md", "reason": "父任务的需求清单、约束与跨子任务验收标准"}
+{"file": ".trellis/tasks/11-23-home-agents-tab/design.md", "reason": "本任务的契约、落点、数据流、兼容性分析与未决问题"}
+{"file": ".trellis/tasks/11-23-home-agents-tab/implement.md", "reason": "分步实施顺序、每步静态检查与回滚点"}

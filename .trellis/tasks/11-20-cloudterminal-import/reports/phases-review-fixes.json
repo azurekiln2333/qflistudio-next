@@ -1,0 +1,11 @@
+[
+  {
+    "name": "05-review-fixes",
+    "paths": [
+      "core/lib/remote_control/pages/session_screen.dart",
+      "core/lib/remote_control/state/herdr_controller.dart",
+      "core/test/remote_control/remote_module_regression_test.dart"
+    ],
+    "report": "phase-05-review-fixes.md"
+  }
+]

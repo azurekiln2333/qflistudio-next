@@ -1,0 +1,74 @@
+--- a/lib/pages/home_page.dart
++++ b/lib/pages/home_page.dart
+@@ -32,6 +32,8 @@
+ import '../services/local_audit_service.dart';
+ import '../editor/open_performance.dart';
+ import '../services/local_stats_service.dart';
++import '../workspace/saved_workspace.dart';
++import '../workspace/saved_workspaces_tab.dart';
+ 
+ /// 应用外壳：功能、教程、示例和个人页均为独立页面。
+ class HomePage extends StatefulWidget {
+@@ -297,7 +299,7 @@
+   State<HomeTab> createState() => _HomeTabState();
+ }
+ 
+-enum _ProjectScope { all, history, favorite, cloud }
++enum _ProjectScope { all, history, favorite, workspace, cloud }
+ 
+ class _HomeTabState extends State<HomeTab>
+     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+@@ -308,10 +310,13 @@
+   String? _archiveBusyLabel;
+   late bool _loggedIn;
+   Future<void>? _refreshRequest;
+-  late final List<_ProjectScope> _scopes =
+-      StudioProfile.current?.offlineOnly == true
+-      ? const [_ProjectScope.all, _ProjectScope.history, _ProjectScope.favorite]
+-      : _ProjectScope.values;
++  late final List<_ProjectScope> _scopes = [
++    _ProjectScope.all,
++    _ProjectScope.history,
++    _ProjectScope.favorite,
++    if (supportsSavedWorkspaces) _ProjectScope.workspace,
++    if (StudioProfile.current?.offlineOnly != true) _ProjectScope.cloud,
++  ];
+   late final TabController _projectTabs = TabController(
+     length: _scopes.length,
+     vsync: this,
+@@ -541,6 +546,11 @@
+                           height: 36,
+                           child: Center(child: Text(l10n.favoriteProjects)),
+                         ),
++                        if (_scopes.contains(_ProjectScope.workspace))
++                          const Tab(
++                            height: 36,
++                            child: Center(child: Text('工作区')),
++                          ),
+                         if (_scopes.contains(_ProjectScope.cloud))
+                           Tab(
+                             height: 36,
+@@ -553,7 +563,13 @@
+                         controller: _projectTabs,
+                         children: [
+                           for (final scope in _scopes)
+-                            _buildProjectList(context, scope: scope),
++                            scope == _ProjectScope.workspace
++                                ? SavedWorkspacesTab(
++                                    store: widget.store,
++                                    auth: widget.auth,
++                                    settings: widget.settings,
++                                  )
++                                : _buildProjectList(context, scope: scope),
+                         ],
+                       ),
+                     ),
+@@ -635,6 +651,8 @@
+         return [...all];
+       case _ProjectScope.favorite:
+         return all.where((p) => p.favorite).toList();
++      case _ProjectScope.workspace:
++        return const [];
+       case _ProjectScope.cloud:
+         return all.where((p) => p.isCloud).toList();
+     }

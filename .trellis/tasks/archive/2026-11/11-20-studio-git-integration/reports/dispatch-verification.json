@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-11-20T19:29:35.097482+08:00",
+  "planning_complete": true,
+  "implementation_accepted": false,
+  "workers": [
+    {
+      "worker": "pi-a",
+      "pid": 23332,
+      "session_id": "01a1f8b6-ec18-7525-97f1-eac1a81ce0a8",
+      "tool_calls": 10,
+      "write_calls": 0,
+      "status": "running",
+      "model_errors": []
+    },
+    {
+      "worker": "pi-b",
+      "pid": 33288,
+      "session_id": "01a1f8b6-ec33-730f-acef-fe5f669cf738",
+      "tool_calls": 6,
+      "write_calls": 0,
+      "status": "running",
+      "model_errors": []
+    },
+    {
+      "worker": "pi-c",
+      "pid": 29028,
+      "session_id": "01a1f8b6-ec58-77f8-96a3-888835b7d1f8",
+      "tool_calls": 7,
+      "write_calls": 0,
+      "status": "running",
+      "model_errors": []
+    },
+    {
+      "worker": "pi-d",
+      "pid": 48020,
+      "session_id": "01a1f8b6-ec63-7442-bdec-120694335f2f",
+      "tool_calls": 6,
+      "write_calls": 0,
+      "status": "running",
+      "model_errors": []
+    }
+  ]
+}

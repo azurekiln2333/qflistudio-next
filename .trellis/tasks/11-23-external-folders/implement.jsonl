@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/repository-layout.md", "reason": "确认每处改动落在 core 还是 app 仓库，并按两个仓库分别跑 pub get 与构建"}
+{"file": ".trellis/spec/frontend/project-storage.md", "reason": "确认项目路径保留规则与 .qfli/project.json 元数据契约，避免改写外部根路径时违反规范"}
+{"file": ".trellis/spec/frontend/process-lifecycle.md", "reason": "确认原生边界的释放与取消要求，范围登记与串行队列要照同一套所有权处理"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "区分 Active 与 Draft 规范行，Draft 行要先读源码再编码"}

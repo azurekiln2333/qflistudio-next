@@ -1,0 +1,109 @@
+{
+  "phase": "published",
+  "branch": "release/studio-git-ui-20261120",
+  "plugin_source": "d002bd3e9febb478758b75b6670a24ba8a3c610c",
+  "plugin_run": 44820553378,
+  "plugin_run_url": "https://github.com/azurekiln2333/qflistudio-git/actions/runs/44820553378",
+  "native_artifact_commit": "e30e88fcba6cd31d452598cbd6111f3f2acae41e",
+  "native_artifact_pushed": true,
+  "native_artifact_run": 44802440226,
+  "native_contract_static_check": "passed: API 2, 10 files, pinned CA",
+  "plugin_cloud_gates": {
+    "host_smoke": "success at 53ad359",
+    "dart_ffi": "success at 53ad359",
+    "android_native": "success at 53ad359",
+    "ohos_native": "success at 53ad359",
+    "ios_native": "success at 53ad359",
+    "example_android": "success at 53ad359",
+    "example_ios": "legacy SDK job remains separate and unproven; exact pinned 53ad359 passed production SDK runtime in final App release gate",
+    "native_contract": "success at 53ad359"
+  },
+  "core_commit": "79bfe0191878179caf370cfb154f23cc51918619",
+  "core_run": 44820635209,
+  "core_run_result": "success: 2394 visible passes, 26 existing skips, zero errors",
+  "app_commit": "6473c165b94367151655f7ebd5a9cf25ff219da5",
+  "app_branch_run": 44820732156,
+  "preview_tag": "v5.0.5-git.2",
+  "local_tests_run": false,
+  "local_builds_run": false,
+  "cloudterminal_modified": false,
+  "core_plugin_pin": "53ad359159258706d4c242e70a2db0e1d075dabc",
+  "app_branch_result": "cancelled duplicate branch run; tag workflow is authoritative",
+  "superseded": {
+    "core_run": 44805454280,
+    "app_run": 44805595969,
+    "reason": "Core log: 2666 started, 2665 completed, no error events; editor Git owner test remained pending. App OHOS package mixed x86_64 into ARM64 release. Both fixed and pushed."
+  },
+  "app_verified_candidate_commit": "d94bd455400ff6dcc88affd80663cb541bbb8120",
+  "app_verified_candidate_run": 44809493852,
+  "app_verified_candidate_result": "success: all existing checks and eleven installer targets",
+  "preview_tag_object": "499560c25505bab77cf3b54fcfaec5d679a97251",
+  "preview_run": 44820763009,
+  "preview_result": "success: all 18 required jobs passed",
+  "release_published": true,
+  "plugin_production_runtime_gate": {
+    "job": "git-ios-integration",
+    "plugin_commit": "53ad359159258706d4c242e70a2db0e1d075dabc",
+    "app_run": 44820763009,
+    "status": "success",
+    "publication_required": true,
+    "job_id": 136581328036,
+    "flutter_version": "3.50.0",
+    "runtime": "iOS simulator",
+    "evidence": "reports/tag-git2-ios.log: all phase markers, 19 unchanged assertions, All tests passed"
+  },
+  "preview_blockers": {},
+  "tagged_core_verification": {
+    "run": 44820763009,
+    "job": 136580776505,
+    "visible_passed": 2394,
+    "visible_skipped": 26,
+    "errors": 0,
+    "finished_including_hidden": 2667,
+    "success": true
+  },
+  "cloudterminal_preservation": "2026-11-21 05:21 CST: HEAD, index and all recorded file hashes unchanged",
+  "package_metadata_verification": "reports/tag-git2-package-metadata.json: Windows x64, Android ARM64, iOS ARM64 and OHOS ARM64 exact pins and inner checksums passed; mobile native binary presence and exact packaged CA passed",
+  "previous_candidate": {
+    "tag": "v5.0.5-git.1",
+    "run": 44818320621,
+    "app_commit": "e9e337c3938f5683d7efa1fb6356215cb2ea3b86",
+    "result": "failure: iOS integration fixture used bare clone path; Android Maven HTTP 429",
+    "blockers": {
+      "android": {
+        "job": 136572490981,
+        "reason": "repo.maven.apache.org returned HTTP 429 while resolving Kotlin plugin dependencies",
+        "log": "reports/tag-git1-android.log",
+        "action": "superseded by .2; .2 Android job 136581328191 passed without a code workaround"
+      },
+      "ios_runtime": {
+        "job": 136572490830,
+        "status": "failure",
+        "reason": "production SDK simulator launched and setup succeeded; clone received a bare local path, rejected by _validateRemoteUrl",
+        "log": "reports/tag-git1-ios.log",
+        "evidence_lines": "12706-12715",
+        "fix": "Pi A converts disposable fixture paths to file URLs, preserving assertions; repin and use candidate .2"
+      }
+    }
+  },
+  "plugin_commit": "53ad359159258706d4c242e70a2db0e1d075dabc",
+  "native_artifact_validation_run": 44804687527,
+  "preview_checks": "all 18 required jobs successful, including production SDK iOS flow and all eleven installer targets",
+  "release_url": "https://github.com/azurekiln2333/qflistudio-next/releases/tag/v5.0.5-git.2",
+  "release_id": 453206976,
+  "release_assets": 13,
+  "published_at": "2026-11-20T21:43:01Z",
+  "release_asset_verification": {
+    "tag": "v5.0.5-git.2",
+    "release_id": 453206976,
+    "url": "https://github.com/azurekiln2333/qflistudio-next/releases/tag/v5.0.5-git.2",
+    "asset_count": 13,
+    "all_uploaded": true,
+    "zip_digests_match_manifest": true,
+    "windows_download_digest": "a54c0696791106e6caca3f873f5408a3b8cc521af89895726c4dd2892d3795e6",
+    "windows_installer": "QFLIStudioN-5.0.5-windows-x64-setup.exe",
+    "windows_source_pins": "passed",
+    "windows_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.2/qflistudio-5.0.5-windows-x64.zip",
+    "android_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.2/qflistudio-5.0.5-android-arm64-v8a.zip"
+  }
+}

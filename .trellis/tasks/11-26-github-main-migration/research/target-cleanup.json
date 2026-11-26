@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "task": ".trellis/tasks/11-26-github-main-migration",
+  "audit_date": "2026-11-26",
+  "evidence_window": {
+    "start": "2026-11-26T18:04:55.8151496+08:00",
+    "last_explicit_timestamp": "2026-11-26T18:13:25.9429641+08:00",
+    "note": "Additional scoped metadata reads followed the last timed status summary. Baseline observations; other migration agents may subsequently change the source. Not final acceptance evidence."
+  },
+  "auditor": {
+    "herdr_pane": "w65:p5",
+    "lead_pane": "w65:p1",
+    "model": "gpt-6.1-sol",
+    "model_evidence": "PI_MODEL"
+  },
+  "authorization": {
+    "initial_mode": "read_only",
+    "approved_write_paths": [
+      ".trellis/tasks/11-26-github-main-migration/research/target-cleanup.md",
+      ".trellis/tasks/11-26-github-main-migration/research/target-cleanup.json"
+    ],
+    "target_edits": false,
+    "target_agent_contact": false,
+    "coordination_channel": "herdr",
+    "git_state_mutations_by_auditor": false,
+    "builds_tests_analyzers_installs_run": false,
+    "credentials_read": false,
+    "wsl_started_mounted_exported_unregistered": false
+  },
+  "repositories": {
+    "source": {
+      "path": "D:/MyNewProjects/qflistudio",
+      "branch": "main",
+      "head": "fd5041973d954031abeaaadd6ed1d3e7f70f9994",
+      "tree": "16b7ba992f3ff1d9e13b618e7c3ffa282e26bb5b",
+      "clean": false,
+      "status_before_report_creation": {
+        "observed_at": "2026-11-26T18:13:25+08:00",
+        "command": "git --no-optional-locks -c core.fsmonitor=false status --porcelain=v1 -uall",
+        "entries": 8863,
+        "modified": 25,
+        "deleted": 77,
+        "untracked": 8761,
+        "trellis_task_entries": 8755,
+        "github_repo_clone_staging_entries": 7490,
+        "deleted_tree": "azurekiln-qfli-server",
+        "deleted_tree_disposition": "Lead must verify split-repository preservation; not cleanup output."
+      },
+      "remote_names": ["cnb", "gitcode", "gitee", "github", "gitlab"],
+      "github_remote": "https://github.com/azurekiln2333/qflistudio-next.git",
+      "github_only": false,
+      "cached_github_main": "c5f4bc3afe9c81ba488fd3f544d43c3dac061512",
+      "main_vs_cached_github_main": {"ahead": 2, "behind": 117},
+      "live_remote_verified": false,
+      "tracked_trellis_files_at_baseline": 264,
+      "index_gitlinks": 0,
+      "lfs_files_list_empty": true,
+      "machine_override": {
+        "path": "pubspec_overrides.yaml",
+        "ignored": true,
+        "core_path": "D:/MyNewProjects/_wt/integration/qfli_studio_core",
+        "lockfile_absolute_paths": true,
+        "disposition": "Do not publish or copy into target."
+      }
+    },
+    "target": {
+      "path": "E:/MyNewProjects/QFLIProjects/qflistudio-next",
+      "branch": "main",
+      "upstream": "origin/main",
+      "head": "7104c64ef545ca006533140794729c2f2f40795f",
+      "tree": "076bea13ff5c3a971e88d5560729d960998f4a36",
+      "clean": true,
+      "status_entries": 0,
+      "remote_names": ["origin"],
+      "origin_fetch": "https://github.com/azurekiln2333/qflistudio-next.git",
+      "origin_push": "https://github.com/azurekiln2333/qflistudio-next.git",
+      "github_only": true,
+      "local_branches": 1,
+      "registered_worktrees": 1,
+      "tracked_trellis_files_at_baseline": 449,
+      "index_gitlinks": 0,
+      "gitmodules_present": false,
+      "lfs_files_list_empty": true,
+      "lfs_attributes_observed": false,
+      "head_is_ancestor_of_source_cached_github_main": true,
+      "commits_behind_source_cached_github_main": 2,
+      "missing_cached_github_commits": [
+        {"short_hash": "83f4b14", "subject": "docs(task): plan the large-screen workbench UI cleanup"},
+        {"short_hash": "c5f4bc3", "subject": "release: prepare 5.0.14 workbench UI cleanup"}
+      ],
+      "absent_generated_paths": [
+        "build", ".dart_tool", ".flutter-plugins-dependencies", "pubspec_overrides.yaml",
+        "android/.gradle", "ohos/node_modules", "ohos/oh_modules", "ohos/.hvigor"
+      ],
+      "portable_support_missing": [
+        ".trellis/workflow.md", ".trellis/scripts", ".trellis/workspace", ".agents/skills"
+      ],
+      "portable_support_ignored": true,
+      "cleanup_required_at_baseline": false
+    }
+  },
+  "path_migration": {
+    "status": "blocked_at_baseline_coordinated_fix_owned_by_leads",
+    "approved_core_relative_path": "../qflistudio-core",
+    "preserve_dart_package_identifier": "qfli_studio_core",
+    "missing_target_paths": [
+      "../qfli_studio_core",
+      "../qfli_studio_core/vendor/re_editor",
+      "../qfli_studio_core/vendor/xterm"
+    ],
+    "existing_new_core_directory": "../qflistudio-core",
+    "pubspec_yaml_lines": [18, 28, 33],
+    "pubspec_lock_lines": [452, 467, 607],
+    "directory_mapping": {
+      "qflistudio": "qflistudio-next",
+      "qfli_studio_core": "qflistudio-core",
+      "qfli_c": "qflistudio-cpp",
+      "qfli_dart": "qflistudio-dart",
+      "qfli_go": "qflistudio-go",
+      "qfli_java": "qflistudio-java",
+      "qfli_json": "qflistudio-json",
+      "qfli_lua": "qflistudio-lua",
+      "qfli_note": "qflistudio-note",
+      "qfli_python": "qflistudio-python",
+      "qfli_rust": "qflistudio-rust",
+      "qfli_sql": "qflistudio-sql",
+      "qfli_web": "qflistudio-web"
+    },
+    "sibling_contents_audited": false,
+    "ci_paths_require_coordinated_update": [
+      ".github/actions/app-setup/action.yml",
+      ".github/workflows/app-installers.yml"
+    ],
+    "filesystem_sensitive_tools_to_review": [
+      "tool/generate_content_catalog.dart", "tool/generate_studio_content.dart",
+      "tool/new_language_app.dart", "tool/validate_content.dart",
+      "tool/verify_ohos_products.dart", "tool/verify_runtime_matrix.dart",
+      "tool/verify_studio_content.dart", "tool/verify_vibe_e2e.dart",
+      "tool/build_studio_hap.sh"
+    ],
+    "qfli_git": {
+      "source": "git",
+      "repository": "https://github.com/azurekiln2333/qflistudio-git.git",
+      "resolved_ref": "697291a27818612ae9dc53d83d4f99fa5887908e",
+      "ordinary_app_requires_local_plugin_sibling": false
+    }
+  },
+  "cloning_documentation_requirements": [
+    "Document exact GitHub repository-to-directory mapping, including cpp/core/plugin exceptions.",
+    "Document minimum app/core paired commits and explicit sibling clone destinations.",
+    "Document optional language checkouts for cross-product content generation.",
+    "State app baseline has no observed submodule/LFS requirement; sibling owners must document their own.",
+    "Describe pinned Git plugin and native artifact provenance without local artifact downloads.",
+    "Publish reviewed portable Trellis workflow/scripts/journals/skills while excluding runtime/machine data.",
+    "Replace or qualify old local validation/setup commands with the superseding cloud-only policy."
+  ],
+  "wsl": {
+    "inventory_command": "wsl --list --verbose",
+    "all_stopped": true,
+    "registry_root": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Lxss",
+    "default_distribution": "Ubuntu",
+    "project_vhd_file_length_total_bytes": 40580939776,
+    "project_vhd_file_length_total_gib": 37.7939453125,
+    "allocated_or_reclaimable_bytes_measured": false,
+    "distributions": [
+      {
+        "name": "Ubuntu",
+        "state": "Stopped",
+        "version": 2,
+        "default": true,
+        "registry_subkey": "{044a4968-7a56-42d5-a25a-c213da943493}",
+        "base_path": "D:\\WindowsExt\\Subsystem\\Ubuntu\\Ubuntu_2204.1.7.0_x64",
+        "base_path_exists": true,
+        "base_path_direct_listing_empty": true,
+        "registered_vhd_filename": null,
+        "candidate_vhd_path": "D:\\WindowsExt\\Subsystem\\Ubuntu\\Ubuntu_2204.1.7.0_x64\\ext4.vhdx",
+        "candidate_vhd_exists": false,
+        "length_bytes": null,
+        "last_write_time_utc": null,
+        "scope": "outside_project",
+        "disposition": "Retain. Actual disk location is unresolved; no broader search or startup authorized."
+      },
+      {
+        "name": "qfli-terminal-test",
+        "state": "Stopped",
+        "version": 2,
+        "default": false,
+        "registry_subkey": "{41edc189-b7fb-411a-bfc0-205fbb9be0f7}",
+        "base_path": "D:\\MyNewProjects\\qflistudio\\.artifacts\\terminal-runtime-test\\ubuntu",
+        "registered_vhd_filename": "ext4.vhdx",
+        "vhd_path": "D:\\MyNewProjects\\qflistudio\\.artifacts\\terminal-runtime-test\\ubuntu\\ext4.vhdx",
+        "vhd_exists": true,
+        "length_bytes": 19723714560,
+        "last_write_time_utc": "2026-11-03T19:22:43.6384004Z",
+        "attributes": "Archive",
+        "scope": "source_project",
+        "disposition": "Retain registered disk and directory. Separate recovery/content review and approval required for future retirement."
+      },
+      {
+        "name": "qfli-terminal-al3-clean",
+        "state": "Stopped",
+        "version": 2,
+        "default": false,
+        "registry_subkey": "{7dbc0ce5-4ed2-4963-a126-327b8724161b}",
+        "base_path": "D:\\MyNewProjects\\qflistudio\\.artifacts\\terminal-runtime-test\\al3-clean",
+        "registered_vhd_filename": "ext4.vhdx",
+        "vhd_path": "D:\\MyNewProjects\\qflistudio\\.artifacts\\terminal-runtime-test\\al3-clean\\ext4.vhdx",
+        "vhd_exists": true,
+        "length_bytes": 13742637056,
+        "last_write_time_utc": "2026-11-02T08:43:10.6521993Z",
+        "attributes": "Archive",
+        "scope": "source_project",
+        "disposition": "Retain registered disk and directory. Separate recovery/content review and approval required for future retirement."
+      },
+      {
+        "name": "qfli-terminal-al3-test",
+        "state": "Stopped",
+        "version": 2,
+        "default": false,
+        "registry_subkey": "{bacb944f-b4e4-4670-9ecc-faf0997b892c}",
+        "base_path": "D:\\MyNewProjects\\qflistudio\\.artifacts\\terminal-runtime-test\\al3",
+        "registered_vhd_filename": "ext4.vhdx",
+        "vhd_path": "D:\\MyNewProjects\\qflistudio\\.artifacts\\terminal-runtime-test\\al3\\ext4.vhdx",
+        "vhd_exists": true,
+        "length_bytes": 7114588160,
+        "last_write_time_utc": "2026-11-02T08:43:10.6621961Z",
+        "attributes": "Archive",
+        "scope": "source_project",
+        "disposition": "Retain registered disk and directory. Separate recovery/content review and approval required for future retirement."
+      },
+      {
+        "name": "qfli-java-build",
+        "state": "Stopped",
+        "version": 2,
+        "default": false,
+        "registry_subkey": "{f334d531-8048-482f-9ef2-41193fb63cb3}",
+        "base_path": "D:\\MyNewProjects\\qfli_java\\build\\wsl\\qfli-java-build",
+        "registered_vhd_filename": "ext4.vhdx",
+        "vhd_path": "D:\\MyNewProjects\\qfli_java\\build\\wsl\\qfli-java-build\\ext4.vhdx",
+        "vhd_exists": true,
+        "length_bytes": 84817215488,
+        "last_write_time_utc": "2026-10-28T06:32:53.0749263Z",
+        "attributes": "Archive",
+        "scope": "other_repository",
+        "disposition": "Retain; owner and cleanup scope are outside this app audit."
+      }
+    ]
+  },
+  "cleanup_proposal": {
+    "executed": false,
+    "authorization_for_deletion": false,
+    "source_root": "D:/MyNewProjects/qflistudio",
+    "gates": [
+      "Publish reviewed source and portable progress; privately retain recovery snapshot.",
+      "Account for every branch/worktree and embedded-server split.",
+      "Verify cloud results, then compare final GitHub/source/target commit, tree, tracked content and clean status.",
+      "Owner reviews unique content, native payload provenance and recovery requirements.",
+      "Obtain separate exact-path cleanup authorization. WSL unregister remains excluded from this task."
+    ],
+    "zero_tracked_file_cache_candidates_relative_to_source": [
+      "build", ".dart_tool", ".hvigor", "android/.gradle",
+      "ohos/.hvigor", "ohos/oh_modules", "ohos/node_modules", "ohos/entry/build"
+    ],
+    "native_payload_retention_gate": {
+      "path_relative_to_source": "ohos/entry/libs",
+      "tracked_files": 0,
+      "requirement": "Verify reproducible cloud artifact source/version/hashes before any removal."
+    },
+    "staging_root_relative_to_source": ".trellis/tasks/11-21-github-repo-clone/reports/staging",
+    "zero_tracked_file_staging_children_requiring_unique_content_review": [
+      "__pycache__", "_app_index_validation", "_index_validation", "b", "c", "d"
+    ],
+    "tracked_staging_evidence_to_retain": ".trellis/tasks/11-21-github-repo-clone/reports/staging/final-verification.json",
+    "retain_pending_recovery_review_relative_to_source": [
+      ".artifacts/repository-split-backup-20260929-071812",
+      ".artifacts/repository-split-staging",
+      ".artifacts/repository-split-baseline",
+      ".artifacts/spec-index-baseline",
+      ".artifacts/vibe-live-db",
+      ".artifacts/terminal-runtime-test/ubuntu",
+      ".artifacts/terminal-runtime-test/al3-clean",
+      ".artifacts/terminal-runtime-test/al3",
+      ".idea",
+      "pubspec_overrides.yaml"
+    ],
+    "archive_retention_candidates": [
+      {"relative_path": ".artifacts/terminal-ubuntu-root.tar.xz", "length_bytes": 117884936},
+      {"relative_path": ".artifacts/terminal-runtime-test/al3-rootfs.tar", "length_bytes": 182662144},
+      {"relative_path": ".artifacts/terminal-runtime-test/sandbox-v1.tar", "length_bytes": 339993088},
+      {"relative_path": ".artifacts/terminal-runtime-test/sandbox-v2.tar", "length_bytes": 2546997760},
+      {"relative_path": ".artifacts/terminal-runtime-test/terminal-legacy-source.tar", "length_bytes": 133120}
+    ],
+    "private_file_presence_only": ".artifacts/terminal-runtime-test/business.env",
+    "blanket_artifacts_or_trellis_deletion_forbidden": true,
+    "worktree_removal_authorized": false,
+    "global_cache_or_unrelated_disk_cleanup_proposed": false,
+    "target_cleanup_required": false
+  },
+  "target_policy": {
+    "supersedes_old_tasks_specs_readme": true,
+    "requires_publication_by_lead": true,
+    "target_already_modified_by_auditor": false,
+    "allowed": [
+      "Scoped text editing under future assignment",
+      "File metadata and hash inspection",
+      "Reviewed Git inspection/synchronization under lead scope",
+      "Herdr coordination"
+    ],
+    "forbidden_local": [
+      "Build/run/debug", "Tests", "Analyzers/lint/verification scripts", "Code generation",
+      "Flutter/Dart pub get or pub upgrade", "npm/pnpm/yarn dependency install or npm ci",
+      "ohpm/hvigor", "Gradle", "CMake/Ninja/native compilation", "Toolchain setup",
+      "WSL startup", "Containers/emulators/simulators/local test servers/device validation",
+      "Artifact downloads or extraction into target", "IDE auto-pub-get/Sync/background validation"
+    ],
+    "cloud_requirement": "All project builds/tests/analysis/dependency operations use approved cloud workflows with coordinated app/core revisions and provenance.",
+    "no_pub_flag_is_not_an_exception": true
+  },
+  "limits": [
+    "No live GitHub freshness or cloud-run verification by this auditor.",
+    "Sibling directories were compared by immediate names only; sibling contents were not audited.",
+    "No VHD contents or allocated disk sizes were inspected.",
+    "No final consolidation, synchronization or w6D handover performed by this auditor.",
+    "Evidence is baseline only; lead must repeat permitted final commit/tree/status comparison."
+  ]
+}

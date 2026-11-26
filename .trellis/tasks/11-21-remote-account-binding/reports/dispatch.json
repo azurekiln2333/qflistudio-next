@@ -1,0 +1,33 @@
+{
+  "workspace": "w37",
+  "task": "11-21-remote-account-binding",
+  "status": "implementing",
+  "local_validation": "format, static, syntax, document lint only",
+  "workers": [
+    {
+      "name": "pi-desktop",
+      "pane": "w37:pC",
+      "role": "desktop-pairing-and-sessions",
+      "brief": "reports/brief-desktop.md"
+    },
+    {
+      "name": "pi-mobile",
+      "pane": "w37:pG",
+      "role": "phone-account-devices",
+      "brief": "reports/brief-mobile.md"
+    },
+    {
+      "name": "pi-qfli",
+      "pane": "w37:pH",
+      "role": "qfli-grant-service",
+      "brief": "reports/brief-qfli-server.md"
+    },
+    {
+      "name": "pi-relay",
+      "pane": "w37:pJ",
+      "role": "relay-account-and-revocation",
+      "brief": "reports/brief-relay-server.md"
+    }
+  ],
+  "confirmed_working_at": "2026-11-21T19:08:43.4408212+08:00"
+}

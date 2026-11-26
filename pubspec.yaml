@@ -15,7 +15,7 @@ dependencies:
 
   # IDE 能力由并列仓库的共享内核提供。
   qfli_studio_core:
-    path: ../qfli_studio_core
+    path: ../qflistudio-core
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -25,12 +25,12 @@ dependencies:
 # （原包用 kIsAndroid/kIsIOS 判断，flutter_ohos 下均为 false）
 dependency_overrides:
   re_editor:
-    path: ../qfli_studio_core/vendor/re_editor
+    path: ../qflistudio-core/vendor/re_editor
   # 远程电脑终端用内核里打过补丁的 xterm 分支。
   # 内核的 dependency_overrides 不会传递给依赖它的 App，所以这里也要覆盖，
   # 否则 App 会解析 pub.dev 上未打补丁的同版本包。
   xterm:
-    path: ../qfli_studio_core/vendor/xterm
+    path: ../qflistudio-core/vendor/xterm
 
 dev_dependencies:
   flutter_test:

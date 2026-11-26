@@ -1,0 +1,92 @@
+{
+  "observed_at": "2026-11-21T02:32:13.6832183+08:00",
+  "workspace": "w37",
+  "worktree_root": "D:/MyNewProjects/_wt/studio-git-integration",
+  "agents": [
+    {
+      "agent": "pi",
+      "agent_session": {
+        "agent": "pi",
+        "kind": "path",
+        "source": "herdr:pi",
+        "value": "C:\\Users\\lichengyu\\.pi\\agent\\sessions\\--D--MyNewProjects-qflistudio--\\2026-11-19T07-24-21-339Z_01a1f2b1-31d6-70d7-87a5-b0f78e20df29.jsonl"
+      },
+      "agent_status": "working",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "focused": false,
+      "pane_id": "w37:pC",
+      "revision": 5,
+      "screen_detection_skipped": true,
+      "state_change_seq": 90,
+      "tab_id": "w37:t1",
+      "terminal_id": "term_660b893b08f47d",
+      "terminal_title": "π - qflistudio",
+      "terminal_title_stripped": "π - qflistudio",
+      "workspace_id": "w37"
+    },
+    {
+      "agent": "pi",
+      "agent_session": {
+        "agent": "pi",
+        "kind": "path",
+        "source": "herdr:pi",
+        "value": "C:\\Users\\lichengyu\\.pi\\agent\\sessions\\--D--MyNewProjects-qflistudio--\\2026-11-19T07-24-32-473Z_01a1f2b1-5d57-73ce-9ed5-7169ec35c50c.jsonl"
+      },
+      "agent_status": "working",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "focused": false,
+      "pane_id": "w37:pH",
+      "revision": 5,
+      "screen_detection_skipped": true,
+      "state_change_seq": 91,
+      "tab_id": "w37:t1",
+      "terminal_id": "term_660b893b08f61e",
+      "terminal_title": "π - qflistudio",
+      "terminal_title_stripped": "π - qflistudio",
+      "workspace_id": "w37"
+    },
+    {
+      "agent": "pi",
+      "agent_session": {
+        "agent": "pi",
+        "kind": "path",
+        "source": "herdr:pi",
+        "value": "C:\\Users\\lichengyu\\.pi\\agent\\sessions\\--D--MyNewProjects-qflistudio--\\2026-11-19T07-24-43-584Z_01a1f2b1-88be-776a-bd68-55757a94c388.jsonl"
+      },
+      "agent_status": "done",
+      "completion_seq": 95,
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "focused": false,
+      "pane_id": "w37:pG",
+      "revision": 5,
+      "screen_detection_skipped": true,
+      "state_change_seq": 95,
+      "tab_id": "w37:t1",
+      "terminal_id": "term_660b893b08f7ff",
+      "terminal_title": "π - qflistudio",
+      "terminal_title_stripped": "π - qflistudio",
+      "workspace_id": "w37"
+    },
+    {
+      "agent": "pi",
+      "agent_session": {
+        "agent": "pi",
+        "kind": "path",
+        "source": "herdr:pi",
+        "value": "C:\\Users\\lichengyu\\.pi\\agent\\sessions\\--D--MyNewProjects-qflistudio--\\2026-11-19T07-24-54-669Z_01a1f2b1-b40a-7313-99e8-80b5ee406a63.jsonl"
+      },
+      "agent_status": "working",
+      "cwd": "D:\\MyNewProjects\\qflistudio",
+      "focused": false,
+      "pane_id": "w37:pJ",
+      "revision": 5,
+      "screen_detection_skipped": true,
+      "state_change_seq": 100,
+      "tab_id": "w37:t1",
+      "terminal_id": "term_660b893b08f9910",
+      "terminal_title": "π - qflistudio",
+      "terminal_title_stripped": "π - qflistudio",
+      "workspace_id": "w37"
+    }
+  ]
+}

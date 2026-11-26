@@ -1,7 +1,0 @@
-# Development-only override. Production pulls the published image.
-# Usage: docker compose -f docker-compose.yaml -f docker-compose.build.yaml up -d --build
-services:
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile

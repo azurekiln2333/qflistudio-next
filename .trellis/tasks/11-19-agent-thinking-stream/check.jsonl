@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/frontend/ai-protocols.md", "reason": "Verify no protocol branching in VibeCodingController and per-protocol stream tests exist"}
+{"file": ".trellis/spec/backend/ai-terminal-pool.md", "reason": "Verify relay limits, cancellation reaching upstream, strict request whitelist"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Server lint and test expectations"}
+{"file": ".trellis/spec/backend/logging-guidelines.md", "reason": "Check audit detail carries counts only"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Flutter analyze/test expectations"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Sealed event types and JSON round-trip of new message fields"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Bubble tap targets, text scale and theming"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "End-to-end contract consistency between server NDJSON and client events"}

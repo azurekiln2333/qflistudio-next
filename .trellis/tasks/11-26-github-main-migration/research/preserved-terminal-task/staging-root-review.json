@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "root_relative": ".trellis/tasks/11-21-github-repo-clone/reports/staging/",
+  "files": [
+    {
+      "source_relative_path": ".trellis/tasks/11-21-github-repo-clone/reports/staging/analyze_app_index.py",
+      "bytes": 3228,
+      "sha256": "b1e1f3fdc7bf6f686f9fa5b7974c6d7dbfcb95750be320624eadc60cd646a100",
+      "disposition": "metadata-only; content not copied",
+      "contains_local_path": true,
+      "contains_raw_runtime_or_command_logic": true
+    },
+    {
+      "source_relative_path": ".trellis/tasks/11-21-github-repo-clone/reports/staging/analyze_index.py",
+      "bytes": 2363,
+      "sha256": "c88abda1fc3be794bee21bd2ff760cb5eb803210c0759011e380345a007efeb5",
+      "disposition": "metadata-only; content not copied",
+      "contains_local_path": true,
+      "contains_raw_runtime_or_command_logic": true
+    },
+    {
+      "source_relative_path": ".trellis/tasks/11-21-github-repo-clone/reports/staging/final-verification.json",
+      "bytes": 3215,
+      "sha256": "1c1c553265e4e4863fb3f069b41b3137853e74fcd640ed28f60be2c242fe407e",
+      "disposition": "metadata-only; content not copied",
+      "contains_local_path": true,
+      "contains_raw_runtime_or_command_logic": false
+    },
+    {
+      "source_relative_path": ".trellis/tasks/11-21-github-repo-clone/reports/staging/stage_requirement.py",
+      "bytes": 3921,
+      "sha256": "5391cffa18dc62a7bb54c86a4682cbeee734d76ea04c00a19af51c2e3e01246a",
+      "disposition": "metadata-only; content not copied",
+      "contains_local_path": true,
+      "contains_raw_runtime_or_command_logic": true
+    },
+    {
+      "source_relative_path": ".trellis/tasks/11-21-github-repo-clone/reports/staging/verify_final.py",
+      "bytes": 2365,
+      "sha256": "00d45bf828d5fd300cf256af3123dadd79c6564a15efdbae209e8ec851f640a9",
+      "disposition": "metadata-only; content not copied",
+      "contains_local_path": false,
+      "contains_raw_runtime_or_command_logic": true
+    }
+  ],
+  "policy": "Five staging-root files reviewed by metadata. No staging content copied."
+}

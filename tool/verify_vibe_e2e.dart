@@ -3,7 +3,9 @@
 // 只做三件事：准备环境变量、调度驱动、把报告读成表格。
 // 脚本本身不构造 HTTP 请求，也不保存任何凭据。
 //
-// 用法（在 qflistudio 目录）：
+// 仅供 GitHub Actions 云端任务运行。
+// 本机禁止执行，包括 --report、--dry-run 和 --no-pub。
+// 用法（云端应用检出目录，标准克隆名 qflistudio-next）：
 //   dart run tool/verify_vibe_e2e.dart                      # 全场景
 //   dart run tool/verify_vibe_e2e.dart --scenario web_search
 //   dart run tool/verify_vibe_e2e.dart --env-file <路径>     # 仅在本次子进程生效
@@ -18,8 +20,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-/// 驱动脚本相对本仓库的位置。
-const String _driverRelative = '../qfli_studio_core/tool/vibe_e2e.dart';
+/// Driver path inside the canonical sibling core checkout.
+const String _driverRelative = '../qflistudio-core/tool/vibe_e2e.dart';
 
 /// 首次运行前必须导出的三个变量名，不含值。
 const List<String> _requiredVariables = [
@@ -42,7 +44,7 @@ Future<void> main(List<String> args) async {
   }
 
   final repoRoot = _repositoryRoot();
-  final coreRoot = p.normalize(p.join(repoRoot, '..', 'qfli_studio_core'));
+  final coreRoot = p.normalize(p.join(repoRoot, '..', 'qflistudio-core'));
   final driver = File(p.normalize(p.join(repoRoot, _driverRelative)));
 
   final checks = _environmentChecks(
@@ -112,12 +114,12 @@ Future<void> main(List<String> args) async {
   if (code != 0) exitCode = code;
 }
 
-/// 提示一处限制：实时宿主一次性跑完三个场景，单独跑一个场景请直接用
-/// `flutter test --no-pub --plain-name`。
+/// 实时宿主一次跑完三个场景。
+/// 云端单场景使用 `flutter test --no-pub --plain-name`。
 String scenarioHint(String? scenario) => scenario == null
     ? ''
-    : '\n提示：--scenario 在实时宿主下忽略；单独跑场景请用\n'
-          '  (cd ../qfli_studio_core && flutter test --no-pub --plain-name "<场景>")\n';
+    : '\n提示：实时宿主忽略 --scenario。云端单场景请用\n'
+          '  (cd ../qflistudio-core && flutter test --no-pub --plain-name "<场景>")\n';
 
 class _Check {
   const _Check(this.name, this.ok, this.detail);
@@ -385,10 +387,11 @@ class _Options {
 }
 
 const String _usage =
+    '仅供 GitHub Actions 云端任务运行。本机禁止执行。\n'
     'dart run tool/verify_vibe_e2e.dart [选项]\n\n'
     '  --env-file <路径>   从文件读取 QFLI_DEBUG_*，只作用于本次子进程\n'
     '  --report <路径>     只读已有报告，不跑驱动\n'
     '  --dry-run           只检查环境\n\n'
-    '实时场景在 qfli_studio_core 里用 flutter test 宿主运行：\n'
+    '实时场景由云端 ../qflistudio-core 中的 flutter test 宿主运行：\n'
     '  flutter test --no-pub test/vibe_live_e2e_test.dart\n\n'
     '凭据永不打印。缺少变量时全部场景跳过，退出码 0。';

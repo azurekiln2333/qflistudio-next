@@ -1,0 +1,31 @@
+{
+  "id": "mobile-files-agents",
+  "name": "mobile-files-agents",
+  "title": "移动端文件互通与 Agents 首页",
+  "description": "手机接收分享文件、打开外部文件夹、电脑改动回到手机、首页 Agents 标签",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P1",
+  "creator": "lichengyu",
+  "assignee": "lichengyu",
+  "createdAt": "2026-11-23",
+  "completedAt": null,
+  "branch": "main",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": "055dd223e4641419cc8e603405a134508508094c",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "11-23-share-target",
+    "11-23-external-folders",
+    "11-23-home-agents-tab",
+    "11-23-device-sync"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "v5.0.11 已发布。App main 与 Core main CI 均通过。Core 提交 d3d899571382121d3b5d69dd36b60222e5fa0b37。证据见 reports/takeover-integration.md。真机验收待执行，暂不归档。",
+  "meta": {}
+}

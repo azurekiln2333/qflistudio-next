@@ -1,0 +1,111 @@
+{
+  "tag": "v5.0.5-git.6",
+  "run": 44851658777,
+  "release_id": 453366073,
+  "release_url": "https://github.com/azurekiln2333/qflistudio-next/releases/tag/v5.0.5-git.6",
+  "published_at": "2026-11-21T01:52:53Z",
+  "app_commit": "07d8082abaf9d1aabd3f91058ff1430d2097f0c4",
+  "core_commit": "123602be34ab6fa9725bb93f0d3bc27a630c7b44",
+  "tag_resolves_to_app": true,
+  "workflow_core_pin_verified": true,
+  "java_pin_preserved": true,
+  "release_body_pins_verified": true,
+  "asset_count": 13,
+  "zip_count": 12,
+  "manifest_api_digest_verified": true,
+  "all_zip_api_digests_match_manifest": true,
+  "verification_scope": "Release API, exact tagged workflow and published checksum manifest. No installer execution or device validation.",
+  "assets": [
+    {
+      "id": 774066081,
+      "name": "qfli-remote-assistant-5.0.5-windows-x64.zip",
+      "size": 183766121,
+      "digest": "sha256:c29f85c2f52d9928ce9b19b1feb4581bd66f876c8d6485f16bc0c9889d3e7a7e",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qfli-remote-assistant-5.0.5-windows-x64.zip"
+    },
+    {
+      "id": 774066093,
+      "name": "qflistudio-5.0.5-android-arm64-v8a.zip",
+      "size": 16620476,
+      "digest": "sha256:6b4479b1efd62077d795a8f645833287fd98c5793e623bfc08527eb93af203b5",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-android-arm64-v8a.zip"
+    },
+    {
+      "id": 774066086,
+      "name": "qflistudio-5.0.5-android-armeabi-v7a.zip",
+      "size": 16509452,
+      "digest": "sha256:19f1318561ad93b9d492a8d7418c5714308cdea02db074fbe99168a5bcbf3e3d",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-android-armeabi-v7a.zip"
+    },
+    {
+      "id": 774066085,
+      "name": "qflistudio-5.0.5-android-x86_64.zip",
+      "size": 16916631,
+      "digest": "sha256:a4df26ac2f8eb9ce9dc0b750985d7b3ec2a9d1f68673789883a8325e49d3b3c4",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-android-x86_64.zip"
+    },
+    {
+      "id": 774066104,
+      "name": "qflistudio-5.0.5-ios-arm64.zip",
+      "size": 17126972,
+      "digest": "sha256:e6014ba172208e9e8e707a475c78bebdf1075c47e86ce14e8112cb6961b80bb5",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-ios-arm64.zip"
+    },
+    {
+      "id": 774066122,
+      "name": "qflistudio-5.0.5-linux-arm64.zip",
+      "size": 30285921,
+      "digest": "sha256:5a226c1cef7612ae5045b483e32b780a1f4373b45edba6ea9415b9f279fbeffb",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-linux-arm64.zip"
+    },
+    {
+      "id": 774066135,
+      "name": "qflistudio-5.0.5-linux-x64.zip",
+      "size": 31001072,
+      "digest": "sha256:15f1a01f18eb71ac0c73187ebcd6f4afb09c5c231554137d057483423ce6402b",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-linux-x64.zip"
+    },
+    {
+      "id": 774066151,
+      "name": "qflistudio-5.0.5-macos-arm64.zip",
+      "size": 20450862,
+      "digest": "sha256:1ae5ac2c35c8333af9d5b679ababeb8e7ee3d7d24626a38aa552d1ee5d2f4574",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-macos-arm64.zip"
+    },
+    {
+      "id": 774066155,
+      "name": "qflistudio-5.0.5-macos-x86_64.zip",
+      "size": 21589563,
+      "digest": "sha256:d80d7b9ba1c1a24081abeb898b791aec325644ef0dbee6b2201ab2034e34281c",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-macos-x86_64.zip"
+    },
+    {
+      "id": 774066189,
+      "name": "qflistudio-5.0.5-ohos-arm64.zip",
+      "size": 18944508,
+      "digest": "sha256:c4c9a008a06553c1a77624313cd5c31a5906f1d322f9a6dcc30418fbf1f6d0ed",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-ohos-arm64.zip"
+    },
+    {
+      "id": 774066198,
+      "name": "qflistudio-5.0.5-windows-arm64.zip",
+      "size": 33265424,
+      "digest": "sha256:10fae04a69e66a406a430ca3a85b883109d431b4d147831efd99860c0c8dff83",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-windows-arm64.zip"
+    },
+    {
+      "id": 774066213,
+      "name": "qflistudio-5.0.5-windows-x64.zip",
+      "size": 34605821,
+      "digest": "sha256:e3381dab915c6785a948f80022d735d0261df79b495b8de9fa68d71cdb74135e",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/qflistudio-5.0.5-windows-x64.zip"
+    },
+    {
+      "id": 774066084,
+      "name": "SHA256SUMS",
+      "size": 1238,
+      "digest": "sha256:7b59ead7faf74d6f506ea8917da8d109d5ce07e08164495581e8f50dff836825",
+      "browser_download_url": "https://github.com/azurekiln2333/qflistudio-next/releases/download/v5.0.5-git.6/SHA256SUMS"
+    }
+  ]
+}

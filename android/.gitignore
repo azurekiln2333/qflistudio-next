@@ -1,8 +1,7 @@
-gradle-wrapper.jar
+# The Gradle wrapper is committed so a clean clone and CI can build without a
+# preinstalled Gradle. See implement.md W-D step 4.
 /.gradle
 /captures/
-/gradlew
-/gradlew.bat
 /local.properties
 GeneratedPluginRegistrant.java
 .cxx/

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized progress summary",
+  "source_relative_path": "home-named-workspace-dependency-20261024/isolated-apply-check.json",
+  "policy": "Raw commands, paths, process data, logs and transcript fields omitted."
+}

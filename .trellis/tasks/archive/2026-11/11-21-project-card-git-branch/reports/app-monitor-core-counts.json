@@ -1,0 +1,155 @@
+{
+  "visible_success": 2415,
+  "visible_skipped": 26,
+  "errors": [
+    {
+      "name": "keyboard button hides the input method without editing code",
+      "error": "Test failed. See exception logs above.\nThe test description was: keyboard button hides the input method without editing code"
+    },
+    {
+      "name": "keyboard button stays at the right while symbols scroll",
+      "error": "Test failed. See exception logs above.\nThe test description was: keyboard button stays at the right while symbols scroll"
+    }
+  ],
+  "focused": [
+    {
+      "test": "loading /home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": true
+    },
+    {
+      "test": "(setUpAll)",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": true
+    },
+    {
+      "test": "repository card displays its branch and full tooltip",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "revision reloads HEAD without replacing the project",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "resuming reloads a branch changed outside the App",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "minimizing the retained editor refreshes Home branch cards",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "ordinary and cloud project cards hide local branch metadata",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "reused card clears the branch when its project path changes",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "cloud conversion hides the branch on the same project object",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "long branch fits a narrow card at text scale 1.0",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "long branch fits a narrow card at text scale 2.0",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "(tearDownAll)",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/project_card_git_test.dart",
+      "result": "success",
+      "hidden": true
+    },
+    {
+      "test": "loading /home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": true
+    },
+    {
+      "test": "reads the branch from the project root HEAD with CRLF",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "keeps a full unborn branch name without reading a ref",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "resolves a relative gitdir against the project directory",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "supports an absolute gitdir path containing spaces",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "labels a detached 40-digit hexadecimal HEAD",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "labels a detached 64-digit hexadecimal HEAD",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "does not discover a repository in a parent directory",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "returns null for missing or malformed HEAD metadata",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    },
+    {
+      "test": "returns null for a broken gitdir file",
+      "suite": "/home/runner/work/qflistudio-next/qflistudio-next/qfli_studio_core/test/git_branch_label_test.dart",
+      "result": "success",
+      "hidden": false
+    }
+  ],
+  "finished": [
+    {
+      "success": false,
+      "type": "done",
+      "time": 279211
+    }
+  ]
+}

@@ -1,6 +1,16 @@
 # 语言专属 App 与鸿蒙上的本地编译
 
-> 本文中的 `apps/`、`packages/` 和 pub workspace 路径来自拆分前布局。当前 C App 位于主仓库的并列目录 `../qfli_c`，共享内核位于 `../qfli_studio_core`；检出与构建命令见 [README](../README.md#仓库结构)。
+> 本文保留拆分前的 `apps/`、`packages/` 和 pub workspace 路径。
+> 当前主应用和共享内核分别克隆到 `qflistudio-next/` 与 `qflistudio-core/`。
+> C/C++ 源码维护在独立的 `qflistudio-cpp` GitHub 仓库。
+> 语言仓库按需克隆。本文的构建和验证命令只作历史记录。
+
+新电脑先按 [README](../README.md#github-仓库与新电脑克隆) 克隆主应用和共享内核。
+以上名称是克隆目标，不代表本机已有目录。
+构建、测试、分析、代码生成和依赖解析只在 GitHub Actions 执行。
+本机不要执行本文命令，包括 `--no-pub` 变体。
+请关闭 IDE 自动构建、自动测试、依赖安装和 Sync。
+下文的状态与用例数是历史快照，不代表本次验证结果。
 
 记录「一个语言做一个 App」这个方向在 HarmonyOS 上到底能做到哪一步，以及 C 版是怎么落地的。
 
@@ -59,7 +69,8 @@ C 版实现了两个这样的后端：
 
 默认走 Dart 解释器，因为它在所有平台都能跑、能被 CI 覆盖，而且教学规模的程序
 （几十到几千行）速度完全够用。picoc 作为「想要更快」时的可选升级路径保留，
-接线方式见 [`apps/qfli_c/native/README.md`](../apps/qfli_c/native/README.md)。
+旧接线说明位于历史路径 `apps/qfli_c/native/README.md`。
+当前实现请查阅独立 `azurekiln2333/qflistudio-cpp` 仓库。
 
 ### Dart 解释器覆盖了什么
 
@@ -122,13 +133,14 @@ C 版实现了两个这样的后端：
 | `qfli_cpp` | 和 C 共用 clang | 建议和 C 合成一个「C/C++」包 |
 | `qfli_python` | 应用内 Dart 解释器 | 已建 App，解释器待写 |
 
-## 工程结构
+## 历史工程结构
 
-仓库用 **Dart pub workspace** 组织：一次 `pub get` 解析全部子包，共用一份 `pubspec.lock`。
+以下目录只记录早期拆分布局，不代表当前磁盘目录。
+当时使用 Dart pub workspace，共用一份 `pubspec.lock`。
 
-```
+```text
 pubspec.yaml                 根：workspace 声明 + 唯一的 dependency_overrides
-packages/qfli_studio_core/   共享 IDE 内核（编辑器、文件树、主题、项目管理、教程加载）
+packages/qfli_studio_core/    共享 IDE 内核（编辑器、文件树、主题、项目管理、教程加载）
 packages/qfli_c_runtime/     C 解释器（预处理/词法/语法/执行 + 标准库）
 apps/qfli_c/                 C 版 App（薄壳 + C 档位 + 平台工程）
 apps/qfli_web/               Web 版（不需要解释器，走内核的本地静态服务器）
@@ -157,10 +169,14 @@ StudioProfile.current = const StudioProfile(
 首页语言筛选芯片只剩 C、运行按钮走应用内解释器。加一门语言 = 加一个 App 目录，
 内核一行不用改。
 
-## 构建
+## 历史构建记录
+
+以下命令仅保留旧布局下的操作记录。
+当前验证只在 GitHub Actions 执行。
+`--no-pub` 不授权本地验证。
 
 ```bash
-# 依赖（workspace 一次解析全部子包）
+# 历史依赖解析（workspace 一次解析全部子包）
 flutter pub get
 
 # 全量静态检查
@@ -180,7 +196,10 @@ flutter analyze
 # 鸿蒙（命令行，见下）
 ```
 
-## 在 DevEco 里构建
+## 历史记录：在 DevEco 里构建
+
+以下内容保留旧故障、解决方法和验证结果。
+不要在当前工作区执行 DevEco Sync、构建或签名。
 
 **Open 的目录是 `apps/qfli_c/ohos`，不是 `apps/qfli_c`。** DevEco 认的是 ohos 这一层
 （`hvigorfile.ts` / `build-profile.json5` 在这里）。选错了会提示"不是 HarmonyOS 工程"。
@@ -299,7 +318,11 @@ export PATH="$TEMP/ohpm-shim:$NODE_HOME:$PATH"
 debug 走 JIT，产物是 `rawfile/flutter_assets/kernel_blob.bin`。
 
 
-## 当前验证到哪一步
+## 历史验证进度
+
+本表保留原记录，不代表本次迁移已验证。
+当前提交仍需云端验证。
+真机验收需要独立授权。
 
 | 项 | 状态 |
 | --- | --- |
@@ -317,7 +340,7 @@ debug 走 JIT，产物是 `rawfile/flutter_assets/kernel_blob.bin`。
 里有 `kernel_blob.bin`，说明 hvigor 插件的 `flutter assemble` + 拷贝链路是通的。
 debug 构建没有 `libapp.so` 属正常（只有 profile/release 才拷）。
 
-## 已知限制与下一步
+## 已知限制与下一步（历史快照）
 
 1. **交互式 stdin 不支持。** 解释器是「先跑完再输出」的模型，`scanf` / `getchar`
    拿到的是一次性输入。当前约定：项目根目录放 `input.txt`，内容即标准输入。
