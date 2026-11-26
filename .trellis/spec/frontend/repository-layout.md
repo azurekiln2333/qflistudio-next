@@ -24,6 +24,11 @@ All package resolution, package-version checks, generation, formatting, analysis
 
 Cloud logs must record both repository SHAs, app package/version, core package/version, the selected `CORE_REF`, and the lockfile's core path/version. Verify that the resolved package configuration points to that core checkout. A path dependency's lock entry does not contain the core Git SHA; record the checkout SHA separately. Fail cloud verification on a mismatch.
 
+The canonical-import check must inspect quoted Dart `import` and `export`
+directives. Do not treat prose containing `package:` as an import or allow a
+package-name match to span whitespace and comments. Cloud run `45897093931`
+exposed this false positive in the pinned core's runtime catalog documentation.
+
 ## 3. Contracts
 
 - `qflistudio-next` owns the main app and its app-local tools.
