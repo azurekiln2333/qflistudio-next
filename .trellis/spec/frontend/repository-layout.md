@@ -29,6 +29,13 @@ directives. Do not treat prose containing `package:` as an import or allow a
 package-name match to span whitespace and comments. Cloud run `45897093931`
 exposed this false positive in the pinned core's runtime catalog documentation.
 
+Core `476a30a` has a legacy self-path in `interop_arkts_contract_test.dart`.
+The cloud Core verification job temporarily creates a `qfli_studio_core` symlink
+to the canonical `qflistudio-core` checkout for that fixture lookup. This leaves
+the pinned source, package identity and all assertions intact. It does not prove
+that unmodified Core tests support the canonical layout without this adaptation.
+Remove the alias after adopting the owner's verified portability fix.
+
 ## 3. Contracts
 
 - `qflistudio-next` owns the main app and its app-local tools.

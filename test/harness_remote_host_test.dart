@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qfli_studio_core/harness/harness_host.dart';
@@ -735,9 +737,10 @@ void main() {
       expect(handle.transcript, isNull);
 
       final chunks = <String>[];
-      final subscription = handle.terminal!.output.listen(
-        (data) => chunks.add(String.fromCharCodes(data)),
-      );
+      final subscription = handle.terminal!.output
+          .cast<List<int>>()
+          .transform(utf8.decoder)
+          .listen(chunks.add);
       // Push after subscribing: the terminal is a view, not a buffer.
       herdrPort.paneTexts['w37:p14'] = 'π > ready\n';
       herdrPort.notifyListeners();
