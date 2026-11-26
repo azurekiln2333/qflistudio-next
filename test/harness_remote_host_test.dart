@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -179,6 +180,7 @@ class FakeRemoteHerdrPort extends ChangeNotifier implements RemoteHerdrPort {
   final List<herdr.HerdrAgent> agentList = <herdr.HerdrAgent>[];
   final Map<String, String> paneTexts = <String, String>{};
   final List<String> calls = <String>[];
+  final Completer<void> firstKeysSent = Completer<void>();
 
   @override
   List<herdr.HerdrAgent> get agents =>
@@ -210,6 +212,7 @@ class FakeRemoteHerdrPort extends ChangeNotifier implements RemoteHerdrPort {
     List<String> keys,
   ) async {
     calls.add('sendKeys:$paneId:${keys.join(',')}');
+    if (!firstKeysSent.isCompleted) firstKeysSent.complete();
     return const herdr.HerdrActionReport(action: 'ok', summary: '');
   }
 
@@ -751,7 +754,7 @@ void main() {
       expect(chunks.join(), contains('π > ready'));
 
       handle.terminal!.write(Uint8List.fromList(<int>[0x1b, 0x5b, 0x41]));
-      await Future<void>.delayed(const Duration(milliseconds: 10));
+      await herdrPort.firstKeysSent.future.timeout(const Duration(seconds: 2));
       expect(herdrPort.calls, contains('sendKeys:w37:p14:up'));
 
       await expectLater(
