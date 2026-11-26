@@ -177,7 +177,7 @@ payloads, or installer provenance. The App consumes the plugin through Core.
 
 ### Contracts
 
-The plugin lock uses schema 2 and API 2. All three platform source commits must
+The pinned plugin lock uses schema 2 and API 3. All three platform source commits must
 match its full `source.commit`. Import all three native artifacts in one command.
 Core pins the artifact commit, and the App workflow pins the resulting Core
 commit. A source commit with old checked-in binaries is an interim pin only.

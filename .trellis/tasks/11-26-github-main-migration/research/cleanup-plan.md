@@ -1,8 +1,21 @@
 # Non-executing project cleanup plan
 
-## Status and authority
+## Current status preamble — cleanup remains on HOLD
 
-**HOLD — source/target parity is still pending. No cleanup is authorized.**
+This bounded update records the lead-provided migration status. It does not rerun verification. The older inventory, exact paths and provenance below remain historical evidence; statements that all gates were open describe plan preparation, not the current publication state.
+
+- Reviewed source and portable Trellis progress were published through `3ffde9d495f129ed8362e23d739178b69b1ceb09` and later fixes.
+- At `76e1f80`, source/target comparison verified exact raw-byte equality for **1,700 tracked files**. **129 preservation files** passed the reported byte/hash checks. These results apply to that recorded revision and scope, not automatically to later commits, ignored/private files or guest data.
+- Candidate `da74782075d4bb31f92546c18031c340df1adb21` passed App installers run `45908020703`: 18 successful jobs and one tag-only publication skip. The target was fast-forwarded to this commit. The final evidence-only commit still requires a fresh pull, byte comparison and Herdr handover acknowledgement; the lead owns those steps. See `migration-handover.md` and `cloud-acceptance.md` for the later acceptance record.
+- Guest-data status for all three registered source-owned VHDs is **UNKNOWN — RETAIN**. The tracked-file and preservation checks do not inspect or preserve guest-only contents.
+- Retain private recovery storage, including `D:/MyNewProjects/_migration-backup/qflistudio-20261126/publication-hold/`, the linked worktrees, the old source root and its shared `D:/MyNewProjects/qflistudio/.git`. The earlier inventory recorded 34 worktrees including the primary; their shared metadata dependency is not resolved by target parity.
+- **No cleanup has been performed. No cleanup is authorized.** Keep every exact candidate and provenance record below. Any later cleanup still needs owner classification, verified recovery and separate exact-path approval.
+
+Only this document is updated. No task status, other file or target checkout is changed by this assignment. No Git mutation command, build, test, dependency operation or WSL operation is performed.
+
+## Historical status and authority at plan preparation
+
+**HOLD at preparation — source/target parity was then pending. No cleanup was authorized.**
 
 - Task: `.trellis/tasks/11-26-github-main-migration`.
 - Plan prepared on 2026-11-26 by Herdr pane `w65:p5` for lead `w65:p1`.
@@ -13,11 +26,11 @@
 - No staging, commits, synchronization, worktree removal, WSL startup, mounting, export, unregister, registry edits or target edits were performed by this auditor.
 - All builds, tests, analyzers, lint and dependency operations remain cloud-only. Cleanup must not trigger dependency restoration, IDE Sync or a local validation run.
 
-## Evidence and limits
+## Historical evidence and limits
 
-The 19:46 UTC+08:00 source snapshot was `c11a5a78573220495c5b575cac43bc25b932e230`, tree `619c1c0f8c90da88ff644b0d798496fc9d7c710b`. This is a local preservation commit, not proof of publication, cloud success or target equality. A subsequent scoped status read found 77 deleted, 2 modified and 10 untracked paths. The source is not a completed clean migration.
+The 19:46 UTC+08:00 source snapshot was `c11a5a78573220495c5b575cac43bc25b932e230`, tree `619c1c0f8c90da88ff644b0d798496fc9d7c710b`. This is a local preservation commit, not proof of publication, cloud success or target equality. A subsequent scoped status read found 77 deleted, 2 modified and 10 untracked paths. At that snapshot, the source was not a completed clean migration. See the current preamble for later publication and bounded parity results.
 
-Git metadata currently lists 34 source-repository worktrees including the primary checkout. Their common Git directory is **`D:/MyNewProjects/qflistudio/.git`**. Deleting the old primary checkout would therefore destroy shared repository metadata used by its linked worktrees.
+The historical Git metadata inventory listed 34 source-repository worktrees including the primary checkout. Their common Git directory is **`D:/MyNewProjects/qflistudio/.git`**. Deleting the old primary checkout would therefore destroy shared repository metadata used by its linked worktrees.
 
 References:
 
@@ -27,7 +40,9 @@ References:
 
 No guest filesystem contents, credentials, global cache contents or unrelated disks were inspected for this plan. Directory/file metadata and source Git metadata only were refreshed. Do not infer that an ignored path, a clean worktree or an ancestral branch contains no unique untracked/guest-only data.
 
-## Gate sequence — all gates remain open
+## Gate sequence — final closure remains pending
+
+The current preamble records publication and bounded verification progress. The original gate requirements below remain applicable; they are not a claim that no gate work has occurred. Earlier parity evidence does not close latest-revision cloud acceptance, final pull/handover, guest-data recovery or exact-path cleanup approval.
 
 ### G1. Finish publication and source/target comparison
 
@@ -78,7 +93,7 @@ Keep `.idea/` and `pubspec_overrides.yaml` until the owner has preserved any req
 
 ## B. Staging, reports and historical backups
 
-Review only the following six exact staging children after G1–G3. They were previously identified as generated-copy candidates; this plan does not certify their unique-content equivalence:
+The following six exact staging children are historical review paths, not a blanket generated-copy or deletion list. `__pycache__/`, `_app_index_validation/` and `_index_validation/` were generated-output review candidates. The `b/`, `c/` and `d/` directories are frozen historical B/C/D snapshots, mapped to requirement commits by the original task's `reports/commit-ledger.md`. Preserve that distinction when reviewing them after G1–G3:
 
 - `D:/MyNewProjects/qflistudio/.trellis/tasks/11-21-github-repo-clone/reports/staging/__pycache__/`
 - `D:/MyNewProjects/qflistudio/.trellis/tasks/11-21-github-repo-clone/reports/staging/_app_index_validation/`
@@ -87,7 +102,9 @@ Review only the following six exact staging children after G1–G3. They were pr
 - `D:/MyNewProjects/qflistudio/.trellis/tasks/11-21-github-repo-clone/reports/staging/c/`
 - `D:/MyNewProjects/qflistudio/.trellis/tasks/11-21-github-repo-clone/reports/staging/d/`
 
-Do not remove the parent staging directory. **`reports/staging/final-verification.json` is tracked** and remains preservation evidence. Keep reviewed briefs, dispatch/support source, recovery summaries, native manifests/licenses, layout JSON, task records and journals. Ignoring screenshots or raw transcripts does not prove they have no private recovery/evidentiary value.
+Six recovered helper scripts are preserved as original source bytes under `research/preserved-staging-tools/`, with their manifest and README. They are source, not generated bundles, and are not the six directories listed above. The four root helper scripts and final verification summary remain in the original task. Private staging originals remain retained. Helper recovery does not establish that every B/C/D snapshot or other staging file is disposable.
+
+Do not remove the parent staging directory or wholesale-delete B/C/D snapshots. **`reports/staging/final-verification.json` is tracked** and remains preservation evidence. Keep reviewed briefs, dispatch/support source, recovery summaries, native manifests/licenses, layout JSON, task records and journals. Ignoring screenshots or raw transcripts does not prove they have no private recovery/evidentiary value.
 
 Retain these exact old-source directories pending recovery and unique-content review:
 
@@ -216,4 +233,4 @@ For each row, future approval requires a fresh status/name inventory including i
 
 ## Lead handoff
 
-Current decision: **retain everything; finish migration/parity and guest/worktree preservation first**. Lead owns final cloud acceptance, restored metadata staging, synchronization, target handover and any future exact-path cleanup approval. This file is planning evidence only and must not be presented as cleanup completion or authorization.
+Current decision: **retain all cleanup candidates, private hold, worktrees, shared `.git` and all three guest-data-UNKNOWN VHDs**. Publication and the `76e1f80` tracked-byte/preservation checks are recorded in the current preamble. Latest-candidate cloud acceptance, final target pull/parity and handover remain pending. Lead owns those steps and any future exact-path cleanup approval. **No cleanup has been performed.** This file is planning evidence only and must not be presented as cleanup completion or authorization.

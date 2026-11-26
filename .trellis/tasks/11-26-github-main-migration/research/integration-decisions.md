@@ -70,10 +70,13 @@ SDK/pub/Gradle/CocoaPods/OHOS tool caches are cloud-only. They are dependency ca
 not a claim that a new reusable native producer release has been completed.
 Current plugin payload provenance and ABI checks remain mandatory.
 
-## Remaining acceptance
+## Acceptance update
 
-At this record's creation, the candidate has not yet passed its own cloud run.
-Do not inherit the historical tag run's green status. Follow the published commit's
-GitHub Actions results. Target pull, commit/tree/content comparison and Herdr
-handover acknowledgement are required before closeout. Cleanup remains gated by
-`cleanup-plan.md`; no WSL distribution has been started, unregistered or deleted.
+Code commit `da74782075d4bb31f92546c18031c340df1adb21` passed its own cloud run
+`45908020703`: 18 successful jobs, no failed jobs, and one tag-only publication
+skip. See `cloud-acceptance.md/json` for exact tests, artifacts and adaptations.
+The target has pulled this code revision. The final bookkeeping commit still
+requires exact-SHA cloud dispatch, final target pull/content comparison and
+Herdr acknowledgement. Follow `migration-handover.md` for the receiver's work.
+Cleanup remains gated by `cleanup-plan.md`; no WSL distribution has been started,
+unregistered or deleted.

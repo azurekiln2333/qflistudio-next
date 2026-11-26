@@ -21,6 +21,6 @@
   "children": [],
   "parent": null,
   "relatedFiles": [],
-  "notes": "",
+  "notes": "Reviewed source/Trellis published; code da74782075d4bb31f92546c18031c340df1adb21 passed run45908020703 (18 success, publication skipped). Final documentation commit cloud dispatch, final target parity and Herdr acknowledgement belong to source lead; receiving Codex owns closeout after acknowledgement. WSL/private backups/worktrees retained. Core final migration and native immutable release remain separately owned.",
   "meta": {}
 }
