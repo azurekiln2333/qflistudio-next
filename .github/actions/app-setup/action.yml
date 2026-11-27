@@ -21,7 +21,7 @@ inputs:
   core-ref:
     description: qflistudio-core commit, tag or branch.
     required: false
-    default: main
+    default: 1ae4674a4b153701b0c3b3ff04b1a1b77a318611
   desktop-platforms:
     description: Comma separated desktop platforms to enable, for example windows,macos.
     required: false
@@ -176,11 +176,24 @@ runs:
           echo "QFLI_CORE_COMMIT=$(git -C ../qflistudio-core rev-parse HEAD)"
         } >> "$GITHUB_ENV"
 
-    - name: Patch shared core for upstream Flutter
-      if: inputs.patch-upstream-core == 'true'
+    - name: Prepare shared core for the pinned Flutter SDK
+      if: inputs.patch-upstream-core == 'true' || inputs.flutter-mode == 'ohos'
       shell: bash
       working-directory: qflistudio
-      run: bash tool/ci/patch_upstream_core.sh "$PWD" ../qflistudio-core
+      env:
+        FLUTTER_MODE: ${{ inputs.flutter-mode }}
+        SDK_ROOT: ${{ runner.temp }}/flutter
+        SDK_REVISION: ${{ inputs.flutter-commit }}
+      run: |
+        set -euo pipefail
+        case "$FLUTTER_MODE" in
+          upstream) flavor=official ;;
+          ohos) flavor=ohos ;;
+          *) echo "::error::Unsupported Flutter mode: $FLUTTER_MODE"; exit 1 ;;
+        esac
+        python3 -B ../qflistudio-core/tool/ci/prepare_flutter_core.py \
+          --flavor "$flavor" --sdk-root "$SDK_ROOT" \
+          --sdk-revision "$SDK_REVISION" --app-root .
 
     - name: Resolve Dart packages
       shell: bash

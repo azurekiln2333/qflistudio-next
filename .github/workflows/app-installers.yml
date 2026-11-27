@@ -82,7 +82,7 @@ env:
   # the version inside its BUILD_INFO.txt agree. The other jobs read pubspec.yaml.
   APP_VERSION: "5.0.14"
   FLUTTER_VERSION: "3.50.0"
-  CORE_REF: "476a30acee21dc486ee2849dd8064a7be665e4d5"
+  CORE_REF: "1ae4674a4b153701b0c3b3ff04b1a1b77a318611"
   # The complete core suite reads the Java receiver's committed ArkTS contract.
   JAVA_REF: "60d97c783f29da767fafe503980812101f6aa61f"
   # qfli_git C ABI version and Dart binding version. Package jobs reject a
@@ -195,7 +195,7 @@ jobs:
 
       # The full suites exercise TargetPlatform.ohos and real Huawei view types.
       # Keep the core source intact and use the same pinned SDK as the HAP job.
-      # Its legacy fixture lookup needs the explicit cloud-only alias below.
+      # Retain the historical fixture alias; overrides need the preparation API.
       - name: Set up OHOS Flutter and shared core
         uses: ./qflistudio/.github/actions/app-setup
         with:
@@ -207,19 +207,19 @@ jobs:
           patch-upstream-core: "false"
           ohos-platform-tooling: "false"
 
-      - name: Expose the pinned Core test's legacy fixture path
+      - name: Retain the historical Core fixture alias
         if: matrix.package == 'core'
         working-directory: ${{ github.workspace }}
         run: |
           set -euo pipefail
-          # Core 476a30a reads its own source through this old folder name.
-          # Keep its exact source and all assertions; remove after owner fixes it.
+          # The default Core resolves its own package root. The retained alias
+          # changes no source or assertion; it is not an older-pin guarantee.
           test -f qflistudio-core/lib/interop/interop_transport.dart
           test ! -e qfli_studio_core
           test ! -L qfli_studio_core
           ln -s qflistudio-core qfli_studio_core
           test "$(readlink -f qfli_studio_core)" = "$(readlink -f qflistudio-core)"
-          echo 'Core tests use a temporary qfli_studio_core -> qflistudio-core fixture alias; no source or assertion is changed.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Historical alias qfli_studio_core -> qflistudio-core is retained; overrides must provide the Core preparation API.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Resolve all Dart packages read by the analyzer
         id: dependencies

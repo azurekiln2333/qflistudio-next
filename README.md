@@ -21,7 +21,7 @@ mkdir qflistudio-workspace
 cd qflistudio-workspace
 git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-next.git qflistudio-next
 git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-core.git qflistudio-core
-git -C qflistudio-core checkout --detach 476a30acee21dc486ee2849dd8064a7be665e4d5
+git -C qflistudio-core checkout --detach 1ae4674a4b153701b0c3b3ff04b1a1b77a318611
 ```
 
 上例固定到本次核对的工作流 `CORE_REF`。

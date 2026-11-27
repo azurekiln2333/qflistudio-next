@@ -13,7 +13,7 @@ New machines clone the two required GitHub repositories explicitly:
 ```bash
 git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-next.git qflistudio-next
 git clone --branch main --single-branch https://github.com/azurekiln2333/qflistudio-core.git qflistudio-core
-git -C qflistudio-core checkout --detach 476a30acee21dc486ee2849dd8064a7be665e4d5
+git -C qflistudio-core checkout --detach 1ae4674a4b153701b0c3b3ff04b1a1b77a318611
 ```
 
 The final command uses the `CORE_REF` found in the reviewed workflow snapshot. For another app revision, use that revision's reviewed full `CORE_REF`. Record any authorized `workflow_dispatch.core_ref` override and its resolved full SHA. Do not infer that the core `main` head is the compatible version.
@@ -29,12 +29,12 @@ directives. Do not treat prose containing `package:` as an import or allow a
 package-name match to span whitespace and comments. Cloud run `45897093931`
 exposed this false positive in the pinned core's runtime catalog documentation.
 
-Core `476a30a` has a legacy self-path in `interop_arkts_contract_test.dart`.
-The cloud Core verification job temporarily creates a `qfli_studio_core` symlink
-to the canonical `qflistudio-core` checkout for that fixture lookup. This leaves
-the pinned source, package identity and all assertions intact. It does not prove
-that unmodified Core tests support the canonical layout without this adaptation.
-Remove the alias after adopting the owner's verified portability fix.
+Core `1ae4674` resolves its own package root for `interop_arkts_contract_test.dart`.
+The cloud Core verification job retains the historical `qfli_studio_core`
+symlink to the canonical `qflistudio-core` checkout. The alias leaves source,
+package identity and assertions intact. Overrides must provide the Core
+preparation script; the alias alone does not support older pins. This workflow
+does not certify execution without the compatibility alias.
 
 ## 3. Contracts
 
@@ -79,6 +79,13 @@ Correct: clone `qflistudio-next/` and `qflistudio-core/`, preserve the package i
 The installer workflow deliberately checks out the app as `qflistudio/` and the core as sibling `qflistudio-core/` inside the cloud runner. `qflistudio/` is a CI checkout alias, not the canonical new-machine directory `qflistudio-next/` and not evidence of an existing local folder. Both app names resolve `../qflistudio-core` to the same sibling. Keep workflow working directories and composite-action paths consistent with this alias.
 
 Windows, Linux, macOS, iOS and Android consume one upstream stable version resolved at the start of the run. OHOS uses the pinned OHOS Flutter fork and its own cache. Keep these SDKs separate.
+
+The shared setup invokes the pinned Core's `tool/ci/prepare_flutter_core.py`
+after SDK installation and before package resolution. Pass the exact SDK root,
+full framework revision and app root. Map upstream Flutter to `--flavor official`
+and the OHOS fork to `--flavor ohos`. The Core-owned script verifies the SDK and
+source before replacing the Huawei view on official runners. OHOS mode preserves
+the native view bytes. This preparation runs only on GitHub-hosted runners.
 
 External JavaScript actions use only SHA-pinned Node 24 actions:
 
