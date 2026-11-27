@@ -20,6 +20,28 @@ Managed by Trellis. Edits outside this block are preserved; edits inside may be 
 
 <!-- TRELLIS:END -->
 
+# QFLI product workspace rules
+
+These rules apply to every agent and every repository under this directory.
+The user requires all builds and tests to run on GitHub-hosted runners.
+
+- Do not run local builds, tests, benchmarks, emulators, or native compilation.
+- Do not run dependency installation, SDK installation, or dependency restore.
+- Do not download build artifacts, installers, SDKs, or build caches to this workspace.
+- Do not run Flutter, Dart, Gradle, CMake, Ninja, Xcode, Hvigor, or package-manager commands that generate output.
+- Read and edit source locally. Inspect Git metadata and text without creating build or test outputs.
+- Run validation through the repository's GitHub Actions workflows. Read results through GitHub API or log output.
+- Keep artifacts on GitHub. Record immutable source revisions, run IDs, job conclusions, checksums, and signing limitations in Trellis.
+- Keep durable Trellis tasks, specs, research, journals, and project instructions in version control. Keep local runtime/session state and secrets ignored.
+- Use GitHub as the sole remote for migrated clones. Check both fetch and push URLs.
+- Preserve another agent's work. Coordinate repository ownership and handoff through Herdr.
+- Do not delete shared WSL distributions or old source workspaces without the owning coordinators' preservation decision.
+- Folder names follow GitHub repository names. Shared core is `qflistudio-core`; its Dart package name remains `qfli_studio_core`.
+
+Each repository must also commit these restrictions in its own AGENTS.md or project policy so fresh clones on another PC retain the rules. This parent file is a convenience copy, not a substitute for versioned repository policy.
+
+Initial coordinated writer: SQL coordinator, Herdr w62:p1, 2026-11-26.
+
 ## Cloud-only execution policy
 
 The user approved this rule on 2026-11-26 for every agent and human workflow.
