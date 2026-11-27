@@ -21,7 +21,7 @@ inputs:
   core-ref:
     description: qflistudio-core commit, tag or branch.
     required: false
-    default: 1ae4674a4b153701b0c3b3ff04b1a1b77a318611
+    default: 8e031313ffc8d531c5a6b4d131f721f35da04c86
   desktop-platforms:
     description: Comma separated desktop platforms to enable, for example windows,macos.
     required: false
